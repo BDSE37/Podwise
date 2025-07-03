@@ -1,0 +1,56 @@
+# Frontend 服務持久化儲存配置
+# 用於儲存靜態檔案、快取和使用者上傳檔案
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frontend-static-pvc
+  namespace: podwise
+  labels:
+    app: frontend
+    component: static
+  annotations:
+    description: "Frontend 靜態檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi  # 靜態檔案
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frontend-cache-pvc
+  namespace: podwise
+  labels:
+    app: frontend
+    component: cache
+  annotations:
+    description: "Frontend 快取檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi  # 快取檔案
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frontend-uploads-pvc
+  namespace: podwise
+  labels:
+    app: frontend
+    component: uploads
+  annotations:
+    description: "Frontend 使用者上傳檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi  # 使用者上傳檔案
+  storageClassName: nfs-client 

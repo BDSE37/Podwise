@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "8"
+    meta.helm.sh/release-name: my-n8n
+    meta.helm.sh/release-namespace: podwise
+  creationTimestamp: "2025-06-16T08:27:41Z"
+  generation: 9
+  labels:
+    app.kubernetes.io/instance: my-n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/version: 1.85.1
+    helm.sh/chart: n8n-1.0.7
+  name: my-n8n
+  namespace: podwise
+  resourceVersion: "1655881"
+  uid: a9d0e559-a423-46f5-8667-8da3f8373634
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: my-n8n
+      app.kubernetes.io/name: n8n
+      app.kubernetes.io/type: master
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/config: a92358389c517d46059e83d6f43041576a2585bcbaecac2502b91141e3513cdb
+        kubectl.kubernetes.io/restartedAt: "2025-06-21T15:54:53+08:00"
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: my-n8n
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/type: master
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker4
+      containers:
+      - env:
+        - name: N8N_SECURE_COOKIE
+          value: "false"
+        - name: N8N_BASIC_AUTH_ACTIVE
+          value: "true"
+        - name: N8N_BASIC_AUTH_USER
+          value: bdse37
+        - name: N8N_BASIC_AUTH_PASSWORD
+          value: BDSE37podwise
+        - name: WEBHOOK_URL
+          value: "http://n8n.192.168.32.126.nip.io/"
+
+        image: n8nio/n8n:1.85.1
+        imagePullPolicy: IfNotPresent
+        lifecycle: {}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: n8n
+        ports:
+        - containerPort: 5678
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /home/node/.n8n
+          name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      serviceAccount: my-n8n
+      serviceAccountName: my-n8n
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: data
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-06-16T08:27:41Z"
+    lastUpdateTime: "2025-06-23T08:36:18Z"
+    message: ReplicaSet "my-n8n-69d6dbccc4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2025-06-24T00:44:28Z"
+    lastUpdateTime: "2025-06-24T00:44:28Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 9
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

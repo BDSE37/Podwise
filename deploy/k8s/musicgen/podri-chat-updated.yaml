@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podri-chat-service
+  namespace: podwise
+  labels:
+    app: podri-chat-service
+    version: v2.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podri-chat-service
+  template:
+    metadata:
+      labels:
+        app: podri-chat-service
+        version: v2.0.0
+    spec:
+      containers:
+      - name: podri-chat
+        image: localhost:5000/podri-chat-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8501
+          name: http
+        env:
+        - name: RAG_URL
+          value: "http://rag-pipeline-service:8004"
+        - name: ML_URL
+          value: "http://ml-pipeline-service:8004"
+        - name: TTS_URL
+          value: "http://tts-service:8501"
+        - name: STT_URL
+          value: "http://stt-service:8501"
+        - name: MUSICGEN_URL
+          value: "http://musicgen-service:8005"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys-secret
+              key: openai-api-key
+              optional: true
+        - name: GOOGLE_SEARCH_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys-secret
+              key: google-search-api-key
+              optional: true
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys-secret
+              key: gemini-api-key
+              optional: true
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-keys-secret
+              key: anthropic-api-key
+              optional: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: chat-data
+          mountPath: /app/data
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: chat-data
+        persistentVolumeClaim:
+          claimName: chat-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podri-chat-service
+  namespace: podwise
+  labels:
+    app: podri-chat-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8501
+    targetPort: 8501
+    protocol: TCP
+    name: http
+  selector:
+    app: podri-chat-service
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-data-pvc
+  namespace: podwise
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-keys-secret
+  namespace: podwise
+type: Opaque
+data:
+  # 這些值需要 base64 編碼
+  openai-api-key: ""  # echo -n "your-openai-key" | base64
+  google-search-api-key: ""  # echo -n "your-google-key" | base64
+  gemini-api-key: ""  # echo -n "your-gemini-key" | base64
+  anthropic-api-key: ""  # echo -n "your-anthropic-key" | base64 

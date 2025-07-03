@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-pipeline-service
+  namespace: podwise
+  labels:
+    app: ml-pipeline-service
+    component: ml-pipeline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-pipeline-service
+  template:
+    metadata:
+      labels:
+        app: ml-pipeline-service
+        component: ml-pipeline
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker3  # 指定節點
+      containers:
+      - name: ml-pipeline-service
+        image: 192.168.32.38:5000/podwise-ml-pipeline:latest
+        ports:
+        - containerPort: 8004
+          name: ml-api
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"  # 使用 GPU 0
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        volumeMounts:
+        - name: ml-data
+          mountPath: /app/data
+        - name: ml-models
+          mountPath: /app/models
+        - name: ml-cache
+          mountPath: /app/cache
+        workingDir: /app
+        command: ["python3"]
+        args: ["app.py"]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: ml-data
+        persistentVolumeClaim:
+          claimName: ml-data-pvc
+      - name: ml-models
+        persistentVolumeClaim:
+          claimName: ml-models-pvc
+      - name: ml-cache
+        persistentVolumeClaim:
+          claimName: ml-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-pipeline-service
+  namespace: podwise
+  labels:
+    app: ml-pipeline-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8004
+    targetPort: 8004
+    nodePort: 30810
+    name: ml-api
+  selector:
+    app: ml-pipeline-service 

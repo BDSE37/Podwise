@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: milvus-standalone
+  namespace: podwise
+  labels:
+    app: milvus-standalone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: milvus-standalone
+  template:
+    metadata:
+      labels:
+        app: milvus-standalone
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker3
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: milvus-standalone
+          image: milvusdb/milvus:v2.3.3
+          command:
+            - milvus
+            - run
+            - standalone
+          ports:
+            - containerPort: 19530
+              name: milvus
+            - containerPort: 9091
+              name: metrics
+          env:
+            - name: ETCD_USE_EMBED
+              value: "true"
+            - name: ETCD_DATA_DIR
+              value: "/var/lib/milvus/etcd"
+            - name: ETCD_CONFIG_PATH
+              value: "/milvus/configs/etcd.yaml"
+            - name: MINIO_ADDRESS
+              value: "localhost:9000"
+            - name: MINIO_ACCESS_KEY
+              value: "minioadmin"
+            - name: MINIO_SECRET_KEY
+              value: "minioadmin"
+            - name: COMMON_STORAGETYPE
+              value: "local"
+            - name: COMMON_STORAGEPATH
+              value: "/var/lib/milvus"
+          volumeMounts:
+            - name: milvus-data
+              mountPath: /var/lib/milvus
+            - name: milvus-config
+              mountPath: /milvus/configs
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9091
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: milvus-data
+          persistentVolumeClaim:
+            claimName: milvus-data-pvc
+        - name: milvus-config
+          configMap:
+            name: milvus-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus-service
+  namespace: podwise
+  labels:
+    app: milvus-standalone
+spec:
+  type: ClusterIP
+  ports:
+  - port: 19530
+    targetPort: 19530
+    protocol: TCP
+    name: milvus
+  - port: 9091
+    targetPort: 9091
+    protocol: TCP
+    name: metrics
+  selector:
+    app: milvus-standalone
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: milvus-config
+  namespace: podwise
+data:
+  etcd.yaml: |
+    log:
+      level: info
+      file:
+        maxSize: 300MB
+        maxAge: 5
+        maxBackups: 10
+    data-dir: /var/lib/milvus/etcd
+    auto-compaction-mode: revision
+    auto-compaction-retention: "1000"
+    quota-backend-bytes: 4294967296
+    max-request-bytes: 1048576
+    grpc-keepalive-min-time: 5s
+    grpc-keepalive-interval: 2h
+    grpc-keepalive-timeout: 20s
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: milvus-data-pvc
+  namespace: podwise
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: nfs-client 

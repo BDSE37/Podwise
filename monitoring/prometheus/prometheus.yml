@@ -1,0 +1,115 @@
+# Prometheus 監控配置
+# 用於監控層級化樹狀結構 RAG 系統的各項指標
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus 本身
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # PostgreSQL 監控
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # MongoDB 監控
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb:27017']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Milvus 監控
+  - job_name: 'milvus'
+    static_configs:
+      - targets: ['milvus:9091']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # MinIO 監控
+  - job_name: 'minio'
+    static_configs:
+      - targets: ['minio:9000']
+    metrics_path: '/minio/v2/metrics/cluster'
+    scrape_interval: 30s
+
+  # Ollama 監控
+  - job_name: 'ollama'
+    static_configs:
+      - targets: ['ollama:11434']
+    metrics_path: '/api/tags'
+    scrape_interval: 30s
+
+  # 應用服務監控
+  - job_name: 'llm_service'
+    static_configs:
+      - targets: ['llm:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'stt_service'
+    static_configs:
+      - targets: ['stt:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'tts_service'
+    static_configs:
+      - targets: ['tts:8002']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'ml_pipeline'
+    static_configs:
+      - targets: ['ml_pipeline:8003']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'rag_pipeline'
+    static_configs:
+      - targets: ['rag_pipeline:8004']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['frontend:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Langfuse 監控
+  - job_name: 'langfuse'
+    static_configs:
+      - targets: ['langfuse:3000']
+    metrics_path: '/api/health'
+    scrape_interval: 30s
+
+# 遠程寫入配置 (可選)
+remote_write:
+  - url: "http://remote-storage:9201/write"
+    remote_timeout: 30s
+    write_relabel_configs:
+      - source_labels: [service]
+        regex: "rag.*"
+        action: keep
+
+# 遠程讀取配置 (可選)
+remote_read:
+  - url: "http://remote-storage:9201/read"
+    read_timeout: 30s 

@@ -1,0 +1,16 @@
+architecture: standalone       # 或改 cluster
+auth:
+  enabled: false               # 初期關閉，可之後加密
+persistence:
+  enabled: true
+  storageClass: nfs-client
+  size: 5Gi
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+nodeSelector:
+  node-role: control-center    # 綁到 worker5；若用 worker4 改這行

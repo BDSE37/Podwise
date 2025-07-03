@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: podwise-postgres-pvc-pvc-bf12702a-9716-412c-bb80-5387720e61fa
+spec:
+  capacity:
+    storage: 600Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /srv/nfs/podwise-postgres-pvc-pvc-bf12702a-9716-412c-bb80-5387720e61fa
+    server: 192.168.32.81

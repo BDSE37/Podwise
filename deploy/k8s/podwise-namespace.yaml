@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podwise
+  labels:
+    name: podwise
+    app: podwise-system
+---
+# Podwise 系統配置 ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: podwise-config
+  namespace: podwise
+data:
+  # 資料庫連線配置 (使用實際的服務名稱)
+  POSTGRES_HOST: "postgres"  # 實際服務名稱
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "podwise"
+  POSTGRES_USER: "bdse37"
+  POSTGRES_PASSWORD: "111111"
+  
+  # MongoDB 配置 (使用實際的服務名稱)
+  MONGODB_HOST: "my-mongodb"  # 實際服務名稱
+  MONGODB_PORT: "27017"
+  MONGODB_DB: "podcast"
+  MONGODB_USER: "bdse37"
+  MONGODB_PASSWORD: "111111"
+  
+  # Milvus 向量資料庫配置 (在另一台機器 192.168.32.86 上運行)
+  MILVUS_HOST: "192.168.32.86"  # Milvus 機器 IP
+  MILVUS_PORT: "19530"
+  MILVUS_COLLECTION: "podwise_vectors"
+  
+  # MinIO 物件儲存配置 (使用實際的服務名稱)
+  MINIO_HOST: "minio"  # 實際服務名稱
+  MINIO_PORT: "9000"
+  MINIO_ACCESS_KEY: "bdse37"
+  MINIO_SECRET_KEY: "11111111"
+  MINIO_BUCKET: "mp3-1321-top-10"
+  
+  # Ollama LLM 配置
+  OLLAMA_HOST: "ollama-service"
+  OLLAMA_PORT: "11434"
+  
+  # 服務間通訊配置
+  RAG_PIPELINE_HOST: "rag-pipeline-service"
+  RAG_PIPELINE_PORT: "8004"
+  ML_PIPELINE_HOST: "ml-pipeline-service"
+  ML_PIPELINE_PORT: "8004"
+  TTS_HOST: "tts-service"
+  TTS_PORT: "8003"
+  STT_HOST: "stt-service"
+  STT_PORT: "8001"
+  
+  # Langfuse 追蹤配置
+  LANGFUSE_HOST: "langfuse-service"
+  LANGFUSE_PORT: "3000"
+  LANGFUSE_PUBLIC_KEY: "pk-demo"
+  LANGFUSE_SECRET_KEY: "sk-demo"
+  LANGFUSE_PROJECT: "podwise-rag"
+  
+  # 環境配置
+  ENVIRONMENT: "production"
+  DEBUG: "false" 

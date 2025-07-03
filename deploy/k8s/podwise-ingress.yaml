@@ -1,0 +1,118 @@
+# Podwise Ingress 配置
+# 暴露前端和 API 服務到外部
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: podwise-ingress
+  namespace: podwise
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: podwise.local
+    http:
+      paths:
+      # 前端聊天介面
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: podri-chat-updated-service
+            port:
+              number: 8501
+      
+      # RAG API
+      - path: /api/rag
+        pathType: Prefix
+        backend:
+          service:
+            name: rag-pipeline-service
+            port:
+              number: 8004
+      
+      # ML API
+      - path: /api/ml
+        pathType: Prefix
+        backend:
+          service:
+            name: ml-pipeline-service
+            port:
+              number: 8004
+      
+      # TTS API
+      - path: /api/tts
+        pathType: Prefix
+        backend:
+          service:
+            name: tts-service
+            port:
+              number: 8501
+      
+      # STT API
+      - path: /api/stt
+        pathType: Prefix
+        backend:
+          service:
+            name: stt-service
+            port:
+              number: 8001
+      
+      # TTS WebUI
+      - path: /tts-webui
+        pathType: Prefix
+        backend:
+          service:
+            name: tts-service
+            port:
+              number: 7860
+      
+      # Langfuse Dashboard
+      - path: /langfuse
+        pathType: Prefix
+        backend:
+          service:
+            name: langfuse-server
+            port:
+              number: 3000
+---
+# 如果使用 LoadBalancer 類型的服務
+apiVersion: v1
+kind: Service
+metadata:
+  name: podwise-loadbalancer
+  namespace: podwise
+spec:
+  type: LoadBalancer
+  ports:
+  - name: frontend
+    port: 80
+    targetPort: 8501
+    protocol: TCP
+  - name: rag-api
+    port: 8004
+    targetPort: 8004
+    protocol: TCP
+  - name: tts-api
+    port: 8003
+    targetPort: 8003
+    protocol: TCP
+  - name: stt-api
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  - name: tts-webui
+    port: 7860
+    targetPort: 7860
+    protocol: TCP
+  - name: langfuse
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: podri-chat  # 主要選擇器，其他服務通過 Ingress 路由 

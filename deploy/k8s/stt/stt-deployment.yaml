@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stt-service
+  namespace: podwise
+  labels:
+    app: stt-service
+    component: stt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stt-service
+  template:
+    metadata:
+      labels:
+        app: stt-service
+        component: stt
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker1  # 指定節點
+      containers:
+      - name: stt-service
+        image: 192.168.32.38:5000/stt-service:latest
+        ports:
+        - containerPort: 8001
+          name: stt-api
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"  # 使用 GPU 0
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        volumeMounts:
+        - name: stt-models
+          mountPath: /app/models
+        - name: stt-cache
+          mountPath: /app/cache
+        - name: stt-output
+          mountPath: /app/output
+        workingDir: /app
+        command: ["python3"]
+        args: ["streamlit_app.py"]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: stt-models
+        persistentVolumeClaim:
+          claimName: stt-models-pvc
+      - name: stt-cache
+        persistentVolumeClaim:
+          claimName: stt-cache-pvc
+      - name: stt-output
+        persistentVolumeClaim:
+          claimName: stt-output-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stt-service
+  namespace: podwise
+  labels:
+    app: stt-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8001
+    targetPort: 8001
+    nodePort: 30804
+    name: stt-api
+  selector:
+    app: stt-service 

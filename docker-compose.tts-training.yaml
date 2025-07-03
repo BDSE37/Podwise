@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # TTS 訓練專用服務
+  tts_training:
+    build:
+      context: ./backend/tts
+      dockerfile: Dockerfile
+    container_name: podwise_tts_training
+    ports:
+      - "7860:7860" # GPT-SoVITS WebUI (推理)
+      - "7861:7861" # GPT-SoVITS WebUI (訓練)
+      - "8002:8002" # Streamlit 管理介面
+      - "8003:8003" # TTS API 服務
+      - "9880:9880" # GPT-SoVITS API
+    environment:
+      - DEBUG=true
+      - DEFAULT_VOICE=podri
+      - GRADIO_SERVER_PORT=7860
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - STREAMLIT_SERVER_PORT=8002
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - API_SERVER_PORT=8003
+      - WEBUI_TRAINING_PORT=7861
+    volumes:
+      - ./backend/tts/GPT-SoVITS:/app/GPT-SoVITS
+      - ./backend/tts/models:/app/models
+      - ./backend/tts/training_data:/app/training_data
+      - ./backend/tts/raw:/app/raw
+      - ./backend/tts/logs:/app/logs
+      - ./backend/tts/output:/app/output
+      - ./backend/tts/cache:/app/cache
+      - ./backend/tts/pretrained_models:/app/pretrained_models
+    command: >
+      bash -c "
+        echo '🚀 啟動 TTS 訓練環境...' &&
+        cd /app/GPT-SoVITS &&
+        echo '📊 啟動 GPT-SoVITS WebUI (推理)...' &&
+        python webui.py --port 7860 --host 0.0.0.0 &
+        echo '🎓 啟動 GPT-SoVITS WebUI (訓練)...' &&
+        python webui.py --port 7861 --host 0.0.0.0 &
+        echo '🔧 啟動 TTS API 服務...' &&
+        cd /app && python api.py &
+        echo '📊 啟動 Streamlit 管理介面...' &&
+        python -m streamlit run app/streamlit_app.py --server.port 8002 --server.address 0.0.0.0 &
+        echo '⏳ 等待服務啟動...' &&
+        sleep 10 &&
+        echo '📊 TTS 訓練環境狀態：' &&
+        echo '   - 推理 WebUI: http://localhost:7860' &&
+        echo '   - 訓練 WebUI: http://localhost:7861' &&
+        echo '   - 管理介面: http://localhost:8002' &&
+        echo '   - API 服務: http://localhost:8003' &&
+        echo '   - GPT-SoVITS API: http://localhost:9880' &&
+        echo '✅ TTS 訓練環境啟動完成！' &&
+        tail -f /dev/null
+      "
+    networks:
+      - tts_training
+    restart: unless-stopped
+
+  # 可選：PostgreSQL 資料庫（用於儲存訓練記錄）
+  postgres_training:
+    image: postgres:15
+    container_name: podwise_postgres_training
+    environment:
+      POSTGRES_DB: tts_training
+      POSTGRES_USER: tts_user
+      POSTGRES_PASSWORD: tts_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_training_data:/var/lib/postgresql/data
+    networks:
+      - tts_training
+    restart: unless-stopped
+
+networks:
+  tts_training:
+    driver: bridge
+
+volumes:
+  postgres_training_data:

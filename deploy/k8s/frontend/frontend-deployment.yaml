@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-service
+  namespace: podwise
+  labels:
+    app: frontend-service
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-service
+  template:
+    metadata:
+      labels:
+        app: frontend-service
+        component: frontend
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker5  # 指定節點
+      containers:
+      - name: frontend-service
+        image: 192.168.32.38:5000/frontend-service:latest
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: NGINX_HOST
+          value: "localhost"
+        - name: NGINX_PORT
+          value: "80"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        volumeMounts:
+        - name: frontend-static
+          mountPath: /usr/share/nginx/html
+        - name: frontend-config
+          mountPath: /etc/nginx/conf.d
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: frontend-static
+        persistentVolumeClaim:
+          claimName: frontend-static-pvc
+      - name: frontend-config
+        persistentVolumeClaim:
+          claimName: frontend-config-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: podwise
+  labels:
+    app: frontend-service
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+    name: http
+  - port: 443
+    targetPort: 443
+    nodePort: 30443
+    name: https
+  selector:
+    app: frontend-service 

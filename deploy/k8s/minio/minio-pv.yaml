@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: podwise-minio-pvc-pvc-56673b89-05bf-48b9-a026-fe53833fbee6
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /srv/nfs/podwise-minio-pvc-pvc-56673b89-05bf-48b9-a026-fe53833fbee6
+    server: 192.168.32.81

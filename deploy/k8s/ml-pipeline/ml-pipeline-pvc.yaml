@@ -1,0 +1,74 @@
+# ML Pipeline 服務持久化儲存配置
+# 用於儲存機器學習模型、訓練資料和實驗結果
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-models-pvc
+  namespace: podwise
+  labels:
+    app: ml-pipeline
+    component: models
+  annotations:
+    description: "ML Pipeline 機器學習模型檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi  # 機器學習模型檔案
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-data-pvc
+  namespace: podwise
+  labels:
+    app: ml-pipeline
+    component: data
+  annotations:
+    description: "ML Pipeline 訓練資料持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi  # 訓練和測試資料
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-experiments-pvc
+  namespace: podwise
+  labels:
+    app: ml-pipeline
+    component: experiments
+  annotations:
+    description: "ML Pipeline 實驗結果持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi  # 實驗結果和日誌
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ml-cache-pvc
+  namespace: podwise
+  labels:
+    app: ml-pipeline
+    component: cache
+  annotations:
+    description: "ML Pipeline 快取檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi  # 快取檔案
+  storageClassName: nfs-client 

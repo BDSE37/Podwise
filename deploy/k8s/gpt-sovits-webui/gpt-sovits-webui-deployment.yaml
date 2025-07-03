@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpt-sovits-webui
+  namespace: podwise
+  labels:
+    app: gpt-sovits-webui
+    component: tts-training
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpt-sovits-webui
+  template:
+    metadata:
+      labels:
+        app: gpt-sovits-webui
+        component: tts-training
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker1  # 指定節點
+      containers:
+      - name: gpt-sovits-webui
+        image: 192.168.32.38:5000/gpt-sovits-webui:latest
+        ports:
+        - containerPort: 7860
+          name: webui
+        - containerPort: 9874
+          name: main
+        - containerPort: 9873
+          name: uvr5
+        - containerPort: 9872
+          name: infer-tts
+        - containerPort: 9871
+          name: subfix
+        env:
+        - name: version
+          value: "v2Pro"
+        - name: language
+          value: "zh"
+        - name: PYTHONPATH
+          value: "/app/GPT-SoVITS"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"  # 使用 GPU 0
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: gpt-sovits-data
+          mountPath: /app/GPT-SoVITS
+        - name: gpt-sovits-models
+          mountPath: /app/GPT-SoVITS/pretrained_models
+        - name: gpt-sovits-weights
+          mountPath: /app/GPT-SoVITS/SoVITS_weights_v2Pro
+        - name: gpt-sovits-gpt-weights
+          mountPath: /app/GPT-SoVITS/GPT_weights_v2Pro
+        - name: gpt-sovits-logs
+          mountPath: /app/GPT-SoVITS/logs
+        - name: gpt-sovits-output
+          mountPath: /app/GPT-SoVITS/output
+        - name: gpt-sovits-temp
+          mountPath: /app/GPT-SoVITS/TEMP
+        workingDir: /app/GPT-SoVITS
+        command: ["python"]
+        args: ["webui.py", "zh", "--server-name", "0.0.0.0", "--server-port", "7860", "--listen"]
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 7860
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 7860
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: gpt-sovits-data
+        persistentVolumeClaim:
+          claimName: gpt-sovits-data-pvc
+      - name: gpt-sovits-models
+        persistentVolumeClaim:
+          claimName: gpt-sovits-models-pvc
+      - name: gpt-sovits-weights
+        persistentVolumeClaim:
+          claimName: gpt-sovits-weights-pvc
+      - name: gpt-sovits-gpt-weights
+        persistentVolumeClaim:
+          claimName: gpt-sovits-gpt-weights-pvc
+      - name: gpt-sovits-logs
+        persistentVolumeClaim:
+          claimName: gpt-sovits-logs-pvc
+      - name: gpt-sovits-output
+        persistentVolumeClaim:
+          claimName: gpt-sovits-output-pvc
+      - name: gpt-sovits-temp
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpt-sovits-webui-service
+  namespace: podwise
+  labels:
+    app: gpt-sovits-webui
+spec:
+  type: NodePort
+  ports:
+  - port: 7860
+    targetPort: 7860
+    nodePort: 30786
+    name: webui
+  - port: 9874
+    targetPort: 9874
+    nodePort: 30974
+    name: main
+  - port: 9873
+    targetPort: 9873
+    nodePort: 30973
+    name: uvr5
+  - port: 9872
+    targetPort: 9872
+    nodePort: 30972
+    name: infer-tts
+  - port: 9871
+    targetPort: 9871
+    nodePort: 30971
+    name: subfix
+  selector:
+    app: gpt-sovits-webui 

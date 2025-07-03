@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-service
+  namespace: podwise
+  labels:
+    app: llm-service
+    component: llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-service
+  template:
+    metadata:
+      labels:
+        app: llm-service
+        component: llm
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker2  # 指定節點
+      containers:
+      - name: llm-service
+        image: 192.168.32.38:5000/podwise-llm:latest
+        ports:
+        - containerPort: 8003
+          name: llm-api
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"  # 使用 GPU 0
+        - name: OLLAMA_HOST
+          value: "192.168.32.38"
+        - name: OLLAMA_PORT
+          value: "11434"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        volumeMounts:
+        - name: llm-models
+          mountPath: /app/models
+        - name: llm-cache
+          mountPath: /app/cache
+        workingDir: /app
+        command: ["python3"]
+        args: ["main.py"]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8003
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: llm-models
+        persistentVolumeClaim:
+          claimName: llm-models-pvc
+      - name: llm-cache
+        persistentVolumeClaim:
+          claimName: llm-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-service
+  namespace: podwise
+  labels:
+    app: llm-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8003
+    targetPort: 8003
+    name: llm-api
+  selector:
+    app: llm-service 

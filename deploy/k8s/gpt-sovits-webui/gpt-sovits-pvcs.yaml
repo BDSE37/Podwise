@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-data-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS 主要數據存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-models-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS 預訓練模型存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-weights-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS SoVITS 權重存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-gpt-weights-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS GPT 權重存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-logs-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS 日誌存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-output-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS 輸出文件存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gpt-sovits-raw-pvc
+  namespace: podwise
+  annotations:
+    description: "GPT-SoVITS 原始音訊資料存儲"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi 

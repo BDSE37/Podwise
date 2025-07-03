@@ -1,0 +1,56 @@
+# LLM 服務持久化儲存配置
+# 用於儲存語言模型檔案和快取
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llm-models-pvc
+  namespace: podwise
+  labels:
+    app: llm
+    component: models
+  annotations:
+    description: "LLM 語言模型檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi  # LLM 模型檔案較大
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llm-cache-pvc
+  namespace: podwise
+  labels:
+    app: llm
+    component: cache
+  annotations:
+    description: "LLM 模型快取持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi  # 模型快取
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llm-logs-pvc
+  namespace: podwise
+  labels:
+    app: llm
+    component: logs
+  annotations:
+    description: "LLM 服務日誌持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi  # 服務日誌
+  storageClassName: nfs-client 

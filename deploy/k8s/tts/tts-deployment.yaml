@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+  namespace: podwise
+  labels:
+    app: tts-service
+    component: tts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+        component: tts
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker1  # 指定節點
+      containers:
+      - name: tts-service
+        image: 192.168.32.38:5000/tts-service:latest
+        ports:
+        - containerPort: 8501
+          name: tts-api
+        - containerPort: 7860
+          name: webui
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"  # 使用 GPU 0
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        volumeMounts:
+        - name: tts-models
+          mountPath: /app/models
+        - name: tts-cache
+          mountPath: /app/cache
+        - name: tts-output
+          mountPath: /app/output
+        workingDir: /app
+        command: ["python3"]
+        args: ["main.py"]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8501
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8501
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: tts-models
+        persistentVolumeClaim:
+          claimName: tts-models-pvc
+      - name: tts-cache
+        persistentVolumeClaim:
+          claimName: tts-cache-pvc
+      - name: tts-output
+        persistentVolumeClaim:
+          claimName: tts-output-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-service
+  namespace: podwise
+  labels:
+    app: tts-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8501
+    targetPort: 8501
+    nodePort: 30852
+    name: tts-api
+  - port: 7860
+    targetPort: 7860
+    nodePort: 30786
+    name: webui
+  selector:
+    app: tts-service 

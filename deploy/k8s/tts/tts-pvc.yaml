@@ -1,0 +1,56 @@
+# TTS 服務持久化儲存配置
+# 用於儲存 GPT-SoVITS 模型檔案和訓練資料
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tts-models-pvc
+  namespace: podwise
+  labels:
+    app: tts
+    component: models
+  annotations:
+    description: "TTS 模型檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi  # TTS 模型檔案較大
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tts-cache-pvc
+  namespace: podwise
+  labels:
+    app: tts
+    component: cache
+  annotations:
+    description: "TTS 音訊快取持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi  # 音訊快取
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tts-output-pvc
+  namespace: podwise
+  labels:
+    app: tts
+    component: output
+  annotations:
+    description: "TTS 輸出音訊檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi  # 生成的音訊檔案
+  storageClassName: nfs-client 

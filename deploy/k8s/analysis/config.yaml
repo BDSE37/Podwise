@@ -1,0 +1,53 @@
+# 數據相關配置
+data:
+  bucket_name: essbd-magiccube-analysis  # MinIO 存儲桶名稱
+  object_name: ess_event_data_labled.csv  # MinIO 中的數據文件名稱
+  target_column: Final_Category_Numeric  # 目標標籤的列名，用於模型訓練或驗證
+
+# MinIO 連接配置
+minio:
+  access_key: 7ElicvSOGoSI781fnf0w  # MinIO 訪問密鑰
+  endpoint_url: http://aip.deltaos.corp:30900  # MinIO 伺服器的 URL
+  secret_key: YwDlweHvlnhT3ZslebLKYzDreKDpROdA71mtZuoK  # MinIO 秘密密鑰
+
+# MLflow 配置
+mlflow:
+  enabled: true  # 啟用或禁用 MLflow 的紀錄功能
+  experiment_name: ESSBD_MagicCube_root_cause_analysis  # MLflow 實驗名稱
+  tracking_uri: http://10.136.219.171:30025  # MLflow 追蹤伺服器的 URL
+
+# 模型相關配置
+model:
+  name: kmeans # 使用的模型名稱，支持 'kmeans', 'dbscan', 'hdbscan'
+  params:  # 模型參數
+    min_cluster_size: 40  # 最小群大小（適用於 HDBSCAN）
+    min_samples: 20  # 最小樣本數量（適用於 HDBSCAN 和 DBSCAN）
+    n_clusters: 4  # 聚類數量（適用於 KMeans）
+    random_state: 42  # 隨機種子，確保結果穩定（適用於 KMeans）
+
+# 輸出配置
+output:
+  path: ./pipeline_output  # 儲存模型和輸出的路徑
+
+# 特徵工程相關配置
+transformer:
+  dynamic_column_prefixes:  # 定義需要自動檢索的欄位前綴
+    - VOLTAGE_  # 所有以 VOLTAGE_ 開頭的欄位
+    - TEMPERATURE_  # 所有以 TEMPERATURE_ 開頭的欄位
+  selected_cols:  # 靜態選擇的欄位，這些欄位將被模型使用
+    - BUS_VOLTAGE
+    - VOLTAGE
+    - CURRENT
+    - POWER
+    - ABSOLUTE_SOC
+    - SOC
+    - SOH
+    - CYCLE_COUNT
+    - CHARGE_SUGGESTED_POWER
+    - DISCHARGE_SUGGESTED_POWER
+  categorical:
+    imputer: most_frequent  # 對分類特徵使用的填補策略（most_frequent 表示使用最頻繁值）
+  numeric:
+    imputer: median  # 對數值特徵的填補策略（median 表示中位數填補）
+  pca:
+    n_components: 3  # 主成分分析（PCA）的維度數量

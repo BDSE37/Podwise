@@ -1,0 +1,74 @@
+# RAG Pipeline 服務持久化儲存配置
+# 用於儲存向量資料、索引和文檔
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rag-vectors-pvc
+  namespace: podwise
+  labels:
+    app: rag-pipeline
+    component: vectors
+  annotations:
+    description: "RAG Pipeline 向量資料持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi  # 向量資料庫檔案
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rag-documents-pvc
+  namespace: podwise
+  labels:
+    app: rag-pipeline
+    component: documents
+  annotations:
+    description: "RAG Pipeline 文檔資料持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi  # 文檔資料
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rag-indexes-pvc
+  namespace: podwise
+  labels:
+    app: rag-pipeline
+    component: indexes
+  annotations:
+    description: "RAG Pipeline 索引檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi  # 索引檔案
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rag-cache-pvc
+  namespace: podwise
+  labels:
+    app: rag-pipeline
+    component: cache
+  annotations:
+    description: "RAG Pipeline 快取檔案持久化儲存"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi  # 快取檔案
+  storageClassName: nfs-client 

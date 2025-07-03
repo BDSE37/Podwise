@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podri-chat-service
+  namespace: podwise
+  labels:
+    app: podri-chat-service
+    component: podri-chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podri-chat-service
+  template:
+    metadata:
+      labels:
+        app: podri-chat-service
+        component: podri-chat
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: master1  # 指定節點
+      containers:
+      - name: podri-chat-service
+        image: localhost:5000/podri-chat:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8501
+          name: chat-api
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        volumeMounts:
+        - name: chat-data
+          mountPath: /app/data
+        - name: chat-cache
+          mountPath: /app/cache
+        workingDir: /app
+        command: ["streamlit"]
+        args: ["run", "podri_chat.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
+        livenessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+        readinessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+      volumes:
+      - name: chat-data
+        persistentVolumeClaim:
+          claimName: podri-chat-data-pvc
+      - name: chat-cache
+        persistentVolumeClaim:
+          claimName: podri-chat-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podri-chat-service
+  namespace: podwise
+  labels:
+    app: podri-chat-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8501
+    targetPort: 8501
+    nodePort: 30805
+    name: chat-api
+  selector:
+    app: podri-chat-service 
