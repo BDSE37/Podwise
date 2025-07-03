@@ -1,0 +1,29 @@
+# LLM 服務依賴（已優化，並加上詳細繁體中文註解）
+
+# --- API 框架 ---
+fastapi==0.109.2              # 高效能 API 框架
+uvicorn==0.27.1               # ASGI 伺服器
+pydantic>=2.7.4               # 資料驗證與型別註解（相容所有依賴）
+
+# --- LLM 與 NLP ---
+transformers==4.36.0          # LLM 框架
+sentence-transformers==2.2.2  # 句向量模型
+langchain==0.1.9              # LLM 工作流框架
+langchain-openai==0.0.2       # OpenAI API 整合
+torch==2.1.0                   # PyTorch，transformers 後端
+accelerate==0.25.0             # 加速推論
+bitsandbytes==0.41.1           # 低精度推論
+
+# --- 向量資料庫 ---
+pymilvus==2.3.4                # Milvus 向量資料庫
+
+# --- 工具與監控 ---
+python-dotenv==1.0.1           # 讀取 .env 檔案
+httpx==0.25.2                  # 非同步 HTTP 請求
+requests==2.31.0               # HTTP 請求
+numpy==1.24.3                  # 數值運算
+prometheus-client==0.19.0      # 監控指標上報
+langfuse==2.7.0                # LLM 任務追蹤與監控
+psycopg2-binary==2.9.9         # PostgreSQL 連線
+pymongo==4.6.1                 # MongoDB 連線
+# logging==0.4.9.6             # 標準日誌（如需自訂可啟用） 
