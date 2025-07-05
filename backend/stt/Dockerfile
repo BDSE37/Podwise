@@ -17,6 +17,10 @@ COPY requirements.txt .
 # 安裝 Python 依賴
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 安裝 faster-whisper 並下載 Medium 模型
+RUN pip install --no-cache-dir faster-whisper
+RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('medium')"
+
 # 複製應用程式代碼
 COPY . .
 

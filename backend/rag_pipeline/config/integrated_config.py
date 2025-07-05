@@ -31,10 +31,10 @@ class ModelConfig:
     def __post_init__(self):
         if self.llm_priority is None:
             self.llm_priority = [
-                "qwen3:8b",           # 主要 LLM
-                "qwen2.5:taiwan",     # 台灣優化版本
-                "deepseek:7b",        # 備用版本
-                "llama3:8b"           # 最後備用
+                "qwen2.5:taiwan",     # 第一優先：台灣優化版本
+                "qwen3:8b",           # 第二優先：Qwen3:8b
+                "openai:gpt-3.5",     # 備援：OpenAI GPT-3.5
+                "openai:gpt-4"        # 最後備援：OpenAI GPT-4
             ]
 
 
@@ -178,7 +178,7 @@ class PodwiseIntegratedConfig(BaseSettings):
     llm_port: int = Field(default=8004)
     
     # Ollama 配置
-    ollama_host: str = Field(default="http://localhost:11434")
+    ollama_host: str = Field(default="http://worker1:11434")
     ollama_model: str = Field(default="qwen2.5:8b")
     
     # 安全配置

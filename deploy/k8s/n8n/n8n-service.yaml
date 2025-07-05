@@ -4,17 +4,12 @@ metadata:
   name: my-n8n
   namespace: podwise
   labels:
-    app.kubernetes.io/instance: my-n8n
-    app.kubernetes.io/name: n8n
+    app: my-n8n
 spec:
+  selector:
+    app: my-n8n
   type: NodePort
   ports:
     - port: 5678
       targetPort: 5678
-      nodePort: 30567
-      protocol: TCP
-      name: http
-  selector:
-    app.kubernetes.io/instance: my-n8n
-    app.kubernetes.io/name: n8n
-    app.kubernetes.io/type: master 
+      nodePort: 30567  # 可自行指定1024-32767之間，或刪掉自動配置

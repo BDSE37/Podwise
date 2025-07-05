@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # 導入統一的 API 模型
-from ..core.api_models import QueryRequest, QueryResponse
+from core.api_models import QueryRequest, QueryResponse
 
 # 導入核心組件
 from core.hierarchical_rag_pipeline import HierarchicalRAGPipeline
@@ -28,6 +28,8 @@ from core.crew_agents import AgentManager
 from tools.enhanced_vector_search import EnhancedVectorSearchTool
 from tools.deepseek_tool import DeepseekTool
 from tools.qwen3_tool import Qwen3Tool
+from tools.keyword_mapper import KeywordMapper, CategoryResult
+from tools.knn_recommender import KNNRecommender, PodcastItem, RecommendationResult
 
 # 導入配置
 from config.integrated_config import get_config
@@ -195,26 +197,29 @@ async def query(request: QueryRequest, background_tasks: BackgroundTasks):
         processing_time = (datetime.now() - start_time).total_seconds()
         
         # 記錄查詢歷史
-        if request.user_id:
+        if request.user_id and chat_history_service:
+            try:
             background_tasks.add_task(
                 chat_history_service.add_query,
                 user_id=request.user_id,
                 session_id=request.session_id,
                 query=request.query,
-                response=result["response"],
-                confidence=result["confidence"],
-                sources=result["sources"]
+                    response=result.response,
+                    confidence=result.confidence,
+                    sources=result.sources
             )
+            except Exception as e:
+                logger.warning(f"記錄查詢歷史失敗: {str(e)}")
         
         return QueryResponse(
             query=request.query,
-            response=result["response"],
-            confidence=result["confidence"],
-            sources=result["sources"],
+            response=result.response,
+            confidence=result.confidence,
+            sources=result.sources,
             processing_time=processing_time,
-            level_used=result["level_used"],
-            category=result["category"],
-            metadata=result["metadata"],
+            level_used=result.level_used,
+            category=result.category,
+            metadata=result.metadata,
             timestamp=datetime.now().isoformat()
         )
         

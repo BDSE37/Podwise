@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-pipeline-service
+  namespace: podwise
+  labels:
+    app: rag-pipeline-service
+    component: rag-pipeline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-pipeline-service
+  template:
+    metadata:
+      labels:
+        app: rag-pipeline-service
+        component: rag-pipeline
+    spec:
+      # 移除節點選擇器，允許調度到任何可用節點
+      containers:
+        - name: rag-pipeline-service
+          image: 192.168.32.38:5000/podwise-rag-pipeline:latest
+          ports:
+            - containerPort: 8004
+              name: rag-api
+          env:
+            - name: PYTHONPATH
+              value: "/app"
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0"
+            - name: LANGFUSE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_PUBLIC_KEY
+            - name: LANGFUSE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_SECRET_KEY
+            - name: LANGFUSE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_HOST
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+          volumeMounts:
+            - name: rag-data
+              mountPath: /app/data
+            - name: rag-models
+              mountPath: /app/models
+            - name: rag-cache
+              mountPath: /app/cache
+          workingDir: /app
+          command: ["python", "-m", "uvicorn"]
+          args: ["app.main_integrated:app", "--host", "0.0.0.0", "--port", "8004"]
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: rag-data
+          persistentVolumeClaim:
+            claimName: rag-data-pvc
+        - name: rag-models
+          persistentVolumeClaim:
+            claimName: rag-models-pvc
+        - name: rag-cache
+          persistentVolumeClaim:
+            claimName: rag-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-pipeline-service
+  namespace: podwise
+  labels:
+    app: rag-pipeline-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8004
+      targetPort: 8004
+      nodePort: 30806
+      name: rag-api
+  selector:
+    app: rag-pipeline-service 

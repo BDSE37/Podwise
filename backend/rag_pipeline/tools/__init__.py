@@ -5,8 +5,15 @@ RAG Pipeline 工具模組
 
 from .unified_llm_tool import UnifiedLLMTool
 from .enhanced_vector_search import EnhancedVectorSearchTool
+from .keyword_mapper import KeywordMapper, CategoryResult
+from .knn_recommender import KNNRecommender, PodcastItem, RecommendationResult
 
 __all__ = [
     "UnifiedLLMTool",
-    "EnhancedVectorSearchTool"
+    "EnhancedVectorSearchTool",
+    "KeywordMapper",
+    "CategoryResult", 
+    "KNNRecommender",
+    "PodcastItem",
+    "RecommendationResult"
 ] 

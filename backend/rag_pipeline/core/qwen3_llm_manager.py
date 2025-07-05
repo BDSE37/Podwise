@@ -14,6 +14,7 @@ import requests
 from langchain.llms.base import LLM
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.schema import BaseMessage, HumanMessage, AIMessage
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from config.integrated_config import get_config
@@ -42,14 +43,12 @@ class Qwen3ModelConfig:
             self.stop_sequences = ["<|endoftext|>", "<|im_end|>"]
 
 
-class Qwen3LLM(LLM, BaseModel):
+class Qwen3LLM:
     """Qwen3 LLM 實作"""
     
-    model_config: Qwen3ModelConfig = Field(...)
-    config: Dict[str, Any] = Field(default_factory=dict)
-    
-    class Config:
-        arbitrary_types_allowed = True
+    def __init__(self, model_config: Qwen3ModelConfig, config: Optional[Dict[str, Any]] = None):
+        self.model_config = model_config
+        self.config = config or {}
     
     @property
     def _llm_type(self) -> str:
@@ -63,6 +62,47 @@ class Qwen3LLM(LLM, BaseModel):
         **kwargs: Any,
     ) -> str:
         """執行 LLM 呼叫"""
+        try:
+            # 檢查是否為 OpenAI 模型
+            if self.model_config.model_type.startswith("openai:"):
+                return self._call_openai(prompt, stop, **kwargs)
+            else:
+                return self._call_qwen3(prompt, stop, **kwargs)
+                
+        except Exception as e:
+            logger.error(f"LLM 呼叫異常: {str(e)}")
+            return f"錯誤: {str(e)}"
+    
+    def _call_openai(self, prompt: str, stop: Optional[List[str]] = None, **kwargs: Any) -> str:
+        """呼叫 OpenAI API"""
+        try:
+            config = get_config()
+            if not config.api.openai_api_key:
+                return "錯誤: OpenAI API Key 未配置"
+            
+            # 創建 OpenAI 客戶端
+            openai_llm = ChatOpenAI(
+                model=self.model_config.name,
+                api_key=config.api.openai_api_key,
+                temperature=self.model_config.temperature,
+                max_tokens=self.model_config.max_tokens
+            )
+            
+            # 準備消息
+            messages = [
+                HumanMessage(content=f"{self.model_config.system_prompt}\n\n{prompt}")
+            ]
+            
+            # 發送請求
+            response = openai_llm.invoke(messages)
+            return str(response.content)
+            
+        except Exception as e:
+            logger.error(f"OpenAI API 呼叫異常: {str(e)}")
+            return f"錯誤: OpenAI API 呼叫失敗 - {str(e)}"
+    
+    def _call_qwen3(self, prompt: str, stop: Optional[List[str]] = None, **kwargs: Any) -> str:
+        """呼叫 Qwen3 API"""
         try:
             # 準備請求參數
             request_data = {
@@ -105,8 +145,8 @@ class Qwen3LLM(LLM, BaseModel):
                 return f"錯誤: API 呼叫失敗 (狀態碼: {response.status_code})"
                 
         except Exception as e:
-            logger.error(f"Qwen3 LLM 呼叫異常: {str(e)}")
-            return f"錯誤: {str(e)}"
+            logger.error(f"Qwen3 API 呼叫異常: {str(e)}")
+            return f"錯誤: Qwen3 API 呼叫失敗 - {str(e)}"
     
     @property
     def _identifying_params(self) -> Dict[str, Any]:
@@ -135,7 +175,15 @@ class Qwen3LLMManager:
     
     def _initialize_models(self):
         """初始化所有模型"""
-        # Qwen3:8b 主要模型
+        # Qwen2.5-Taiwan 台灣優化版本 (第一優先)
+        qwen3_taiwan_config = Qwen3ModelConfig(
+            name="weiren119/Qwen2.5-Taiwan-8B-Instruct",
+            endpoint="http://worker1:11434/api/chat",
+            model_type="qwen2.5:taiwan",
+            system_prompt="你是一個專業的 AI 助手，特別針對台灣地區優化。請用繁體中文回答，提供準確、有用的資訊。"
+        )
+        
+        # Qwen3:8b 主要模型 (第二優先)
         qwen3_8b_config = Qwen3ModelConfig(
             name="Qwen/Qwen2.5-8B-Instruct",
             endpoint="http://worker1:11434/api/chat",
@@ -143,29 +191,35 @@ class Qwen3LLMManager:
             system_prompt="你是一個專業的 AI 助手，擅長中文和英文對話。請提供準確、有用的回答。"
         )
         
-        # Qwen3 台灣優化版本
-        qwen3_taiwan_config = Qwen3ModelConfig(
-            name="weiren119/Qwen2.5-Taiwan-8B-Instruct",
-            endpoint="http://worker1:11434/api/chat",
-            model_type="qwen3:taiwan",
-            system_prompt="你是一個專業的 AI 助手，特別針對台灣地區優化。請用繁體中文回答，提供準確、有用的資訊。"
-        )
+        # OpenAI GPT-3.5 備援模型
+        if self.config.api.openai_api_key:
+            openai_gpt35_config = Qwen3ModelConfig(
+                name="gpt-3.5-turbo",
+                endpoint="https://api.openai.com/v1/chat/completions",
+                model_type="openai:gpt-3.5",
+                system_prompt="你是一個專業的 AI 助手，能夠提供準確、有用的回答。"
+            )
         
-        # Qwen3:7b 備用模型
-        qwen3_7b_config = Qwen3ModelConfig(
-            name="Qwen/Qwen2.5-7B-Instruct",
-            endpoint="http://worker1:11434/api/chat",
-            model_type="qwen3:7b",
-            system_prompt="你是一個專業的 AI 助手，能夠提供準確、有用的回答。"
-        )
+        # OpenAI GPT-4 最後備援模型
+        if self.config.api.openai_api_key:
+            openai_gpt4_config = Qwen3ModelConfig(
+                name="gpt-4",
+                endpoint="https://api.openai.com/v1/chat/completions",
+                model_type="openai:gpt-4",
+                system_prompt="你是一個專業的 AI 助手，能夠提供準確、有用的回答。"
+            )
         
         # 創建模型實例
+        self.models["qwen2.5:taiwan"] = Qwen3LLM(model_config=qwen3_taiwan_config)
         self.models["qwen3:8b"] = Qwen3LLM(model_config=qwen3_8b_config)
-        self.models["qwen3:taiwan"] = Qwen3LLM(model_config=qwen3_taiwan_config)
-        self.models["qwen3:7b"] = Qwen3LLM(model_config=qwen3_7b_config)
         
-        # 設置預設模型
-        self.current_model = "qwen3:8b"
+        # 只有在有 OpenAI API Key 時才添加 OpenAI 模型
+        if self.config.api.openai_api_key:
+            self.models["openai:gpt-3.5"] = Qwen3LLM(model_config=openai_gpt35_config)
+            self.models["openai:gpt-4"] = Qwen3LLM(model_config=openai_gpt4_config)
+        
+        # 設置預設模型為台灣優化版本
+        self.current_model = "qwen2.5:taiwan"
         
         # 初始化健康狀態
         for model_name in self.models.keys():
@@ -181,11 +235,11 @@ class Qwen3LLMManager:
     def get_model(self, model_name: Optional[str] = None) -> Qwen3LLM:
         """獲取指定模型"""
         if model_name is None:
-            model_name = self.current_model
+            model_name = self.current_model or "qwen2.5:taiwan"
         
         if model_name not in self.models:
             logger.warning(f"模型 {model_name} 不存在，使用預設模型")
-            model_name = self.current_model
+            model_name = self.current_model or "qwen2.5:taiwan"
         
         return self.models[model_name]
     
@@ -275,11 +329,11 @@ class Qwen3LLMManager:
     def get_best_model(self) -> str:
         """獲取最佳可用模型"""
         # 檢查當前模型是否健康
-        if self.test_model_health(self.current_model):
+        if self.current_model and self.test_model_health(self.current_model):
             return self.current_model
         
         # 按優先級檢查其他模型
-        priority_models = self.config.models.llm_priority
+        priority_models = self.config.models.llm_priority or []
         for model_name in priority_models:
             if model_name in self.models and self.test_model_health(model_name):
                 self.switch_model(model_name)
@@ -287,7 +341,7 @@ class Qwen3LLMManager:
         
         # 如果所有模型都不健康，返回預設模型
         logger.warning("所有模型都不健康，使用預設模型")
-        return self.current_model
+        return self.current_model or "qwen2.5:taiwan"
     
     def call_with_fallback(self, prompt: str, **kwargs) -> str:
         """帶回退機制的模型呼叫"""

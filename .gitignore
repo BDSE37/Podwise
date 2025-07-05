@@ -1,118 +1,133 @@
-# ===========================================
-# Podwise 專案 Git 忽略檔案 - 簡化版
-# ===========================================
+# 模型檔案 (太大，不應該上傳到 Git)
+backend/llm/models/*/
+backend/llm/models/*.gguf
+backend/llm/models/*.bin
+backend/llm/models/*.safetensors
 
-# ===========================================
-# 環境配置檔案 (敏感資訊)
-# ===========================================
-.env
-.env.local
-.env.production
-.env.staging
-.env.development
-.env.test
+# GitLab 資料庫和監控檔案 (本地開發用，不上傳)
+gitlab/data/
+gitlab/logs/
 
-# ===========================================
-# 敏感配置檔案
-# ===========================================
-*.key
-*.pem
-*.crt
-*.p12
-secrets/
-secrets.yaml
-secrets.yml
-config/secrets.*
-
-# ===========================================
-# 測試音檔和媒體檔案
-# ===========================================
-*.wav
-*.mp3
-*.mp4
-*.avi
-*.mov
-*.flac
-*.aac
-*.ogg
-test_*.wav
-test_*.mp3
-test_*.mp4
-frontend/chat/test_*.wav
-frontend/chat/test_*.mp3
-
-# ===========================================
-# 大型模型檔案 (超過 100MB)
-# ===========================================
-*.pth
-*.pt
-*.ckpt
-*.safetensors
-*.bin
-*.onnx
-*.tflite
-*.pb
-*.h5
-*.hdf5
-*.pkl
-*.joblib
-
-# ===========================================
-# 快取和臨時檔案
-# ===========================================
+# 快取目錄
+cache/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 *.so
-.cache/
-.pytest_cache/
-.coverage
-htmlcov/
 
-# ===========================================
-# 日誌檔案
-# ===========================================
-*.log
-logs/
-log/
+# 虛擬環境
+venv/
+env/
+ENV/
+.venv/
+.env/
 
-# ===========================================
-# 系統檔案
-# ===========================================
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# ===========================================
 # IDE 檔案
-# ===========================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# ===========================================
+# 日誌檔案
+*.log
+logs/
+log/
+
 # 資料庫檔案
-# ===========================================
 *.db
 *.sqlite
 *.sqlite3
-gitlab/data/postgresql/
-gitlab/data/redis/
-gitlab/data/prometheus/
-n8n_data/
 
-# ===========================================
+# 環境變數檔案
+.env
+.env.local
+.env.production
+.env.staging
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# Docker 相關
+.dockerignore
+
+# Kubernetes 相關
+*.kubeconfig
+
 # 備份檔案
-# ===========================================
 *.bak
 *.backup
-*.old
-*.tmp 
+*.tmp
+
+# 大型資料檔案
+data/raw/
+data/processed/
+*.csv
+*.json
+*.xml
+*.zip
+*.tar.gz
+*.rar
+
+# 音訊檔案
+*.wav
+*.mp3
+*.flac
+*.aac
+
+# 影片檔案
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# 圖片檔案 (如果不需要)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+
+# 暫存檔案
+temp/
+tmp/
+.tmp/
+
+# 編譯檔案
+*.o
+*.a
+*.lib
+
+# 測試覆蓋率
+.coverage
+htmlcov/
+
+# 本地配置檔案
+config/local.py
+config/local.yaml
+config/local.json
+
+# 敏感資訊
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# 大型二進制檔案
+*.bin
+*.dat
+*.model
+
+# 快取目錄
+.cache/
+.pytest_cache/
+
+# 其他
+*.pid
+*.seed
+*.pid.lock 

@@ -1,0 +1,74 @@
+# Podwise RAG Pipeline K8s 最小化 Dockerfile
+# 只安裝基本套件，讓用戶進入容器手動安裝其他套件
+
+FROM python:3.11-slim
+
+# 設置工作目錄
+WORKDIR /app
+
+# 安裝基本工具和基本 Python 套件
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    vim \
+    nano \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# 升級 pip 並安裝基本套件
+RUN pip install --no-cache-dir --upgrade pip
+
+# 只安裝最基本的套件
+RUN pip install --no-cache-dir \
+    fastapi==0.104.1 \
+    uvicorn[standard]==0.24.0 \
+    pydantic==2.5.0 \
+    pydantic-settings==2.1.0 \
+    python-multipart==0.0.6 \
+    python-dotenv==1.0.0 \
+    aiofiles==23.2.1
+
+# 複製 requirements.txt (僅供參考，不自動安裝)
+COPY backend/rag_pipeline/requirements.txt ./requirements.txt
+
+# 複製應用程式代碼
+COPY backend/rag_pipeline ./backend/rag_pipeline
+COPY backend/config ./backend/config
+COPY backend/core ./backend/core
+COPY backend/utils ./backend/utils
+
+# 創建必要的目錄
+RUN mkdir -p /app/data /app/models /app/cache /app/logs
+
+# 設置環境變數
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV APP_ENV=production
+ENV DEBUG=false
+ENV LOG_LEVEL=INFO
+
+# 暴露端口
+EXPOSE 8004
+
+# 創建啟動腳本
+RUN echo '#!/bin/bash\n\
+echo "=== Podwise RAG Pipeline 最小化容器 ==="\n\
+echo "基本套件已安裝完成"\n\
+echo "請手動安裝其他套件："\n\
+echo "pip install -r requirements.txt"\n\
+echo ""\n\
+echo "啟動服務："\n\
+echo "python -m uvicorn backend.rag_pipeline.app.main_crewai:app --host 0.0.0.0 --port 8004"\n\
+echo ""\n\
+echo "進入容器後，您可以："\n\
+echo "1. 檢查 requirements.txt: cat requirements.txt"\n\
+echo "2. 安裝套件: pip install -r requirements.txt"\n\
+echo "3. 啟動服務: python -m uvicorn backend.rag_pipeline.app.main_crewai:app --host 0.0.0.0 --port 8004"\n\
+echo "4. 測試健康檢查: curl http://localhost:8004/health"\n\
+echo ""\n\
+exec bash\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# 啟動命令
+CMD ["/app/start.sh"] 

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-n8n
+  namespace: podwise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-n8n
+  template:
+    metadata:
+      labels:
+        app: my-n8n
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker4
+      containers:
+        - name: n8n
+          image: registry.192.168.32.126.nip.io/podwise/my-n8n-bge:node20
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5678
+          env:
+            - name: N8N_SECURE_COOKIE
+              value: "false"
+            - name: N8N_BASIC_AUTH_ACTIVE
+              value: "true"
+            - name: N8N_BASIC_AUTH_USER
+              value: "bdse37"
+            - name: N8N_BASIC_AUTH_PASSWORD
+              value: "BDSE37podwise"
+            - name: WEBHOOK_URL
+              value: "http://n8n.192.168.32.126.nip.io/"
+          volumeMounts:
+            - name: n8n-data
+              mountPath: /home/node/.n8n
+      volumes:
+        - name: n8n-data
+          persistentVolumeClaim:
+            claimName: n8n-pvc
