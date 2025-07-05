@@ -4,6 +4,14 @@ backend/llm/models/*.gguf
 backend/llm/models/*.bin
 backend/llm/models/*.safetensors
 
+# 大型二進制檔案 (超過 100MB)
+*.onnx
+*.ckpt
+*.pkl
+backend/tts/GPT-SoVITS/GPT_SoVITS/text/G2PWModel_1.1/g2pW.onnx
+backend/tts/GPT-SoVITS/pretrained_models/*.ckpt
+backend/tts/GPT-SoVITS/pretrained_models/*.pkl
+
 # GitLab 資料庫和監控檔案 (本地開發用，不上傳)
 gitlab/data/
 gitlab/logs/
