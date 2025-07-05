@@ -1,0 +1,26 @@
+# MongoDB 與 Milvus 標籤整合系統需求套件
+
+# 資料處理
+pandas>=1.5.0
+numpy>=1.21.0
+
+# 資料庫連接
+pymongo>=4.0.0
+pymilvus>=2.3.0
+
+# 機器學習與向量化
+sentence-transformers>=2.2.0
+torch>=1.12.0
+transformers>=4.20.0
+
+# Excel 檔案處理
+openpyxl>=3.0.0
+xlrd>=2.0.0
+
+# 日誌與工具
+python-dotenv>=0.19.0
+requests>=2.28.0
+
+# 可選：效能優化
+faiss-cpu>=1.7.0
+scikit-learn>=1.1.0 

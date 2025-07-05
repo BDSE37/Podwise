@@ -1,5 +1,0 @@
-# speaker1 音檔轉錄文字
-# 格式：檔案名稱|說話者|文字內容
-
-reply.wav|speaker1|這是一個測試音檔，用於訓練 GPT-SoVITS 模型。
-reply2.wav|speaker1|這是第二個測試音檔，包含更多的語音內容用於模型訓練。 

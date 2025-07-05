@@ -1,79 +1,22 @@
-# 整合 TTS 服務依賴（經過測試的相容版本）
+# Podri TTS 核心依賴
+edge-tts>=6.1.9
+aiofiles>=23.2.1
 
-# --- 前端與 API 框架 ---
-streamlit>=1.28.0            # 前端互動式網頁
-fastapi==0.109.2             # API 框架
-uvicorn==0.27.1              # ASGI 伺服器
-gradio==3.50.2               # GPT-SoVITS Web UI
+# FastAPI 相關
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
 
-# --- 語音合成與語音處理 ---
-edge-tts==6.1.9               # 微軟 Edge TTS 語音合成
-pyttsx3==2.90                 # 跨平台 TTS
-soundfile==0.12.1             # 音訊檔案處理
-pydub==0.25.1                 # 音訊格式轉換
-librosa==0.10.1               # 音訊分析
-webrtcvad==2.0.10             # 語音活動檢測
-ffmpeg-python==0.2.0          # FFmpeg Python 綁定
+# 日誌和工具
+colorlog>=6.7.0
 
-# --- AI 語音模型（相容版本） ---
-torch==2.1.0                  # PyTorch (CPU 版本)
-torchaudio==2.1.0             # PyTorch Audio (CPU 版本)
-torchvision==0.16.0           # PyTorch Vision (CPU 版本)
-transformers==4.34.0          # Hugging Face Transformers
-accelerate>=0.20.3            # 模型加速
+# 音訊處理
+soundfile>=0.12.1
+numpy>=1.24.0
 
-# --- 工具與設定 ---
-python-dotenv==1.0.1           # 讀取 .env 檔案
-requests>=2.31.0               # HTTP 請求
-httpx==0.26.0                  # 異步 HTTP 客戶端
-PyYAML>=6.0.1                  # 讀取 YAML 設定檔
-tqdm>=4.66.1                   # 進度條
-loguru>=0.7.2                  # 進階日誌工具
-pydantic<=2.10.6               # 資料驗證
+# 開發和測試工具
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
 
-# --- 資料庫 ---
-psycopg2-binary==2.9.9          # PostgreSQL 連線
-pymongo==4.6.1                  # MongoDB 連線
-
-# --- GPT-SoVITS 核心依賴（相容版本） ---
-psutil>=5.9.0                   # 系統和進程監控
-jieba>=0.42.1                   # 中文分詞
-cn2an==0.5.22                   # 中文數字轉換
-opencc-python-reimplemented==0.1.7  # 中文簡繁轉換
-pypinyin==0.50.0                # 中文拼音
-numpy==1.26.4                   # 數值計算
-scipy==1.11.4                   # 科學計算
-tensorboard                     # 訓練監控
-numba                          # JIT 編譯
-pytorch-lightning==2.4.0        # PyTorch Lightning (固定版本)
-funasr==1.0.27                  # 語音識別
-pyopenjtalk>=0.4.1              # 日語語音合成
-g2p_en                          # 英文 G2P
-modelscope==1.10.0              # 模型管理
-sentencepiece                   # 分詞器
-peft                           # 參數高效微調
-chardet                        # 字符編碼檢測
-jieba_fast                      # 快速中文分詞
-split-lang==2.1.0               # 語言分割
-wordsegment                     # 英文分詞
-rotary_embedding_torch          # 旋轉位置編碼
-ToJyutping                      # 粵語拼音
-g2pk2                          # 韓文 G2P
-ko_pron                        # 韓文發音
-python_mecab_ko                # 韓文形態分析
-x_transformers                  # Transformer 實現
-torchmetrics==1.5.0             # PyTorch 指標 (固定版本)
-ctranslate2>=4.0,<5            # CTranslate2
-huggingface_hub>=0.13          # Hugging Face Hub
-tokenizers>=0.13,<1            # 分詞器
-av>=11                         # 音視頻處理
-
-# --- 修正版本衝突 ---
-fast_langdetect==0.3.2          # 修正 'infer' 屬性錯誤
-
-# --- 額外依賴 ---
-aiohttp>=3.8.0                  # 異步 HTTP 伺服器
-matplotlib>=3.7.0               # 圖表繪製
-pandas>=2.0.0                   # 資料處理
-seaborn>=0.12.0                 # 統計圖表
-scikit-learn>=1.3.0             # 機器學習工具
+# 共用工具依賴
+langfuse>=2.0.0

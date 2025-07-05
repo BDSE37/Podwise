@@ -1,31 +1,39 @@
-# 使用 Python 3.10 作為基礎映像
+# STT 服務 Dockerfile
+# 語音轉文字服務，支援多種音訊格式處理
 FROM python:3.10-slim
 
-# 設置工作目錄
+# 設定工作目錄
 WORKDIR /app
 
-# 安裝系統依賴
+# 安裝必要系統依賴（音訊處理、編譯器、curl）
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     ffmpeg \
+    libsndfile1 \
+    portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 複製依賴文件
+# 複製 requirements.txt 並安裝 Python 依賴
 COPY requirements.txt .
-
-# 安裝 Python 依賴
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 安裝 faster-whisper 並下載 Medium 模型
-RUN pip install --no-cache-dir faster-whisper
-RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('medium')"
-
-# 複製應用程式代碼
+# 複製應用程式碼
 COPY . .
 
-# 暴露端口
+# 創建音訊處理目錄
+RUN mkdir -p /app/audio/input \
+    /app/audio/output \
+    /app/models/stt
+
+# 設定環境變數
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV AUDIO_INPUT_DIR=/app/audio/input
+ENV AUDIO_OUTPUT_DIR=/app/audio/output
+
+# 暴露 API 服務埠（8001）
 EXPOSE 8001
 
-# 啟動應用（使用端口 8001）
-CMD ["streamlit", "run", "streamlit_app.py", "--server.port", "8001", "--server.address", "0.0.0.0"] 
+# 啟動指令
+CMD ["python", "main.py"] 

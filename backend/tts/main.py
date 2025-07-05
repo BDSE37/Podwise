@@ -1,15 +1,27 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-TTS 語音合成服務主程式
-基於 FastAPI 提供 RESTful API 服務
+Podri TTS 服務主程式
+
+提供基於 FastAPI 的 RESTful API 服務，支援四種台灣語音合成。
+
+Author: Podri Team
+License: MIT
 """
+
+import asyncio
+import logging
+import os
+import sys
+from typing import Dict, Any, Optional
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, Dict, Any
-import asyncio
-import logging
+from pydantic import BaseModel, Field
+
+# 添加 backend 路徑以引用共用工具
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from tts_service import TTSService
 from utils.logging_config import get_logger
@@ -19,162 +31,227 @@ logger = get_logger(__name__)
 
 # 創建 FastAPI 應用
 app = FastAPI(
-    title="PodWise TTS 語音合成服務",
-    description="提供高品質的語音合成功能，支援多種語音選項",
-    version="1.0.0"
+    title="PodWise Podri TTS 語音合成服務",
+    description="提供高品質的 Podri TTS 語音合成功能，支援四種台灣語音",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # 配置 CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 在生產環境中應該限制具體的域名
+    allow_origins=["*"],  # 生產環境中應該限制具體域名
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # 創建 TTS 服務實例
-tts_service = TTSService()
+tts_service = None
 
 
 class TTSRequest(BaseModel):
     """TTS 請求模型"""
-    文字: str
-    語音: Optional[str] = "podri"
-    語速: Optional[float] = 1.0
-    音調: Optional[float] = 1.0
-    音量: Optional[float] = 1.0
+    文字: str = Field(..., description="要合成的文字內容", min_length=1, max_length=1000)
+    語音: Optional[str] = Field(default="podrina", description="語音 ID")
+    語速: Optional[str] = Field(default="+0%", description="語速調整，格式如 +10%")
+    音量: Optional[str] = Field(default="+0%", description="音量調整，格式如 +5%")
+    音調: Optional[str] = Field(default="+0%", description="音調調整，格式如 +2%")
 
 
 class TTSResponse(BaseModel):
     """TTS 回應模型"""
-    成功: bool
-    音訊檔案: Optional[str] = None
-    錯誤訊息: Optional[str] = None
-    處理時間: Optional[float] = None
+    成功: bool = Field(..., description="是否成功")
+    音訊檔案: Optional[str] = Field(None, description="Base64 編碼的音訊檔案")
+    錯誤訊息: Optional[str] = Field(None, description="錯誤訊息")
+    處理時間: Optional[float] = Field(None, description="處理時間（秒）")
+
+
+class VoiceInfo(BaseModel):
+    """語音信息模型"""
+    id: str = Field(..., description="語音 ID")
+    name: str = Field(..., description="語音名稱")
+    description: str = Field(..., description="語音描述")
+
+
+class ServiceStatus(BaseModel):
+    """服務狀態模型"""
+    podri_tts: Dict[str, Any] = Field(..., description="Podri TTS 狀態")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """應用啟動事件"""
+    global tts_service
+    try:
+        tts_service = TTSService()
+        logger.info("TTS 服務初始化成功")
+    except Exception as e:
+        logger.error(f"TTS 服務初始化失敗: {e}")
+        raise
 
 
 @app.get("/")
-async def 根路徑():
+async def root():
     """根路徑 - 服務狀態檢查"""
     return {
-        "服務名稱": "PodWise TTS 語音合成服務",
+        "服務名稱": "PodWise Edge TTS 語音合成服務",
         "狀態": "運行中",
-        "版本": "1.0.0"
+        "版本": "1.0.0",
+        "支援語音": ["podrina", "podrisa", "podrino", "podriso"]
     }
 
 
 @app.get("/health")
-async def 健康檢查():
+async def health_check():
     """健康檢查端點"""
-    return {"狀態": "健康", "服務": "TTS"}
+    return {"狀態": "健康", "服務": "Edge TTS"}
 
 
-@app.get("/voices")
-async def 獲取可用語音():
+@app.get("/voices", response_model=list[VoiceInfo])
+async def get_available_voices():
     """獲取可用的語音選項"""
     try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
         語音列表 = tts_service.獲取可用語音()
-        return {
-            "成功": True,
-            "語音列表": 語音列表
-        }
+        return [
+            VoiceInfo(
+                id=voice["id"],
+                name=voice["name"],
+                description=voice["description"]
+            )
+            for voice in 語音列表
+        ]
     except Exception as e:
         logger.error(f"獲取語音列表失敗: {e}")
         raise HTTPException(status_code=500, detail=f"獲取語音列表失敗: {str(e)}")
 
 
 @app.post("/synthesize", response_model=TTSResponse)
-async def 語音合成(request: TTSRequest):
+async def synthesize_speech(request: TTSRequest):
     """語音合成端點"""
     try:
-        logger.info(f"收到語音合成請求: 文字='{request.文字[:50]}...', 語音='{request.語音}', 語速={request.語速}, 音調={request.音調}, 音量={request.音量}")
-        logger.info(f"詳細語音參數: 語音ID='{request.語音}', 語音類型='{tts_service._get_voice_type(request.語音 or 'podri')}'")
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
+        logger.info(f"收到語音合成請求: 文字='{request.文字[:50]}...', 語音='{request.語音}'")
         
         # 執行語音合成
         開始時間 = asyncio.get_event_loop().time()
-        結果 = await tts_service.語音合成(
+        音訊數據 = await tts_service.語音合成(
             text=request.文字,
-            語音=request.語音 or "podri",
-            語速=request.語速 or 1.0,
-            音調=request.音調 or 1.0,
-            音量=request.音量 or 1.0
+            語音=request.語音,
+            語速=request.語速,
+            音量=request.音量,
+            音調=request.音調
         )
         結束時間 = asyncio.get_event_loop().time()
         處理時間 = 結束時間 - 開始時間
         
-        if 結果["成功"]:
+        if 音訊數據:
+            # 轉換為 Base64
+            import base64
+            音訊檔案 = base64.b64encode(音訊數據).decode('utf-8')
+            
             return TTSResponse(
                 成功=True,
-                音訊檔案=結果["音訊檔案"],
+                音訊檔案=音訊檔案,
                 處理時間=處理時間
             )
         else:
             return TTSResponse(
                 成功=False,
-                錯誤訊息=結果["錯誤訊息"],
+                錯誤訊息="語音合成失敗",
                 處理時間=處理時間
             )
             
+    except ValueError as e:
+        logger.error(f"請求參數錯誤: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"語音合成失敗: {e}")
         raise HTTPException(status_code=500, detail=f"語音合成失敗: {str(e)}")
 
 
-@app.post("/synthesize-stream")
-async def 串流語音合成(request: TTSRequest):
-    """串流語音合成端點"""
+@app.get("/voice/{voice_id}", response_model=VoiceInfo)
+async def get_voice_info(voice_id: str):
+    """獲取特定語音信息"""
     try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
+        語音信息 = tts_service.獲取語音信息(voice_id)
+        if not 語音信息:
+            raise HTTPException(status_code=404, detail=f"語音 {voice_id} 不存在")
+        
+        return VoiceInfo(
+            id=語音信息["id"],
+            name=語音信息["name"],
+            description=語音信息["description"]
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"獲取語音信息失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"獲取語音信息失敗: {str(e)}")
+
+
+@app.get("/status", response_model=ServiceStatus)
+async def get_service_status():
+    """獲取服務狀態"""
+    try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
+        狀態 = await tts_service.獲取服務狀態()
+        return ServiceStatus(podri_tts=狀態["podri_tts"])
+    except Exception as e:
+        logger.error(f"獲取服務狀態失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"獲取服務狀態失敗: {str(e)}")
+
+
+@app.post("/synthesize-stream")
+async def synthesize_speech_stream(request: TTSRequest):
+    """串流語音合成端點（未來實現）"""
+    try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
         logger.info(f"收到串流語音合成請求: {request.文字[:50]}...")
         
-        # 這裡應該實現串流回應
-        # 目前返回標準回應
-        結果 = await tts_service.語音合成(
+        # 目前返回標準回應，未來可實現真正的串流
+        音訊數據 = await tts_service.語音合成(
             text=request.文字,
-            語音=request.語音 or "podri",
-            語速=request.語速 or 1.0,
-            音調=request.音調 or 1.0,
-            音量=request.音量 or 1.0
+            語音=request.語音,
+            語速=request.語速,
+            音量=request.音量,
+            音調=request.音調
         )
         
-        return 結果
+        if 音訊數據:
+            import base64
+            return {
+                "成功": True,
+                "音訊檔案": base64.b64encode(音訊數據).decode('utf-8'),
+                "訊息": "串流功能開發中，目前返回完整音訊"
+            }
+        else:
+            return {
+                "成功": False,
+                "錯誤訊息": "語音合成失敗"
+            }
         
     except Exception as e:
         logger.error(f"串流語音合成失敗: {e}")
         raise HTTPException(status_code=500, detail=f"串流語音合成失敗: {str(e)}")
 
 
-@app.get("/config")
-async def 獲取配置():
-    """獲取 TTS 配置"""
-    try:
-        配置 = tts_service.獲取配置()
-        return {
-            "成功": True,
-            "配置": 配置
-        }
-    except Exception as e:
-        logger.error(f"獲取配置失敗: {e}")
-        raise HTTPException(status_code=500, detail=f"獲取配置失敗: {str(e)}")
-
-
-@app.post("/config")
-async def 更新配置(配置: Dict[str, Any]):
-    """更新 TTS 配置"""
-    try:
-        結果 = tts_service.更新配置(配置)
-        return {
-            "成功": 結果,
-            "訊息": "配置更新成功" if 結果 else "配置更新失敗"
-        }
-    except Exception as e:
-        logger.error(f"更新配置失敗: {e}")
-        raise HTTPException(status_code=500, detail=f"更新配置失敗: {str(e)}")
-
-
-def 啟動服務():
+def start_server():
     """啟動 TTS 服務"""
-    logger.info("正在啟動 TTS 語音合成服務...")
+    logger.info("正在啟動 Podri TTS 語音合成服務...")
     
     # 配置 uvicorn
     uvicorn.run(
@@ -182,9 +259,10 @@ def 啟動服務():
         host="0.0.0.0",
         port=8501,
         log_level="info",
-        access_log=True
+        access_log=True,
+        reload=False  # 生產環境中應設為 False
     )
 
 
 if __name__ == "__main__":
-    啟動服務()
+    start_server()

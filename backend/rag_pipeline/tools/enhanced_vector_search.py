@@ -56,7 +56,7 @@ class EnhancedVectorSearchTool:
         # 初始化 LLM（如果可用）
         self.llm = None
         try:
-        self.llm = OpenAI(temperature=0.1)
+            self.llm = OpenAI(temperature=0.1)
             logger.info("LLM 初始化成功")
         except Exception as e:
             logger.warning(f"LLM 初始化失敗: {e}")
@@ -110,31 +110,31 @@ class EnhancedVectorSearchTool:
         """設定查詢提示樣板"""
         if self.search_type == "job":
             # 職缺搜尋提示
-        self.query_prompt = PromptTemplate(
-            input_variables=["query"],
-            template="""
-            將以下用戶查詢轉化為適合向量數據庫搜索的查詢文本:
-            查詢: {query}
+            self.query_prompt = PromptTemplate(
+                input_variables=["query"],
+                template="""
+                將以下用戶查詢轉化為適合向量數據庫搜索的查詢文本:
+                查詢: {query}
+                
+                轉換後的查詢:
+                """
+            )
             
-            轉換後的查詢:
-            """
-        )
-        
-        self.answer_prompt = PromptTemplate(
-            input_variables=["query", "results"],
-            template="""
-            你是一位專業的職缺顧問，根據以下職缺資訊回答用戶的問題。
-            
-            用戶問題: {query}
-            
-            相關職缺資訊:
-            {results}
-            
-            請基於這些職缺資訊，針對用戶問題提供詳細且專業的回答。
-            使用繁體中文回覆，並確保回覆中客觀反映實際的職缺狀況。
-            如有按件計酬等特殊薪資類型，請特別說明。
-            """
-        )
+            self.answer_prompt = PromptTemplate(
+                input_variables=["query", "results"],
+                template="""
+                你是一位專業的職缺顧問，根據以下職缺資訊回答用戶的問題。
+                
+                用戶問題: {query}
+                
+                相關職缺資訊:
+                {results}
+                
+                請基於這些職缺資訊，針對用戶問題提供詳細且專業的回答。
+                使用繁體中文回覆，並確保回覆中客觀反映實際的職缺狀況。
+                如有按件計酬等特殊薪資類型，請特別說明。
+                """
+            )
         else:
             # 一般搜尋提示
             self.query_prompt = PromptTemplate(
@@ -165,9 +165,9 @@ class EnhancedVectorSearchTool:
     def _get_embedding(self, query: str) -> List[float]:
         """獲取查詢文本的嵌入向量"""
         try:
-        from langchain.embeddings import OpenAIEmbeddings
-        embeddings = OpenAIEmbeddings()
-        return embeddings.embed_query(query)
+            from langchain.embeddings import OpenAIEmbeddings
+            embeddings = OpenAIEmbeddings()
+            return embeddings.embed_query(query)
         except Exception as e:
             logger.error(f"獲取嵌入向量失敗: {e}")
             # 返回零向量作為備用
@@ -310,7 +310,7 @@ class EnhancedVectorSearchTool:
             enhanced_query = query
             if self.llm:
                 try:
-            enhanced_query = self.llm(self.query_prompt.format(query=query))
+                    enhanced_query = self.llm(self.query_prompt.format(query=query))
                     logger.info(f"優化後查詢文本: {enhanced_query}")
                 except Exception as e:
                     logger.warning(f"查詢優化失敗，使用原始查詢: {e}")
@@ -332,10 +332,10 @@ class EnhancedVectorSearchTool:
             if self.llm and hits:
                 try:
                     formatted_results = "\n".join([hit["content"] for hit in hits])
-            answer = self.llm(self.answer_prompt.format(
-                query=query,
-                results=formatted_results
-            ))
+                    answer = self.llm(self.answer_prompt.format(
+                        query=query,
+                        results=formatted_results
+                    ))
                 except Exception as e:
                     logger.warning(f"生成回答失敗: {e}")
             
