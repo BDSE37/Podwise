@@ -11,8 +11,8 @@ load_dotenv()
 
 # PostgreSQL 配置
 POSTGRES_CONFIG: Dict = {
-    "host": os.getenv("POSTGRES_HOST", "localhost"),
-    "port": int(os.getenv("POSTGRES_PORT", "5432")),
+    "host": os.getenv("POSTGRES_HOST", "192.168.32.56"),  # worker1 節點 IP
+    "port": int(os.getenv("POSTGRES_PORT", "32432")),  # NodePort
     "database": os.getenv("POSTGRES_DB", "podcast"),
     "user": os.getenv("POSTGRES_USER", "bdse37"),
     "password": os.getenv("POSTGRES_PASSWORD", "111111")
@@ -20,7 +20,7 @@ POSTGRES_CONFIG: Dict = {
 
 # Milvus 配置
 MILVUS_CONFIG: Dict = {
-    "host": os.getenv("MILVUS_HOST", "localhost"),
+    "host": os.getenv("MILVUS_HOST", "192.168.32.86"),  # worker3 節點 IP
     "port": int(os.getenv("MILVUS_PORT", "19530")),
     "collection_name": os.getenv("MILVUS_COLLECTION_NAME", "podwise_embeddings"),
     "dim": int(os.getenv("MILVUS_DIM", "1536")),

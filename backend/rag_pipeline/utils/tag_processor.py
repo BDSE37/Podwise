@@ -35,14 +35,26 @@ class TagProcessor:
     def _load_tags(self):
         """載入標籤資料"""
         try:
-            # 讀取 Excel 檔案
+            # 嘗試讀取 Excel 檔案，如果失敗則讀取 CSV
+            try:
             df = pd.read_excel(self.tag_file)
+            except Exception:
+                # 如果 Excel 讀取失敗，嘗試讀取 CSV
+                df = pd.read_csv(self.tag_file)
             
             # 處理每個類別
             for _, row in df.iterrows():
                 main_category = row["主要類別"]
                 sub_category = row["子類別"]
-                tags = row["標籤"].split(",") if isinstance(row["標籤"], str) else []
+                
+                # 處理標籤欄位（支援逗號分隔的多個標籤）
+                tags_str = row["標籤"]
+                if isinstance(tags_str, str):
+                    # 分割標籤並清理
+                    tags = [tag.strip() for tag in tags_str.split(",") if tag.strip()]
+                else:
+                    tags = []
+                
                 weight = float(row.get("權重", 1.0))
                 
                 # 更新類別

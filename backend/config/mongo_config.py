@@ -6,8 +6,8 @@ from typing import Dict
 
 # MongoDB 配置
 MONGO_CONFIG: Dict = {
-    "host": "localhost",
-    "port": 27017,
+    "host": "192.168.32.86",  # worker3 節點 IP
+    "port": 30017,  # NodePort
     "username": "bdse37",
     "password": "111111",
     "database": "podwise",

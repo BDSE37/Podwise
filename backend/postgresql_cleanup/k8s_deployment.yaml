@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podwise
+  labels:
+    name: podwise
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: postgresql-cleanup-sa
+  namespace: podwise
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: postgresql-cleanup-role
+  namespace: podwise
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: postgresql-cleanup-rolebinding
+  namespace: podwise
+subjects:
+- kind: ServiceAccount
+  name: postgresql-cleanup-sa
+  namespace: podwise
+roleRef:
+  kind: Role
+  name: postgresql-cleanup-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-cleanup-config
+  namespace: podwise
+data:
+  # 清理配置
+  CLEANUP_BATCH_SIZE: "1000"
+  CLEANUP_MAX_RETRIES: "3"
+  CLEANUP_TIMEOUT: "300"
+  CLEANUP_MAX_AGE_DAYS: "90"
+  CLEANUP_STATUS_FILTER: "completed,failed"
+  CLEANUP_SIZE_LIMIT_MB: "1000"
+  
+  # Kubernetes 配置
+  K8S_NAMESPACE: "podwise"
+  K8S_JOB_TIMEOUT: "3600"
+  K8S_RETRY_INTERVAL: "30"
+  
+  # 資源限制
+  CLEANUP_MEMORY_REQUEST: "256Mi"
+  CLEANUP_CPU_REQUEST: "100m"
+  CLEANUP_MEMORY_LIMIT: "512Mi"
+  CLEANUP_CPU_LIMIT: "500m"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-cleanup-secret
+  namespace: podwise
+type: Opaque
+data:
+  # 使用 base64 編碼的實際值
+  POSTGRES_PASSWORD: "MTExMTEx"  # 111111 的 base64 編碼
+  POSTGRES_SSL_CERT: ""
+  POSTGRES_SSL_KEY: ""
+  POSTGRES_SSL_CA: ""
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgresql-cleanup-cronjob
+  namespace: podwise
+spec:
+  schedule: "0 2 * * *"  # 每天凌晨 2 點執行
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: postgresql-cleanup
+        spec:
+          serviceAccountName: postgresql-cleanup-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: postgresql-cleanup
+            image: postgresql-cleanup:latest
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+            env:
+            # 資料庫連線配置
+            - name: POSTGRES_HOST
+              value: "postgresql-service"  # 請根據實際的 Service 名稱調整
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "podcast"  # 更新為實際資料庫名稱
+            - name: POSTGRES_USER
+              value: "bdse37"   # 更新為實際使用者名稱
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-cleanup-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_SSLMODE
+              value: "prefer"
+            
+            # 從 ConfigMap 讀取配置
+            - name: CLEANUP_BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: CLEANUP_BATCH_SIZE
+            - name: CLEANUP_MAX_RETRIES
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: CLEANUP_MAX_RETRIES
+            - name: CLEANUP_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: CLEANUP_TIMEOUT
+            - name: CLEANUP_MAX_AGE_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: CLEANUP_MAX_AGE_DAYS
+            - name: CLEANUP_STATUS_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: CLEANUP_STATUS_FILTER
+            - name: K8S_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: postgresql-cleanup-config
+                  key: K8S_NAMESPACE
+            
+            # 清理參數
+            - name: CLEANUP_DRY_RUN
+              value: "false"  # 生產環境設為 false
+            
+            command: ["python"]
+            args: ["-m", "postgresql_cleanup.main", "--verbose"]
+            
+            # 健康檢查
+            livenessProbe:
+              exec:
+                command:
+                - python
+                - -c
+                - "import psycopg2; print('OK')"
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 3
+            
+            # 日誌配置
+            volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+          
+          volumes:
+          - name: logs
+            emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-cleanup-service
+  namespace: podwise
+spec:
+  selector:
+    app: postgresql-cleanup
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP 

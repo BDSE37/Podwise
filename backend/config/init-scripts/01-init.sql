@@ -9,22 +9,67 @@ CREATE DATABASE podcast;
 -- 連接到 podcast 資料庫
 \c podcast;
 
--- 1. users
+-- 1. users (修改後的使用者表)
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    given_name VARCHAR(64),
-    family_name VARCHAR(64),
-    username VARCHAR(64),
+    user_identifier VARCHAR(64) UNIQUE NOT NULL,  -- 使用者識別碼 (如: user123, guest_001)
+    email VARCHAR(255),                           -- 可為 NULL
+    given_name VARCHAR(64),                       -- 可為 NULL
+    family_name VARCHAR(64),                      -- 可為 NULL
+    username VARCHAR(64),                         -- 可為 NULL
+    user_type VARCHAR(32) NOT NULL DEFAULT 'guest', -- 使用者類型: 'registered', 'guest'
+    is_active BOOLEAN DEFAULT true,
+    password VARCHAR(255),                        -- 可為 NULL (訪客模式不需要密碼)
+    locale VARCHAR(16) DEFAULT 'zh-TW',
+    access_token VARCHAR(255),                    -- 可為 NULL
+    refresh_token VARCHAR(255),                   -- 可為 NULL
+    expires_in INTEGER,                           -- 可為 NULL
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP,
-    is_active BOOLEAN,
-    password VARCHAR(255) NOT NULL,
-    locale VARCHAR(16),
-    access_token VARCHAR(255),
-    refresh_token VARCHAR(255),
-    expires_in INTEGER
+    last_login TIMESTAMP,                         -- 可為 NULL
+    last_chat_at TIMESTAMP,                       -- 最後聊天時間
+    total_chat_count INTEGER DEFAULT 0,           -- 總聊天次數
+    preferred_categories TEXT[],                  -- 偏好類別陣列
+    CONSTRAINT valid_user_type CHECK (user_type IN ('registered', 'guest'))
+);
+
+-- 新增使用者偏好表
+CREATE TABLE user_preferences (
+    user_id INTEGER NOT NULL,
+    category VARCHAR(64) NOT NULL,
+    preference_score DECIMAL(3,2) DEFAULT 0.5,    -- 偏好分數 0.0-1.0
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, category),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- 新增使用者聊天記錄表
+CREATE TABLE user_chat_history (
+    chat_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    session_id VARCHAR(64) NOT NULL,
+    message_type VARCHAR(16) NOT NULL,            -- 'user' 或 'bot'
+    message_content TEXT NOT NULL,
+    message_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    metadata JSONB,                               -- 額外資訊 (如: 使用的服務、回應時間等)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- 新增使用者行為統計表
+CREATE TABLE user_behavior_stats (
+    user_id INTEGER NOT NULL,
+    stat_date DATE NOT NULL,
+    total_queries INTEGER DEFAULT 0,
+    rag_queries INTEGER DEFAULT 0,
+    recommendation_queries INTEGER DEFAULT 0,
+    voice_queries INTEGER DEFAULT 0,
+    avg_response_time_ms INTEGER DEFAULT 0,
+    favorite_categories TEXT[],
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, stat_date),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- 2. podcasts
@@ -300,9 +345,35 @@ CREATE INDEX idx_task_log_status ON task_log(status);
 CREATE INDEX idx_embedding_log_episode_id ON embedding_log(episode_id);
 CREATE INDEX idx_ingestion_log_status ON ingestion_log(status);
 
+-- 新增使用者相關索引
+CREATE INDEX idx_users_user_identifier ON users(user_identifier);
+CREATE INDEX idx_users_user_type ON users(user_type);
+CREATE INDEX idx_users_last_chat_at ON users(last_chat_at);
+CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
+CREATE INDEX idx_user_preferences_category ON user_preferences(category);
+CREATE INDEX idx_user_chat_history_user_id ON user_chat_history(user_id);
+CREATE INDEX idx_user_chat_history_session_id ON user_chat_history(session_id);
+CREATE INDEX idx_user_chat_history_timestamp ON user_chat_history(message_timestamp);
+CREATE INDEX idx_user_behavior_stats_user_id ON user_behavior_stats(user_id);
+CREATE INDEX idx_user_behavior_stats_date ON user_behavior_stats(stat_date);
+
 -- 插入測試資料
-INSERT INTO users (email, given_name, family_name, username, is_active, password, locale) VALUES
-('bdse37@podwise.com', 'BDSE', 'User', 'bdse37', true, '111111', 'zh-TW');
+INSERT INTO users (user_identifier, email, given_name, family_name, username, user_type, is_active, password, locale) VALUES
+('bdse37', 'bdse37@podwise.com', 'BDSE', 'User', 'bdse37', 'registered', true, '111111', 'zh-TW'),
+('user123', 'user123@example.com', '張', '小明', 'user123', 'registered', true, 'password123', 'zh-TW'),
+('tech_lover', 'tech@example.com', '李', '科技', 'tech_lover', 'registered', true, 'tech123', 'zh-TW'),
+('business_user', 'business@example.com', '王', '商業', 'business_user', 'registered', true, 'business123', 'zh-TW');
+
+-- 插入使用者偏好資料
+INSERT INTO user_preferences (user_id, category, preference_score) VALUES
+(1, '科技', 0.8),
+(1, '商業', 0.6),
+(2, '科技', 0.9),
+(2, '教育', 0.7),
+(3, '科技', 0.95),
+(3, '創新', 0.8),
+(4, '商業', 0.9),
+(4, '管理', 0.8);
 
 -- 插入範例 Podcast 資料
 INSERT INTO podcasts (podcast_id, name, description, author, rss_link, category, languages) VALUES

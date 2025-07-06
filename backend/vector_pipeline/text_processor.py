@@ -37,7 +37,7 @@ class TextProcessor:
     def __init__(self, 
                  mongo_config: Dict[str, Any],
                  postgres_config: Dict[str, Any],
-                 tag_csv_path: str = "csv/TAG_info.csv",
+                 tag_csv_path: str = "TAG_info.csv",  # 修正預設路徑
                  embedding_model: str = "BAAI/bge-m3",
                  max_chunk_size: int = 1024) -> None:
         """

@@ -4,12 +4,10 @@ Podwise RAG Pipeline Core 模組
 """
 
 from .hierarchical_rag_pipeline import HierarchicalRAGPipeline
-from .unified_processor import UnifiedContentProcessor
 from .crew_agents import AgentManager, LeaderAgent, BusinessExpertAgent, EducationExpertAgent
 
 __all__ = [
     'HierarchicalRAGPipeline',
-    'UnifiedContentProcessor',
     'AgentManager',
     'LeaderAgent', 
     'BusinessExpertAgent',
