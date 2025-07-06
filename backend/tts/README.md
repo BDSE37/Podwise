@@ -2,7 +2,7 @@
 
 基於 Microsoft Podri TTS 的高品質語音合成服務，專為台灣語音優化設計。
 
-## 🎯 功能特色
+## 功能特色
 
 - **四種台灣語音**：溫柔女聲、活潑女聲、穩重男聲、專業男聲
 - **高品質合成**：基於 Microsoft Podri TTS 技術
@@ -10,7 +10,7 @@
 - **OOP 設計**：符合 Google Code Style 的物件導向設計
 - **完整測試**：包含單元測試和整合測試
 
-## 🏗️ 系統架構
+## 系統架構
 
 ```
 tts/
@@ -30,7 +30,7 @@ tts/
     └── logging_config.py  # 日誌配置
 ```
 
-## 🎤 支援語音
+## 支援語音
 
 ### Podri TTS 語音
 - **Podrina (溫柔女聲)**：溫柔親切的女聲，適合日常對話和情感表達
@@ -38,7 +38,7 @@ tts/
 - **Podrino (穩重男聲)**：穩重可靠的男聲，適合正式場合和專業內容
 - **Podriso (專業男聲)**：專業權威的男聲，適合新聞播報和學術內容
 
-## 🚀 快速開始
+## 使用方法
 
 ### 1. 安裝依賴
 
@@ -58,7 +58,7 @@ python main.py
 
 訪問 `http://localhost:8501/docs` 查看互動式 API 文檔
 
-## 📋 API 參考
+## API 參考
 
 ### 主要端點
 
@@ -83,22 +83,7 @@ curl -X POST "http://localhost:8501/synthesize" \
      }'
 ```
 
-## 🧪 測試
-
-### 執行測試
-
-```bash
-python test_edge_tts.py
-```
-
-### 測試內容
-
-- Podri TTS 提供者功能測試
-- 四種台灣語音合成測試
-- TTS 服務整合測試
-- API 端點測試
-
-## 🏛️ 程式碼架構
+## 程式碼架構
 
 ### 核心類別
 
@@ -145,7 +130,7 @@ class VoiceConfig:
 3. **依賴反轉原則**：依賴抽象而非具體實現
 4. **介面隔離原則**：提供精確的介面
 
-## 🔧 配置
+## 配置
 
 ### 語音配置
 
@@ -175,7 +160,7 @@ class AudioConfig:
     CHANNELS = 1                # 單聲道
 ```
 
-## 🐳 Docker 部署
+## Docker 部署
 
 ### 建置映像
 
@@ -189,42 +174,18 @@ docker build -t podwise-tts .
 docker run -p 8501:8501 podwise-tts
 ```
 
-## 📊 效能監控
+## 依賴項目
 
-### 日誌配置
+- fastapi
+- uvicorn
+- edge-tts
+- pydantic
+- python-multipart
 
-使用 `utils/logging_config.py` 配置結構化日誌：
+## 重要注意事項
 
-- 控制台彩色輸出
-- 檔案輪轉日誌
-- 不同等級的日誌記錄
-
-### 健康檢查
-
-服務提供 `/health` 端點用於健康檢查：
-
-```bash
-curl http://localhost:8501/health
-```
-
-## 🔄 更新日誌
-
-### v1.0.0 (2024-01-XX)
-- ✅ 完成 Podri TTS 整合
-- ✅ 實現四種台灣語音
-- ✅ 提供 RESTful API
-- ✅ 符合 Google Code Style
-- ✅ 完整的 OOP 設計
-- ✅ 單元測試和整合測試
-
-## 📄 授權
-
-MIT License - 詳見 LICENSE 檔案
-
-## 🤝 貢獻
-
-歡迎提交 Issue 和 Pull Request！
-
-## 📞 支援
-
-如有問題，請聯繫開發團隊或提交 Issue。 
+- 確保網路連接正常（需要連接到 Microsoft TTS 服務）
+- 語音合成需要一定的處理時間
+- 大量請求時注意 API 限制
+- 音訊檔案會暫存在記憶體中
+- 定期檢查服務健康狀態 

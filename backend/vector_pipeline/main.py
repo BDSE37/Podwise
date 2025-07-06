@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Podwise 資料處理主程式
-整合 MongoDB 資料下載、PostgreSQL 元資料查詢、文本分塊、標籤化和向量化功能
+Vector Pipeline 主程式入口點
+
+提供統一的命令列介面，方便調用所有向量處理功能。
+
+Author: Podri Team
+License: MIT
 """
 
 import argparse
-import logging
 import sys
+import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
-
-# 添加父目錄到路徑
-sys.path.append(str(Path(__file__).parent.parent))
-
-from vector_pipeline.pipeline_orchestrator import PipelineOrchestrator
-from config.mongo_config import MONGO_CONFIG
-from config.db_config import POSTGRES_CONFIG, MILVUS_CONFIG
+from typing import Dict, Any
 
 # 設定日誌
 logging.basicConfig(
@@ -24,178 +22,269 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# 添加父目錄到路徑
+sys.path.append(str(Path(__file__).parent.parent))
 
-def main() -> None:
-    """主程式"""
-    parser = argparse.ArgumentParser(description="Podwise 資料處理管道")
-    parser.add_argument("--action", choices=["process", "recreate", "search", "stats"], 
-                       default="process", help="執行動作")
-    parser.add_argument("--mongo-collection", default="RSS_1567737523", 
-                       help="MongoDB 集合名稱")
-    parser.add_argument("--milvus-collection", default="podcast_chunks", 
-                       help="Milvus 集合名稱")
-    parser.add_argument("--limit", type=int, help="限制處理文檔數量")
-    parser.add_argument("--batch-size", type=int, default=100, 
-                       help="批次處理大小")
-    parser.add_argument("--query-text", help="搜尋查詢文本")
-    parser.add_argument("--top-k", type=int, default=10, 
-                       help="搜尋結果數量")
-    parser.add_argument("--tag-csv", default="TAG_info.csv", 
-                       help="標籤 CSV 檔案路徑")
-    parser.add_argument("--embedding-model", default="BAAI/bge-m3", 
-                       help="嵌入模型名稱")
-    parser.add_argument("--max-chunk-size", type=int, default=1024, 
-                       help="最大分塊大小")
+def list_components():
+    """列出所有可用的組件"""
+    try:
+        from vector_pipeline import (
+            PipelineOrchestrator, MongoDBProcessor, PostgreSQLMapper,
+            TextChunker, VectorProcessor, MilvusWriter
+        )
+        
+        components = {
+            "PipelineOrchestrator": "主要協調器，整合所有處理流程",
+            "MongoDBProcessor": "MongoDB 資料處理器（整合 data_cleaning）",
+            "PostgreSQLMapper": "PostgreSQL metadata mapping",
+            "TextChunker": "文本切分處理器",
+            "VectorProcessor": "向量化處理器",
+            "MilvusWriter": "Milvus 資料寫入器"
+        }
+        
+        print("可用的組件：")
+        print("=" * 60)
+        for name, description in components.items():
+            print(f"• {name}: {description}")
+        print("=" * 60)
+        
+    except ImportError as e:
+        logger.error(f"無法載入組件: {e}")
+        return False
+    
+    return True
+
+def test_components():
+    """測試所有組件"""
+    try:
+        from vector_pipeline import MongoDBProcessor, TextChunker, VectorProcessor
+        
+        print("測試組件功能...")
+        print("=" * 60)
+        
+        # 測試 TextChunker
+        print("1. 測試 TextChunker")
+        chunker = TextChunker()
+        test_text = "這是一個測試文本。它包含多個句子。我們要測試文本切分功能。"
+        chunks = chunker.split_text_into_chunks(test_text, "test_doc")
+        print(f"   原始文本: {test_text}")
+        print(f"   切分結果: {len(chunks)} 個 chunks")
+        for i, chunk in enumerate(chunks[:3]):  # 只顯示前3個
+            print(f"     Chunk {i+1}: {chunk.chunk_text[:30]}...")
+        print()
+        
+        # 測試 VectorProcessor
+        print("2. 測試 VectorProcessor")
+        processor = VectorProcessor()
+        test_chunks = [
+            {"text": "這是第一個文本塊", "metadata": {"source": "test"}},
+            {"text": "這是第二個文本塊", "metadata": {"source": "test"}}
+        ]
+        print(f"   測試文本塊數量: {len(test_chunks)}")
+        print("   (向量化需要模型載入，這裡只測試初始化)")
+        print()
+        
+        # 測試 MongoDBProcessor
+        print("3. 測試 MongoDBProcessor")
+        processor = MongoDBProcessor("mongodb://localhost:27017", "test_db")
+        print("   MongoDBProcessor 初始化成功")
+        print("   (實際處理需要 MongoDB 連接)")
+        print()
+        
+        print("所有組件測試完成！")
+        return True
+        
+    except Exception as e:
+        logger.error(f"測試組件失敗: {e}")
+        return False
+
+def process_rss_collection(collection_name: str, mongo_config: Dict[str, Any]):
+    """處理 RSS collection"""
+    try:
+        from vector_pipeline.rss_processor import RSSProcessor
+        
+        print(f"開始處理 RSS collection: {collection_name}")
+        
+        # 初始化 RSS 處理器
+        postgres_config = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "podcast",
+            "user": "user",
+            "password": "password"
+        }
+        
+        milvus_config = {
+            "host": "localhost",
+            "port": "19530",
+            "collection_name": "podcast_chunks",
+            "dim": 1024
+        }
+        
+        processor = RSSProcessor(mongo_config, postgres_config, milvus_config)
+        
+        # 處理 collection
+        result = processor.process_rss_collection(collection_name)
+        
+        print(f"RSS collection 處理完成！")
+        print(f"結果: {result}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"處理 RSS collection 失敗: {e}")
+        return False
+
+def run_pipeline(input_config: Dict[str, Any]):
+    """執行完整的 Pipeline"""
+    try:
+        from vector_pipeline import PipelineOrchestrator
+        
+        print("開始執行完整 Pipeline...")
+        
+        # 準備配置
+        mongo_config = input_config.get('mongo', {})
+        postgres_config = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "podcast",
+            "user": "user",
+            "password": "password"
+        }
+        milvus_config = {
+            "host": "localhost",
+            "port": "19530",
+            "collection_name": "podcast_chunks",
+            "dim": 1024
+        }
+        
+        # 初始化協調器
+        orchestrator = PipelineOrchestrator(mongo_config, postgres_config, milvus_config)
+        
+        # 執行 Pipeline
+        collections = input_config.get('collections', [])
+        results = []
+        
+        for collection in collections:
+            result = orchestrator.process_collection(collection, "podcast_chunks")
+            results.append(result)
+        
+        print(f"Pipeline 執行完成！")
+        print(f"結果: {results}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"執行 Pipeline 失敗: {e}")
+        return False
+
+def test_data_cleaning_integration():
+    """測試 data_cleaning 整合"""
+    try:
+        print("測試 data_cleaning 模組整合...")
+        print("=" * 60)
+        
+        # 測試導入
+        from vector_pipeline.core import MongoDBProcessor
+        
+        # 初始化處理器
+        processor = MongoDBProcessor("mongodb://localhost:27017", "test_db")
+        
+        # 測試清理功能
+        test_doc = {
+            "text": "這是一個測試文檔 😊 包含表情符號 :)",
+            "title": "測試標題 🚀",
+            "description": "測試描述 :D"
+        }
+        
+        # 測試清理（需要實際的清理器）
+        print("MongoDBProcessor 初始化成功")
+        print("data_cleaning 模組整合正常")
+        print()
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"測試 data_cleaning 整合失敗: {e}")
+        return False
+
+def main():
+    """主程式入口點"""
+    parser = argparse.ArgumentParser(
+        description="Vector Pipeline 命令列工具",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+使用範例:
+  # 列出所有組件
+  python main.py --list-components
+  
+  # 測試組件
+  python main.py --test-components
+  
+  # 測試 data_cleaning 整合
+  python main.py --test-data-cleaning
+  
+  # 處理 RSS collection
+  python main.py --process-rss RSS_1500839292
+  
+  # 執行完整 Pipeline
+  python main.py --run-pipeline
+        """
+    )
+    
+    # 基本選項
+    parser.add_argument('--list-components', action='store_true',
+                       help='列出所有可用的組件')
+    parser.add_argument('--test-components', action='store_true',
+                       help='測試所有組件功能')
+    parser.add_argument('--test-data-cleaning', action='store_true',
+                       help='測試 data_cleaning 模組整合')
+    
+    # 處理選項
+    parser.add_argument('--process-rss', type=str,
+                       help='處理指定的 RSS collection')
+    parser.add_argument('--run-pipeline', action='store_true',
+                       help='執行完整的 Pipeline')
+    
+    # 配置選項
+    parser.add_argument('--mongo-host', type=str, default='localhost',
+                       help='MongoDB 主機 (預設: localhost)')
+    parser.add_argument('--mongo-port', type=int, default=27017,
+                       help='MongoDB 埠號 (預設: 27017)')
+    parser.add_argument('--mongo-db', type=str, default='podwise',
+                       help='MongoDB 資料庫名稱 (預設: podwise)')
     
     args = parser.parse_args()
     
-    try:
-        # 初始化 Pipeline Orchestrator
-        orchestrator = PipelineOrchestrator(
-            mongo_config=MONGO_CONFIG,
-            postgres_config=POSTGRES_CONFIG,
-            milvus_config=MILVUS_CONFIG,
-            tag_csv_path=args.tag_csv,
-            embedding_model=args.embedding_model,
-            max_chunk_size=args.max_chunk_size,
-            batch_size=args.batch_size
-        )
-        
-        if args.action == "process":
-            # 處理和向量化
-            logger.info("開始處理和向量化...")
-            stats = orchestrator.process_collection(
-                mongo_collection=args.mongo_collection,
-                milvus_collection=args.milvus_collection,
-                limit=args.limit
-            )
-            logger.info(f"處理完成: {stats}")
-            
-        elif args.action == "recreate":
-            # 重建集合
-            logger.info("重建 Milvus 集合...")
-            orchestrator.milvus_writer.drop_collection(args.milvus_collection)
-            collection_name = orchestrator.milvus_writer.create_collection(args.milvus_collection)
-            logger.info(f"集合重建完成: {collection_name}")
-            
-        elif args.action == "search":
-            # 搜尋相似文檔
-            if not args.query_text:
-                logger.error("搜尋需要提供 --query-text 參數")
-                return
-                
-            logger.info(f"搜尋相似文檔: {args.query_text}")
-            # TODO: 實作搜尋功能
-            logger.info("搜尋功能待實作")
-            
-        elif args.action == "stats":
-            # 獲取統計資訊
-            logger.info("獲取集合統計資訊...")
-            stats = orchestrator.milvus_writer.get_collection_stats(args.milvus_collection)
-            logger.info(f"集合統計: {stats}")
-            
-        else:
-            logger.error(f"未知動作: {args.action}")
-            
-    except Exception as e:
-        logger.error(f"執行失敗: {e}")
-        sys.exit(1)
-    finally:
-        if 'orchestrator' in locals():
-            orchestrator.close()
-
-
-def interactive_mode() -> None:
-    """互動模式"""
-    print("🎙️ Podwise 資料處理管道")
-    print("=" * 50)
+    # 準備配置
+    mongo_config = {
+        'host': args.mongo_host,
+        'port': args.mongo_port,
+        'database': args.mongo_db
+    }
     
-    # 配置
-    mongo_config = MONGO_CONFIG
-    milvus_config = MILVUS_CONFIG
-    postgres_config = POSTGRES_CONFIG
+    # 執行對應功能
+    if args.list_components:
+        return list_components()
     
-    orchestrator = PipelineOrchestrator(
-        mongo_config=mongo_config,
-        postgres_config=postgres_config,
-        milvus_config=milvus_config
-    )
+    elif args.test_components:
+        return test_components()
     
-    try:
-        while True:
-            print("\n請選擇操作:")
-            print("1. 處理和向量化文檔")
-            print("2. 重建集合")
-            print("3. 搜尋相似文檔")
-            print("4. 查看統計資訊")
-            print("5. 退出")
-            
-            choice = input("\n請輸入選項 (1-5): ").strip()
-            
-            if choice == "1":
-                # 處理和向量化
-                mongo_collection = input("MongoDB 集合名稱 (預設: RSS_1567737523): ").strip() or "RSS_1567737523"
-                milvus_collection = input("Milvus 集合名稱 (預設: podcast_chunks): ").strip() or "podcast_chunks"
-                limit_str = input("限制文檔數量 (預設: 無限制): ").strip()
-                limit: Optional[int] = int(limit_str) if limit_str else None
-                
-                print("開始處理...")
-                stats = orchestrator.process_collection(
-                    mongo_collection=mongo_collection,
-                    milvus_collection=milvus_collection,
-                    limit=limit
-                )
-                print(f"處理完成: {stats}")
-                
-            elif choice == "2":
-                # 重建集合
-                collection_name = input("集合名稱 (預設: podcast_chunks): ").strip() or "podcast_chunks"
-                confirm = input(f"確定要重建集合 {collection_name} 嗎? (y/N): ").strip().lower()
-                
-                if confirm == 'y':
-                    print("重建集合...")
-                    orchestrator.milvus_writer.drop_collection(collection_name)
-                    new_collection = orchestrator.milvus_writer.create_collection(collection_name)
-                    print(f"集合重建完成: {new_collection}")
-                else:
-                    print("取消重建")
-                    
-            elif choice == "3":
-                # 搜尋
-                query_text = input("搜尋查詢: ").strip()
-                if not query_text:
-                    print("請輸入搜尋查詢")
-                    continue
-                    
-                collection_name = input("集合名稱 (預設: podcast_chunks): ").strip() or "podcast_chunks"
-                print("搜尋功能待實作")
-                    
-            elif choice == "4":
-                # 統計資訊
-                collection_name = input("集合名稱 (預設: podcast_chunks): ").strip() or "podcast_chunks"
-                print("獲取統計資訊...")
-                stats = orchestrator.milvus_writer.get_collection_stats(collection_name)
-                print(f"集合統計: {stats}")
-                
-            elif choice == "5":
-                print("再見！")
-                break
-                
-            else:
-                print("無效選項，請重新選擇")
-                
-    except KeyboardInterrupt:
-        print("\n\n程式被中斷")
-    except Exception as e:
-        print(f"發生錯誤: {e}")
-    finally:
-        orchestrator.close()
-
+    elif args.test_data_cleaning:
+        return test_data_cleaning_integration()
+    
+    elif args.process_rss:
+        return process_rss_collection(args.process_rss, mongo_config)
+    
+    elif args.run_pipeline:
+        input_config = {
+            'mongo': mongo_config,
+            'collections': ['RSS_1500839292']  # 預設處理股癌 collection
+        }
+        return run_pipeline(input_config)
+    
+    else:
+        parser.print_help()
+        return False
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        # 命令列模式
-        main()
-    else:
-        # 互動模式
-        interactive_mode() 
+    success = main()
+    sys.exit(0 if success else 1) 

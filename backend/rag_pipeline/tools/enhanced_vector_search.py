@@ -1,78 +1,134 @@
 #!/usr/bin/env python3
 """
-增強型向量搜尋工具
-整合職缺搜尋和一般向量搜尋功能，提供統一的搜尋介面
-支援 Milvus 向量資料庫和智能查詢優化
+統一向量搜尋工具
+
+整合所有向量搜尋相關功能：
+- 增強型向量搜尋
+- KNN 推薦算法
+- 智能標籤提取
+- 混合檢索策略
+- 語意相似度計算
+
+作者: Podwise Team
+版本: 2.0.0
 """
 
 import os
 import logging
-from typing import List, Dict, Any, Optional
-from pymilvus import connections, Collection, utility
-from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
-import json
 import numpy as np
-from dotenv import load_dotenv
+from typing import List, Dict, Any, Optional, Tuple, Union
+from dataclasses import dataclass, field
+from abc import ABC, abstractmethod
+import json
+from datetime import datetime
 
-# 載入環境變數
-load_dotenv()
+try:
+    import pandas as pd
+except ImportError:
+    print("警告：pandas 未安裝，標籤匹配功能將不可用")
+    pd = None
+
+try:
+    from pymilvus import connections, Collection, utility
+except ImportError:
+    print("警告：pymilvus 未安裝，向量搜尋功能將不可用")
+    connections = None
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class EnhancedVectorSearchTool:
-    """增強型向量搜尋工具類別"""
+
+@dataclass
+class SearchResult:
+    """搜尋結果數據類別"""
+    id: str
+    title: str
+    content: str
+    score: float
+    category: str
+    tags: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    source: str = ""
+
+
+@dataclass
+class PodcastItem:
+    """Podcast 項目數據類別"""
+    rss_id: str
+    title: str
+    description: str
+    category: str
+    tags: List[str] = field(default_factory=list)
+    vector: np.ndarray
+    updated_at: str
+    confidence: float = 0.0
+
+
+@dataclass
+class RecommendationResult:
+    """推薦結果數據類別"""
+    recommendations: List[PodcastItem]
+    total_found: int
+    confidence: float
+    reasoning: str
+    processing_time: float
+
+
+@dataclass
+class TagMapping:
+    """標籤映射結果"""
+    original_tag: str
+    mapped_tags: List[str]
+    confidence: float
+    method: str  # "exact", "similarity", "fuzzy"
+
+
+@dataclass
+class SmartTagResult:
+    """智能標籤提取結果"""
+    extracted_tags: List[str]
+    mapped_tags: List[TagMapping]
+    confidence: float
+    processing_time: float
+    method_used: List[str]
+
+
+class BaseVectorSearch(ABC):
+    """向量搜尋基礎抽象類別"""
     
-    def __init__(
-        self,
-        collection_name: str = "podcast_embeddings",
-        host: str = "milvus",
-        port: int = 19530,
-        dimension: int = 1536,
-        search_type: str = "general"  # "general" 或 "job"
-    ):
-        """
-        初始化增強型向量搜尋工具
-        
-        Args:
-            collection_name: 集合名稱
-            host: Milvus 主機
-            port: Milvus 端口
-            dimension: 向量維度
-            search_type: 搜尋類型 ("general" 或 "job")
-        """
-        self.collection_name = collection_name
-        self.host = host
-        self.port = port
-        self.dimension = dimension
-        self.search_type = search_type
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+        self.collection_name = config.get("collection_name", "podcast_embeddings")
+        self.host = config.get("host", "milvus")
+        self.port = config.get("port", 19530)
+        self.dimension = config.get("dimension", 1536)
         self.collection = None
-        
-        # 連接到 Milvus
+    
+    @abstractmethod
+    async def search(self, query: str, top_k: int = 5) -> List[SearchResult]:
+        """執行搜尋"""
+        pass
+    
+    @abstractmethod
+    def get_embedding(self, text: str) -> np.ndarray:
+        """獲取文本嵌入向量"""
+        pass
+
+
+class MilvusVectorSearch(BaseVectorSearch):
+    """Milvus 向量搜尋實現"""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__(config)
         self._connect_to_milvus()
-        
-        # 初始化 LLM（如果可用）
-        self.llm = None
-        try:
-            self.llm = OpenAI(temperature=0.1)
-            logger.info("LLM 初始化成功")
-        except Exception as e:
-            logger.warning(f"LLM 初始化失敗: {e}")
-        
-        # 載入職缺元數據（如果是職缺搜尋）
-        self.metadata = {}
-        if search_type == "job":
-            self._load_job_metadata()
-        
-        # 設定查詢提示樣板
-        self._setup_prompts()
-        
-        logger.info(f"增強型向量搜尋工具初始化完成: {host}:{port}, 類型: {search_type}")
     
     def _connect_to_milvus(self):
         """連接到 Milvus"""
+        if connections is None:
+            logger.warning("pymilvus 未安裝，無法使用 Milvus 向量搜尋")
+            return
+        
         try:
             connections.connect(
                 alias="default",
@@ -81,7 +137,6 @@ class EnhancedVectorSearchTool:
             )
             logger.info("成功連接到 Milvus")
             
-            # 檢查集合是否存在
             if utility.has_collection(self.collection_name):
                 self.collection = Collection(self.collection_name)
                 self.collection.load()
@@ -91,438 +146,506 @@ class EnhancedVectorSearchTool:
                 
         except Exception as e:
             logger.error(f"連接到 Milvus 失敗: {str(e)}")
-            raise
     
-    def _load_job_metadata(self):
-        """載入職缺元數據"""
+    async def search(self, query: str, top_k: int = 5) -> List[SearchResult]:
+        """執行 Milvus 向量搜尋"""
+        if self.collection is None:
+            return []
+        
         try:
-            metadata_path = "../data_processing_system/data/processed/vector/jobs_metadata.json"
-            if os.path.exists(metadata_path):
-                with open(metadata_path, 'r', encoding='utf-8') as f:
-                    self.metadata = json.load(f)
-                logger.info(f"載入職缺元數據: {len(self.metadata)} 筆記錄")
-            else:
-                logger.warning(f"找不到職缺元數據檔案: {metadata_path}")
-        except Exception as e:
-            logger.error(f"載入職缺元數據時出錯: {e}")
-    
-    def _setup_prompts(self):
-        """設定查詢提示樣板"""
-        if self.search_type == "job":
-            # 職缺搜尋提示
-            self.query_prompt = PromptTemplate(
-                input_variables=["query"],
-                template="""
-                將以下用戶查詢轉化為適合向量數據庫搜索的查詢文本:
-                查詢: {query}
-                
-                轉換後的查詢:
-                """
-            )
+            query_vector = self.get_embedding(query)
             
-            self.answer_prompt = PromptTemplate(
-                input_variables=["query", "results"],
-                template="""
-                你是一位專業的職缺顧問，根據以下職缺資訊回答用戶的問題。
-                
-                用戶問題: {query}
-                
-                相關職缺資訊:
-                {results}
-                
-                請基於這些職缺資訊，針對用戶問題提供詳細且專業的回答。
-                使用繁體中文回覆，並確保回覆中客觀反映實際的職缺狀況。
-                如有按件計酬等特殊薪資類型，請特別說明。
-                """
-            )
-        else:
-            # 一般搜尋提示
-            self.query_prompt = PromptTemplate(
-                input_variables=["query"],
-                template="""
-                將以下用戶查詢轉化為適合向量數據庫搜索的查詢文本:
-                查詢: {query}
-                
-                轉換後的查詢:
-                """
-            )
+            search_params = {
+                "metric_type": "COSINE",
+                "params": {"nprobe": 10}
+            }
             
-            self.answer_prompt = PromptTemplate(
-                input_variables=["query", "results"],
-                template="""
-                根據以下相關內容回答用戶的問題。
-                
-                用戶問題: {query}
-                
-                相關內容:
-                {results}
-                
-                請基於這些內容，針對用戶問題提供準確且有用的回答。
-                使用繁體中文回覆。
-                """
-            )
-    
-    def _get_embedding(self, query: str) -> List[float]:
-        """獲取查詢文本的嵌入向量"""
-        try:
-            from langchain.embeddings import OpenAIEmbeddings
-            embeddings = OpenAIEmbeddings()
-            return embeddings.embed_query(query)
-        except Exception as e:
-            logger.error(f"獲取嵌入向量失敗: {e}")
-            # 返回零向量作為備用
-            return [0.0] * self.dimension
-    
-    def _format_job_result(self, job_id: str, score: float) -> str:
-        """格式化職缺搜尋結果"""
-        if not self.metadata or job_id not in self.metadata:
-            return f"職缺 ID: {job_id} (無詳細資訊)"
-        
-        job = self.metadata[job_id]
-        
-        # 格式化薪資顯示
-        salary_display = ""
-        if job.get("is_commission", False):
-            salary_display = "按件計酬 (無底薪保障)"
-        else:
-            salary_type = job.get("salary_type", "月薪")
-            salary_min = job.get("salary_min", 0)
-            salary_max = job.get("salary_max", 0)
-            if salary_min and salary_max:
-                salary_display = f"{salary_type} {salary_min:,} - {salary_max:,} 元"
-            elif salary_min:
-                salary_display = f"{salary_type} {salary_min:,} 元以上"
-            else:
-                salary_display = "待遇面議"
-        
-        # 組織職缺資訊
-        result = f"""
-職缺標題: {job.get('job_title', '未提供')}
-公司名稱: {job.get('company_name', '未提供')}
-工作地點: {job.get('location', '未提供')}
-薪資待遇: {salary_display}
-類別: {job.get('primary_category', '')} / {job.get('job_category', '')}
-相關度: {score:.2f}
-"""
-        
-        # 添加技能要求 (如果有)
-        skills = job.get('skills', [])
-        if skills and len(skills) > 0:
-            result += f"所需技能: {', '.join(skills)}\n"
-        
-        # 添加工作描述片段 (如果有)
-        job_description = job.get('job_description', '')
-        if job_description:
-            # 截取前 100 個字符作為摘要
-            result += f"工作描述: {job_description[:100]}...\n"
-        
-        return result
-    
-    def _format_general_result(self, hit) -> str:
-        """格式化一般搜尋結果"""
-        return f"""
-內容: {hit.entity.get('content', '')[:200]}...
-來源: {hit.entity.get('source', '')}
-相關度: {hit.score:.2f}
-"""
-    
-    def search_similar_content(
-        self,
-        query_vector: List[float],
-        top_k: int = 5,
-        search_params: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        搜尋相似內容
-        
-        Args:
-            query_vector: 查詢向量
-            top_k: 返回結果數量
-            search_params: 搜尋參數
-            
-        Returns:
-            List[Dict[str, Any]]: 搜尋結果
-        """
-        try:
-            if self.collection is None:
-                raise ValueError("集合未載入")
-            
-            # 預設搜尋參數
-            if search_params is None:
-                search_params = {
-                    "metric_type": "COSINE",
-                    "params": {"nprobe": 10}
-                }
-            
-            # 設定輸出欄位
-            if self.search_type == "job":
-                output_fields = ["job_title", "company_name", "salary_min", "salary_type", "is_commission"]
-            else:
-                output_fields = ["content", "metadata", "source"]
-            
-            # 執行搜尋
             results = self.collection.search(
                 data=[query_vector],
                 anns_field="embedding",
                 param=search_params,
                 limit=top_k,
-                output_fields=output_fields
+                output_fields=["title", "content", "category", "tags", "metadata"]
             )
             
-            # 格式化結果
-            formatted_results = []
+            search_results = []
             for hits in results:
                 for hit in hits:
-                    if self.search_type == "job":
-                        result_text = self._format_job_result(hit.id, hit.score)
-                    else:
-                        result_text = self._format_general_result(hit)
-                    
-                    formatted_results.append({
-                        "id": hit.id,
-                        "score": hit.score,
-                        "content": result_text,
-                        "metadata": hit.entity.get("metadata", {}),
-                        "source": hit.entity.get("source", "")
-                    })
+                    search_results.append(SearchResult(
+                        id=str(hit.id),
+                        title=hit.entity.get("title", ""),
+                        content=hit.entity.get("content", ""),
+                        score=hit.score,
+                        category=hit.entity.get("category", ""),
+                        tags=hit.entity.get("tags", []),
+                        metadata=hit.entity.get("metadata", {}),
+                        source="milvus"
+                    ))
             
-            logger.info(f"搜尋完成，找到 {len(formatted_results)} 個結果")
-            return formatted_results
+            return search_results
             
         except Exception as e:
-            logger.error(f"向量搜尋失敗: {str(e)}")
+            logger.error(f"Milvus 搜尋失敗: {str(e)}")
             return []
     
-    def search(self, query: str, top_k: int = 5, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get_embedding(self, text: str) -> np.ndarray:
+        """獲取文本嵌入向量（簡化實現）"""
+        # 簡化的向量生成邏輯
+        words = text.lower().split()
+        vector = np.zeros(self.dimension)
+        
+        # 簡單的關鍵詞權重
+        business_keywords = ["股票", "投資", "理財", "財經", "市場", "經濟"]
+        education_keywords = ["學習", "技能", "成長", "職涯", "發展", "教育"]
+        
+        for word in words:
+            if word in business_keywords:
+                vector[0:self.dimension//2] += 0.1
+            if word in education_keywords:
+                vector[self.dimension//2:] += 0.1
+        
+        # 正規化
+        norm = np.linalg.norm(vector)
+        if norm > 0:
+            vector = vector / norm
+        
+        return vector
+
+
+class KNNRecommender:
+    """KNN 推薦器"""
+    
+    def __init__(self, k: int = 5, metric: str = "cosine"):
+        self.k = k
+        self.metric = metric
+        self.podcast_items: List[PodcastItem] = []
+        self.category_statistics: Dict[str, int] = {}
+    
+    def add_podcast_items(self, items: List[PodcastItem]) -> None:
+        """添加 Podcast 項目"""
+        self.podcast_items.extend(items)
+        self._update_category_statistics()
+    
+    def _update_category_statistics(self) -> None:
+        """更新分類統計"""
+        self.category_statistics = {}
+        for item in self.podcast_items:
+            category = item.category
+            self.category_statistics[category] = self.category_statistics.get(category, 0) + 1
+    
+    def _calculate_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
+        """計算相似度"""
+        if self.metric == "cosine":
+            dot_product = np.dot(vec1, vec2)
+            norm1 = np.linalg.norm(vec1)
+            norm2 = np.linalg.norm(vec2)
+            if norm1 == 0 or norm2 == 0:
+                return 0.0
+            return dot_product / (norm1 * norm2)
+        elif self.metric == "euclidean":
+            return 1.0 / (1.0 + np.linalg.norm(vec1 - vec2))
+        else:
+            return 0.0
+    
+    def recommend(self, 
+                 query_vector: np.ndarray, 
+                 category_filter: Optional[str] = None,
+                 top_k: int = 5) -> RecommendationResult:
+        """執行推薦"""
+        start_time = datetime.now()
+        
+        # 過濾項目
+        filtered_items = self.podcast_items
+        if category_filter:
+            filtered_items = [item for item in self.podcast_items if item.category == category_filter]
+        
+        if not filtered_items:
+            return RecommendationResult(
+                recommendations=[],
+                total_found=0,
+                confidence=0.0,
+                reasoning="沒有找到符合條件的項目",
+                processing_time=(datetime.now() - start_time).total_seconds()
+            )
+        
+        # 計算相似度
+        similarities = []
+        for item in filtered_items:
+            similarity = self._calculate_similarity(query_vector, item.vector)
+            similarities.append((item, similarity))
+        
+        # 排序並取前 k 個
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        top_items = similarities[:top_k]
+        
+        # 轉換為 PodcastItem 並設置信心度
+        recommendations = []
+        for item, similarity in top_items:
+            item.confidence = similarity
+            recommendations.append(item)
+        
+        processing_time = (datetime.now() - start_time).total_seconds()
+        
+        return RecommendationResult(
+            recommendations=recommendations,
+            total_found=len(recommendations),
+            confidence=top_items[0][1] if top_items else 0.0,
+            reasoning=f"使用 {self.metric} 相似度計算，找到 {len(recommendations)} 個推薦",
+            processing_time=processing_time
+        )
+    
+    def get_category_statistics(self) -> Dict[str, int]:
+        """獲取分類統計"""
+        return self.category_statistics.copy()
+
+
+class SmartTagExtractor:
+    """智能標籤提取器"""
+    
+    def __init__(self, 
+                 existing_tags_file: Optional[str] = None,
+                 similarity_threshold: float = 0.7):
+        self.similarity_threshold = similarity_threshold
+        self.existing_tags = self._load_existing_tags(existing_tags_file)
+    
+    def _load_existing_tags(self, tags_file: Optional[str]) -> Dict[str, List[str]]:
+        """載入現有標籤"""
+        if tags_file and os.path.exists(tags_file) and pd is not None:
+            try:
+                df = pd.read_csv(tags_file, encoding='utf-8')
+                tags_dict = {}
+                for _, row in df.iterrows():
+                    category = str(row['類別'])
+                    tag = str(row['TAG'])
+                    if category not in tags_dict:
+                        tags_dict[category] = []
+                    tags_dict[category].append(tag)
+                return tags_dict
+            except Exception as e:
+                logger.error(f"載入標籤檔案失敗: {e}")
+        
+        # 預設標籤
+        return {
+            "商業": ["股票", "投資", "理財", "財經", "市場", "經濟", "創業", "職場"],
+            "教育": ["學習", "成長", "職涯", "心理", "溝通", "語言", "親子", "技能"]
+        }
+    
+    def extract_basic_tags(self, query: str) -> List[str]:
+        """提取基本標籤"""
+        query_lower = query.lower()
+        extracted_tags = []
+        
+        for category, tags in self.existing_tags.items():
+            for tag in tags:
+                if tag.lower() in query_lower:
+                    extracted_tags.append(tag)
+        
+        return extracted_tags
+    
+    def find_missing_tags(self, extracted_tags: List[str]) -> List[str]:
+        """找出缺失的標籤"""
+        all_tags = []
+        for tags in self.existing_tags.values():
+            all_tags.extend(tags)
+        
+        missing_tags = []
+        for tag in all_tags:
+            if tag not in extracted_tags:
+                missing_tags.append(tag)
+        
+        return missing_tags
+    
+    def fuzzy_match(self, query_tag: str) -> List[str]:
+        """模糊匹配"""
+        matches = []
+        query_lower = query_tag.lower()
+        
+        for category, tags in self.existing_tags.items():
+            for tag in tags:
+                tag_lower = tag.lower()
+                # 簡單的字符相似度計算
+                similarity = self._calculate_char_similarity(query_lower, tag_lower)
+                if similarity >= self.similarity_threshold:
+                    matches.append(tag)
+        
+        return matches
+    
+    def _calculate_char_similarity(self, str1: str, str2: str) -> float:
+        """計算字符相似度"""
+        if not str1 or not str2:
+            return 0.0
+        
+        # 使用編輯距離計算相似度
+        len1, len2 = len(str1), len(str2)
+        matrix = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+        
+        for i in range(len1 + 1):
+            matrix[i][0] = i
+        for j in range(len2 + 1):
+            matrix[0][j] = j
+        
+        for i in range(1, len1 + 1):
+            for j in range(1, len2 + 1):
+                if str1[i-1] == str2[j-1]:
+                    matrix[i][j] = matrix[i-1][j-1]
+                else:
+                    matrix[i][j] = min(
+                        matrix[i-1][j] + 1,    # 刪除
+                        matrix[i][j-1] + 1,    # 插入
+                        matrix[i-1][j-1] + 1   # 替換
+                    )
+        
+        max_len = max(len1, len2)
+        if max_len == 0:
+            return 1.0
+        
+        return 1.0 - (matrix[len1][len2] / max_len)
+    
+    def extract_smart_tags(self, query: str, context: str = "") -> SmartTagResult:
+        """提取智能標籤"""
+        start_time = datetime.now()
+        
+        # 提取基本標籤
+        basic_tags = self.extract_basic_tags(query)
+        
+        # 找出缺失標籤
+        missing_tags = self.find_missing_tags(basic_tags)
+        
+        # 模糊匹配
+        mapped_tags = []
+        for missing_tag in missing_tags[:10]:  # 限制數量
+            fuzzy_matches = self.fuzzy_match(missing_tag)
+            if fuzzy_matches:
+                mapped_tags.append(TagMapping(
+                    original_tag=missing_tag,
+                    mapped_tags=fuzzy_matches,
+                    confidence=0.8,
+                    method="fuzzy"
+                ))
+        
+        processing_time = (datetime.now() - start_time).total_seconds()
+        
+        return SmartTagResult(
+            extracted_tags=basic_tags,
+            mapped_tags=mapped_tags,
+            confidence=len(basic_tags) / 10.0,  # 簡化的信心度計算
+            processing_time=processing_time,
+            method_used=["basic_extraction", "fuzzy_matching"]
+        )
+
+
+class UnifiedVectorSearch:
+    """統一向量搜尋工具"""
+    
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+        
+        # 初始化各組件
+        self.milvus_search = MilvusVectorSearch(config.get("milvus", {}))
+        self.knn_recommender = KNNRecommender(
+            k=config.get("knn_k", 5),
+            metric=config.get("knn_metric", "cosine")
+        )
+        self.tag_extractor = SmartTagExtractor(
+            existing_tags_file=config.get("tags_file"),
+            similarity_threshold=config.get("similarity_threshold", 0.7)
+        )
+        
+        # 載入示例數據
+        self._load_sample_data()
+        
+        logger.info("統一向量搜尋工具初始化完成")
+    
+    def _load_sample_data(self):
+        """載入示例數據"""
+        sample_items = [
+            PodcastItem(
+                rss_id="rss_001",
+                title="股癌 EP310",
+                description="台股投資分析與市場趨勢",
+                category="商業",
+                tags=["股票", "投資", "台股", "財經"],
+                vector=np.array([0.8, 0.6, 0.9, 0.7, 0.8, 0.6, 0.9, 0.7]),
+                updated_at="2025-01-15",
+                confidence=0.9
+            ),
+            PodcastItem(
+                rss_id="rss_002",
+                title="大人學 EP110",
+                description="職涯發展與個人成長指南",
+                category="教育",
+                tags=["職涯", "成長", "技能", "學習"],
+                vector=np.array([0.3, 0.8, 0.4, 0.9, 0.3, 0.8, 0.4, 0.9]),
+                updated_at="2025-01-14",
+                confidence=0.85
+            ),
+            PodcastItem(
+                rss_id="rss_003",
+                title="財報狗 Podcast",
+                description="財報分析與投資策略",
+                category="商業",
+                tags=["財報", "投資", "分析", "策略"],
+                vector=np.array([0.9, 0.5, 0.8, 0.6, 0.9, 0.5, 0.8, 0.6]),
+                updated_at="2025-01-13",
+                confidence=0.88
+            )
+        ]
+        
+        self.knn_recommender.add_podcast_items(sample_items)
+    
+    async def search(self, 
+                    query: str, 
+                    top_k: int = 5,
+                    use_milvus: bool = True,
+                    use_knn: bool = True,
+                    use_tags: bool = True) -> Dict[str, Any]:
         """
-        執行智能搜尋
+        執行統一搜尋
         
         Args:
-            query: 查詢文本
+            query: 查詢文字
             top_k: 返回結果數量
-            filters: 過濾條件
+            use_milvus: 是否使用 Milvus 搜尋
+            use_knn: 是否使用 KNN 推薦
+            use_tags: 是否使用標籤提取
             
         Returns:
             Dict[str, Any]: 搜尋結果
         """
-        try:
-            # 優化查詢文本
-            enhanced_query = query
-            if self.llm:
-                try:
-                    enhanced_query = self.llm(self.query_prompt.format(query=query))
-                    logger.info(f"優化後查詢文本: {enhanced_query}")
-                except Exception as e:
-                    logger.warning(f"查詢優化失敗，使用原始查詢: {e}")
-            
-            # 獲取查詢向量
-            query_vector = self._get_embedding(enhanced_query)
-            
-            # 準備搜尋參數
-            search_params = {
-                "metric_type": "COSINE",
-                "params": {"ef": 64}
-            }
-            
-            # 執行向量搜尋
-            hits = self.search_similar_content(query_vector, top_k, search_params)
-            
-            # 生成摘要回答
-            answer = query  # 預設使用原始查詢
-            if self.llm and hits:
-                try:
-                    formatted_results = "\n".join([hit["content"] for hit in hits])
-                    answer = self.llm(self.answer_prompt.format(
-                        query=query,
-                        results=formatted_results
-                    ))
-                except Exception as e:
-                    logger.warning(f"生成回答失敗: {e}")
-            
-            return {
-                "query": query,
-                "answer": answer,
-                "hits": hits,
-                "enhanced_query": enhanced_query
-            }
+        results = {
+            "query": query,
+            "milvus_results": [],
+            "knn_results": None,
+            "tag_results": None,
+            "combined_results": [],
+            "processing_time": 0.0
+        }
         
-        except Exception as e:
-            logger.error(f"搜尋時出錯: {e}")
-            return {
-                "query": query,
-                "answer": f"搜尋處理過程中發生錯誤: {str(e)}",
-                "hits": [],
-                "enhanced_query": query
-            }
-    
-    def insert_vectors(
-        self,
-        vectors: List[List[float]],
-        contents: List[str],
-        metadatas: List[Dict[str, Any]],
-        sources: List[str]
-    ) -> bool:
-        """
-        插入向量資料
+        start_time = datetime.now()
         
-        Args:
-            vectors: 向量列表
-            contents: 內容列表
-            metadatas: 元數據列表
-            sources: 來源列表
-            
-        Returns:
-            bool: 是否成功
-        """
-        try:
-            if self.collection is None:
-                raise ValueError("集合未載入")
-            
-            # 準備插入資料
-            insert_data = [
-                vectors,
-                contents,
-                metadatas,
-                sources
-            ]
-            
-            # 插入資料
-            self.collection.insert(insert_data)
-            self.collection.flush()
-            
-            logger.info(f"成功插入 {len(vectors)} 個向量")
-            return True
-            
-        except Exception as e:
-            logger.error(f"插入向量失敗: {str(e)}")
-            return False
-    
-    def delete_vectors(self, ids: List[int]) -> bool:
-        """
-        刪除向量資料
+        # 1. Milvus 向量搜尋
+        if use_milvus:
+            results["milvus_results"] = await self.milvus_search.search(query, top_k)
         
-        Args:
-            ids: 要刪除的 ID 列表
-            
-        Returns:
-            bool: 是否成功
-        """
-        try:
-            if self.collection is None:
-                raise ValueError("集合未載入")
-            
-            # 刪除資料
-            self.collection.delete(f"id in {ids}")
-            
-            logger.info(f"成功刪除 {len(ids)} 個向量")
-            return True
-            
-        except Exception as e:
-            logger.error(f"刪除向量失敗: {str(e)}")
-            return False
-    
-    def get_collection_stats(self) -> Dict[str, Any]:
-        """
-        獲取集合統計資訊
+        # 2. KNN 推薦
+        if use_knn:
+            query_vector = self.milvus_search.get_embedding(query)
+            knn_result = self.knn_recommender.recommend(query_vector, top_k=top_k)
+            results["knn_results"] = knn_result
         
-        Returns:
-            Dict[str, Any]: 統計資訊
-        """
-        try:
-            if self.collection is None:
-                return {"error": "集合未載入"}
-            
-            stats = {
-                "collection_name": self.collection_name,
-                "num_entities": self.collection.num_entities,
-                "dimension": self.dimension,
-                "search_type": self.search_type
-            }
-            
-            if self.search_type == "job":
-                stats["job_metadata_count"] = len(self.metadata)
-            
-            return stats
-            
-        except Exception as e:
-            logger.error(f"獲取集合統計失敗: {str(e)}")
-            return {"error": f"獲取集合統計失敗: {str(e)}"}
-    
-    def health_check(self) -> Dict[str, Any]:
-        """
-        健康檢查
+        # 3. 智能標籤提取
+        if use_tags:
+            tag_result = self.tag_extractor.extract_smart_tags(query)
+            results["tag_results"] = tag_result
         
-        Returns:
-            Dict[str, Any]: 健康狀態
-        """
-        try:
-            # 檢查 Milvus 連接
-            connections.get_connection("default")
-            
-            # 檢查集合狀態
-            collection_loaded = self.collection is not None
-            
-            return {
-                "status": "healthy",
-                "milvus_connected": True,
-                "collection_loaded": collection_loaded,
-                "search_type": self.search_type,
-                "llm_available": self.llm is not None
-            }
-            
-        except Exception as e:
-            logger.error(f"健康檢查失敗: {str(e)}")
-            return {
-                "status": "unhealthy",
-                "error": str(e)
-            }
+        # 4. 合併結果
+        results["combined_results"] = self._combine_results(
+            results["milvus_results"],
+            results["knn_results"],
+            results["tag_results"]
+        )
+        
+        results["processing_time"] = (datetime.now() - start_time).total_seconds()
+        
+        return results
     
-    def close(self):
-        """關閉連接"""
-        try:
-            if self.collection:
-                self.collection.release()
-            connections.disconnect("default")
-            logger.info("向量搜尋工具連接已關閉")
-        except Exception as e:
-            logger.error(f"關閉連接失敗: {str(e)}")
+    def _combine_results(self, 
+                        milvus_results: List[SearchResult],
+                        knn_result: Optional[RecommendationResult],
+                        tag_result: Optional[SmartTagResult]) -> List[Dict[str, Any]]:
+        """合併搜尋結果"""
+        combined = []
+        
+        # 添加 Milvus 結果
+        for result in milvus_results:
+            combined.append({
+                "id": result.id,
+                "title": result.title,
+                "content": result.content,
+                "score": result.score,
+                "category": result.category,
+                "tags": result.tags,
+                "source": "milvus",
+                "type": "vector_search"
+            })
+        
+        # 添加 KNN 結果
+        if knn_result and knn_result.recommendations:
+            for item in knn_result.recommendations:
+                combined.append({
+                    "id": item.rss_id,
+                    "title": item.title,
+                    "content": item.description,
+                    "score": item.confidence,
+                    "category": item.category,
+                    "tags": item.tags,
+                    "source": "knn",
+                    "type": "recommendation"
+                })
+        
+        # 按分數排序並去重
+        combined.sort(key=lambda x: x["score"], reverse=True)
+        
+        # 簡單去重（基於 ID）
+        seen_ids = set()
+        unique_results = []
+        for result in combined:
+            if result["id"] not in seen_ids:
+                seen_ids.add(result["id"])
+                unique_results.append(result)
+        
+        return unique_results
+    
+    def get_statistics(self) -> Dict[str, Any]:
+        """獲取統計資訊"""
+        return {
+            "milvus_connected": self.milvus_search.collection is not None,
+            "knn_items_count": len(self.knn_recommender.podcast_items),
+            "category_statistics": self.knn_recommender.get_category_statistics(),
+            "available_tags": len(self.tag_extractor.existing_tags)
+        }
+
 
 # 向後相容性別名
-JobSearchRAG = EnhancedVectorSearchTool
+EnhancedVectorSearchTool = UnifiedVectorSearch
+JobSearchRAG = UnifiedVectorSearch
 
-# 示範使用方式
+
+# 使用範例
 if __name__ == "__main__":
-    # 職缺搜尋範例
-    job_rag = EnhancedVectorSearchTool(search_type="job")
+    # 配置
+    config = {
+        "milvus": {
+            "collection_name": "podcast_embeddings",
+            "host": "localhost",
+            "port": 19530,
+            "dimension": 8
+        },
+        "knn_k": 5,
+        "knn_metric": "cosine",
+        "similarity_threshold": 0.7,
+        "tags_file": "scripts/csv/TAG_info.csv"
+    }
     
-    job_queries = [
-        "我想找一份台北市的前端開發工作，需要熟悉 React，月薪至少 5 萬",
-        "有沒有在高雄的資深 Python 工程師職缺？",
-        "有哪些按件計酬的工作機會？",
-    ]
+    # 創建統一搜尋工具
+    search_tool = UnifiedVectorSearch(config)
     
-    for query in job_queries:
-        print("\n" + "="*50)
-        print(f"職缺查詢: {query}")
-        result = job_rag.search(query, top_k=3)
-        print(f"回答: {result['answer']}")
-        print(f"找到 {len(result['hits'])} 個相關職缺")
+    # 測試搜尋
+    import asyncio
     
-    # 一般搜尋範例
-    general_rag = EnhancedVectorSearchTool(search_type="general")
+    async def test_search():
+        query = "我想學習投資理財，有什麼推薦的 Podcast 嗎？"
+        results = await search_tool.search(query, top_k=3)
+        
+        print(f"查詢: {query}")
+        print(f"處理時間: {results['processing_time']:.3f} 秒")
+        print(f"合併結果數量: {len(results['combined_results'])}")
+        
+        for i, result in enumerate(results['combined_results'][:3]):
+            print(f"\n{i+1}. {result['title']}")
+            print(f"   分數: {result['score']:.3f}")
+            print(f"   類別: {result['category']}")
+            print(f"   來源: {result['source']}")
+            print(f"   標籤: {', '.join(result['tags'])}")
     
-    general_queries = [
-        "什麼是機器學習？",
-        "如何學習 Python 程式設計？",
-    ]
-    
-    for query in general_queries:
-        print("\n" + "="*50)
-        print(f"一般查詢: {query}")
-        result = general_rag.search(query, top_k=3)
-        print(f"回答: {result['answer']}")
-        print(f"找到 {len(result['hits'])} 個相關內容")
-    
-    # 關閉連接
-    job_rag.close()
-    general_rag.close()
+    asyncio.run(test_search())

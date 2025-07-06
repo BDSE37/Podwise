@@ -4,22 +4,46 @@ ML Pipeline 核心模組
 提供推薦系統的核心功能
 """
 
+# 核心推薦器
+from .recommender import Recommender
+
+# 推薦策略
 from .podcast_recommender import PodcastRecommender
 from .gnn_podcast_recommender import GNNPodcastRecommender
 from .hybrid_gnn_recommender import HybridGNNRecommender
-from .recommender import Recommender
-from .recommender_data import RecommenderData
-from .recommender_evaluator import RecommenderEvaluator
-from .recommender_main import RecommenderSystem
-from .recommender_config import get_recommender_config
+
+# 推薦服務
+from .recommendation_service import RecommendationService
+
+# 推薦系統
+from .recommender_system import RecommenderSystem
+
+# 配置
+from .recommender_config import RecommenderConfig
+
+# 工具類
+from .data_processor import DataProcessor
+from .model_manager import ModelManager
 
 __all__ = [
+    # 核心推薦器
+    'Recommender',
+    
+    # 推薦策略
     'PodcastRecommender',
     'GNNPodcastRecommender', 
     'HybridGNNRecommender',
-    'Recommender',
-    'RecommenderData',
-    'RecommenderEvaluator',
+    
+    # 推薦服務
+    'RecommendationService',
+    
+    # 推薦系統
     'RecommenderSystem',
-    'get_recommender_config'
+    
+    # 配置
+    'RecommenderConfig',
+    
+    # 工具類
+    'DataProcessor',
+    'ModelManager'
 ] 

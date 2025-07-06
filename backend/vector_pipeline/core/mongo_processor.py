@@ -1,14 +1,30 @@
 """
 MongoDB 資料處理器
 負責從 MongoDB 抓取長文本資料並解析 file 欄位
+整合 data_cleaning 模組的清理功能
 """
 
 import re
 import logging
+import sys
+from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from pymongo import MongoClient
 from dataclasses import dataclass
 from datetime import datetime
+
+# 添加父目錄到路徑以支援 data_cleaning import
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
+# 導入 data_cleaning 模組的清理器
+try:
+    from data_cleaning.core.mongo_cleaner import MongoCleaner
+    from data_cleaning.core.stock_cancer_cleaner import StockCancerCleaner
+    from data_cleaning.core.longtext_cleaner import LongTextCleaner
+    DATA_CLEANING_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"無法載入 data_cleaning 模組: {e}")
+    DATA_CLEANING_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -16,139 +32,166 @@ logger = logging.getLogger(__name__)
 @dataclass
 class MongoDocument:
     """MongoDB 文檔資料類別"""
-    document_id: str
-    text: str
-    file: str
-    created: datetime
-    episode_number: Optional[int]
-    podcast_name: Optional[str]
-    title: Optional[str]
-    raw_data: Dict[str, Any]
+    episode_id: str
+    title: str
+    content: str
+    file_path: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
 
 
 class MongoDBProcessor:
-    """MongoDB 資料處理器"""
+    """MongoDB 資料處理器 - 整合 data_cleaning 模組"""
     
-    def __init__(self, mongo_config: Dict[str, Any]):
-        """
-        初始化 MongoDB 處理器
-        
-        Args:
-            mongo_config: MongoDB 配置字典
-        """
-        self.mongo_config = mongo_config
-        self.client: Optional[MongoClient] = None
+    def __init__(self, mongo_uri: str, database_name: str):
+        """初始化 MongoDB 處理器"""
+        self.mongo_uri = mongo_uri
+        self.database_name = database_name
+        self.client = None
         self.db = None
-        
-    def connect(self) -> None:
-        """連接到 MongoDB"""
+        # 初始化清理器
+        if not DATA_CLEANING_AVAILABLE:
+            raise ImportError("data_cleaning 模組不可用，請確認依賴安裝與路徑設定")
+        self.mongo_cleaner = MongoCleaner()
+        self.stock_cancer_cleaner = StockCancerCleaner()
+        self.longtext_cleaner = LongTextCleaner()
+        logger.info("✅ data_cleaning 模組整合成功")
+    
+    def connect(self) -> bool:
+        """建立 MongoDB 連接"""
         try:
-            if self.mongo_config.get("password"):
-                uri = f"mongodb://{self.mongo_config['username']}:{self.mongo_config['password']}@{self.mongo_config['host']}:{self.mongo_config['port']}"
-            else:
-                uri = f"mongodb://{self.mongo_config['host']}:{self.mongo_config['port']}"
-            
-            self.client = MongoClient(uri)
-            self.db = self.client[self.mongo_config['database']]
-            logger.info(f"成功連接到 MongoDB: {self.mongo_config['host']}:{self.mongo_config['port']}")
+            self.client = MongoClient(self.mongo_uri)
+            self.db = self.client[self.database_name]
+            logger.info(f"✅ MongoDB 連接成功: {self.database_name}")
+            return True
         except Exception as e:
-            logger.error(f"MongoDB 連接失敗: {e}")
-            raise
+            logger.error(f"❌ MongoDB 連接失敗: {e}")
+            return False
     
-    def parse_file_field(self, file_name: str) -> Tuple[Optional[int], Optional[str], Optional[str]]:
-        """
-        解析 file 欄位，提取 episode_number、podcast_name、title
-        
-        Args:
-            file_name: 檔案名稱
-            
-        Returns:
-            Tuple[episode_number, podcast_name, title]
-        """
-        try:
-            # 解析 episode number
-            episode_match = re.search(r'podcast_(\d+)', file_name)
-            episode_number = int(episode_match.group(1)) if episode_match else None
-            
-            # 解析 podcast name (取【】內文)
-            podcast_match = re.search(r'【(.+?)】', file_name)
-            podcast_name = podcast_match.group(1) if podcast_match else None
-            
-            # 解析 title (取】之後到.mp3之前)
-            title_match = re.search(r'】(.+?)\.mp3', file_name)
-            title = title_match.group(1).strip() if title_match else None
-            
-            return episode_number, podcast_name, title
-            
-        except Exception as e:
-            logger.error(f"解析 file 欄位失敗: {e}")
-            return None, None, None
-    
-    def fetch_documents(self, collection_name: str, query: Optional[Dict[str, Any]] = None, 
-                       limit: Optional[int] = None) -> List[MongoDocument]:
-        """
-        從 MongoDB 獲取文檔並解析
-        
-        Args:
-            collection_name: 集合名稱
-            query: 查詢條件
-            limit: 限制數量
-            
-        Returns:
-            解析後的文檔列表
-        """
-        if self.db is None:
-            self.connect()
-            
-        try:
-            collection = self.db[collection_name]
-            query = query or {}
-            
-            if limit:
-                documents = list(collection.find(query).limit(limit))
-            else:
-                documents = list(collection.find(query))
-                
-            logger.info(f"從 MongoDB 獲取 {len(documents)} 個文檔")
-            
-            processed_documents = []
-            for doc in documents:
-                # 解析 file 欄位
-                episode_number, podcast_name, title = self.parse_file_field(doc.get('file', ''))
-                
-                # 建立 MongoDocument 物件
-                mongo_doc = MongoDocument(
-                    document_id=str(doc.get('_id')),
-                    text=doc.get('text', ''),
-                    file=doc.get('file', ''),
-                    created=doc.get('created'),
-                    episode_number=episode_number,
-                    podcast_name=podcast_name,
-                    title=title,
-                    raw_data=doc
-                )
-                processed_documents.append(mongo_doc)
-                
-            return processed_documents
-            
-        except Exception as e:
-            logger.error(f"獲取 MongoDB 文檔失敗: {e}")
-            raise
-    
-    def get_collection_names(self) -> List[str]:
-        """獲取所有集合名稱"""
-        if self.db is None:
-            self.connect()
-        return self.db.list_collection_names()
-    
-    def get_document_count(self, collection_name: str) -> int:
-        """獲取集合文檔數量"""
-        if self.db is None:
-            self.connect()
-        return self.db[collection_name].count_documents({})
-    
-    def close(self) -> None:
-        """關閉連接"""
+    def disconnect(self):
+        """關閉 MongoDB 連接"""
         if self.client:
             self.client.close()
-            logger.info("MongoDB 連接已關閉") 
+            logger.info("MongoDB 連接已關閉")
+    
+    def get_collections(self) -> List[str]:
+        """獲取所有 collection 名稱"""
+        try:
+            collections = self.db.list_collection_names()
+            logger.info(f"找到 {len(collections)} 個 collections")
+            return collections
+        except Exception as e:
+            logger.error(f"獲取 collections 失敗: {e}")
+            return []
+    
+    def process_collection(self, collection_name: str, limit: Optional[int] = None) -> List[MongoDocument]:
+        """處理單個 collection"""
+        try:
+            collection = self.db[collection_name]
+            documents = []
+            
+            # 查詢文檔
+            cursor = collection.find({})
+            if limit:
+                cursor = cursor.limit(limit)
+            
+            for doc in cursor:
+                try:
+                    processed_doc = self._process_document(doc, collection_name)
+                    if processed_doc:
+                        documents.append(processed_doc)
+                except Exception as e:
+                    logger.error(f"處理文檔失敗 {doc.get('_id')}: {e}")
+                    continue
+            
+            logger.info(f"✅ 處理完成 {collection_name}: {len(documents)} 個文檔")
+            return documents
+            
+        except Exception as e:
+            logger.error(f"處理 collection {collection_name} 失敗: {e}")
+            return []
+    
+    def _process_document(self, doc: Dict[str, Any], collection_name: str) -> Optional[MongoDocument]:
+        """處理單個文檔"""
+        try:
+            # 提取基本資訊
+            episode_id = str(doc.get('_id', ''))
+            title = doc.get('title', '')
+            content = doc.get('content', '')
+            file_path = doc.get('file', '')
+            
+            # 使用 data_cleaning 模組進行清理
+            if DATA_CLEANING_AVAILABLE:
+                cleaned_data = self._clean_with_data_cleaning(
+                    title, content, episode_id, collection_name
+                )
+                title = cleaned_data['title']
+                content = cleaned_data['content']
+            else:
+                # 基本清理（fallback）
+                title = self._basic_clean_text(title)
+                content = self._basic_clean_text(content)
+            
+            return MongoDocument(
+                episode_id=episode_id,
+                    title=title,
+                content=content,
+                file_path=file_path,
+                metadata=doc
+                )
+            
+        except Exception as e:
+            logger.error(f"處理文檔失敗: {e}")
+            return None
+    
+    def _clean_with_data_cleaning(self, title: str, content: str, episode_id: str, collection_name: str) -> Dict[str, str]:
+        """使用 data_cleaning 模組進行清理"""
+        try:
+            # 檢查是否為股癌節目
+            if collection_name == 'RSS_1500839292' or '股癌' in title:
+                # 強制標題格式
+                cleaned_title = self.stock_cancer_cleaner._clean_stock_cancer_title(title)
+                cleaned_content = self.longtext_cleaner.clean(content)
+                logger.debug(f"使用股癌清理器處理: {title[:50]}...")
+            else:
+                # 使用一般 MongoDB 清理器
+                cleaned_title = self.mongo_cleaner._clean_title(title)
+                cleaned_content = self.longtext_cleaner.clean(content)
+            return {
+                'title': cleaned_title,
+                'content': cleaned_content
+            }
+        except Exception as e:
+            logger.error(f"data_cleaning 清理失敗: {e}")
+            # fallback 到基本清理
+            return {
+                'title': self._basic_clean_text(title),
+                'content': self._basic_clean_text(content)
+            }
+    
+    def _basic_clean_text(self, text: str) -> str:
+        """基本文本清理（fallback）"""
+        if not text:
+            return ""
+        
+        # 移除多餘空白
+        text = re.sub(r'\s+', ' ', text.strip())
+        
+        # 移除特殊字符
+        text = re.sub(r'[^\w\s\u4e00-\u9fff]', '', text)
+        
+        return text
+    
+    def process_all_collections(self, limit_per_collection: Optional[int] = None) -> Dict[str, List[MongoDocument]]:
+        """處理所有 collections"""
+        collections = self.get_collections()
+        results = {}
+        
+        for collection_name in collections:
+            try:
+                documents = self.process_collection(collection_name, limit_per_collection)
+                results[collection_name] = documents
+            except Exception as e:
+                logger.error(f"處理 collection {collection_name} 失敗: {e}")
+                results[collection_name] = []
+        
+        return results 

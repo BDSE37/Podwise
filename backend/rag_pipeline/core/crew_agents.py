@@ -776,23 +776,30 @@ class LeaderAgent(BaseAgent):
             # 1. 用戶管理層
             user_result = await self.user_manager.process(input_data)
             
-            # 2. RAG 檢索層
-            rag_result = await self.rag_expert.process(input_data)
-            
-            # 3. 類別專家層
+            # 2. 根據類別決定處理方式
             if input_data.category == "商業":
+                # 商業類別：交給商業專家處理
                 category_result = await self.business_expert.process(input_data)
+                rag_result = await self.rag_expert.process(input_data)
             elif input_data.category == "教育":
+                # 教育類別：交給教育專家處理
                 category_result = await self.education_expert.process(input_data)
+                rag_result = await self.rag_expert.process(input_data)
             else:
-                # 雙類別情況，需要進一步分析
-                category_result = await self._analyze_dual_category(input_data)
+                # 其他類別：直接由 Leader 處理 RAG，不交給類別專家
+                category_result = AgentResponse(
+                    content="其他類別查詢",
+                    confidence=0.5,
+                    reasoning="其他類別由 Leader 直接處理",
+                    metadata={"category": "其他"}
+                )
+                rag_result = await self.rag_expert.process(input_data)
             
-            # 4. 功能專家層
+            # 3. 功能專家層（所有類別都使用）
             summary_result = await self.summary_expert.process(rag_result.metadata.get("results", []))
             rating_result = await self.rating_expert.process(rag_result.metadata.get("results", []))
             
-            # 5. 最終決策
+            # 4. 最終決策
             final_response = await self._make_final_decision(
                 input_data, rag_result, category_result, summary_result, rating_result
             )

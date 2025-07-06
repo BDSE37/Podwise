@@ -2,298 +2,410 @@
 """
 Podwise RAG Pipeline 主模組
 
-此模組整合了所有 RAG Pipeline 功能，提供統一的入口點。
-包含三層 CrewAI 架構、智能 TAG 提取、向量搜尋、Web Search 備援等功能。
+提供統一的 OOP 介面，整合所有 RAG Pipeline 功能：
+- 層級化 CrewAI 架構
+- 語意檢索（text2vec-base-chinese + TAG_info.csv）
+- 提示詞模板系統
+- Langfuse 監控
+- 聊天歷史記錄
+- 效能優化
 
 作者: Podwise Team
-版本: 3.0.0
+版本: 1.0.0
 """
 
 import asyncio
 import logging
-import sys
-from pathlib import Path
-from typing import Dict, Any, Optional
-
-# 添加專案路徑
-sys.path.append(str(Path(__file__).parent))
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+import json
 
 # 設定日誌
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# 導入核心模組
+from core.crew_agents import LeaderAgent, BusinessExpertAgent, EducationExpertAgent, UserManagerAgent, UserQuery, AgentResponse
+from core.hierarchical_rag_pipeline import HierarchicalRAGPipeline, RAGResponse
+from core.content_categorizer import ContentCategorizer
+from core.confidence_controller import get_confidence_controller
+from core.qwen_llm_manager import Qwen3LLMManager
+from core.chat_history_service import get_chat_history_service
+from config.prompt_templates import PodwisePromptTemplates
+from config.integrated_config import get_config
+from utils.langfuse_integration import get_langfuse_monitor
 
-class RAGPipelineManager:
-    """RAG Pipeline 管理器"""
+
+class PodwiseRAGPipeline:
+    """
+    Podwise RAG Pipeline 主類別
     
-    def __init__(self):
-        """初始化 RAG Pipeline 管理器"""
-        self.is_initialized = False
-        logger.info("🚀 初始化 RAG Pipeline 管理器...")
+    提供統一的介面來使用所有 RAG Pipeline 功能
+    專注於核心 RAG 處理邏輯，不包含 Web API 功能
+    """
     
-    async def initialize(self) -> None:
-        """初始化所有組件"""
-        try:
-            logger.info("📋 載入配置...")
-            
-            # 初始化基本組件
-            logger.info("✅ 基本組件初始化完成")
-            
-            self.is_initialized = True
-            logger.info("✅ RAG Pipeline 管理器初始化完成")
-            
-        except Exception as e:
-            logger.error(f"❌ RAG Pipeline 管理器初始化失敗: {e}")
-            raise
-    
-    async def process_query(
-        self,
-        query: str,
-        user_id: str,
-        session_id: Optional[str] = None,
-        use_advanced_features: bool = True
-    ) -> Dict[str, Any]:
+    def __init__(self, 
+                 enable_monitoring: bool = True,
+                 enable_semantic_retrieval: bool = True,
+                 enable_chat_history: bool = True,
+                 confidence_threshold: float = 0.7):
         """
-        處理用戶查詢
+        初始化 RAG Pipeline
         
         Args:
-            query: 查詢內容
+            enable_monitoring: 是否啟用 Langfuse 監控
+            enable_semantic_retrieval: 是否啟用語意檢索
+            enable_chat_history: 是否啟用聊天歷史記錄
+            confidence_threshold: 信心度閾值
+        """
+        self.enable_monitoring = enable_monitoring
+        self.enable_semantic_retrieval = enable_semantic_retrieval
+        self.enable_chat_history = enable_chat_history
+        self.confidence_threshold = confidence_threshold
+        
+        # 初始化監控器
+        self.monitor = get_langfuse_monitor() if enable_monitoring else None
+        
+        # 初始化整合配置
+        self.config = get_config()
+        
+        # 初始化提示詞模板
+        self.prompt_templates = PodwisePromptTemplates()
+        
+        # 初始化 LLM 管理器
+        self.llm_manager = Qwen3LLMManager()
+        
+        # 初始化內容處理器
+        self.categorizer = ContentCategorizer()
+        
+        # 初始化信心度控制器
+        self.confidence_controller = get_confidence_controller()
+        self.confidence_controller.update_confidence_threshold(confidence_threshold)
+        
+        # 初始化聊天歷史服務
+        self.chat_history = get_chat_history_service() if enable_chat_history else None
+        
+        # 初始化 CrewAI 代理
+        self._initialize_agents()
+        
+        # 初始化層級化 RAG Pipeline
+        self.rag_pipeline = HierarchicalRAGPipeline()
+        
+        logger.info("✅ Podwise RAG Pipeline 初始化完成")
+    
+    def _initialize_agents(self):
+        """初始化 CrewAI 代理"""
+        # 配置字典
+        config = {
+            'confidence_threshold': self.confidence_threshold,
+            'max_processing_time': 30.0
+        }
+        
+        # 用戶管理層
+        self.user_manager = UserManagerAgent(config)
+        
+        # 商業專家
+        self.business_expert = BusinessExpertAgent(config)
+        
+        # 教育專家
+        self.education_expert = EducationExpertAgent(config)
+        
+        # 領導者代理
+        self.leader_agent = LeaderAgent(config)
+        
+        logger.info("✅ CrewAI 代理初始化完成")
+    
+    async def process_query(self, 
+                           query: str, 
+                           user_id: str = "default_user",
+                           session_id: Optional[str] = None,
+                           metadata: Optional[Dict[str, Any]] = None) -> RAGResponse:
+        """
+        處理用戶查詢（核心 RAG 功能）
+        
+        Args:
+            query: 用戶查詢
             user_id: 用戶 ID
             session_id: 會話 ID
-            use_advanced_features: 是否使用進階功能
+            metadata: 額外元數據
             
         Returns:
-            處理結果
+            RAGResponse: 處理結果
         """
-        if not self.is_initialized:
-            raise RuntimeError("RAG Pipeline 尚未初始化")
+        start_time = datetime.now()
+        
+        # 記錄用戶查詢到聊天歷史
+        if self.enable_chat_history and self.chat_history:
+            try:
+                self.chat_history.save_chat_message(
+                    user_id=user_id,
+                    session_id=session_id or f"session_{user_id}_{int(start_time.timestamp())}",
+                    role="user",
+                    content=query,
+                    chat_mode="rag",
+                    metadata=metadata
+                )
+            except Exception as e:
+                logger.warning(f"記錄用戶查詢失敗: {e}")
+        
+        # 創建追蹤
+        trace_id = None
+        if self.monitor and self.monitor.is_enabled():
+            trace_id = self.monitor.create_trace(
+                name="RAG Pipeline 查詢處理",
+                user_id=user_id,
+                metadata={
+                    "query": query,
+                    "enable_semantic_retrieval": self.enable_semantic_retrieval,
+                    "confidence_threshold": self.confidence_threshold,
+                    **(metadata or {})
+                }
+            )
         
         try:
-            logger.info(f"🔍 處理查詢: {query}")
+            # 使用層級化 RAG Pipeline 處理
+            response = await self.rag_pipeline.process_query(query)
             
-            # 模擬處理邏輯
-            response = {
-                "query": query,
-                "response": f"這是對查詢 '{query}' 的回應",
-                "confidence": 0.85,
-                "reasoning": "基於 RAG Pipeline 處理",
-                "level_used": "level_1",
-                "processing_time": 0.5,
-                "metadata": {
-                    "user_id": user_id,
-                    "session_id": session_id,
-                    "use_advanced_features": use_advanced_features
-                }
-            }
+            # 記錄助手回應到聊天歷史
+            if self.enable_chat_history and self.chat_history:
+                try:
+                    self.chat_history.save_chat_message(
+                        user_id=user_id,
+                        session_id=session_id or f"session_{user_id}_{int(start_time.timestamp())}",
+                        role="assistant",
+                        content=response.content,
+                        chat_mode="rag",
+                        metadata={
+                            "confidence": response.confidence,
+                            "level_used": response.level_used,
+                            "sources_count": len(response.sources),
+                            **(metadata or {})
+                        }
+                    )
+                except Exception as e:
+                    logger.warning(f"記錄助手回應失敗: {e}")
             
-            logger.info(f"✅ 查詢處理成功")
+            # 追蹤完整流程
+            if trace_id and self.monitor:
+                processing_time = (datetime.now() - start_time).total_seconds()
+                self.monitor.trace_rag_pipeline(
+                    trace_id=trace_id,
+                    query=query,
+                    category="其他",  # 預設類別
+                    rag_results={
+                        "category_result": {"category": "其他", "confidence": response.confidence},
+                        "rag_result": response.sources
+                    },
+                    final_response=response.content,
+                    confidence=response.confidence,
+                    processing_time=processing_time
+                )
+                self.monitor.end_trace(trace_id, "success")
+            
             return response
             
         except Exception as e:
-            logger.error(f"❌ 查詢處理失敗: {e}")
-            raise
+            logger.error(f"處理查詢失敗: {e}")
+            
+            # 記錄錯誤回應
+            if self.enable_chat_history and self.chat_history:
+                try:
+                    self.chat_history.save_chat_message(
+                        user_id=user_id,
+                        session_id=session_id or f"session_{user_id}_{int(start_time.timestamp())}",
+                        role="assistant",
+                        content=f"處理查詢時發生錯誤: {str(e)}",
+                        chat_mode="rag",
+                        metadata={"error": str(e), **(metadata or {})}
+                    )
+                except Exception as chat_error:
+                    logger.warning(f"記錄錯誤回應失敗: {chat_error}")
+            
+            # 追蹤錯誤
+            if trace_id and self.monitor:
+                self.monitor.end_trace(trace_id, "error")
+            
+            # 返回錯誤回應
+            return RAGResponse(
+                content=f"處理查詢時發生錯誤: {str(e)}",
+                confidence=0.0,
+                sources=[],
+                processing_time=(datetime.now() - start_time).total_seconds(),
+                level_used="error",
+                metadata={"error": str(e)}
+            )
     
-    async def validate_user(self, user_id: str) -> Dict[str, Any]:
+    async def process_with_agents(self, 
+                                 query: str, 
+                                 user_id: str = "default_user") -> AgentResponse:
         """
-        驗證用戶
+        使用 CrewAI 代理處理查詢
         
         Args:
+            query: 用戶查詢
             user_id: 用戶 ID
             
         Returns:
-            驗證結果
+            AgentResponse: 代理回應
         """
-        if not self.is_initialized:
-            raise RuntimeError("RAG Pipeline 尚未初始化")
+        start_time = datetime.now()
+        
+        # 創建追蹤
+        trace_id = None
+        if self.monitor and self.monitor.is_enabled():
+            trace_id = self.monitor.create_trace(
+                name="CrewAI 代理處理",
+                user_id=user_id,
+                metadata={"query": query}
+            )
         
         try:
-            return {
-                "user_id": user_id,
-                "is_valid": True,
-                "has_history": False,
-                "preferred_category": None,
-                "message": "用戶驗證成功"
-            }
+            # 創建用戶查詢物件
+            user_query = UserQuery(
+                query=query,
+                user_id=user_id,
+                category=None,
+                context=None
+            )
+            
+            # 使用領導者代理處理
+            response = await self.leader_agent.process(user_query)
+            
+            # 追蹤代理互動
+            if trace_id and self.monitor:
+                processing_time = (datetime.now() - start_time).total_seconds()
+                self.monitor.trace_agent_interactions(
+                    trace_id=trace_id,
+                    agent_name="LeaderAgent",
+                    agent_role="領導者",
+                    input_data={"query": query},
+                    output_data={"response": response.content, "confidence": response.confidence},
+                    confidence=response.confidence,
+                    processing_time=processing_time
+                )
+                self.monitor.end_trace(trace_id, "success")
+            
+            return response
             
         except Exception as e:
-            logger.error(f"❌ 用戶驗證失敗: {e}")
-            return {
-                "user_id": user_id,
-                "is_valid": False,
-                "has_history": False,
-                "preferred_category": None,
-                "message": f"用戶驗證失敗: {str(e)}"
-            }
-    
-    async def get_chat_history(self, user_id: str, limit: int = 50) -> list:
-        """
-        獲取聊天歷史
-        
-        Args:
-            user_id: 用戶 ID
-            limit: 返回數量限制
+            logger.error(f"代理處理失敗: {e}")
             
-        Returns:
-            聊天歷史列表
-        """
-        if not self.is_initialized:
-            raise RuntimeError("RAG Pipeline 尚未初始化")
-        
-        # 模擬聊天歷史
-        return [
-            {
-                "user_id": user_id,
-                "session_id": "default",
-                "role": "user",
-                "content": "測試查詢",
-                "timestamp": "2025-01-15T10:00:00",
-                "metadata": {}
-            }
-        ]
+            if trace_id and self.monitor:
+                self.monitor.end_trace(trace_id, "error")
+            
+            return AgentResponse(
+                content=f"代理處理時發生錯誤: {str(e)}",
+                confidence=0.0,
+                reasoning="處理失敗",
+                processing_time=(datetime.now() - start_time).total_seconds()
+            )
     
-    def get_system_status(self) -> Dict[str, Any]:
-        """
-        獲取系統狀態
-        
-        Returns:
-            系統狀態資訊
-        """
-        if not self.is_initialized:
-            return {
-                "is_ready": False,
-                "components": {},
-                "version": "3.0.0",
-                "timestamp": "",
-                "message": "系統尚未初始化"
-            }
+    def get_semantic_config(self) -> Optional[Dict[str, Any]]:
+        """獲取語意檢索配置"""
+        if not self.config.get("semantic_retrieval"):
+            return None
         
         return {
-            "is_ready": True,
-            "components": {
-                "hierarchical_pipeline": True,
-                "agent_manager": True,
-                "chat_service": True,
-                "llm_manager": True,
-                "langfuse_manager": False,
-                "performance_monitor": True,
-                "ab_testing_manager": True
-            },
-            "version": "3.0.0",
-            "timestamp": "",
-            "message": "系統運行正常"
+            "model_config": self.config["semantic_retrieval"].get("model_config"),
+            "retrieval_config": self.config["semantic_retrieval"].get("retrieval_config"),
+            "tag_statistics": self.config["semantic_retrieval"].get("tag_statistics")
         }
     
-    def get_performance_metrics(self) -> Dict[str, Any]:
-        """
-        獲取性能指標
-        
-        Returns:
-            性能指標
-        """
+    def get_prompt_templates(self) -> Dict[str, str]:
+        """獲取提示詞模板"""
         return {
-            "overall_performance": {
-                "total_queries": 0,
-                "success_rate": 1.0,
-                "avg_response_time": 0.5,
-                "avg_confidence": 0.85
-            },
-            "service_performance": {
-                "service_name": "rag_pipeline",
-                "total_queries": 0,
-                "success_rate": 1.0,
-                "avg_response_time": 0.5,
-                "avg_confidence": 0.85
-            },
-            "alerts": []
+            "category_classifier": "分類提示詞模板",
+            "semantic_retrieval": "語意檢索提示詞模板",
+            "business_expert": "商業專家提示詞模板",
+            "education_expert": "教育專家提示詞模板",
+            "leader_decision": "領導者決策提示詞模板",
+            "answer_generation": "回答生成提示詞模板"
         }
     
-    async def close(self) -> None:
-        """關閉所有連接"""
-        logger.info("🔒 關閉 RAG Pipeline 管理器...")
-        logger.info("✅ RAG Pipeline 管理器已關閉")
-
-
-# 全域管理器實例
-_rag_pipeline_manager: Optional[RAGPipelineManager] = None
-
-
-async def get_rag_pipeline_manager() -> RAGPipelineManager:
-    """獲取 RAG Pipeline 管理器實例"""
-    global _rag_pipeline_manager
+    def is_monitoring_enabled(self) -> bool:
+        """檢查監控是否啟用"""
+        return self.monitor is not None and self.monitor.is_enabled()
     
-    if _rag_pipeline_manager is None:
-        _rag_pipeline_manager = RAGPipelineManager()
-        await _rag_pipeline_manager.initialize()
+    def get_monitor_url(self, trace_id: str) -> Optional[str]:
+        """獲取監控 URL"""
+        if self.monitor and self.monitor.is_enabled():
+            return self.monitor.get_trace_url(trace_id)
+        return None
     
-    return _rag_pipeline_manager
+    async def health_check(self) -> Dict[str, Any]:
+        """健康檢查"""
+        health_status = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "components": {}
+        }
+        
+        # 檢查 LLM 管理器
+        try:
+            health_status["components"]["llm_manager"] = {"status": "healthy"}
+        except Exception as e:
+            health_status["components"]["llm_manager"] = {"status": "error", "error": str(e)}
+            health_status["status"] = "degraded"
+        
+        # 檢查語意檢索
+        if self.config.get("semantic_retrieval"):
+            try:
+                semantic_status = self.config["semantic_retrieval"].get("model_config")
+                health_status["components"]["semantic_retrieval"] = {
+                    "status": "healthy",
+                    "model": semantic_status.get("model_name", "unknown")
+                }
+            except Exception as e:
+                health_status["components"]["semantic_retrieval"] = {"status": "error", "error": str(e)}
+                health_status["status"] = "degraded"
+        
+        # 檢查監控
+        health_status["components"]["monitoring"] = {
+            "status": "enabled" if self.is_monitoring_enabled() else "disabled"
+        }
+        
+        return health_status
 
 
-async def close_rag_pipeline_manager() -> None:
-    """關閉 RAG Pipeline 管理器"""
-    global _rag_pipeline_manager
-    
-    if _rag_pipeline_manager:
-        await _rag_pipeline_manager.close()
-        _rag_pipeline_manager = None
+# 全域 RAG Pipeline 實例
+_rag_pipeline = None
 
-
-def run_fastapi_app():
-    """運行 FastAPI 應用程式"""
-    try:
-        import uvicorn
-        uvicorn.run(
-            "app.main_crewai:app",
-            host="0.0.0.0",
-            port=8004,
-            reload=True,
-            log_level="info"
-        )
-    except ImportError:
-        logger.error("❌ uvicorn 未安裝，無法運行 FastAPI 應用程式")
-        logger.info("💡 請執行: pip install uvicorn[standard]")
+def get_rag_pipeline() -> PodwiseRAGPipeline:
+    """獲取全域 RAG Pipeline 實例"""
+    global _rag_pipeline
+    if _rag_pipeline is None:
+        _rag_pipeline = PodwiseRAGPipeline()
+    return _rag_pipeline
 
 
 async def main():
-    """主函數"""
-    try:
-        # 初始化管理器
-        manager = await get_rag_pipeline_manager()
-        
-        # 顯示系統狀態
-        status = manager.get_system_status()
-        logger.info(f"系統狀態: {status}")
-        
-        # 測試查詢處理
-        test_query = "我想了解人工智慧在企業中的應用"
-        test_user_id = "test_user_001"
-        
-        logger.info(f"🧪 測試查詢: {test_query}")
-        result = await manager.process_query(
-            query=test_query,
-            user_id=test_user_id,
-            use_advanced_features=True
-        )
-        
-        logger.info(f"✅ 查詢處理成功:")
-        logger.info(f"回應: {result['response'][:200]}...")
-        logger.info(f"信心度: {result['confidence']:.3f}")
-        logger.info(f"處理時間: {result['processing_time']:.3f}秒")
-        
-        # 顯示性能指標
-        metrics = manager.get_performance_metrics()
-        logger.info(f"📊 性能指標: {metrics}")
-        
-    except Exception as e:
-        logger.error(f"❌ 主函數執行失敗: {e}")
-        raise
-    finally:
-        # 關閉管理器
-        await close_rag_pipeline_manager()
+    """主函數 - 用於測試"""
+    print("🚀 Podwise RAG Pipeline 測試")
+    
+    # 創建 RAG Pipeline 實例
+    pipeline = PodwiseRAGPipeline()
+    
+    # 健康檢查
+    health = await pipeline.health_check()
+    print(f"📊 健康狀態: {json.dumps(health, ensure_ascii=False, indent=2)}")
+    
+    # 測試查詢
+    test_query = "我想學習投資理財，有什麼推薦的 Podcast 嗎？"
+    print(f"\n🔍 測試查詢: {test_query}")
+    
+    # 使用層級化 RAG Pipeline
+    rag_response = await pipeline.process_query(test_query, "test_user")
+    print(f"📝 RAG 回應: {rag_response.content}")
+    print(f"🎯 信心度: {rag_response.confidence}")
+    print(f"📂 來源: {len(rag_response.sources)} 個")
+    
+    # 使用 CrewAI 代理
+    agent_response = await pipeline.process_with_agents(test_query, "test_user")
+    print(f"🤖 代理回應: {agent_response.content}")
+    print(f"🎯 信心度: {agent_response.confidence}")
+    
+    print("\n✅ 測試完成")
 
 
 if __name__ == "__main__":
-    # 運行 FastAPI 應用程式
-    run_fastapi_app() 
+    asyncio.run(main()) 

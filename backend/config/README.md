@@ -29,22 +29,7 @@
 - `POST /api/v1/init/database` - 執行資料庫初始化
 - `GET /api/v1/init/status` - 初始化狀態
 
-## 檔案結構
-
-```
-config/
-├── config_service.py      # FastAPI 主服務
-├── db_config.py          # PostgreSQL/Milvus/MinIO 配置
-├── mongo_config.py       # MongoDB 配置
-├── requirements.txt      # Python 依賴
-├── Dockerfile           # 容器化配置
-├── init-scripts/        # 初始化腳本
-│   ├── 00-wait-for-db.sh  # 等待資料庫腳本
-│   └── 01-init.sql        # PostgreSQL 初始化 SQL
-└── README.md            # 說明文件
-```
-
-## 使用方式
+## 使用方法
 
 ### 本地開發
 ```bash
@@ -89,13 +74,18 @@ psql -h localhost -U bdse37 -d podcast -f init-scripts/01-init.sql
 - `MINIO_ROOT_PASSWORD` - 密碼 (預設: 11111111)
 - `MINIO_BUCKET_NAME` - 儲存桶名稱 (預設: podwise)
 
-## 整合說明
+## 依賴項目
 
-本服務整合了原本分散的配置管理和資料庫初始化功能：
+- fastapi
+- uvicorn
+- psycopg2-binary
+- pymongo
+- pymilvus
+- minio
 
-1. **配置管理**：統一提供所有服務的配置查詢
-2. **資料庫初始化**：自動化 PostgreSQL 資料庫結構建立
-3. **健康檢查**：提供服務狀態監控
-4. **容器化**：支援 Docker 部署
+## 注意事項
 
-所有其他服務可以透過 HTTP API 獲取所需配置，實現配置的集中管理。 
+- 確保 PostgreSQL 服務正在運行
+- 檢查資料庫連接配置
+- 初始化腳本需要適當的資料庫權限
+- 配置變更後需要重啟服務 

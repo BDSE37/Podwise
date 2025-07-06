@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """
-Podwise RAG Pipeline 主應用程式模組
+Podwise RAG Pipeline FastAPI 應用程式
 
-此模組實現三層 CrewAI 架構的 FastAPI 應用程式，整合
-Keyword Mapper、KNN 推薦器和用戶 ID 管理流程。
-
-主要功能：
-- 三層 CrewAI 代理人架構
+此模組提供 REST API 介面，整合核心 RAG Pipeline 功能：
 - 用戶查詢處理和分類
 - Podcast 推薦系統
 - 聊天歷史管理
@@ -31,21 +27,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
 
-# 導入核心組件
-from core.crew_agents import AgentManager, UserQuery
-from core.chat_history_service import ChatHistoryService
-from core.qwen3_llm_manager import Qwen3LLMManager
+# 導入核心 RAG Pipeline
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from main import PodwiseRAGPipeline, get_rag_pipeline
 
 # 導入工具
-from tools.keyword_mapper import KeywordMapper, CategoryResult
-from tools.knn_recommender import KNNRecommender, PodcastItem, RecommendationResult
-from tools.enhanced_vector_search import EnhancedVectorSearchTool
+from tools.enhanced_vector_search import UnifiedVectorSearch
 from tools.web_search_tool import WebSearchTool
 from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
 
 # 導入配置
 from config.integrated_config import get_config
-from config.crewai_config import get_crewai_config, validate_config
+
+# 導入統一 API 模型
+from core.api_models import (
+    UserQueryRequest, UserQueryResponse, UserValidationRequest, UserValidationResponse,
+    ErrorResponse, SystemInfoResponse, HealthCheckResponse
+)
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
@@ -55,8 +54,8 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class AppConfig:
     """應用程式配置數據類別"""
-    title: str = "Podwise RAG Pipeline - 三層 CrewAI 架構"
-    description: str = "整合 Keyword Mapper、KNN 推薦器和用戶 ID 管理的智能 Podcast 推薦系統"
+    title: str = "Podwise RAG Pipeline - FastAPI 介面"
+    description: str = "提供 REST API 介面的智能 Podcast 推薦系統"
     version: str = "3.0.0"
     docs_url: str = "/docs"
     redoc_url: str = "/redoc"
@@ -72,20 +71,18 @@ class SystemStatus:
 
 
 class ApplicationManager:
-    """應用程式管理器"""
+    """應用程式管理器 - 專注於 Web API 功能"""
     
     def __init__(self) -> None:
         """初始化應用程式管理器"""
         self.config = get_config()
         self.app_config = AppConfig()
         
-        # 核心組件
-        self.agent_manager: Optional[AgentManager] = None
-        self.keyword_mapper: Optional[KeywordMapper] = None
-        self.knn_recommender: Optional[KNNRecommender] = None
-        self.chat_history_service: Optional[ChatHistoryService] = None
-        self.qwen3_manager: Optional[Qwen3LLMManager] = None
-        self.vector_search_tool: Optional[EnhancedVectorSearchTool] = None
+        # 核心 RAG Pipeline（使用 main.py 中的實現）
+        self.rag_pipeline: Optional[PodwiseRAGPipeline] = None
+        
+        # Web API 專用組件
+        self.vector_search_tool: Optional[UnifiedVectorSearch] = None
         self.web_search_tool: Optional[WebSearchTool] = None
         self.podcast_formatter: Optional[PodcastFormatter] = None
         
@@ -95,35 +92,16 @@ class ApplicationManager:
     async def initialize(self) -> None:
         """初始化所有核心組件"""
         try:
-            logger.info("🚀 初始化 Podwise RAG Pipeline...")
+            logger.info("🚀 初始化 Podwise RAG Pipeline FastAPI...")
             
-            # 載入 CrewAI 配置
-            crewai_config = get_crewai_config()
-            if not validate_config(crewai_config):
-                raise ValueError("CrewAI 配置驗證失敗")
+            # 初始化核心 RAG Pipeline
+            self.rag_pipeline = get_rag_pipeline()
+            logger.info("✅ 核心 RAG Pipeline 初始化完成")
             
-            # 初始化 Keyword Mapper
-            self.keyword_mapper = KeywordMapper()
-            logger.info("✅ Keyword Mapper 初始化完成")
-            
-            # 初始化 KNN 推薦器
-            self.knn_recommender = KNNRecommender(k=5, metric="cosine")
-            logger.info("✅ KNN 推薦器初始化完成")
-            
-            # 載入示例 Podcast 數據
-            await self._load_sample_podcast_data()
-            
-            # 初始化聊天歷史服務
-            self.chat_history_service = ChatHistoryService()
-            logger.info("✅ 聊天歷史服務初始化完成")
-            
-            # 初始化 Qwen3 LLM 管理器
-            self.qwen3_manager = Qwen3LLMManager()
-            logger.info("✅ Qwen3 LLM 管理器初始化完成")
-            
-            # 初始化向量搜尋工具
-            self.vector_search_tool = EnhancedVectorSearchTool()
-            logger.info("✅ 向量搜尋工具初始化完成")
+            # 初始化統一向量搜尋工具
+            vector_config = self.config.get_vector_search_config()
+            self.vector_search_tool = UnifiedVectorSearch(vector_config)
+            logger.info("✅ 統一向量搜尋工具初始化完成")
             
             # 初始化 Web Search 工具
             self.web_search_tool = WebSearchTool()
@@ -136,10 +114,6 @@ class ApplicationManager:
             self.podcast_formatter = PodcastFormatter()
             logger.info("✅ Podcast 格式化工具初始化完成")
             
-            # 初始化 Agent Manager（三層 CrewAI 架構）
-            self.agent_manager = AgentManager(crewai_config)
-            logger.info("✅ Agent Manager 初始化完成")
-            
             self._is_initialized = True
             logger.info("✅ 所有核心組件初始化完成")
             
@@ -147,67 +121,12 @@ class ApplicationManager:
             logger.error(f"❌ 初始化失敗: {str(e)}")
             raise
     
-    async def _load_sample_podcast_data(self) -> None:
-        """載入示例 Podcast 數據"""
-        if self.knn_recommender is None:
-            return
-        
-        sample_items = [
-            PodcastItem(
-                rss_id="rss_001",
-                title="股癌 EP310",
-                description="台股投資分析與市場趨勢",
-                category="商業",
-                tags=["股票", "投資", "台股", "財經"],
-                vector=np.array([0.8, 0.6, 0.9, 0.7, 0.8, 0.6, 0.9, 0.7]),
-                updated_at="2025-01-15",
-                confidence=0.9
-            ),
-            PodcastItem(
-                rss_id="rss_002",
-                title="大人學 EP110",
-                description="職涯發展與個人成長指南",
-                category="教育",
-                tags=["職涯", "成長", "技能", "學習"],
-                vector=np.array([0.3, 0.8, 0.4, 0.9, 0.3, 0.8, 0.4, 0.9]),
-                updated_at="2025-01-14",
-                confidence=0.85
-            ),
-            PodcastItem(
-                rss_id="rss_003",
-                title="財報狗 Podcast",
-                description="財報分析與投資策略",
-                category="商業",
-                tags=["財報", "投資", "分析", "策略"],
-                vector=np.array([0.9, 0.5, 0.8, 0.6, 0.9, 0.5, 0.8, 0.6]),
-                updated_at="2025-01-13",
-                confidence=0.88
-            ),
-            PodcastItem(
-                rss_id="rss_004",
-                title="生涯決策學 EP52",
-                description="人生規劃與決策思維",
-                category="教育",
-                tags=["生涯", "決策", "規劃", "思維"],
-                vector=np.array([0.4, 0.7, 0.5, 0.8, 0.4, 0.7, 0.5, 0.8]),
-                updated_at="2025-01-12",
-                confidence=0.82
-            )
-        ]
-        
-        self.knn_recommender.add_podcast_items(sample_items)
-        logger.info(f"✅ 已載入 {len(sample_items)} 個示例 Podcast 項目")
-    
     def get_system_status(self) -> SystemStatus:
         """獲取系統狀態"""
         return SystemStatus(
             is_ready=self._is_initialized,
             components={
-                "agent_manager": self.agent_manager is not None,
-                "keyword_mapper": self.keyword_mapper is not None,
-                "knn_recommender": self.knn_recommender is not None,
-                "chat_history_service": self.chat_history_service is not None,
-                "qwen3_manager": self.qwen3_manager is not None,
+                "rag_pipeline": self.rag_pipeline is not None,
                 "vector_search_tool": self.vector_search_tool is not None,
                 "web_search_tool": self.web_search_tool is not None and self.web_search_tool.is_configured(),
                 "podcast_formatter": self.podcast_formatter is not None
@@ -255,69 +174,6 @@ app.add_middleware(
 )
 
 
-# API 模型定義
-class UserQueryRequest(BaseModel):
-    """用戶查詢請求模型"""
-    user_id: str = Field(..., description="用戶 ID", min_length=1)
-    query: str = Field(..., description="查詢內容", min_length=1)
-    session_id: Optional[str] = Field(default=None, description="會話 ID")
-    
-    @validator('user_id')
-    def validate_user_id(cls, v: str) -> str:
-        """驗證用戶 ID"""
-        if not v.strip():
-            raise ValueError("用戶 ID 不能為空")
-        return v.strip()
-    
-    @validator('query')
-    def validate_query(cls, v: str) -> str:
-        """驗證查詢內容"""
-        if not v.strip():
-            raise ValueError("查詢內容不能為空")
-        return v.strip()
-
-
-class UserQueryResponse(BaseModel):
-    """用戶查詢回應模型"""
-    user_id: str
-    query: str
-    response: str
-    category: str
-    confidence: float
-    recommendations: List[Dict[str, Any]]
-    reasoning: str
-    processing_time: float
-    timestamp: str
-
-
-class UserValidationRequest(BaseModel):
-    """用戶驗證請求模型"""
-    user_id: str = Field(..., description="用戶 ID", min_length=1)
-    
-    @validator('user_id')
-    def validate_user_id(cls, v: str) -> str:
-        """驗證用戶 ID"""
-        if not v.strip():
-            raise ValueError("用戶 ID 不能為空")
-        return v.strip()
-
-
-class UserValidationResponse(BaseModel):
-    """用戶驗證回應模型"""
-    user_id: str
-    is_valid: bool
-    has_history: bool
-    preferred_category: Optional[str] = None
-    message: str
-
-
-class ErrorResponse(BaseModel):
-    """錯誤回應模型"""
-    error: str
-    detail: str
-    timestamp: str
-
-
 # 依賴注入
 def get_app_manager() -> ApplicationManager:
     """獲取應用程式管理器"""
@@ -338,35 +194,40 @@ def validate_system_ready(manager: ApplicationManager = Depends(get_app_manager)
 async def root() -> Dict[str, Any]:
     """根端點"""
     return {
-        "message": "Podwise RAG Pipeline - 三層 CrewAI 架構運行中",
+        "message": "Podwise RAG Pipeline - FastAPI 介面運行中",
         "version": app_manager.app_config.version,
         "timestamp": datetime.now().isoformat(),
         "features": [
-            "Keyword Mapper 分類",
-            "KNN 推薦算法",
-            "三層 CrewAI 架構",
+            "核心 RAG Pipeline 整合",
+            "統一向量搜尋",
             "用戶 ID 管理",
-            "聊天歷史追蹤",
-            "向量搜尋",
-            "Qwen3 LLM 整合"
+            "REST API 介面"
         ],
         "supported_categories": ["商業", "教育"],
         "status": "running"
     }
 
 
-@app.get("/health")
-async def health_check(manager: ApplicationManager = Depends(get_app_manager)) -> Dict[str, Any]:
+@app.get("/health", response_model=HealthCheckResponse)
+async def health_check(manager: ApplicationManager = Depends(get_app_manager)) -> HealthCheckResponse:
     """健康檢查端點"""
     status = manager.get_system_status()
     
-    return {
-        "status": "healthy" if status.is_ready else "unhealthy",
-        "timestamp": status.timestamp,
-        "version": status.version,
-        "components": status.components,
-        "web_search_available": manager.web_search_tool.is_configured() if manager.web_search_tool else False
-    }
+    # 獲取核心 RAG Pipeline 健康狀態
+    rag_health = {}
+    if manager.rag_pipeline:
+        try:
+            rag_health = await manager.rag_pipeline.health_check()
+        except Exception as e:
+            rag_health = {"status": "error", "error": str(e)}
+    
+    return HealthCheckResponse(
+        status="healthy" if status.is_ready else "unhealthy",
+        timestamp=status.timestamp,
+        components=status.components,
+        rag_pipeline_health=rag_health,
+        web_search_available=manager.web_search_tool.is_configured() if manager.web_search_tool else False
+    )
 
 
 @app.post("/api/v1/validate-user", response_model=UserValidationResponse)
@@ -394,20 +255,11 @@ async def validate_user(
                 message="用戶 ID 格式無效，必須至少 3 個字符且只包含字母和數字"
             )
         
-        # 檢查歷史記錄
+        # 檢查歷史記錄（簡化版本）
         has_history = False
         preferred_category = None
         
-        if manager.chat_history_service:
-            history = manager.chat_history_service.get_chat_history(user_id, limit=10)
-            has_history = len(history) > 0
-            
-            if has_history:
-                preferred_category = _analyze_user_preference(history)
-        
         message = "用戶驗證成功"
-        if has_history:
-            message += f"，發現 {len(history)} 條歷史記錄"
         
         return UserValidationResponse(
             user_id=user_id,
@@ -422,22 +274,6 @@ async def validate_user(
         raise HTTPException(status_code=500, detail=f"用戶驗證失敗: {str(e)}")
 
 
-def _analyze_user_preference(history: List[Dict[str, Any]]) -> Optional[str]:
-    """分析用戶偏好"""
-    if not history:
-        return None
-    
-    category_counts = {}
-    for record in history:
-        category = record.get('category', '未知')
-        category_counts[category] = category_counts.get(category, 0) + 1
-    
-    if category_counts:
-        return max(category_counts.items(), key=lambda x: x[1])[0]
-    
-    return None
-
-
 @app.post("/api/v1/query", response_model=UserQueryResponse)
 async def process_query(
     request: UserQueryRequest,
@@ -448,7 +284,7 @@ async def process_query(
     """
     處理用戶查詢
     
-    此端點處理用戶查詢，通過三層 CrewAI 架構協調各專家。
+    此端點使用核心 RAG Pipeline 處理用戶查詢，並整合推薦功能。
     """
     start_time = datetime.now()
     
@@ -459,61 +295,37 @@ async def process_query(
         
         logger.info(f"處理用戶查詢: {user_id} - {query}")
         
-        # 1. 使用 Keyword Mapper 進行初步分類
-        if manager.keyword_mapper is None:
-            raise HTTPException(status_code=500, detail="Keyword Mapper 未初始化")
+        # 使用核心 RAG Pipeline 處理查詢
+        if manager.rag_pipeline is None:
+            raise HTTPException(status_code=500, detail="RAG Pipeline 未初始化")
         
-        category_result = manager.keyword_mapper.categorize_query(query)
-        
-        # 2. 通過 Agent Manager 和 Leader Agent 協調所有專家
-        if manager.agent_manager is None:
-            raise HTTPException(status_code=500, detail="Agent Manager 未初始化")
-        
-        # 創建用戶查詢對象
-        user_query = UserQuery(
+        # 使用核心 RAG Pipeline 處理
+        rag_response = await manager.rag_pipeline.process_query(
             query=query,
-            user_id=user_id,
-            category=category_result.category
+            user_id=user_id
         )
         
-        # 通過 Leader Agent 處理查詢，協調所有專家
-        agent_response = await manager.agent_manager.process_query(
-            query=query,
-            user_id=user_id,
-            category=category_result.category
-        )
+        # 獲取推薦項目
+        recommendations = await _get_recommendations(query, manager)
         
-        # 3. 從 Agent 回應中提取推薦和結果
-        recommendations = []
-        if agent_response.metadata:
-            # 從 RAG 專家結果中提取推薦
-            rag_results = agent_response.metadata.get("rag_result", {}).get("results", [])
-            if rag_results:
-                recommendations = rag_results[:3]  # 取前3個推薦
-            
-            # 從類別專家結果中提取推薦
-            category_recommendations = agent_response.metadata.get("category_result", {}).get("recommendations", [])
-            if category_recommendations:
-                recommendations.extend(category_recommendations[:2])  # 再取2個類別推薦
-        
-        # 4. 計算處理時間
+        # 計算處理時間
         processing_time = (datetime.now() - start_time).total_seconds()
         
-        # 5. 記錄歷史（背景任務）
+        # 記錄歷史（背景任務）
         background_tasks.add_task(
             _log_query_history,
-            user_id, session_id, query, agent_response.content, 
-            category_result.category, category_result.confidence
+            user_id, session_id, query, rag_response.content, 
+            rag_response.confidence
         )
         
         return UserQueryResponse(
             user_id=user_id,
             query=query,
-            response=agent_response.content,
-            category=category_result.category,
-            confidence=agent_response.confidence,
+            response=rag_response.content,
+            category=rag_response.metadata.get("category", "其他"),
+            confidence=rag_response.confidence,
             recommendations=recommendations,
-            reasoning=agent_response.reasoning,
+            reasoning=f"使用 {rag_response.level_used} 層級處理",
             processing_time=processing_time,
             timestamp=datetime.now().isoformat()
         )
@@ -525,37 +337,26 @@ async def process_query(
         raise HTTPException(status_code=500, detail=f"查詢處理失敗: {str(e)}")
 
 
-async def _get_recommendations(
-    query: str, 
-    category_result: CategoryResult,
-    manager: ApplicationManager
-) -> List[Dict[str, Any]]:
+async def _get_recommendations(query: str, manager: ApplicationManager) -> List[Dict[str, Any]]:
     """獲取推薦項目"""
-    if manager.knn_recommender is None:
+    if manager.vector_search_tool is None:
         return []
     
     try:
-        # 生成查詢向量（簡化版本）
-        query_vector = _generate_simple_vector(query)
-        
-        # 執行推薦
-        recommendation_result = manager.knn_recommender.recommend(
-            query_vector=query_vector,
-            category_filter=category_result.category if category_result.category != "雙類別" else None,
-            top_k=3
-        )
+        # 使用統一向量搜尋工具
+        search_results = await manager.vector_search_tool.search(query, top_k=3)
         
         # 轉換為字典格式
         recommendations = []
-        for item in recommendation_result.recommendations:
+        for result in search_results.get("combined_results", [])[:3]:
             recommendations.append({
-                "rss_id": item.rss_id,
-                "title": item.title,
-                "description": item.description,
-                "category": item.category,
-                "tags": item.tags,
-                "confidence": item.confidence,
-                "updated_at": item.updated_at
+                "id": result.get("id", ""),
+                "title": result.get("title", ""),
+                "content": result.get("content", ""),
+                "category": result.get("category", ""),
+                "tags": result.get("tags", []),
+                "score": result.get("score", 0.0),
+                "source": result.get("source", "")
             })
         
         return recommendations
@@ -565,168 +366,52 @@ async def _get_recommendations(
         return []
 
 
-def _generate_simple_vector(text: str) -> np.ndarray:
-    """生成簡單的文本向量（用於測試）"""
-    # 簡化的向量生成邏輯
-    # 實際應用中應使用更複雜的嵌入模型
-    words = text.lower().split()
-    vector = np.zeros(8)
-    
-    # 簡單的關鍵詞權重
-    business_keywords = ["股票", "投資", "理財", "財經", "市場", "經濟"]
-    education_keywords = ["學習", "技能", "成長", "職涯", "發展", "教育"]
-    
-    for word in words:
-        if word in business_keywords:
-            vector[0:4] += 0.1
-        if word in education_keywords:
-            vector[4:8] += 0.1
-    
-    # 正規化
-    norm = np.linalg.norm(vector)
-    if norm > 0:
-        vector = vector / norm
-    
-    return vector
-
-
-async def _generate_response(
-    query: str,
-    category_result: CategoryResult,
-    recommendations: List[Dict[str, Any]],
-    manager: ApplicationManager
-) -> str:
-    """生成回應"""
-    try:
-        # 如果有 LLM 管理器，使用它生成回應
-        if manager.qwen3_manager:
-            # 這裡可以整合 LLM 生成邏輯
-            pass
-        
-        # 否則使用簡單的回應生成
-        return _generate_fallback_response(category_result, recommendations)
-        
-    except Exception as e:
-        logger.error(f"生成回應失敗: {str(e)}")
-        return _generate_fallback_response(category_result, recommendations)
-
-
-def _generate_fallback_response(
-    category_result: CategoryResult,
-    recommendations: List[Dict[str, Any]]
-) -> str:
-    """生成備用回應"""
-    category = category_result.category
-    confidence = category_result.confidence
-    
-    if not recommendations:
-        return f"根據您的查詢，我將其分類為 {category} 類別（信心值: {confidence:.2f}）。目前沒有找到相關的 Podcast 推薦。"
-    
-    response = f"""
-根據您的查詢，我將其分類為 {category} 類別（信心值: {confidence:.2f}）。
-
-以下是為您推薦的 Podcast：
-
-"""
-    
-    for i, rec in enumerate(recommendations, 1):
-        response += f"{i}. **{rec['title']}**\n"
-        response += f"   - 類別: {rec['category']}\n"
-        response += f"   - 描述: {rec['description']}\n"
-        response += f"   - 標籤: {', '.join(rec['tags'])}\n\n"
-    
-    response += f"分類理由: {category_result.reasoning}"
-    
-    return response
-
-
 async def _log_query_history(
     user_id: str,
     session_id: Optional[str],
     query: str,
     response: str,
-    category: str,
     confidence: float
 ) -> None:
     """記錄查詢歷史"""
     try:
-        if app_manager.chat_history_service:
-            # 儲存用戶查詢
-            app_manager.chat_history_service.save_chat_message(
-                user_id=user_id,
-                session_id=session_id or "default",
-                role="user",
-                content=query,
-                chat_mode="rag",
-                metadata={"category": category, "confidence": confidence}
-            )
-            
-            # 儲存系統回應
-            app_manager.chat_history_service.save_chat_message(
-                user_id=user_id,
-                session_id=session_id or "default",
-                role="assistant",
-                content=response,
-                chat_mode="rag",
-                metadata={"category": category, "confidence": confidence}
-            )
+        # 簡化的歷史記錄（實際應用中應使用資料庫）
+        logger.info(f"記錄查詢歷史: {user_id} - {confidence}")
     except Exception as e:
         logger.error(f"記錄歷史失敗: {str(e)}")
 
 
-@app.get("/api/v1/chat-history/{user_id}")
-async def get_chat_history(
-    user_id: str,
-    limit: int = 50,
-    manager: ApplicationManager = Depends(get_app_manager),
-    _: None = Depends(validate_system_ready)
-) -> List[Dict[str, Any]]:
-    """獲取用戶聊天歷史"""
-    try:
-        if manager.chat_history_service is None:
-            raise HTTPException(status_code=500, detail="聊天歷史服務未初始化")
-        
-        history = manager.chat_history_service.get_chat_history(user_id, limit=limit)
-        return history
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"獲取聊天歷史失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"獲取聊天歷史失敗: {str(e)}")
-
-
-@app.get("/api/v1/system-info")
-async def get_system_info(manager: ApplicationManager = Depends(get_app_manager)) -> Dict[str, Any]:
+@app.get("/api/v1/system-info", response_model=SystemInfoResponse)
+async def get_system_info(manager: ApplicationManager = Depends(get_app_manager)) -> SystemInfoResponse:
     """獲取系統資訊"""
     status = manager.get_system_status()
     
-    return {
-        "system_status": {
-            "is_ready": status.is_ready,
-            "components": status.components,
-            "timestamp": status.timestamp,
-            "version": status.version
-        },
-        "configuration": {
+    # 獲取向量搜尋統計
+    vector_stats = {}
+    if manager.vector_search_tool:
+        vector_stats = manager.vector_search_tool.get_statistics()
+    
+    return SystemInfoResponse(
+        version=status.version,
+        timestamp=status.timestamp,
+        environment=manager.config.environment,
+        debug=manager.config.debug,
+        components=status.components,
+        features=[
+            "核心 RAG Pipeline 整合",
+            "統一向量搜尋",
+            "用戶 ID 管理",
+            "REST API 介面"
+        ],
+        configuration={
             "app_title": manager.app_config.title,
             "app_version": manager.app_config.version,
-            "supported_categories": ["商業", "教育"],
-            "features": [
-                "Keyword Mapper 分類",
-                "KNN 推薦算法",
-                "三層 CrewAI 架構",
-                "用戶 ID 管理",
-                "聊天歷史追蹤",
-                "向量搜尋",
-                "Qwen3 LLM 整合"
-            ]
+            "supported_categories": ["商業", "教育"]
         },
-        "statistics": {
-            "total_podcast_items": len(manager.knn_recommender.podcast_items) if manager.knn_recommender else 0,
-            "category_distribution": manager.knn_recommender.get_category_statistics() if manager.knn_recommender else {}
+        statistics={
+            "vector_search_stats": vector_stats
         }
-    }
+    )
 
 
 # 錯誤處理

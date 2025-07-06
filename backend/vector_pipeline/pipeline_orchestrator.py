@@ -23,15 +23,11 @@ from .core import (
     PostgreSQLMapper, EpisodeMetadata,
     TextChunker, TextChunk,
     VectorProcessor,
-    MilvusWriter
+    MilvusWriter,
+    UnifiedTagManager,
+    TagExtractionResult
 )
-
-# 嘗試 import TagProcessor，如果失敗則設為 None
-try:
-    from rag_pipeline.utils.tag_processor import TagProcessor
-except ImportError:
-    TagProcessor = None
-    logging.warning("無法載入 TagProcessor，將使用簡單標籤提取")
+from .error_logger import ErrorLogger, ErrorHandler
 
 logger = logging.getLogger(__name__)
 
@@ -122,159 +118,39 @@ class EpisodeMetadataValidator(MetadataValidator):
 
 
 class TagProcessorManager:
-    """標籤處理器管理器"""
+    """標籤處理器管理器 - 使用統一標籤管理器"""
     
     def __init__(self, tag_csv_path: str):
         self.tag_csv_path = tag_csv_path
-        self.tag_processor = self._initialize_tag_processor()
-    
-    def _initialize_tag_processor(self) -> Optional[TagProcessor]:
-        """初始化標籤處理器"""
-        try:
-            if TagProcessor is not None:
-                processor = TagProcessor(self.tag_csv_path)
-                logger.info(f"成功載入標籤處理器: {self.tag_csv_path}")
-                return processor
-            else:
-                logger.warning("TagProcessor 不可用，將使用簡單標籤提取")
-                return None
-        except Exception as e:
-            logger.warning(f"載入標籤處理器失敗，將使用預設標籤: {e}")
-            return None
+        self.tag_manager = UnifiedTagManager(tag_csv_path)
     
     def extract_tags(self, chunk_text: str) -> List[str]:
-        """提取標籤（帶驗證和重試機制）"""
-        try:
-            tags = []
-            
-            # 第一階段：嘗試使用 TagProcessor（Excel 標籤）
-            if self.tag_processor:
-                try:
-                    result = self.tag_processor.categorize_content(chunk_text)
-                    tags = result.get('tags', [])
-                    logger.debug(f"TagProcessor 提取標籤: {tags}")
-                except Exception as e:
-                    logger.warning(f"TagProcessor 提取標籤失敗: {e}")
-                    tags = []
-            
-            # 第二階段：如果標籤為空，使用簡單關鍵字匹配
-            if not tags:
-                tags = self._simple_tag_extraction(chunk_text)
-                logger.debug(f"簡單標籤提取: {tags}")
-            
-            # 第三階段：如果仍然為空，使用智能標籤系統
-            if not tags:
-                tags = self._intelligent_tag_extraction(chunk_text)
-                logger.debug(f"智能標籤提取: {tags}")
-            
-            # 第四階段：最終驗證，確保至少有基本標籤
-            if not tags:
-                tags = self._fallback_tag_extraction(chunk_text)
-                logger.debug(f"Fallback 標籤提取: {tags}")
-            
-            # 驗證標籤品質
-            tags = self._validate_and_clean_tags(tags, chunk_text)
-            
-            logger.info(f"最終標籤: {tags}")
-            return tags[:3]  # 限制最多 3 個標籤
-                
-        except Exception as e:
-            logger.error(f"提取標籤失敗: {e}")
-            return self._fallback_tag_extraction(chunk_text)
-    
-    def _simple_tag_extraction(self, chunk_text: str) -> List[str]:
-        """簡單的標籤提取"""
-        tags = []
-        chunk_lower = chunk_text.lower()
+        """
+        提取標籤（使用統一標籤管理器）
         
-        # 簡單的關鍵字匹配
-        keyword_tags = {
-            'ai': ['AI', '人工智慧'],
-            '科技': ['科技', '技術'],
-            '商業': ['商業', '企業'],
-            '教育': ['教育', '學習'],
-            '創業': ['創業', '新創'],
-            '管理': ['管理', '領導']
-        }
+        Args:
+            chunk_text: 文本內容
+            
+        Returns:
+            標籤列表（最多3個）
+        """
+        return self.tag_manager.extract_tags(chunk_text)
+    
+    def extract_tags_with_details(self, chunk_text: str) -> TagExtractionResult:
+        """
+        提取標籤並返回詳細資訊
         
-        for keyword, tag_list in keyword_tags.items():
-            if keyword in chunk_lower:
-                tags.extend(tag_list)
-        
-        return tags[:3]  # 限制最多 3 個標籤
+        Args:
+            chunk_text: 文本內容
+            
+        Returns:
+            標籤提取結果
+        """
+        return self.tag_manager.extract_tags_with_details(chunk_text)
     
-    def _intelligent_tag_extraction(self, chunk_text: str) -> List[str]:
-        """智能標籤提取（使用 LLM 或進階 NLP）"""
-        try:
-            # 暫時使用基於詞頻的簡單智能提取
-            import re
-            from collections import Counter
-            
-            # 移除標點符號和數字
-            text_clean = re.sub(r'[^\u4e00-\u9fff\w\s]', '', chunk_text)
-            words = text_clean.split()
-            
-            # 過濾短詞和常見詞
-            stop_words = {'的', '是', '在', '有', '和', '與', '或', '但', '而', '如果', '因為', '所以', '這個', '那個', '什麼', '怎麼', '為什麼'}
-            filtered_words = [word for word in words if len(word) > 1 and word not in stop_words]
-            
-            # 計算詞頻
-            word_freq = Counter(filtered_words)
-            
-            # 取前 3 個最常見的詞作為標籤
-            tags = [word for word, freq in word_freq.most_common(3)]
-            
-            return tags
-            
-        except Exception as e:
-            logger.warning(f"智能標籤提取失敗: {e}")
-            return []
-    
-    def _fallback_tag_extraction(self, chunk_text: str) -> List[str]:
-        """Fallback 標籤提取（確保總是有標籤）"""
-        try:
-            # 基於文本長度和內容的基本標籤
-            if len(chunk_text) > 100:
-                return ['長文本', '詳細內容']
-            elif len(chunk_text) > 50:
-                return ['中等文本', '一般內容']
-            else:
-                return ['短文本', '簡要內容']
-                
-        except Exception as e:
-            logger.warning(f"Fallback 標籤提取失敗: {e}")
-            return ['未分類']
-    
-    def _validate_and_clean_tags(self, tags: List[str], chunk_text: str) -> List[str]:
-        """驗證和清理標籤"""
-        try:
-            cleaned_tags = []
-            
-            for tag in tags:
-                if tag and isinstance(tag, str):
-                    # 清理標籤
-                    tag_clean = tag.strip()
-                    if tag_clean and len(tag_clean) > 0:
-                        # 檢查標籤是否與文本相關
-                        if self._is_tag_relevant(tag_clean, chunk_text):
-                            cleaned_tags.append(tag_clean)
-            
-            # 去重
-            cleaned_tags = list(set(cleaned_tags))
-            
-            return cleaned_tags
-            
-        except Exception as e:
-            logger.warning(f"標籤驗證失敗: {e}")
-            return tags if tags else ['未分類']
-    
-    def _is_tag_relevant(self, tag: str, text: str) -> bool:
-        """檢查標籤是否與文本相關"""
-        try:
-            # 簡單的相關性檢查：標籤是否出現在文本中
-            return tag.lower() in text.lower()
-        except Exception:
-            return True  # 如果檢查失敗，假設相關
+    def get_extractor_status(self) -> Dict[str, bool]:
+        """獲取提取器狀態"""
+        return self.tag_manager.get_extractor_status()
 
 
 class PipelineOrchestrator:
@@ -344,20 +220,115 @@ class PipelineOrchestrator:
                 return 0
                 
         except Exception as e:
-            logger.error(f"處理文檔 {mongo_doc.document_id} 失敗: {e}")
+            logger.error(f"處理文檔 {mongo_doc.episode_id} 失敗: {e}")
             return 0
+    
+    def process_collection(self, mongo_collection: str, milvus_collection: str, 
+                          limit: Optional[int] = None) -> Dict[str, Any]:
+        """
+        處理整個 MongoDB collection
+        
+        Args:
+            mongo_collection: MongoDB collection 名稱
+            milvus_collection: Milvus collection 名稱
+            limit: 處理文檔數量限制
+            
+        Returns:
+            處理結果統計
+        """
+        try:
+            # 設定 Milvus collection 名稱
+            self.milvus_config["collection_name"] = milvus_collection
+            
+            # 初始化錯誤記錄器
+            error_logger = ErrorLogger()
+            error_handler = ErrorHandler(error_logger)
+            
+            # 獲取 MongoDB 文檔
+            documents = self.mongo_processor.process_collection(
+                collection_name=mongo_collection,
+                limit=limit
+            )
+            
+            if not documents:
+                logger.warning(f"Collection {mongo_collection} 沒有找到任何文檔")
+                return {
+                    "collection_name": mongo_collection,
+                    "processed_documents": 0,
+                    "processed_chunks": 0,
+                    "status": "no_documents"
+                }
+            
+            # 批次處理文檔
+            total_chunks = 0
+            processed_docs = 0
+            
+            for i, doc in enumerate(documents):
+                try:
+                    chunks_processed = self.process_single_document(doc)
+                    if chunks_processed > 0:
+                        processed_docs += 1
+                        total_chunks += chunks_processed
+                    
+                    if (i + 1) % 10 == 0:
+                        logger.info(f"已處理 {i + 1}/{len(documents)} 個文檔")
+                        
+                except Exception as e:
+                    # 記錄錯誤
+                    rss_id = self._extract_rss_id_from_collection(mongo_collection)
+                    error_handler.handle_general_error(
+                        collection_id=mongo_collection,
+                        rss_id=rss_id,
+                        title=doc.title if hasattr(doc, 'title') else '',
+                        error=e,
+                        stage="document_processing"
+                    )
+                    logger.error(f"處理文檔 {i + 1} 失敗: {e}")
+                    continue
+            
+            # 儲存錯誤報告
+            if error_logger.errors:
+                error_reports = error_logger.save_errors()
+                logger.warning(f"處理過程中發現 {len(error_logger.errors)} 個錯誤，報告已儲存至: {error_reports}")
+            
+            result = {
+                "collection_name": mongo_collection,
+                "milvus_collection": milvus_collection,
+                "total_documents": len(documents),
+                "processed_documents": processed_docs,
+                "processed_chunks": total_chunks,
+                "status": "completed",
+                "error_count": len(error_logger.errors)
+            }
+            
+            logger.info(f"Collection {mongo_collection} 處理完成: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"處理 collection {mongo_collection} 失敗: {e}")
+            return {
+                "collection_name": mongo_collection,
+                "status": "failed",
+                "error": str(e)
+            }
+    
+    def _extract_rss_id_from_collection(self, collection_name: str) -> str:
+        """從 collection 名稱提取 RSS ID"""
+        import re
+        match = re.search(r'RSS_(\d+)', collection_name)
+        return match.group(1) if match else ""
     
     def _process_single_document_internal(self, mongo_doc: MongoDocument) -> List[ProcessedChunk]:
         """處理單個 MongoDB 文檔"""
         try:
             # 1. 文本切分
             chunks = self.text_chunker.split_text_into_chunks(
-                text=mongo_doc.text,
-                document_id=mongo_doc.document_id
+                text=mongo_doc.content,
+                document_id=mongo_doc.episode_id
             )
             
             if not chunks:
-                logger.warning(f"文檔 {mongo_doc.document_id} 沒有產生任何 chunks")
+                logger.warning(f"文檔 {mongo_doc.episode_id} 沒有產生任何 chunks")
                 return []
             
             # 2. 獲取 PostgreSQL metadata
@@ -365,7 +336,7 @@ class PipelineOrchestrator:
             
             # 3. 驗證 metadata 完整性
             if not self._validate_metadata(episode_metadata, mongo_doc):
-                raise Exception(f"Metadata 不完整，無法處理文檔: {mongo_doc.document_id}")
+                raise Exception(f"Metadata 不完整，無法處理文檔: {mongo_doc.episode_id}")
             
             # 4. 處理每個 chunk
             processed_chunks = []
@@ -377,13 +348,13 @@ class PipelineOrchestrator:
             return processed_chunks
             
         except Exception as e:
-            logger.error(f"處理文檔 {mongo_doc.document_id} 失敗: {e}")
+            logger.error(f"處理文檔 {mongo_doc.episode_id} 失敗: {e}")
             return []
     
     def _validate_metadata(self, metadata: Optional[EpisodeMetadata], mongo_doc: MongoDocument) -> bool:
         """驗證 metadata 完整性"""
         if not metadata:
-            logger.error(f"找不到文檔 {mongo_doc.document_id} 的 metadata")
+            logger.error(f"找不到文檔 {mongo_doc.episode_id} 的 metadata")
             return False
         
         if not self.metadata_validator.validate(metadata):
@@ -397,10 +368,10 @@ class PipelineOrchestrator:
         """獲取 episode metadata"""
         try:
             # 解析 file 欄位來提取 RSS_ID 和 episode 資訊
-            if mongo_doc.file:
-                rss_id, episode_title = self._parse_file_field(mongo_doc.file)
+            if mongo_doc.file_path:
+                rss_id, episode_title = self._parse_file_field(mongo_doc.file_path)
                 
-                if rss_id:
+                if rss_id and episode_title:
                     # 根據 RSS_ID 和 episode_title 查詢 PostgreSQL
                     metadata = self.postgres_mapper.search_episode_by_rss_and_title(
                         rss_id=rss_id,
@@ -410,7 +381,7 @@ class PipelineOrchestrator:
                         return metadata
             
             # 如果找不到，返回預設值
-            logger.warning(f"找不到文檔 {mongo_doc.document_id} 的 metadata，使用預設值")
+            logger.warning(f"找不到文檔 {mongo_doc.episode_id} 的 metadata，使用預設值")
             return None
             
         except Exception as e:
@@ -495,7 +466,7 @@ class PipelineOrchestrator:
             return None
     
     def _generate_tag_vectors(self, tags: List[str], 
-                            default_embedding: np.ndarray) -> List[np.ndarray]:
+                            default_embedding) -> List:
         """生成標籤向量"""
         tag_vectors = []
         
@@ -530,10 +501,10 @@ class PipelineOrchestrator:
                 'episode_id': 0,
                 'podcast_id': 0,
                 'episode_title': mongo_doc.title or '',
-                'podcast_name': mongo_doc.podcast_name or '',
+                'podcast_name': '',
                 'author': '',
                 'category': '',
-                'created_at': mongo_doc.created.isoformat() if mongo_doc.created and hasattr(mongo_doc.created, 'isoformat') else str(mongo_doc.created) if mongo_doc.created else '',
+                'created_at': datetime.now().isoformat(),
                 'language': 'zh'
             }
     
@@ -582,8 +553,11 @@ class PipelineOrchestrator:
     def close(self) -> None:
         """關閉所有連接"""
         try:
-            self.mongo_processor.close()
+            if hasattr(self.mongo_processor, 'disconnect'):
+                self.mongo_processor.disconnect()
+            if hasattr(self.postgres_mapper, 'close'):
             self.postgres_mapper.close()
+            if hasattr(self.milvus_writer, 'close'):
             self.milvus_writer.close()
             logger.info("所有連接已關閉")
         except Exception as e:

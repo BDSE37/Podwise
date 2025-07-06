@@ -8,6 +8,7 @@ from .postgresql_mapper import PostgreSQLMapper, EpisodeMetadata
 from .text_chunker import TextChunker, TextChunk
 from .vector_processor import VectorProcessor
 from .milvus_writer import MilvusWriter
+from .tag_manager import UnifiedTagManager, TagExtractionResult
 
 __all__ = [
     'MongoDBProcessor',
@@ -17,5 +18,7 @@ __all__ = [
     'TextChunker',
     'TextChunk',
     'VectorProcessor',
-    'MilvusWriter'
+    'MilvusWriter',
+    'UnifiedTagManager',
+    'TagExtractionResult'
 ] 

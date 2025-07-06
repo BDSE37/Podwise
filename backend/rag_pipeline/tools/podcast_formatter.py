@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 # 導入智能 TAG 提取器
-from .smart_tag_extractor import SmartTagExtractor
+from .enhanced_vector_search import SmartTagExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -268,56 +268,4 @@ class PodcastFormatter:
         return confidence < 0.7 or result_count < 2
 
 
-def test_podcast_formatter():
-    """測試 Podcast 格式化器"""
-    formatter = PodcastFormatter()
-    
-    # 測試數據
-    test_podcasts = [
-        {
-            'title': '股癌 EP310',
-            'description': '台股投資分析與市場趨勢',
-            'rss_id': '123456789',
-            'confidence': 0.9,
-            'category': '商業',
-            'tags': ['股票', '投資', '台股']
-        },
-        {
-            'title': '大人學 EP110',
-            'description': '職涯發展與個人成長指南',
-            'rss_id': '987654321',
-            'confidence': 0.85,
-            'category': '教育',
-            'tags': ['職涯', '成長', '技能']
-        },
-        {
-            'title': '股癌 EP310',  # 重複的標題
-            'description': '台股投資分析與市場趨勢',
-            'rss_id': '123456789',
-            'confidence': 0.9,
-            'category': '商業',
-            'tags': ['股票', '投資', '台股']
-        }
-    ]
-    
-    test_query = "我想了解 NVIDIA 的投資機會"
-    
-    # 測試格式化
-    result = formatter.format_podcast_recommendations(test_podcasts, test_query)
-    
-    print("=== 測試結果 ===")
-    print(f"原始數量: {len(test_podcasts)}")
-    print(f"去重後數量: {result.total_found}")
-    print(f"推薦數量: {len(result.recommendations)}")
-    print(f"信心度: {result.confidence:.2f}")
-    print(f"TAG: {result.tags_used}")
-    print(f"處理時間: {result.processing_time:.3f}秒")
-    
-    # 生成推薦文字
-    recommendation_text = formatter.generate_recommendation_text(result)
-    print("\n=== 推薦文字 ===")
-    print(recommendation_text)
-
-
-if __name__ == "__main__":
-    test_podcast_formatter() 
+# 測試功能已移除，請使用 main.py 進行測試 

@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-標籤處理系統
-- 從 csv/TAG_info.csv 讀取標籤對應關係（支援多個同義詞欄位）
-- 處理 MongoDB 長文本切斷與標籤匹配
+TAG 處理器
+
+此腳本用於處理 TAG_info.csv 檔案，提供：
+- 標籤匹配與提取
+- 智能標籤提取（Word2Vec + Transformer）
+- 標籤統計與分析
 - 若 chunk 內無任何標籤命中，自動 fallback 執行 SmartTagExtractor 智能標籤提取
+
+作者: Podwise Team
+版本: 1.0.0
 """
 
+import logging
 import pandas as pd
 import re
 import json
-from typing import List, Dict, Tuple, Set
+from typing import List, Dict, Tuple, Set, Any, Optional
 from collections import defaultdict
-import logging
 from pathlib import Path
-from tools.smart_tag_extractor import SmartTagExtractor
+
+# 導入工具
+from tools.enhanced_vector_search import SmartTagExtractor
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)

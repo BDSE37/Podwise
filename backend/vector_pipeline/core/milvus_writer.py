@@ -58,25 +58,23 @@ class MilvusWriter:
                 logger.info(f"集合 {collection_name} 已存在")
                 return collection_name
             
-            # 定義字段
+            # 定義字段 - 符合新的 Milvus schema
             fields = [
-                FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=100, is_primary=True),
+                FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=1024, is_primary=True),
                 FieldSchema(name="chunk_index", dtype=DataType.INT64),
                 FieldSchema(name="episode_id", dtype=DataType.INT64),
                 FieldSchema(name="podcast_id", dtype=DataType.INT64),
-                FieldSchema(name="episode_title", dtype=DataType.VARCHAR, max_length=500),
-                FieldSchema(name="chunk_text", dtype=DataType.VARCHAR, max_length=65535),
-                FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=embedding_dim),
-                FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=10),
-                FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=50),
-                FieldSchema(name="source_model", dtype=DataType.VARCHAR, max_length=100),
-                FieldSchema(name="podcast_name", dtype=DataType.VARCHAR, max_length=200),
-                FieldSchema(name="author", dtype=DataType.VARCHAR, max_length=200),
-                FieldSchema(name="category", dtype=DataType.VARCHAR, max_length=100),
-                # 向量標籤欄位
-                FieldSchema(name="tag_1", dtype=DataType.FLOAT_VECTOR, dim=embedding_dim),
-                FieldSchema(name="tag_2", dtype=DataType.FLOAT_VECTOR, dim=embedding_dim),
-                FieldSchema(name="tag_3", dtype=DataType.FLOAT_VECTOR, dim=embedding_dim)
+                FieldSchema(name="episode_title", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="chunk_text", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=768),
+                FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="source_model", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="podcast_name", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="author", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="category", dtype=DataType.VARCHAR, max_length=1024),
+                # 🔁 合併後的 tag 欄位，存為 JSON 格式字串
+                FieldSchema(name="tags", dtype=DataType.VARCHAR, max_length=1024),
             ]
             
             # 創建集合
@@ -93,11 +91,8 @@ class MilvusWriter:
                 "params": {"nlist": self.milvus_config.get("nlist", 1024)}
             }
             
-            # 為所有向量欄位創建索引
+            # 為嵌入向量欄位創建索引
             collection.create_index(field_name="embedding", index_params=index_params)
-            collection.create_index(field_name="tag_1", index_params=index_params)
-            collection.create_index(field_name="tag_2", index_params=index_params)
-            collection.create_index(field_name="tag_3", index_params=index_params)
             
             logger.info(f"成功創建集合 {collection_name}")
             return collection_name
@@ -148,7 +143,7 @@ class MilvusWriter:
                 "chunk_id", "chunk_index", "episode_id", "podcast_id", 
                 "episode_title", "chunk_text", "embedding", "language", 
                 "created_at", "source_model", "podcast_name", "author", 
-                "category", "tag_1", "tag_2", "tag_3"
+                "category", "tags"
             ]
             
             # 將 dict 轉換為 list of list（每個欄位一個 list）
@@ -232,9 +227,7 @@ class MilvusWriter:
             "podcast_name": [],
             "author": [],
             "category": [],
-            "tag_1": [],
-            "tag_2": [],
-            "tag_3": []
+            "tags": []
         }
         
         for data in data_list:
@@ -249,11 +242,10 @@ class MilvusWriter:
                     batch_data[key].append(value)
                 else:
                     # 提供預設值
-                    if key in ["tag_1", "tag_2", "tag_3"] and "embedding" in data:
-                        # 使用主要嵌入向量作為標籤向量的預設值
-                        batch_data[key].append(data["embedding"])
-                    elif key in ["embedding", "tag_1", "tag_2", "tag_3"]:
+                    if key == "embedding":
                         batch_data[key].append([])
+                    elif key == "tags":
+                        batch_data[key].append("[]")  # 空的 JSON 陣列字串
                     else:
                         batch_data[key].append("")
         

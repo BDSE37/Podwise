@@ -20,19 +20,55 @@ import json
 import pickle
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-import numpy as np
 from datetime import datetime
 
-# 機器學習相關導入
+# 機器學習相關導入（可選）
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    logging.warning("numpy 未安裝，部分功能可能受限")
+
 try:
     import jieba
+    JIEBA_AVAILABLE = True
+except ImportError:
+    JIEBA_AVAILABLE = False
+    logging.warning("jieba 未安裝，無法進行中文分詞")
+
+try:
     from gensim.models import Word2Vec
     from gensim.models.word2vec import LineSentence
-    from sklearn.metrics.pairwise import cosine_similarity
-    ML_AVAILABLE = True
+    GENSIM_AVAILABLE = True
 except ImportError:
-    ML_AVAILABLE = False
-    logging.error("機器學習套件未安裝，無法訓練 Word2Vec 模型")
+    GENSIM_AVAILABLE = False
+    logging.warning("gensim 未安裝，無法訓練 Word2Vec 模型")
+
+try:
+    from sklearn.metrics.pairwise import cosine_similarity
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    logging.warning("sklearn 未安裝，無法計算相似度")
+
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    logging.warning("pandas 未安裝，無法處理 CSV 檔案")
+
+# 檢查所有必要套件
+ML_AVAILABLE = all([
+    NUMPY_AVAILABLE, 
+    JIEBA_AVAILABLE, 
+    GENSIM_AVAILABLE, 
+    SKLEARN_AVAILABLE
+])
+
+if not ML_AVAILABLE:
+    logging.error("機器學習套件未完整安裝，無法訓練 Word2Vec 模型")
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +105,7 @@ class Word2VecTrainer:
         self.model_save_path.parent.mkdir(parents=True, exist_ok=True)
         
         # 初始化 jieba
-        if ML_AVAILABLE:
+        if JIEBA_AVAILABLE:
             jieba.initialize()
     
     def load_podcast_data(self) -> List[str]:
@@ -79,6 +115,10 @@ class Word2VecTrainer:
         Returns:
             List[str]: 文本列表
         """
+        if not ML_AVAILABLE:
+            logger.error("機器學習套件未安裝，無法載入數據")
+            return []
+        
         texts = []
         
         # 支援的檔案格式
@@ -139,8 +179,11 @@ class Word2VecTrainer:
         """載入 CSV 數據"""
         texts = []
         
+        if not PANDAS_AVAILABLE:
+            logger.warning("pandas 未安裝，跳過 CSV 檔案")
+            return texts
+        
         try:
-            import pandas as pd
             df = pd.read_csv(file_path)
             
             # 提取可能的文本欄位
@@ -150,8 +193,6 @@ class Word2VecTrainer:
             for col in text_columns:
                 texts.extend(df[col].dropna().astype(str).tolist())
                 
-        except ImportError:
-            logger.warning("pandas 未安裝，跳過 CSV 檔案")
         except Exception as e:
             logger.error(f"載入 CSV 檔案失敗: {str(e)}")
         
@@ -185,7 +226,7 @@ class Word2VecTrainer:
         Returns:
             List[List[str]]: 分詞後的文本列表
         """
-        if not ML_AVAILABLE:
+        if not JIEBA_AVAILABLE:
             logger.error("jieba 未安裝，無法進行分詞")
             return []
         
@@ -225,7 +266,7 @@ class Word2VecTrainer:
         }
         return word in stopwords
     
-    def train_word2vec_model(self, processed_texts: List[List[str]]) -> Optional[Word2Vec]:
+    def train_word2vec_model(self, processed_texts: List[List[str]]) -> Optional[Any]:
         """
         訓練 Word2Vec 模型
         
@@ -235,7 +276,7 @@ class Word2VecTrainer:
         Returns:
             Optional[Word2Vec]: 訓練好的模型
         """
-        if not ML_AVAILABLE:
+        if not GENSIM_AVAILABLE:
             logger.error("gensim 未安裝，無法訓練 Word2Vec 模型")
             return None
         
@@ -271,7 +312,7 @@ class Word2VecTrainer:
             logger.error(f"訓練 Word2Vec 模型失敗: {str(e)}")
             return None
     
-    def evaluate_model(self, model: Word2Vec) -> Dict[str, Any]:
+    def evaluate_model(self, model: Any) -> Dict[str, Any]:
         """
         評估模型
         
@@ -310,7 +351,7 @@ class Word2VecTrainer:
         
         return evaluation_results
     
-    def save_model(self, model: Word2Vec, evaluation_results: Dict[str, Any]) -> bool:
+    def save_model(self, model: Any, evaluation_results: Dict[str, Any]) -> bool:
         """
         保存模型和評估結果
         
@@ -409,6 +450,12 @@ def main():
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
+    
+    # 檢查必要套件
+    if not ML_AVAILABLE:
+        print("❌ 機器學習套件未完整安裝，請安裝以下套件：")
+        print("pip install numpy jieba gensim scikit-learn pandas")
+        return
     
     # 初始化訓練器
     trainer = Word2VecTrainer(

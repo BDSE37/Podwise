@@ -2,7 +2,7 @@
 
 Podwise Backend 是一個模組化的微服務架構，整合了多個專業化的服務模組，嚴格遵循 OOP 原則和 Google Clean Code 規範。
 
-## 📁 模組結構
+## 模組結構
 
 ```
 backend/
@@ -52,7 +52,7 @@ backend/
     └── requirements.txt   # 向量處理依賴
 ```
 
-## 🏗️ 架構特點
+## 架構特點
 
 ### 模組化設計
 - 每個模組獨立運行
@@ -78,7 +78,7 @@ backend/
 - A/B 測試支援
 - 完整的測試覆蓋
 
-## 🚀 快速開始
+## 快速開始
 
 ### 1. 安裝依賴
 
@@ -115,7 +115,7 @@ cd ml_pipeline
 python main.py
 ```
 
-## 🔧 模組功能
+## 模組功能
 
 ### API 服務 (`api/`)
 - 提供統一的 RESTful API 接口
@@ -169,7 +169,7 @@ python main.py
 - 嵌入模型管理
 - 向量搜尋優化
 
-## 📋 OOP 設計模式
+## OOP 設計模式
 
 ### 1. 抽象工廠模式
 ```python
@@ -211,7 +211,7 @@ class PerformanceMonitor:
             observer.update(event)
 ```
 
-## 🔍 代碼品質指標
+## 代碼品質指標
 
 ### 模組化程度
 - ✅ 19 個 `__init__.py` 檔案
@@ -230,7 +230,7 @@ class PerformanceMonitor:
 - ✅ 代碼風格一致
 - ✅ 職責分離明確
 
-## 🧪 測試覆蓋
+## 測試覆蓋
 
 每個模組都包含：
 - 單元測試
@@ -238,21 +238,16 @@ class PerformanceMonitor:
 - 性能測試
 - 端到端測試
 
-## 📈 性能監控
+## 性能監控
 
 - Langfuse 追蹤
 - 性能指標收集
 - A/B 測試支援
 - 自動調優機制
 
-## 🤝 貢獻指南
+## 重要注意事項
 
-1. 遵循 OOP 原則
-2. 遵循 Google Clean Code 規範
-3. 添加完整的測試
-4. 更新文檔
-5. 提交 Pull Request
-
-## 📄 授權
-
-本專案採用 MIT 授權條款。 
+- 確保所有環境變數正確配置
+- 定期檢查各服務的健康狀態
+- 監控系統性能和回應時間
+- 遵循 OOP 原則和 Clean Code 規範進行開發 

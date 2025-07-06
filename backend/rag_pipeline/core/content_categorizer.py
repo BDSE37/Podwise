@@ -1,204 +1,498 @@
+#!/usr/bin/env python3
 """
-內容分類器 - 專門處理內容分類邏輯
+統一內容處理模組
+
+整合所有內容處理功能：
+- 內容分類
+- 關鍵詞映射
+- 內容摘要
+- 標籤提取
+- 智能分析
+
+作者: Podwise Team
+版本: 2.0.0
 """
 
-import re
 import logging
-from typing import List, Dict, Any
-from .content_models import ContentCategory
+import re
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, field
+from abc import ABC, abstractmethod
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
-class ContentCategorizer:
-    """內容分類器 - 專門處理商業和教育類別分類"""
+
+class ContentCategory(Enum):
+    """內容分類枚舉"""
+    BUSINESS = "商業"
+    EDUCATION = "教育"
+    OTHER = "其他"
+    MIXED = "混合"
+
+
+@dataclass
+class ContentAnalysis:
+    """內容分析結果"""
+    category: ContentCategory
+    confidence: float
+    keywords: List[str] = field(default_factory=list)
+    summary: str = ""
+    tags: List[str] = field(default_factory=list)
+    reasoning: str = ""
+    processing_time: float = 0.0
+
+
+@dataclass
+class CategoryResult:
+    """分類結果"""
+    category: str
+    confidence: float
+    keywords_found: List[str] = field(default_factory=list)
+    reasoning: str = ""
+    business_score: float = 0.0
+    education_score: float = 0.0
+
+
+@dataclass
+class ContentSummary:
+    """內容摘要"""
+    summary: str
+    key_points: List[str] = field(default_factory=list)
+    category: ContentCategory
+    confidence: float
+    processing_time: float = 0.0
+
+
+class KeywordProvider(ABC):
+    """關鍵詞提供者抽象類別"""
+    
+    @abstractmethod
+    def get_keywords(self) -> Dict[str, List[str]]:
+        """獲取關鍵詞"""
+        pass
+
+
+class BusinessKeywordProvider(KeywordProvider):
+    """商業關鍵詞提供者"""
+    
+    def get_keywords(self) -> Dict[str, List[str]]:
+        return {
+            "投資理財": [
+                "股票", "基金", "ETF", "債券", "期貨", "選擇權", "外匯",
+                "投資組合", "資產配置", "風險管理", "報酬率", "股息",
+                "資本利得", "複利", "定存", "活存", "儲蓄", "理財規劃"
+            ],
+            "股票市場": [
+                "台股", "美股", "港股", "日股", "歐股", "新興市場",
+                "大盤", "指數", "漲跌", "成交量", "技術分析", "基本面",
+                "財報", "EPS", "本益比", "股價淨值比", "ROE", "ROA"
+            ],
+            "經濟趨勢": [
+                "GDP", "通貨膨脹", "利率", "匯率", "失業率", "消費者物價指數",
+                "生產者物價指數", "貨幣政策", "財政政策", "經濟成長",
+                "景氣循環", "經濟指標", "市場趨勢", "產業分析"
+            ],
+            "創業職場": [
+                "創業", "新創", "募資", "商業模式", "市場定位", "競爭分析",
+                "行銷策略", "品牌建立", "客戶開發", "營運管理", "財務管理",
+                "人力資源", "領導力", "團隊管理", "職涯發展", "升遷"
+            ],
+            "科技產業": [
+                "AI", "人工智慧", "機器學習", "深度學習", "大數據",
+                "雲端運算", "物聯網", "區塊鏈", "加密貨幣", "數位轉型",
+                "軟體開發", "硬體製造", "半導體", "晶片", "5G", "6G"
+            ]
+        }
+
+
+class EducationKeywordProvider(KeywordProvider):
+    """教育關鍵詞提供者"""
+    
+    def get_keywords(self) -> Dict[str, List[str]]:
+        return {
+            "自我成長": [
+                "個人發展", "自我提升", "目標設定", "時間管理", "習慣養成",
+                "心態調整", "壓力管理", "情緒管理", "自我認知", "價值觀",
+                "人生觀", "世界觀", "自我實現", "成就感", "滿足感"
+            ],
+            "職涯發展": [
+                "職涯規劃", "職業選擇", "技能發展", "專業認證", "進修學習",
+                "轉職", "斜槓", "副業", "自由工作者", "遠端工作",
+                "工作生活平衡", "職場人際關係", "溝通技巧", "談判技巧"
+            ],
+            "學習方法": [
+                "學習策略", "記憶技巧", "閱讀方法", "筆記技巧", "複習方法",
+                "考試準備", "專案學習", "線上學習", "實體課程", "自學",
+                "學習動機", "學習效率", "知識管理", "資訊整理"
+            ],
+            "語言學習": [
+                "英文", "日文", "韓文", "法文", "德文", "西班牙文",
+                "聽說讀寫", "文法", "單字", "發音", "會話", "翻譯",
+                "語言交換", "沉浸式學習", "語言考試", "證照"
+            ],
+            "心理學": [
+                "認知心理學", "社會心理學", "發展心理學", "臨床心理學",
+                "行為心理學", "心理治療", "諮商", "心理健康", "心理疾病",
+                "心理測驗", "人格特質", "動機理論", "學習理論"
+            ],
+            "親子教育": [
+                "育兒", "親子關係", "兒童發展", "青少年教育", "家庭教育",
+                "學校教育", "特殊教育", "資優教育", "品格教育", "性教育",
+                "數位素養", "媒體素養", "理財教育", "生命教育"
+            ]
+        }
+
+
+class ContentProcessor:
+    """統一內容處理器"""
     
     def __init__(self):
-        """初始化分類器"""
-        # 商業類別關鍵詞 (參考 MoneyDJ 財經百科)
-        self.business_keywords = {
-            "股票市場": ["股票", "股價", "漲跌", "成交量", "市值", "本益比", "股息", "除權除息"],
-            "投資理財": ["投資", "理財", "基金", "債券", "保險", "定存", "外匯", "期貨", "選擇權"],
-            "總體經濟": ["GDP", "通膨", "利率", "匯率", "失業率", "經濟成長", "央行", "財政政策"],
-            "科技產業": ["AI", "人工智慧", "5G", "物聯網", "雲端", "大數據", "區塊鏈", "元宇宙"],
-            "半導體": ["晶片", "半導體", "台積電", "聯發科", "英特爾", "AMD", "高通"],
-            "市場動態": ["市場", "趨勢", "分析", "預測", "報告", "研究", "調查"],
-            "個股情報": ["個股", "財報", "營收", "獲利", "展望", "策略", "併購"],
-            "產業分析": ["產業", "供應鏈", "競爭", "創新", "轉型", "升級"],
-            "基金投資": ["基金", "ETF", "共同基金", "指數基金", "債券基金"],
-            "金融保險": ["銀行", "保險", "證券", "期貨", "信託", "租賃"],
-            "消費零售": ["零售", "電商", "百貨", "超市", "餐飲", "旅遊", "娛樂"],
-            "房地產": ["房市", "房價", "建商", "土地", "租金", "房貸", "不動產"],
-            "能源": ["石油", "天然氣", "電力", "再生能源", "太陽能", "風電"],
-            "運輸物流": ["航運", "物流", "快遞", "倉儲", "配送", "供應鏈"],
-            "媒體娛樂": ["媒體", "娛樂", "影視", "音樂", "遊戲", "廣告", "行銷"]
-        }
+        self.business_provider = BusinessKeywordProvider()
+        self.education_provider = EducationKeywordProvider()
+        self.business_keywords = self._flatten_keywords(self.business_provider.get_keywords())
+        self.education_keywords = self._flatten_keywords(self.education_provider.get_keywords())
         
-        # 教育類別關鍵詞 (專注自我成長和學習)
-        self.education_keywords = {
-            "職涯發展": ["職涯", "職業", "工作", "職場", "升遷", "轉職", "創業", "副業"],
-            "自我實現": ["自我", "成長", "實現", "目標", "夢想", "價值", "意義", "使命"],
-            "設計思維": ["設計", "思維", "創新", "創意", "解決問題", "用戶體驗", "原型"],
-            "職場技能": ["技能", "能力", "溝通", "領導", "管理", "團隊", "協作", "談判"],
-            "心態建設": ["心態", "心理", "情緒", "壓力", "抗壓", "樂觀", "積極", "自信"],
-            "目標管理": ["目標", "計劃", "執行", "追蹤", "檢討", "改進", "效率", "時間管理"],
-            "創新思維": ["創新", "創意", "突破", "改變", "變革", "新思維", "新方法"],
-            "學習方法": ["學習", "方法", "技巧", "策略", "記憶", "理解", "應用", "實踐"],
-            "知識管理": ["知識", "資訊", "整理", "歸納", "分析", "應用", "分享"],
-            "個人品牌": ["品牌", "形象", "聲譽", "影響力", "專業", "權威", "信任"],
-            "人際關係": ["人際", "關係", "社交", "網路", "人脈", "合作", "信任"],
-            "財務素養": ["財務", "理財", "投資", "儲蓄", "預算", "規劃", "風險"],
-            "健康生活": ["健康", "生活", "運動", "飲食", "睡眠", "養生", "平衡"],
-            "興趣發展": ["興趣", "愛好", "休閒", "娛樂", "創意", "藝術", "音樂"],
-            "心理成長": ["心理", "成長", "認知", "情緒", "自我認知", "心態調整"]
-        }
+        logger.info("統一內容處理器初始化完成")
     
-    def categorize_content(self, title: str, content: str) -> ContentCategory:
+    def _flatten_keywords(self, keyword_dict: Dict[str, List[str]]) -> List[str]:
+        """扁平化關鍵詞字典"""
+        flattened = []
+        for keywords in keyword_dict.values():
+            flattened.extend(keywords)
+        return flattened
+    
+    def analyze_content(self, title: str, content: str) -> ContentAnalysis:
         """
-        分類內容 (商業類別參考 MoneyDJ 財經百科，教育類別專注自我成長)
+        分析內容
         
         Args:
-            title: 內容標題
-            content: 內容文本
+            title: 標題
+            content: 內容
             
         Returns:
-            ContentCategory: 內容類別
+            ContentAnalysis: 分析結果
         """
-        text = f"{title} {content}".lower()
+        import time
+        start_time = time.time()
         
-        # 首先判斷是否為商業類別
-        business_keywords = [
-            "股票", "投資", "理財", "基金", "債券", "保險", "定存", "外匯", "期貨",
-            "GDP", "通膨", "利率", "匯率", "失業率", "經濟", "央行", "財政",
-            "AI", "人工智慧", "5G", "物聯網", "雲端", "大數據", "區塊鏈",
-            "晶片", "半導體", "台積電", "聯發科", "英特爾", "AMD", "高通",
-            "市場", "趨勢", "分析", "預測", "報告", "研究", "調查",
-            "個股", "財報", "營收", "獲利", "展望", "策略", "併購",
-            "產業", "供應鏈", "競爭", "創新", "轉型", "升級",
-            "銀行", "證券", "期貨", "信託", "租賃", "零售", "電商", "百貨",
-            "房市", "房價", "建商", "土地", "租金", "房貸", "不動產",
-            "石油", "天然氣", "電力", "再生能源", "太陽能", "風電",
-            "航運", "物流", "快遞", "倉儲", "配送", "媒體", "娛樂", "影視"
-        ]
+        # 1. 分類內容
+        category_result = self.categorize_content(title, content)
         
-        # 判斷是否為商業類別
-        business_score = sum(1 for keyword in business_keywords if keyword.lower() in text)
-        is_business = business_score >= 2  # 至少包含2個商業關鍵詞才判定為商業類別
+        # 2. 提取關鍵詞
+        keywords = self.extract_keywords(title + " " + content)
         
-        if is_business:
-            # 商業類別：參考 MoneyDJ 財經百科的分類體系
-            return self._categorize_business_content(title, content)
-        else:
-            # 非商業類別：專注教育、自我成長等
-            return self._categorize_education_content(title, content)
-    
-    def _categorize_business_content(self, title: str, content: str) -> ContentCategory:
-        """商業類別分類 (參考 MoneyDJ 財經百科)"""
-        text = f"{title} {content}".lower()
+        # 3. 生成摘要
+        summary = self.generate_summary(content, category_result.category)
         
-        # 計算各類別分數
-        scores = {category: 0 for category in self.business_keywords.keys()}
+        # 4. 提取標籤
+        tags = self.extract_tags(title + " " + content)
         
-        for category, words in self.business_keywords.items():
-            for word in words:
-                if word.lower() in text:
-                    if category in ["股票市場", "投資理財", "總體經濟", "科技產業", "半導體"]:
-                        scores[category] += 3  # 核心財經類別
-                    elif category in ["市場動態", "個股情報", "產業分析", "基金投資", "金融保險"]:
-                        scores[category] += 2  # 重要財經類別
-                    else:
-                        scores[category] += 1  # 一般類別
+        processing_time = time.time() - start_time
         
-        # 選擇得分最高的類別
-        main_category = max(scores.items(), key=lambda x: x[1])[0]
-        
-        # 確定子類別
-        if main_category == "股票市場":
-            if "市場" in text or "趨勢" in text:
-                sub_category = "市場動態"
-            elif "個股" in text or "財報" in text:
-                sub_category = "個股情報"
-            elif "產業" in text:
-                sub_category = "產業分析"
-            else:
-                sub_category = "一般股票"
-        elif main_category == "投資理財":
-            if "基金" in text:
-                sub_category = "基金投資"
-            elif "債券" in text or "定存" in text:
-                sub_category = "固定收益"
-            else:
-                sub_category = "一般理財"
-        elif main_category == "總體經濟":
-            if "國際" in text or "全球" in text:
-                sub_category = "國際金融"
-            else:
-                sub_category = "國內經濟"
-        else:
-            sub_category = "其他"
-        
-        # 生成標籤
-        tags = []
-        for category, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-            if score > 0 and len(tags) < 5:
-                tags.append(category)
-        
-        return ContentCategory(
-            main_category=main_category,
-            sub_category=sub_category,
-            tags=tags
+        return ContentAnalysis(
+            category=ContentCategory(category_result.category),
+            confidence=category_result.confidence,
+            keywords=keywords,
+            summary=summary.summary,
+            tags=tags,
+            reasoning=category_result.reasoning,
+            processing_time=processing_time
         )
     
-    def _categorize_education_content(self, title: str, content: str) -> ContentCategory:
-        """教育類別分類 (專注自我成長和學習)"""
-        text = f"{title} {content}".lower()
+    def categorize_content(self, title: str, content: str) -> CategoryResult:
+        """
+        分類內容
         
-        # 計算各類別分數
-        scores = {category: 0 for category in self.education_keywords.keys()}
+        Args:
+            title: 標題
+            content: 內容
+            
+        Returns:
+            CategoryResult: 分類結果
+        """
+        text = (title + " " + content).lower()
         
-        for category, words in self.education_keywords.items():
-            for word in words:
-                if word.lower() in text:
-                    if category in ["職涯發展", "自我實現", "設計思維"]:
-                        scores[category] += 3  # 核心教育類別
-                    elif category in ["職場技能", "心態建設", "目標管理", "創新思維"]:
-                        scores[category] += 2  # 重要教育類別
-                    else:
-                        scores[category] += 1  # 一般類別
+        # 計算商業分數
+        business_score = 0.0
+        business_keywords_found = []
+        for keyword in self.business_keywords:
+            if keyword in text:
+                business_score += 0.1
+                business_keywords_found.append(keyword)
         
-        # 選擇得分最高的類別
-        main_category = max(scores.items(), key=lambda x: x[1])[0]
+        # 計算教育分數
+        education_score = 0.0
+        education_keywords_found = []
+        for keyword in self.education_keywords:
+            if keyword in text:
+                education_score += 0.1
+                education_keywords_found.append(keyword)
         
-        # 確定子類別
-        if main_category == "職涯發展":
-            if "技能" in text or "能力" in text:
-                sub_category = "職場技能"
-            elif "創業" in text or "副業" in text:
-                sub_category = "專業成長"
-            else:
-                sub_category = "一般職涯"
-        elif main_category == "自我實現":
-            if "心態" in text or "心理" in text:
-                sub_category = "心態建設"
-            elif "目標" in text or "計劃" in text:
-                sub_category = "目標管理"
-            else:
-                sub_category = "一般成長"
-        elif main_category == "設計思維":
-            if "創新" in text or "創意" in text:
-                sub_category = "創新思維"
-            else:
-                sub_category = "一般設計"
+        # 正規化分數
+        business_score = min(business_score, 1.0)
+        education_score = min(education_score, 1.0)
+        
+        # 決定分類
+        if business_score > 0.5 and education_score > 0.5:
+            category = "混合"
+            confidence = max(business_score, education_score)
+            reasoning = f"同時包含商業({business_score:.2f})和教育({education_score:.2f})元素"
+        elif business_score > education_score and business_score > 0.3:
+            category = "商業"
+            confidence = business_score
+            reasoning = f"主要為商業內容，分數: {business_score:.2f}"
+        elif education_score > business_score and education_score > 0.3:
+            category = "教育"
+            confidence = education_score
+            reasoning = f"主要為教育內容，分數: {education_score:.2f}"
         else:
-            sub_category = "其他"
+            category = "其他"
+            confidence = max(business_score, education_score, 0.2)
+            reasoning = "不屬於主要分類範疇"
         
-        # 生成標籤
-        tags = []
-        for category, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-            if score > 0 and len(tags) < 5:
-                tags.append(category)
+        return CategoryResult(
+            category=category,
+            confidence=confidence,
+            keywords_found=business_keywords_found + education_keywords_found,
+            reasoning=reasoning,
+            business_score=business_score,
+            education_score=education_score
+        )
+    
+    def extract_keywords(self, text: str) -> List[str]:
+        """
+        提取關鍵詞
         
-        return ContentCategory(
-            main_category=main_category,
-            sub_category=sub_category,
-            tags=tags
-        ) 
+        Args:
+            text: 文本
+            
+        Returns:
+            List[str]: 關鍵詞列表
+        """
+        text_lower = text.lower()
+        keywords = []
+        
+        # 從商業關鍵詞中提取
+        for keyword in self.business_keywords:
+            if keyword in text_lower:
+                keywords.append(keyword)
+        
+        # 從教育關鍵詞中提取
+        for keyword in self.education_keywords:
+            if keyword in text_lower:
+                keywords.append(keyword)
+        
+        # 去重並限制數量
+        keywords = list(set(keywords))[:10]
+        
+        return keywords
+    
+    def generate_summary(self, content: str, category: str) -> ContentSummary:
+        """
+        生成內容摘要
+        
+        Args:
+            content: 內容
+            category: 分類
+            
+        Returns:
+            ContentSummary: 摘要結果
+        """
+        import time
+        start_time = time.time()
+        
+        # 根據分類生成不同風格的摘要
+        if category == "商業":
+            summary = self._generate_business_summary(content)
+        elif category == "教育":
+            summary = self._generate_education_summary(content)
+        else:
+            summary = self._generate_general_summary(content)
+        
+        processing_time = time.time() - start_time
+        
+        return ContentSummary(
+            summary=summary,
+            key_points=self._extract_key_points(content),
+            category=ContentCategory(category),
+            confidence=0.8,
+            processing_time=processing_time
+        )
+    
+    def _generate_business_summary(self, content: str) -> str:
+        """生成商業摘要"""
+        # 提取關鍵商業概念
+        business_concepts = []
+        for keyword in self.business_keywords:
+            if keyword in content.lower():
+                business_concepts.append(keyword)
+        
+        # 生成摘要
+        if business_concepts:
+            summary = f"此內容主要討論{', '.join(business_concepts[:3])}等商業議題。"
+        else:
+            summary = "此內容涉及商業相關主題。"
+        
+        # 添加長度資訊
+        if len(content) > 500:
+            summary += "內容詳實，提供深入分析。"
+        else:
+            summary += "內容簡潔，重點突出。"
+        
+        return summary
+    
+    def _generate_education_summary(self, content: str) -> str:
+        """生成教育摘要"""
+        # 提取關鍵教育概念
+        education_concepts = []
+        for keyword in self.education_keywords:
+            if keyword in content.lower():
+                education_concepts.append(keyword)
+        
+        # 生成摘要
+        if education_concepts:
+            summary = f"此內容主要探討{', '.join(education_concepts[:3])}等教育議題。"
+        else:
+            summary = "此內容涉及教育相關主題。"
+        
+        # 添加學習價值
+        summary += "適合學習者參考和應用。"
+        
+        return summary
+    
+    def _generate_general_summary(self, content: str) -> str:
+        """生成一般摘要"""
+        # 簡單的摘要生成
+        sentences = content.split('。')
+        if len(sentences) > 1:
+            summary = sentences[0] + "。"
+        else:
+            summary = content[:100] + "..." if len(content) > 100 else content
+        
+        return summary
+    
+    def _extract_key_points(self, content: str) -> List[str]:
+        """提取關鍵點"""
+        # 簡單的關鍵點提取
+        sentences = content.split('。')
+        key_points = []
+        
+        for sentence in sentences[:5]:  # 取前5句
+            if len(sentence.strip()) > 10:
+                key_points.append(sentence.strip() + "。")
+        
+        return key_points
+    
+    def extract_tags(self, text: str) -> List[str]:
+        """
+        提取標籤
+        
+        Args:
+            text: 文本
+            
+        Returns:
+            List[str]: 標籤列表
+        """
+        # 結合關鍵詞和標籤提取
+        keywords = self.extract_keywords(text)
+        
+        # 添加一些通用標籤
+        tags = keywords.copy()
+        
+        # 根據內容長度添加標籤
+        if len(text) > 1000:
+            tags.append("詳細")
+        else:
+            tags.append("簡潔")
+        
+        # 根據內容類型添加標籤
+        if any(word in text.lower() for word in ["podcast", "節目", "音頻"]):
+            tags.append("podcast")
+        
+        if any(word in text.lower() for word in ["推薦", "建議", "分享"]):
+            tags.append("推薦")
+        
+        return list(set(tags))[:10]  # 去重並限制數量
+    
+    def get_category_keywords(self, category: str) -> Dict[str, List[str]]:
+        """
+        獲取分類關鍵詞
+        
+        Args:
+            category: 分類
+            
+        Returns:
+            Dict[str, List[str]]: 關鍵詞字典
+        """
+        if category == "商業":
+            return self.business_provider.get_keywords()
+        elif category == "教育":
+            return self.education_provider.get_keywords()
+        else:
+            return {}
+    
+    def add_custom_keywords(self, category: str, new_keywords: Dict[str, List[str]]) -> None:
+        """
+        添加自定義關鍵詞
+        
+        Args:
+            category: 分類
+            new_keywords: 新關鍵詞
+        """
+        if category == "商業":
+            # 更新商業關鍵詞
+            current_keywords = self.business_provider.get_keywords()
+            current_keywords.update(new_keywords)
+            self.business_keywords = self._flatten_keywords(current_keywords)
+        elif category == "教育":
+            # 更新教育關鍵詞
+            current_keywords = self.education_provider.get_keywords()
+            current_keywords.update(new_keywords)
+            self.education_keywords = self._flatten_keywords(current_keywords)
+
+
+# 向後相容性別名
+ContentCategorizer = ContentProcessor
+KeywordMapper = ContentProcessor
+
+
+# 全域實例
+content_processor = ContentProcessor()
+
+
+def get_content_processor() -> ContentProcessor:
+    """獲取內容處理器實例"""
+    return content_processor
+
+
+# 使用範例
+if __name__ == "__main__":
+    # 測試內容處理
+    processor = get_content_processor()
+    
+    # 測試商業內容
+    business_title = "股癌 EP310 - 台股投資分析"
+    business_content = "本集討論台股市場趨勢，分析投資策略和風險管理，適合投資者參考。"
+    
+    business_analysis = processor.analyze_content(business_title, business_content)
+    print("商業內容分析:")
+    print(f"分類: {business_analysis.category.value}")
+    print(f"信心度: {business_analysis.confidence:.2f}")
+    print(f"關鍵詞: {', '.join(business_analysis.keywords)}")
+    print(f"摘要: {business_analysis.summary}")
+    print(f"標籤: {', '.join(business_analysis.tags)}")
+    
+    print("\n" + "="*50 + "\n")
+    
+    # 測試教育內容
+    education_title = "大人學 EP110 - 職涯發展指南"
+    education_content = "本集分享職涯規劃技巧，討論技能發展和個人成長，幫助聽眾提升職場競爭力。"
+    
+    education_analysis = processor.analyze_content(education_title, education_content)
+    print("教育內容分析:")
+    print(f"分類: {education_analysis.category.value}")
+    print(f"信心度: {education_analysis.confidence:.2f}")
+    print(f"關鍵詞: {', '.join(education_analysis.keywords)}")
+    print(f"摘要: {education_analysis.summary}")
+    print(f"標籤: {', '.join(education_analysis.tags)}") 

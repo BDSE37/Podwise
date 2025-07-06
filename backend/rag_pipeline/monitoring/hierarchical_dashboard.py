@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 層級化樹狀結構 RAG 系統監控面板
-用於實時監控各層級的效能指標和系統狀態
+整合效能監控和儀表板功能，用於實時監控各層級的效能指標和系統狀態
 """
 
 import streamlit as st
@@ -12,9 +12,33 @@ from plotly.subplots import make_subplots
 import asyncio
 import json
 import time
+import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, asdict
+from collections import defaultdict, deque
+import statistics
+import os
 import yaml
+
+# 設定日誌
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class PerformanceMetrics:
+    """效能指標數據結構"""
+    timestamp: datetime
+    query_id: str
+    service_name: str
+    response_time: float
+    success: bool
+    error_message: Optional[str] = None
+    confidence_score: Optional[float] = None
+    agent_used: Optional[str] = None
+    fallback_used: bool = False
+    memory_usage: Optional[float] = None
+    cpu_usage: Optional[float] = None
 
 # 設定頁面配置
 st.set_page_config(
@@ -38,10 +62,189 @@ class HierarchicalRAGMonitor:
             "混合式RAG"
         ]
         
-        self.metrics_history = []
+        # 效能監控相關
+        self.metrics_file = "performance_metrics.json"
+        self.max_history = 10000
+        self.metrics_history = deque(maxlen=self.max_history)
+        self.service_metrics = defaultdict(list)
+        self.realtime_stats = {
+            "total_queries": 0,
+            "successful_queries": 0,
+            "failed_queries": 0,
+            "average_response_time": 0.0,
+            "current_confidence_avg": 0.0,
+            "fallback_rate": 0.0
+        }
+        
+        # 歷史數據
+        self.metrics_history_display = []
         self.ml_pipeline_metrics = {}
+        
+        # 初始化
         self.load_mock_data()
         self._initialize_ml_pipeline_monitoring()
+        self._load_metrics()
+    
+    def _load_metrics(self):
+        """載入歷史效能指標"""
+        try:
+            if os.path.exists(self.metrics_file):
+                with open(self.metrics_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    for metric_data in data.get('metrics', []):
+                        metric = PerformanceMetrics(
+                            timestamp=datetime.fromisoformat(metric_data['timestamp']),
+                            query_id=metric_data['query_id'],
+                            service_name=metric_data['service_name'],
+                            response_time=metric_data['response_time'],
+                            success=metric_data['success'],
+                            error_message=metric_data.get('error_message'),
+                            confidence_score=metric_data.get('confidence_score'),
+                            agent_used=metric_data.get('agent_used'),
+                            fallback_used=metric_data.get('fallback_used', False),
+                            memory_usage=metric_data.get('memory_usage'),
+                            cpu_usage=metric_data.get('cpu_usage')
+                        )
+                        self.metrics_history.append(metric)
+                        self.service_metrics[metric.service_name].append(metric)
+                
+                logger.info(f"✅ 載入 {len(self.metrics_history)} 條歷史效能指標")
+        except Exception as e:
+            logger.warning(f"⚠️ 載入歷史指標失敗: {e}")
+    
+    def _save_metrics(self):
+        """儲存效能指標到檔案"""
+        try:
+            data = {
+                'last_updated': datetime.now().isoformat(),
+                'total_metrics': len(self.metrics_history),
+                'metrics': [asdict(metric) for metric in self.metrics_history]
+            }
+            
+            with open(self.metrics_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+                
+        except Exception as e:
+            logger.error(f"❌ 儲存效能指標失敗: {e}")
+    
+    def record_performance_metric(self, 
+                                query_id: str,
+                                service_name: str,
+                                response_time: float,
+                                success: bool,
+                                confidence_score: Optional[float] = None,
+                                agent_used: Optional[str] = None,
+                                fallback_used: bool = False,
+                                error_message: Optional[str] = None) -> PerformanceMetrics:
+        """記錄效能指標"""
+        metric = PerformanceMetrics(
+            timestamp=datetime.now(),
+            query_id=query_id,
+            service_name=service_name,
+            response_time=response_time,
+            success=success,
+            error_message=error_message,
+            confidence_score=confidence_score,
+            agent_used=agent_used,
+            fallback_used=fallback_used
+        )
+        
+        self.metrics_history.append(metric)
+        self.service_metrics[service_name].append(metric)
+        self._update_realtime_stats(metric)
+        
+        # 定期儲存
+        if len(self.metrics_history) % 100 == 0:
+            self._save_metrics()
+        
+        return metric
+    
+    def _update_realtime_stats(self, metric: PerformanceMetrics):
+        """更新即時統計數據"""
+        self.realtime_stats["total_queries"] += 1
+        
+        if metric.success:
+            self.realtime_stats["successful_queries"] += 1
+        else:
+            self.realtime_stats["failed_queries"] += 1
+        
+        # 更新平均響應時間
+        if self.metrics_history:
+            total_time = sum(m.response_time for m in self.metrics_history)
+            self.realtime_stats["average_response_time"] = total_time / len(self.metrics_history)
+        
+        # 更新平均信心值
+        confidence_scores = [m.confidence_score for m in self.metrics_history if m.confidence_score is not None]
+        if confidence_scores:
+            self.realtime_stats["current_confidence_avg"] = statistics.mean(confidence_scores)
+        
+        # 更新備援率
+        fallback_count = sum(1 for m in self.metrics_history if m.fallback_used)
+        self.realtime_stats["fallback_rate"] = fallback_count / len(self.metrics_history) if self.metrics_history else 0.0
+    
+    def get_service_performance(self, service_name: str, hours: int = 24) -> Dict[str, Any]:
+        """獲取服務效能統計"""
+        cutoff_time = datetime.now() - timedelta(hours=hours)
+        recent_metrics = [m for m in self.service_metrics[service_name] if m.timestamp >= cutoff_time]
+        
+        if not recent_metrics:
+            return {
+                "total_queries": 0,
+                "success_rate": 0.0,
+                "avg_response_time": 0.0,
+                "avg_confidence": 0.0,
+                "fallback_rate": 0.0
+            }
+        
+        success_count = sum(1 for m in recent_metrics if m.success)
+        confidence_scores = [m.confidence_score for m in recent_metrics if m.confidence_score is not None]
+        fallback_count = sum(1 for m in recent_metrics if m.fallback_used)
+        
+        return {
+            "total_queries": len(recent_metrics),
+            "success_rate": success_count / len(recent_metrics),
+            "avg_response_time": statistics.mean(m.response_time for m in recent_metrics),
+            "avg_confidence": statistics.mean(confidence_scores) if confidence_scores else 0.0,
+            "fallback_rate": fallback_count / len(recent_metrics)
+        }
+    
+    def get_overall_performance(self, hours: int = 24) -> Dict[str, Any]:
+        """獲取整體效能統計"""
+        cutoff_time = datetime.now() - timedelta(hours=hours)
+        recent_metrics = [m for m in self.metrics_history if m.timestamp >= cutoff_time]
+        
+        if not recent_metrics:
+            return {
+                "total_queries": 0,
+                "success_rate": 0.0,
+                "avg_response_time": 0.0,
+                "avg_confidence": 0.0,
+                "fallback_rate": 0.0,
+                "service_breakdown": {}
+            }
+        
+        success_count = sum(1 for m in recent_metrics if m.success)
+        confidence_scores = [m.confidence_score for m in recent_metrics if m.confidence_score is not None]
+        fallback_count = sum(1 for m in recent_metrics if m.fallback_used)
+        
+        # 服務細分
+        service_breakdown = {}
+        for service_name in set(m.service_name for m in recent_metrics):
+            service_metrics = [m for m in recent_metrics if m.service_name == service_name]
+            service_breakdown[service_name] = {
+                "queries": len(service_metrics),
+                "success_rate": sum(1 for m in service_metrics if m.success) / len(service_metrics),
+                "avg_response_time": statistics.mean(m.response_time for m in service_metrics)
+            }
+        
+        return {
+            "total_queries": len(recent_metrics),
+            "success_rate": success_count / len(recent_metrics),
+            "avg_response_time": statistics.mean(m.response_time for m in recent_metrics),
+            "avg_confidence": statistics.mean(confidence_scores) if confidence_scores else 0.0,
+            "fallback_rate": fallback_count / len(recent_metrics),
+            "service_breakdown": service_breakdown
+        }
     
     def _initialize_ml_pipeline_monitoring(self):
         """初始化 ML Pipeline 監控"""
@@ -59,8 +262,8 @@ class HierarchicalRAGMonitor:
             
             # 嘗試導入 ML Pipeline 服務
             try:
-                from services import RecommendationService
-                from config.recommender_config import get_recommender_config
+                from backend.ml_pipeline.services import RecommendationService
+                from backend.ml_pipeline.config.recommender_config import get_recommender_config
                 
                 # 初始化推薦服務用於監控
                 config = get_recommender_config()
@@ -86,7 +289,7 @@ class HierarchicalRAGMonitor:
         # 模擬歷史數據
         for i in range(100):
             timestamp = datetime.now() - timedelta(minutes=i)
-            self.metrics_history.append({
+            self.metrics_history_display.append({
                 'timestamp': timestamp,
                 'level_1_confidence': 0.85 + (i % 10) * 0.01,
                 'level_2_confidence': 0.78 + (i % 8) * 0.015,
@@ -205,259 +408,124 @@ def main():
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.subheader("📊 層級化效能指標")
+        st.subheader("📊 系統效能指標")
         
-        # 獲取當前指標
-        current_metrics = monitor.get_current_metrics()
+        # 獲取整體效能統計
+        overall_perf = monitor.get_overall_performance(hours=24)
         
-        # 信心值圖表
-        if "信心值" in selected_metrics:
-            confidence_data = {
-                '層級': monitor.levels,
-                '信心值': [
-                    current_metrics['level_1_confidence'],
-                    current_metrics['level_2_confidence'],
-                    current_metrics['level_3_confidence'],
-                    current_metrics['level_4_confidence'],
-                    current_metrics['level_5_confidence'],
-                    current_metrics['level_6_confidence']
-                ]
-            }
-            
-            df_confidence = pd.DataFrame(confidence_data)
-            
-            fig_confidence = px.bar(
-                df_confidence,
-                x='層級',
-                y='信心值',
-                title="各層級信心值",
-                color='信心值',
-                color_continuous_scale='RdYlGn',
-                range_color=[0.5, 1.0]
-            )
-            
-            fig_confidence.update_layout(
-                height=400,
-                showlegend=False
-            )
-            
-            st.plotly_chart(fig_confidence, use_container_width=True)
+        # 效能指標卡片
+        perf_col1, perf_col2, perf_col3, perf_col4 = st.columns(4)
         
-        # 回應時間圖表
-        if "回應時間" in selected_metrics:
-            # 模擬各層級回應時間
-            response_times = [0.5, 1.2, 0.8, 0.6, 0.4, 2.0]
-            
-            fig_response = px.line(
-                x=monitor.levels,
-                y=response_times,
-                title="各層級回應時間 (秒)",
-                markers=True
+        with perf_col1:
+            st.metric(
+                "總查詢數",
+                overall_perf["total_queries"],
+                delta=f"{overall_perf['success_rate']:.1%} 成功率"
             )
-            
-            fig_response.update_layout(
-                height=300,
-                xaxis_title="層級",
-                yaxis_title="回應時間 (秒)"
+        
+        with perf_col2:
+            st.metric(
+                "平均回應時間",
+                f"{overall_perf['avg_response_time']:.2f}s",
+                delta=f"{overall_perf['fallback_rate']:.1%} 備援率"
             )
-            
-            st.plotly_chart(fig_response, use_container_width=True)
+        
+        with perf_col3:
+            st.metric(
+                "平均信心值",
+                f"{overall_perf['avg_confidence']:.2f}",
+                delta="信心值"
+            )
+        
+        with perf_col4:
+            st.metric(
+                "即時查詢",
+                monitor.realtime_stats["total_queries"],
+                delta="活躍查詢"
+            )
     
     with col2:
-        st.subheader("🔧 系統狀態")
-        
-        # 服務狀態
+        st.subheader("🔧 服務狀態")
         service_status = monitor.get_service_status()
         
         for service, status in service_status.items():
-            st.markdown(f"**{service}**: {status}")
-        
-        st.markdown("---")
-        
-        # 關鍵指標卡片
-        st.subheader("📈 關鍵指標")
-        
-        col_a, col_b = st.columns(2)
-        
-        with col_a:
-            st.metric(
-                label="平均信心值",
-                value=f"{current_metrics['level_6_confidence']:.3f}",
-                delta="+0.02"
-            )
-            
-            st.metric(
-                label="回應時間",
-                value=f"{current_metrics['response_time']:.1f}s",
-                delta="-0.2s"
-            )
-        
-        with col_b:
-            st.metric(
-                label="吞吐量",
-                value=f"{current_metrics['throughput']} req/min",
-                delta="+3"
-            )
-            
-            st.metric(
-                label="錯誤率",
-                value=f"{current_metrics['error_rate']:.3f}",
-                delta="-0.005"
-            )
+            st.write(f"{service}: {status}")
     
-    # 詳細監控區域
-    st.markdown("---")
-    
-    col3, col4 = st.columns(2)
-    
-    with col3:
-        st.subheader("🔄 層級間數據流")
-        
-        # 層級間數據流圖
-        fig_flow = go.Figure()
-        
-        # 添加節點
-        node_x = [0, 0, 0, 0, 0, 0]
-        node_y = [0, 1, 2, 3, 4, 5]
-        node_text = monitor.levels
-        
-        fig_flow.add_trace(go.Scatter(
-            x=node_x,
-            y=node_y,
-            mode='markers+text',
-            marker=dict(size=20, color='lightblue'),
-            text=node_text,
-            textposition="middle right",
-            name="層級"
-        ))
-        
-        # 添加連接線
-        for i in range(len(node_y) - 1):
-            fig_flow.add_trace(go.Scatter(
-                x=[0, 0],
-                y=[node_y[i], node_y[i + 1]],
-                mode='lines',
-                line=dict(color='gray', width=2),
-                showlegend=False
-            ))
-        
-        fig_flow.update_layout(
-            title="層級化數據流",
-            height=400,
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            showlegend=False
-        )
-        
-        st.plotly_chart(fig_flow, use_container_width=True)
-    
-    with col4:
-        st.subheader("📋 層級詳細信息")
-        
-        # 層級詳細信息表格
-        level_details = []
-        for i, level in enumerate(monitor.levels, 1):
-            level_details.append({
-                '層級': f"第{i}層",
-                '名稱': level,
-                '信心值': current_metrics[f'level_{i}_confidence'],
-                '狀態': '🟢 正常' if current_metrics[f'level_{i}_confidence'] > 0.7 else '🟡 警告',
-                '處理時間': f"{0.5 + i * 0.2:.1f}s"
-            })
-        
-        df_details = pd.DataFrame(level_details)
-        st.dataframe(df_details, use_container_width=True)
-    
-    # 歷史趨勢圖
-    st.markdown("---")
-    st.subheader("📈 歷史趨勢")
+    # 圖表區域
+    st.subheader("📈 效能趨勢圖")
     
     # 轉換歷史數據為 DataFrame
-    df_history = pd.DataFrame(monitor.metrics_history)
-    
-    # 選擇要顯示的指標
-    if "信心值" in selected_metrics:
-        fig_trend = make_subplots(
-            rows=2, cols=1,
-            subplot_titles=("信心值趨勢", "回應時間趨勢"),
-            vertical_spacing=0.1
-        )
+    if monitor.metrics_history_display:
+        df = pd.DataFrame(monitor.metrics_history_display)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
         
-        # 添加信心值趨勢
-        for i in range(1, 7):
-            fig_trend.add_trace(
-                go.Scatter(
-                    x=df_history['timestamp'],
-                    y=df_history[f'level_{i}_confidence'],
-                    name=f"第{i}層",
-                    mode='lines'
-                ),
-                row=1, col=1
+        # 信心值趨勢圖
+        if "信心值" in selected_metrics:
+            fig_confidence = go.Figure()
+            for i, level in enumerate(monitor.levels, 1):
+                col_name = f'level_{i}_confidence'
+                if col_name in df.columns:
+                    fig_confidence.add_trace(go.Scatter(
+                        x=df['timestamp'],
+                        y=df[col_name],
+                        mode='lines',
+                        name=level,
+                        line=dict(width=2)
+                    ))
+            
+            fig_confidence.update_layout(
+                title="各層級信心值趨勢",
+                xaxis_title="時間",
+                yaxis_title="信心值",
+                height=400
             )
+            st.plotly_chart(fig_confidence, use_container_width=True)
         
-        # 添加回應時間趨勢
-        fig_trend.add_trace(
-            go.Scatter(
-                x=df_history['timestamp'],
-                y=df_history['response_time'],
-                name="回應時間",
-                mode='lines',
-                line=dict(color='red')
-            ),
-            row=2, col=1
-        )
-        
-        fig_trend.update_layout(height=600, showlegend=True)
-        st.plotly_chart(fig_trend, use_container_width=True)
+        # 回應時間趨勢圖
+        if "回應時間" in selected_metrics:
+            fig_response = px.line(
+                df, 
+                x='timestamp', 
+                y='response_time',
+                title="回應時間趨勢"
+            )
+            fig_response.update_layout(height=400)
+            st.plotly_chart(fig_response, use_container_width=True)
     
-    # 告警和建議
-    st.markdown("---")
+    # 服務效能細分
+    st.subheader("🔍 服務效能細分")
+    service_perf = overall_perf.get("service_breakdown", {})
     
-    col5, col6 = st.columns(2)
+    if service_perf:
+        service_df = pd.DataFrame([
+            {
+                "服務": service,
+                "查詢數": data["queries"],
+                "成功率": data["success_rate"],
+                "平均回應時間": data["avg_response_time"]
+            }
+            for service, data in service_perf.items()
+        ])
+        
+        st.dataframe(service_df, use_container_width=True)
     
-    with col5:
-        st.subheader("⚠️ 系統告警")
-        
-        alerts = []
-        if current_metrics['error_rate'] > 0.05:
-            alerts.append("🔴 錯誤率過高 (>5%)")
-        if current_metrics['response_time'] > 5:
-            alerts.append("🟡 回應時間過長 (>5s)")
-        if current_metrics['level_1_confidence'] < 0.7:
-            alerts.append("🟡 第一層信心值偏低")
-        
-        if alerts:
-            for alert in alerts:
-                st.error(alert)
-        else:
-            st.success("✅ 系統運行正常，無告警")
+    # ML Pipeline 指標
+    st.subheader("🤖 ML Pipeline 指標")
+    ml_metrics = monitor.get_ml_pipeline_metrics()
     
-    with col6:
-        st.subheader("💡 優化建議")
-        
-        suggestions = []
-        if current_metrics['level_2_confidence'] < 0.8:
-            suggestions.append("考慮優化混合搜尋策略")
-        if current_metrics['throughput'] < 30:
-            suggestions.append("增加系統資源或優化性能")
-        if current_metrics['user_satisfaction'] < 0.8:
-            suggestions.append("改進回應質量和相關性")
-        
-        if suggestions:
-            for suggestion in suggestions:
-                st.info(suggestion)
-        else:
-            st.success("✅ 系統運行良好，無需優化")
+    ml_col1, ml_col2, ml_col3, ml_col4 = st.columns(4)
     
-    # 頁腳
-    st.markdown("---")
-    st.markdown(
-        f"<div style='text-align: center; color: gray;'>"
-        f"最後更新: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | "
-        f"層級化樹狀結構 RAG 系統監控面板"
-        f"</div>",
-        unsafe_allow_html=True
-    )
+    with ml_col1:
+        st.metric("推薦準確率", f"{ml_metrics['recommendation_accuracy']:.2f}")
+    
+    with ml_col2:
+        st.metric("用戶滿意度", f"{ml_metrics['user_satisfaction']:.2f}")
+    
+    with ml_col3:
+        st.metric("多樣性分數", f"{ml_metrics['diversity_score']:.2f}")
+    
+    with ml_col4:
+        st.metric("ML 回應時間", f"{ml_metrics['response_time']:.2f}s")
 
 if __name__ == "__main__":
     main() 

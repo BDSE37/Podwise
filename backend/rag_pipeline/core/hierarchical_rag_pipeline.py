@@ -623,8 +623,8 @@ class Level6HybridRAG(RAGLevel):
             if ml_pipeline_path not in sys.path:
                 sys.path.insert(0, ml_pipeline_path)
             
-            from services import RecommendationService
-            from config.recommender_config import get_recommender_config
+            from backend.ml_pipeline.services import RecommendationService
+            from backend.ml_pipeline.config.recommender_config import get_recommender_config
             
             # 初始化推薦服務
             config = get_recommender_config()
