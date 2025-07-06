@@ -603,6 +603,42 @@ class Level5ContextCompression(RAGLevel):
 class Level6HybridRAG(RAGLevel):
     """第六層：混合式RAG"""
     
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__(config)
+        self.ml_pipeline_service = None
+        self._initialize_ml_pipeline()
+    
+    def _initialize_ml_pipeline(self):
+        """初始化 ML Pipeline 服務"""
+        try:
+            # 嘗試導入 ML Pipeline 服務
+            import sys
+            import os
+            
+            # 添加 ML Pipeline 路徑
+            ml_pipeline_path = os.path.join(
+                os.path.dirname(__file__), 
+                '..', '..', 'ml_pipeline'
+            )
+            if ml_pipeline_path not in sys.path:
+                sys.path.insert(0, ml_pipeline_path)
+            
+            from services import RecommendationService
+            from config.recommender_config import get_recommender_config
+            
+            # 初始化推薦服務
+            config = get_recommender_config()
+            db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
+            
+            if db_url:
+                self.ml_pipeline_service = RecommendationService(db_url, config)
+                logger.info("ML Pipeline 服務初始化成功")
+            else:
+                logger.warning("未設定 DATABASE_URL，ML Pipeline 功能將不可用")
+                
+        except Exception as e:
+            logger.warning(f"ML Pipeline 服務初始化失敗: {str(e)}")
+    
     async def process(self, input_data: List[SearchResult]) -> Tuple[RAGResponse, float]:
         """執行混合式RAG生成"""
         logger.info(f"🔍 {self.name}: 執行混合式RAG生成")
@@ -616,8 +652,11 @@ class Level6HybridRAG(RAGLevel):
             # 自適應生成
             adaptive_response = await self._adaptive_generation(multi_model_response, input_data)
             
+            # 整合 ML Pipeline 推薦
+            enhanced_response = await self._integrate_ml_recommendations(adaptive_response, input_data)
+            
             # 質量控制
-            quality_controlled_response = await self._quality_control(adaptive_response)
+            quality_controlled_response = await self._quality_control(enhanced_response)
             
             processing_time = time.time() - start_time
             
@@ -631,7 +670,8 @@ class Level6HybridRAG(RAGLevel):
                 metadata={
                     'models_used': ['qwen2.5-7b', 'deepseek-coder-6.7b'],
                     'quality_controlled': True,
-                    'adaptive_generation': True
+                    'adaptive_generation': True,
+                    'ml_pipeline_integrated': self.ml_pipeline_service is not None
                 }
             )
             
@@ -666,6 +706,67 @@ class Level6HybridRAG(RAGLevel):
             adaptive_response = f"[簡潔模式] {base_response} [重點摘要]"
         
         return adaptive_response
+    
+    async def _integrate_ml_recommendations(self, base_response: str, results: List[SearchResult]) -> str:
+        """整合 ML Pipeline 推薦"""
+        if not self.ml_pipeline_service:
+            return base_response
+        
+        try:
+            # 從檢索結果中提取相關信息
+            extracted_info = self._extract_recommendation_context(results)
+            
+            # 獲取推薦結果
+            recommendations = await self.ml_pipeline_service.get_recommendations(
+                user_id=1,  # 這裡可以根據實際用戶ID調整
+                top_k=3,
+                context=extracted_info
+            )
+            
+            if recommendations:
+                # 整合推薦結果到回應中
+                recommendation_text = "\n\n推薦播客節目：\n"
+                for i, rec in enumerate(recommendations, 1):
+                    title = rec.get('title', '未知節目')
+                    category = rec.get('category', '未知類別')
+                    recommendation_text += f"{i}. {title} ({category})\n"
+                
+                enhanced_response = f"{base_response}{recommendation_text}"
+                logger.info("ML Pipeline 推薦整合成功")
+                return enhanced_response
+            else:
+                logger.info("ML Pipeline 未返回推薦結果")
+                return base_response
+                
+        except Exception as e:
+            logger.error(f"ML Pipeline 推薦整合失敗: {str(e)}")
+            return base_response
+    
+    def _extract_recommendation_context(self, results: List[SearchResult]) -> Dict[str, Any]:
+        """從檢索結果中提取推薦上下文"""
+        context = {
+            'topics': [],
+            'categories': [],
+            'entities': []
+        }
+        
+        # 簡單的關鍵詞提取
+        for result in results[:3]:  # 只處理前3個結果
+            content = result.content.lower()
+            
+            # 提取主題
+            if '科技' in content:
+                context['topics'].append('technology')
+            if '商業' in content:
+                context['topics'].append('business')
+            if '教育' in content:
+                context['topics'].append('education')
+            
+            # 提取類別
+            if '播客' in content:
+                context['categories'].append('podcast')
+        
+        return context
     
     async def _quality_control(self, response: str) -> str:
         """質量控制"""

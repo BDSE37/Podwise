@@ -39,7 +39,47 @@ class HierarchicalRAGMonitor:
         ]
         
         self.metrics_history = []
+        self.ml_pipeline_metrics = {}
         self.load_mock_data()
+        self._initialize_ml_pipeline_monitoring()
+    
+    def _initialize_ml_pipeline_monitoring(self):
+        """初始化 ML Pipeline 監控"""
+        try:
+            import sys
+            import os
+            
+            # 添加 ML Pipeline 路徑
+            ml_pipeline_path = os.path.join(
+                os.path.dirname(__file__), 
+                '..', '..', 'ml_pipeline'
+            )
+            if ml_pipeline_path not in sys.path:
+                sys.path.insert(0, ml_pipeline_path)
+            
+            # 嘗試導入 ML Pipeline 服務
+            try:
+                from services import RecommendationService
+                from config.recommender_config import get_recommender_config
+                
+                # 初始化推薦服務用於監控
+                config = get_recommender_config()
+                db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
+                
+                if db_url:
+                    self.ml_pipeline_service = RecommendationService(db_url, config)
+                    print("ML Pipeline 監控初始化成功")
+                else:
+                    print("未設定 DATABASE_URL，ML Pipeline 監控將不可用")
+                    self.ml_pipeline_service = None
+                    
+            except ImportError:
+                print("ML Pipeline 模組不可用，監控功能將受限")
+                self.ml_pipeline_service = None
+                
+        except Exception as e:
+            print(f"ML Pipeline 監控初始化失敗: {str(e)}")
+            self.ml_pipeline_service = None
     
     def load_mock_data(self):
         """載入模擬數據"""
@@ -77,7 +117,7 @@ class HierarchicalRAGMonitor:
     
     def get_service_status(self) -> Dict[str, str]:
         """獲取服務狀態"""
-        return {
+        status = {
             'RAG Pipeline': '🟢 運行中',
             'CrewAI': '🟢 運行中',
             'AnythingLLM': '🟢 運行中',
@@ -88,6 +128,48 @@ class HierarchicalRAGMonitor:
             'Milvus': '🟢 運行中',
             'MinIO': '🟢 運行中'
         }
+        
+        # 添加 ML Pipeline 狀態
+        if hasattr(self, 'ml_pipeline_service') and self.ml_pipeline_service:
+            try:
+                ml_status = self.ml_pipeline_service.get_system_status()
+                status['ML Pipeline'] = '🟢 運行中' if ml_status.get('status') == 'healthy' else '🟡 警告'
+            except:
+                status['ML Pipeline'] = '🔴 錯誤'
+        else:
+            status['ML Pipeline'] = '⚪ 未連接'
+        
+        return status
+    
+    def get_ml_pipeline_metrics(self) -> Dict[str, Any]:
+        """獲取 ML Pipeline 指標"""
+        if not hasattr(self, 'ml_pipeline_service') or not self.ml_pipeline_service:
+            return {
+                'recommendation_accuracy': 0.0,
+                'user_satisfaction': 0.0,
+                'diversity_score': 0.0,
+                'response_time': 0.0,
+                'throughput': 0
+            }
+        
+        try:
+            # 模擬 ML Pipeline 指標
+            return {
+                'recommendation_accuracy': 0.85,
+                'user_satisfaction': 0.87,
+                'diversity_score': 0.78,
+                'response_time': 1.2,
+                'throughput': 45
+            }
+        except Exception as e:
+            print(f"獲取 ML Pipeline 指標失敗: {str(e)}")
+            return {
+                'recommendation_accuracy': 0.0,
+                'user_satisfaction': 0.0,
+                'diversity_score': 0.0,
+                'response_time': 0.0,
+                'throughput': 0
+            }
 
 def main():
     """主函數"""

@@ -194,25 +194,85 @@ class RAGExpertAgent(BaseAgent):
             )
         
         try:
-        # 執行語意檢索
-        search_results = await self._semantic_search(input_data.query)
-        
-        # 執行向量搜尋
-        vector_results = await self._vector_search(input_data.query)
-        
-        # 合併結果
-        combined_results = self._merge_results(search_results, vector_results)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
-            content=f"找到 {len(combined_results)} 個相關 Podcast",
-            confidence=0.85,
-            reasoning="結合語意檢索和向量搜尋，提供最相關的結果",
-            metadata={"results": combined_results, "search_method": "hybrid"},
-            processing_time=processing_time
-        )
+            # 導入 Podcast 格式化工具
+            from tools.podcast_formatter import PodcastFormatter
+            formatter = PodcastFormatter()
             
+            # 執行語意檢索
+            search_results = await self._semantic_search(input_data.query)
+            
+            # 執行向量搜尋
+            vector_results = await self._vector_search(input_data.query)
+            
+            # 合併結果
+            combined_results = self._merge_results(search_results, vector_results)
+            
+            # 格式化 Podcast 推薦結果
+            formatted_result = formatter.format_podcast_recommendations(
+                combined_results, 
+                input_data.query, 
+                max_recommendations=3
+            )
+            
+            # 檢查是否需要 Web 搜尋
+            web_search_used = False
+            final_response = formatter.generate_recommendation_text(formatted_result)
+            
+            # 如果信心度不足且沒有足夠結果，嘗試 Web 搜尋
+            if formatter.should_use_web_search(formatted_result.confidence, len(formatted_result.recommendations)):
+                try:
+                    # 導入 Web Search 工具
+                    from tools.web_search_tool import WebSearchTool
+                    web_search = WebSearchTool()
+                    
+                    if web_search.is_configured():
+                        logger.info(f"信心度不足 ({formatted_result.confidence:.2f})，執行 Web 搜尋")
+                        
+                        # 根據類別選擇搜尋方法
+                        if input_data.category == "商業":
+                            web_result = await web_search.search_business_topic(input_data.query)
+                        elif input_data.category == "教育":
+                            web_result = await web_search.search_education_topic(input_data.query)
+                        else:
+                            web_result = await web_search.search_with_openai(input_data.query)
+                        
+                        if web_result["success"]:
+                            # 將 Web 搜尋結果轉換為 Podcast 格式
+                            web_podcasts = self._convert_web_result_to_podcasts(web_result["response"])
+                            web_formatted_result = formatter.format_podcast_recommendations(
+                                web_podcasts, 
+                                input_data.query, 
+                                max_recommendations=3
+                            )
+                            
+                            final_response = formatter.generate_recommendation_text(web_formatted_result)
+                            formatted_result = web_formatted_result
+                            web_search_used = True
+                            logger.info("Web 搜尋成功，使用 OpenAI 回應")
+                        else:
+                            logger.warning(f"Web 搜尋失敗: {web_result.get('error', 'Unknown error')}")
+                    else:
+                        logger.warning("Web Search 工具未配置，無法執行備援搜尋")
+                        
+                except Exception as e:
+                    logger.error(f"Web 搜尋執行失敗: {str(e)}")
+            
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
+                content=final_response,
+                confidence=formatted_result.confidence,
+                reasoning=formatted_result.reasoning,
+                metadata={
+                    "formatted_result": formatted_result,
+                    "search_method": "hybrid_with_web" if web_search_used else "hybrid",
+                    "web_search_used": web_search_used,
+                    "tags_used": formatted_result.tags_used,
+                    "total_found": formatted_result.total_found
+                },
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"RAG 專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -235,6 +295,37 @@ class RAGExpertAgent(BaseAgent):
     def _merge_results(self, semantic: List, vector: List) -> List[Dict[str, Any]]:
         """合併搜尋結果"""
         return semantic + vector
+    
+    def _convert_web_result_to_podcasts(self, web_response: str) -> List[Dict[str, Any]]:
+        """
+        將 Web 搜尋結果轉換為 Podcast 格式
+        
+        Args:
+            web_response: Web 搜尋回應文字
+            
+        Returns:
+            List[Dict[str, Any]]: Podcast 格式的結果
+        """
+        # 這裡將 Web 搜尋結果轉換為 Podcast 格式
+        # 由於 Web 搜尋返回的是文字，我們需要將其轉換為結構化的 Podcast 數據
+        
+        # 示例轉換邏輯（實際實作可能需要更複雜的解析）
+        podcasts = []
+        
+        # 如果 Web 搜尋成功，創建一個通用的 Podcast 推薦
+        if web_response and len(web_response.strip()) > 0:
+            podcast = {
+                "title": "Web 搜尋推薦",
+                "description": web_response[:200] + "..." if len(web_response) > 200 else web_response,
+                "rss_id": "web_search_001",
+                "confidence": 0.85,  # Web 搜尋預設較高信心值
+                "category": "混合",
+                "tags": ["web_search", "openai"],
+                "updated_at": datetime.now().isoformat()
+            }
+            podcasts.append(podcast)
+        
+        return podcasts
 
 
 class SummaryExpertAgent(BaseAgent):
@@ -270,19 +361,19 @@ class SummaryExpertAgent(BaseAgent):
             )
         
         try:
-        # 生成內容摘要
-        summary = await self._generate_summary(input_data)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
-            content=summary,
-            confidence=0.9,
-            reasoning="基於內容分析生成精準摘要",
-            metadata={"summary_type": "content_analysis"},
-            processing_time=processing_time
-        )
+            # 生成內容摘要
+            summary = await self._generate_summary(input_data)
             
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
+                content=summary,
+                confidence=0.9,
+                reasoning="基於內容分析生成精準摘要",
+                metadata={"summary_type": "content_analysis"},
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"摘要專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -330,19 +421,19 @@ class RatingExpertAgent(BaseAgent):
             )
         
         try:
-        # 評估內容質量
-        ratings = await self._evaluate_quality(input_data)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
-            content=f"評估完成，平均評分: {sum(ratings)/len(ratings):.2f}",
-            confidence=0.8,
-            reasoning="基於多維度指標進行質量評估",
-            metadata={"ratings": ratings, "evaluation_criteria": ["relevance", "quality", "popularity"]},
-            processing_time=processing_time
-        )
+            # 評估內容質量
+            ratings = await self._evaluate_quality(input_data)
             
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
+                content=f"評估完成，平均評分: {sum(ratings)/len(ratings):.2f}",
+                confidence=0.8,
+                reasoning="基於多維度指標進行質量評估",
+                metadata={"ratings": ratings, "evaluation_criteria": ["relevance", "quality", "popularity"]},
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"評分專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -390,19 +481,19 @@ class TTSExpertAgent(BaseAgent):
             )
         
         try:
-        # 生成語音
-        audio_url = await self._generate_speech(input_data)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
-            content="語音合成完成",
-            confidence=0.95,
-            reasoning="使用 Edge TW 語音模型生成自然語音",
-            metadata={"audio_url": audio_url, "voice_model": "edge_tw"},
-            processing_time=processing_time
-        )
+            # 生成語音
+            audio_url = await self._generate_speech(input_data)
             
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
+                content="語音合成完成",
+                confidence=0.95,
+                reasoning="使用 Edge TW 語音模型生成自然語音",
+                metadata={"audio_url": audio_url, "voice_model": "edge_tw"},
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"TTS 專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -450,22 +541,22 @@ class UserManagerAgent(BaseAgent):
             )
         
         try:
-        # 驗證用戶 ID
-        is_valid = await self._validate_user_id(input_data.user_id)
-        
-        # 記錄用戶行為
-        await self._log_user_behavior(input_data)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
+            # 驗證用戶 ID
+            is_valid = await self._validate_user_id(input_data.user_id)
+            
+            # 記錄用戶行為
+            await self._log_user_behavior(input_data)
+            
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
                 content=f"用戶 {input_data.user_id} 驗證{'成功' if is_valid else '失敗'}",
                 confidence=0.9 if is_valid else 0.3,
                 reasoning="完成用戶 ID 驗證和行為記錄",
                 metadata={"user_id": input_data.user_id, "is_valid": is_valid},
-            processing_time=processing_time
-        )
-            
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"用戶管理專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -519,22 +610,22 @@ class BusinessExpertAgent(BaseAgent):
             )
         
         try:
-        # 分析商業相關性
+            # 分析商業相關性
             relevance_score = self._analyze_business_relevance(input_data.query)
-        
+            
             # 生成商業推薦
             recommendations = await self._generate_business_recommendations(input_data.query)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
+            
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
                 content=f"商業分析完成，相關性: {relevance_score:.2f}",
                 confidence=relevance_score,
                 reasoning="基於商業關鍵詞和市場趨勢進行分析",
                 metadata={"recommendations": recommendations, "relevance_score": relevance_score},
-            processing_time=processing_time
-        )
-            
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"商業專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -594,22 +685,22 @@ class EducationExpertAgent(BaseAgent):
             )
         
         try:
-        # 分析教育相關性
+            # 分析教育相關性
             relevance_score = self._analyze_education_relevance(input_data.query)
-        
+            
             # 生成教育推薦
             recommendations = await self._generate_education_recommendations(input_data.query)
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
+            
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
                 content=f"教育分析完成，相關性: {relevance_score:.2f}",
                 confidence=relevance_score,
                 reasoning="基於教育關鍵詞和學習需求進行分析",
                 metadata={"recommendations": recommendations, "relevance_score": relevance_score},
-            processing_time=processing_time
-        )
-            
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"教育專家處理失敗: {str(e)}")
             return AgentResponse(
@@ -684,10 +775,10 @@ class LeaderAgent(BaseAgent):
         try:
             # 1. 用戶管理層
             user_result = await self.user_manager.process(input_data)
-        
+            
             # 2. RAG 檢索層
             rag_result = await self.rag_expert.process(input_data)
-        
+            
             # 3. 類別專家層
             if input_data.category == "商業":
                 category_result = await self.business_expert.process(input_data)
@@ -696,32 +787,32 @@ class LeaderAgent(BaseAgent):
             else:
                 # 雙類別情況，需要進一步分析
                 category_result = await self._analyze_dual_category(input_data)
-        
+            
             # 4. 功能專家層
             summary_result = await self.summary_expert.process(rag_result.metadata.get("results", []))
             rating_result = await self.rating_expert.process(rag_result.metadata.get("results", []))
-        
+            
             # 5. 最終決策
-        final_response = await self._make_final_decision(
+            final_response = await self._make_final_decision(
                 input_data, rag_result, category_result, summary_result, rating_result
-        )
-        
-        processing_time = time.time() - start_time
-        
-        return AgentResponse(
-            content=final_response,
+            )
+            
+            processing_time = time.time() - start_time
+            
+            return AgentResponse(
+                content=final_response,
                 confidence=min(rag_result.confidence, category_result.confidence),
                 reasoning="基於三層專家協作的最終決策",
-            metadata={
+                metadata={
                     "user_result": user_result.metadata,
                     "rag_result": rag_result.metadata,
                     "category_result": category_result.metadata,
                     "summary_result": summary_result.metadata,
                     "rating_result": rating_result.metadata
-            },
-            processing_time=processing_time
-        )
-            
+                },
+                processing_time=processing_time
+            )
+                
         except Exception as e:
             logger.error(f"領導者代理人處理失敗: {str(e)}")
             return AgentResponse(
@@ -803,12 +894,12 @@ class AgentManager:
         """
         try:
             # 創建用戶查詢對象
-        user_query = UserQuery(
-            query=query,
-            user_id=user_id,
-            category=category
-        )
-        
+            user_query = UserQuery(
+                query=query,
+                user_id=user_id,
+                category=category
+            )
+            
             # 委託給領導者代理人處理
             return await self.leader_agent.process(user_query)
             

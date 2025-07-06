@@ -40,9 +40,12 @@ from core.qwen3_llm_manager import Qwen3LLMManager
 from tools.keyword_mapper import KeywordMapper, CategoryResult
 from tools.knn_recommender import KNNRecommender, PodcastItem, RecommendationResult
 from tools.enhanced_vector_search import EnhancedVectorSearchTool
+from tools.web_search_tool import WebSearchTool
+from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
 
 # 導入配置
 from config.integrated_config import get_config
+from config.crewai_config import get_crewai_config, validate_config
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
@@ -83,6 +86,8 @@ class ApplicationManager:
         self.chat_history_service: Optional[ChatHistoryService] = None
         self.qwen3_manager: Optional[Qwen3LLMManager] = None
         self.vector_search_tool: Optional[EnhancedVectorSearchTool] = None
+        self.web_search_tool: Optional[WebSearchTool] = None
+        self.podcast_formatter: Optional[PodcastFormatter] = None
         
         # 系統狀態
         self._is_initialized = False
@@ -90,7 +95,12 @@ class ApplicationManager:
     async def initialize(self) -> None:
         """初始化所有核心組件"""
         try:
-            logger.info("🚀 初始化 Podwise RAG Pipeline - 三層 CrewAI 架構...")
+            logger.info("🚀 初始化 Podwise RAG Pipeline...")
+            
+            # 載入 CrewAI 配置
+            crewai_config = get_crewai_config()
+            if not validate_config(crewai_config):
+                raise ValueError("CrewAI 配置驗證失敗")
             
             # 初始化 Keyword Mapper
             self.keyword_mapper = KeywordMapper()
@@ -99,6 +109,9 @@ class ApplicationManager:
             # 初始化 KNN 推薦器
             self.knn_recommender = KNNRecommender(k=5, metric="cosine")
             logger.info("✅ KNN 推薦器初始化完成")
+            
+            # 載入示例 Podcast 數據
+            await self._load_sample_podcast_data()
             
             # 初始化聊天歷史服務
             self.chat_history_service = ChatHistoryService()
@@ -112,13 +125,20 @@ class ApplicationManager:
             self.vector_search_tool = EnhancedVectorSearchTool()
             logger.info("✅ 向量搜尋工具初始化完成")
             
-            # 初始化三層代理人架構
-            agent_config = self.config.get_agent_config()
-            self.agent_manager = AgentManager(agent_config)
-            logger.info("✅ 三層代理人架構初始化完成")
+            # 初始化 Web Search 工具
+            self.web_search_tool = WebSearchTool()
+            if self.web_search_tool.is_configured():
+                logger.info("✅ Web Search 工具初始化完成 (OpenAI 可用)")
+            else:
+                logger.warning("⚠️ Web Search 工具初始化完成 (OpenAI 未配置)")
             
-            # 載入示例 Podcast 數據
-            await self._load_sample_podcast_data()
+            # 初始化 Podcast 格式化工具
+            self.podcast_formatter = PodcastFormatter()
+            logger.info("✅ Podcast 格式化工具初始化完成")
+            
+            # 初始化 Agent Manager（三層 CrewAI 架構）
+            self.agent_manager = AgentManager(crewai_config)
+            logger.info("✅ Agent Manager 初始化完成")
             
             self._is_initialized = True
             logger.info("✅ 所有核心組件初始化完成")
@@ -180,20 +200,20 @@ class ApplicationManager:
     
     def get_system_status(self) -> SystemStatus:
         """獲取系統狀態"""
-        components = {
-            "keyword_mapper": self.keyword_mapper is not None,
-            "knn_recommender": self.knn_recommender is not None,
-            "chat_history_service": self.chat_history_service is not None,
-            "qwen3_manager": self.qwen3_manager is not None,
-            "vector_search_tool": self.vector_search_tool is not None,
-            "agent_manager": self.agent_manager is not None
-        }
-        
         return SystemStatus(
             is_ready=self._is_initialized,
-            components=components,
+            components={
+                "agent_manager": self.agent_manager is not None,
+                "keyword_mapper": self.keyword_mapper is not None,
+                "knn_recommender": self.knn_recommender is not None,
+                "chat_history_service": self.chat_history_service is not None,
+                "qwen3_manager": self.qwen3_manager is not None,
+                "vector_search_tool": self.vector_search_tool is not None,
+                "web_search_tool": self.web_search_tool is not None and self.web_search_tool.is_configured(),
+                "podcast_formatter": self.podcast_formatter is not None
+            },
             timestamp=datetime.now().isoformat(),
-            version=self.app_config.version
+            version="3.0.0"
         )
     
     def is_ready(self) -> bool:
@@ -339,11 +359,13 @@ async def root() -> Dict[str, Any]:
 async def health_check(manager: ApplicationManager = Depends(get_app_manager)) -> Dict[str, Any]:
     """健康檢查端點"""
     status = manager.get_system_status()
+    
     return {
         "status": "healthy" if status.is_ready else "unhealthy",
         "timestamp": status.timestamp,
         "version": status.version,
-        "components": status.components
+        "components": status.components,
+        "web_search_available": manager.web_search_tool.is_configured() if manager.web_search_tool else False
     }
 
 
@@ -426,7 +448,7 @@ async def process_query(
     """
     處理用戶查詢
     
-    此端點處理用戶查詢，執行分類、推薦和回應生成。
+    此端點處理用戶查詢，通過三層 CrewAI 架構協調各專家。
     """
     start_time = datetime.now()
     
@@ -437,17 +459,42 @@ async def process_query(
         
         logger.info(f"處理用戶查詢: {user_id} - {query}")
         
-        # 1. 使用 Keyword Mapper 分類查詢
+        # 1. 使用 Keyword Mapper 進行初步分類
         if manager.keyword_mapper is None:
             raise HTTPException(status_code=500, detail="Keyword Mapper 未初始化")
         
         category_result = manager.keyword_mapper.categorize_query(query)
         
-        # 2. 獲取推薦
-        recommendations = await _get_recommendations(query, category_result, manager)
+        # 2. 通過 Agent Manager 和 Leader Agent 協調所有專家
+        if manager.agent_manager is None:
+            raise HTTPException(status_code=500, detail="Agent Manager 未初始化")
         
-        # 3. 生成回應
-        response = await _generate_response(query, category_result, recommendations, manager)
+        # 創建用戶查詢對象
+        user_query = UserQuery(
+            query=query,
+            user_id=user_id,
+            category=category_result.category
+        )
+        
+        # 通過 Leader Agent 處理查詢，協調所有專家
+        agent_response = await manager.agent_manager.process_query(
+            query=query,
+            user_id=user_id,
+            category=category_result.category
+        )
+        
+        # 3. 從 Agent 回應中提取推薦和結果
+        recommendations = []
+        if agent_response.metadata:
+            # 從 RAG 專家結果中提取推薦
+            rag_results = agent_response.metadata.get("rag_result", {}).get("results", [])
+            if rag_results:
+                recommendations = rag_results[:3]  # 取前3個推薦
+            
+            # 從類別專家結果中提取推薦
+            category_recommendations = agent_response.metadata.get("category_result", {}).get("recommendations", [])
+            if category_recommendations:
+                recommendations.extend(category_recommendations[:2])  # 再取2個類別推薦
         
         # 4. 計算處理時間
         processing_time = (datetime.now() - start_time).total_seconds()
@@ -455,18 +502,18 @@ async def process_query(
         # 5. 記錄歷史（背景任務）
         background_tasks.add_task(
             _log_query_history,
-            user_id, session_id, query, response, 
+            user_id, session_id, query, agent_response.content, 
             category_result.category, category_result.confidence
         )
         
         return UserQueryResponse(
             user_id=user_id,
             query=query,
-            response=response,
+            response=agent_response.content,
             category=category_result.category,
-            confidence=category_result.confidence,
+            confidence=agent_response.confidence,
             recommendations=recommendations,
-            reasoning=category_result.reasoning,
+            reasoning=agent_response.reasoning,
             processing_time=processing_time,
             timestamp=datetime.now().isoformat()
         )
