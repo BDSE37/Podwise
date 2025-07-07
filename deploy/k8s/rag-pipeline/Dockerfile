@@ -1,7 +1,7 @@
 # Podwise RAG Pipeline Dockerfile for K8s
 # 支援 CrewAI + LangChain + LLM 備援機制
 
-FROM python:3.11-slim
+FROM docker.io/library/python:3.11-slim
 
 # 設置工作目錄
 WORKDIR /app

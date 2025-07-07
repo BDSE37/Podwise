@@ -42,10 +42,12 @@ class MongoDocument:
 class MongoDBProcessor:
     """MongoDB 資料處理器 - 整合 data_cleaning 模組"""
     
-    def __init__(self, mongo_uri: str, database_name: str):
+    def __init__(self, mongo_uri: str = None, database_name: str = None):
         """初始化 MongoDB 處理器"""
-        self.mongo_uri = mongo_uri
-        self.database_name = database_name
+        # 使用環境變數或預設值
+        import os
+        self.mongo_uri = mongo_uri or os.getenv("MONGO_URI", "mongodb://bdse37:111111@mongodb.podwise.svc.cluster.local:27017/podwise")
+        self.database_name = database_name or os.getenv("MONGO_DB", "podwise")
         self.client = None
         self.db = None
         # 初始化清理器
@@ -55,6 +57,7 @@ class MongoDBProcessor:
         self.stock_cancer_cleaner = StockCancerCleaner()
         self.longtext_cleaner = LongTextCleaner()
         logger.info("✅ data_cleaning 模組整合成功")
+        logger.info(f"✅ MongoDB 配置: {self.mongo_uri}")
     
     def connect(self) -> bool:
         """建立 MongoDB 連接"""

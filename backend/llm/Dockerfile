@@ -1,6 +1,6 @@
 # LLM 服務 Dockerfile
 # 使用 Python 3.10 精簡映像，適合 LLM 與向量服務
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

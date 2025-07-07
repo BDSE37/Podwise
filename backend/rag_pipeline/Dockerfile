@@ -1,6 +1,6 @@
 # RAG Pipeline 服務 Dockerfile
 # 檢索增強生成系統，整合向量檢索與 LLM
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

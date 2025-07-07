@@ -3,7 +3,18 @@
 定義各種推薦策略的配置參數
 """
 
+import os
 from typing import Dict, Any
+
+# 資料庫配置 (K8s 服務)
+DATABASE_CONFIG = {
+    "host": os.getenv("POSTGRES_HOST", "postgres.podwise.svc.cluster.local"),
+    "port": int(os.getenv("POSTGRES_PORT", "5432")),
+    "database": os.getenv("POSTGRES_DB", "podcast"),
+    "user": os.getenv("POSTGRES_USER", "bdse37"),
+    "password": os.getenv("POSTGRES_PASSWORD", "111111"),
+    "database_url": os.getenv("DATABASE_URL", "postgresql://bdse37:111111@postgres.podwise.svc.cluster.local:5432/podcast")
+}
 
 # 推薦系統基本配置
 RECOMMENDER_CONFIG = {
@@ -72,6 +83,7 @@ def get_recommender_config() -> Dict[str, Any]:
         Dict[str, Any]: 推薦系統配置
     """
     return {
+        "database": DATABASE_CONFIG,
         "base": RECOMMENDER_CONFIG,
         "content": CONTENT_BASED_CONFIG,
         "collaborative": COLLABORATIVE_FILTERING_CONFIG,

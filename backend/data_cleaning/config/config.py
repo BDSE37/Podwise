@@ -8,9 +8,9 @@ from dataclasses import dataclass
 @dataclass
 class DatabaseConfig:
     """資料庫連線設定。"""
-    host: str = "localhost"
+    host: str = "postgres.podwise.svc.cluster.local"
     port: int = 5432
-    database: str = "podwise"
+    database: str = "podcast"
     username: str = "bdse37"
     password: str = "111111"
     
@@ -36,7 +36,7 @@ class TestDataConfig:
 class Config:
     """全域設定管理類別。"""
     
-    def __init__(self, config_path: str | None = None):
+    def __init__(self, config_path: str = ""):
         """初始化設定。
         
         Args:

@@ -35,31 +35,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 服務配置
+# 服務配置 (本地 pod)
 SERVICE_CONFIGS = {
     "stt": {
-        "url": os.getenv("STT_SERVICE_URL", "http://stt-service:8001"),
-        "port": 8001
+        "url": os.getenv("STT_URL", "http://localhost:8004"),
+        "port": int(os.getenv("STT_PORT", "8004"))
     },
     "tts": {
-        "url": os.getenv("TTS_SERVICE_URL", "http://tts-service:8003"),
-        "port": 8003
+        "url": os.getenv("TTS_URL", "http://localhost:8003"),
+        "port": int(os.getenv("TTS_PORT", "8003"))
     },
     "llm": {
-        "url": os.getenv("LLM_SERVICE_URL", "http://llm-service:8000"),
-        "port": 8000
+        "url": os.getenv("LLM_URL", "http://localhost:8005"),
+        "port": int(os.getenv("LLM_PORT", "8005"))
     },
     "rag_pipeline": {
-        "url": os.getenv("RAG_SERVICE_URL", "http://rag-pipeline-service:8005"),
-        "port": 8005
+        "url": os.getenv("RAG_URL", "http://localhost:8001"),
+        "port": int(os.getenv("RAG_PORT", "8001"))
     },
     "ml_pipeline": {
-        "url": os.getenv("ML_SERVICE_URL", "http://ml-pipeline-service:8004"),
-        "port": 8004
+        "url": os.getenv("ML_URL", "http://localhost:8002"),
+        "port": int(os.getenv("ML_PORT", "8002"))
     },
     "config": {
-        "url": os.getenv("CONFIG_SERVICE_URL", "http://config-service:8008"),
-        "port": 8008
+        "url": os.getenv("CONFIG_SERVICE_URL", "http://localhost:8008"),
+        "port": int(os.getenv("CONFIG_SERVICE_PORT", "8008"))
     }
 }
 

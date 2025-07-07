@@ -1,5 +1,5 @@
 # 使用 Python 3.9 作為基礎映像
-FROM python:3.9-slim
+FROM docker.io/library/python:3.9-slim
 
 # 設定工作目錄
 WORKDIR /app

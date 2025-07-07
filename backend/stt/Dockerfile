@@ -1,6 +1,6 @@
 # STT 服務 Dockerfile
 # 語音轉文字服務，支援多種音訊格式處理
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

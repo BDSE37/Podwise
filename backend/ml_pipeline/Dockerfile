@@ -1,6 +1,6 @@
 # ML Pipeline 服務 Dockerfile
 # 機器學習管道，包含推薦系統與模型訓練
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

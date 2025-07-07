@@ -1,6 +1,6 @@
 # TTS 服務 Dockerfile
 # 文字轉語音服務，整合 GPT-SoVITS 與多種 TTS 模型
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

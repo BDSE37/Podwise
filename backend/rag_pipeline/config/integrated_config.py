@@ -63,17 +63,17 @@ class ModelConfig:
 @dataclass
 class DatabaseConfig:
     """資料庫配置"""
-    # MongoDB
-    mongodb_uri: str = "mongodb://worker3:27017/podwise"
+    # MongoDB (K8s 服務)
+    mongodb_uri: str = "mongodb://bdse37:111111@mongodb.podwise.svc.cluster.local:27017/podwise"
     mongodb_database: str = "podwise"
     mongodb_collection: str = "conversations"
     
-    # PostgreSQL
-    postgres_host: str = "worker3"
+    # PostgreSQL (K8s 服務)
+    postgres_host: str = "postgres.podwise.svc.cluster.local"
     postgres_port: int = 5432
-    postgres_db: str = "podwise"
-    postgres_user: str = "podwise_user"
-    postgres_password: str = ""
+    postgres_db: str = "podcast"
+    postgres_user: str = "bdse37"
+    postgres_password: str = "111111"
     
     # Redis
     redis_host: str = "worker3"
@@ -81,7 +81,7 @@ class DatabaseConfig:
     redis_db: int = 0
     redis_password: str = ""
     
-    # Milvus
+    # Milvus (worker3 docker container)
     milvus_host: str = "worker3"
     milvus_port: int = 19530
     milvus_collection: str = "podwise_vectors"

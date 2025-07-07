@@ -1,6 +1,6 @@
 # API 服務 Dockerfile
 # 主要 API 閘道，整合所有後端服務
-FROM python:3.10-slim
+FROM docker.io/library/python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app
