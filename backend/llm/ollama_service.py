@@ -133,6 +133,32 @@ class OllamaService(BaseService):
             repeat_penalty=1.1
         )
     
+        # Taiwan 模型配置 (benchang1110/Qwen2.5-Taiwan-7B-Instruct)
+        self.models["qwen2.5:7b-taiwan"] = OllamaModelConfig(
+            model_name="Qwen2.5-Taiwan-7B-Instruct",
+            model_id="qwen2.5:7b-taiwan",
+            host=self.ollama_host.replace("http://", "").replace("https://", "").split(":")[0],
+            port=11434,
+            max_tokens=2048,
+            temperature=0.7,
+            top_p=0.9,
+            top_k=40,
+            repeat_penalty=1.1
+        )
+        
+        # Qwen3 模型配置
+        self.models["qwen3:8b"] = OllamaModelConfig(
+            model_name="Qwen3-8B",
+            model_id="qwen3:8b",
+            host=self.ollama_host.replace("http://", "").replace("https://", "").split(":")[0],
+            port=11434,
+            max_tokens=4096,
+            temperature=0.7,
+            top_p=0.9,
+            top_k=40,
+            repeat_penalty=1.1
+        )
+    
     async def initialize(self) -> bool:
         """
         初始化服務

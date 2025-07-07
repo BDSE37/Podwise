@@ -257,7 +257,7 @@ def start_server():
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8501,
+        port=8003,
         log_level="info",
         access_log=True,
         reload=False  # 生產環境中應設為 False
