@@ -24,7 +24,7 @@ import aiofiles
 # Edge TTS 導入處理
 try:
     import edge_tts
-    PODRI_TTS_AVAILABLE = True
+    EDGE_TTS_AVAILABLE = True
 except ImportError:
     EDGE_TTS_AVAILABLE = False
     logging.warning("Edge TTS not installed. Please install with: pip install edge-tts")
@@ -97,7 +97,7 @@ class EdgeTTSProvider:
             ),
             "podrisa": EdgeTTSVoice(
                 name="Podrisa (活潑女聲)",
-                voice_id="zh-TW-HanHanNeural", 
+                voice_id="zh-TW-HsiaoYuNeural", 
                 description="活潑開朗的女聲，適合娛樂內容和輕鬆話題",
                 rate="+0%",
                 volume="+0%",
