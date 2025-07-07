@@ -3762,41 +3762,6 @@ button:disabled,
 
 /* Step 3 推薦項目 */
 .quiz-recommendations {
-  position: relative;
-  /* 加這行讓子元素可以絕對定位 */
-  display: flex;
-  gap: 1em;
-  justify-content: center;
-}
-
-.recommend-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  padding: 1em;
-  width: 100px;
-}
-
-.recommend-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.5em;
-}
-
-.recommend-item audio {
-  width: 100%;
-}
-
-
-
-/* 推薦卡片區塊 */
-.quiz-recommendations {
-  position: relative;
-  /* ⬅️ 加這行讓子元素可以絕對定位 */
   display: flex;
   gap: 1em;
   justify-content: center;
@@ -3805,85 +3770,41 @@ button:disabled,
 
 .recommend-item {
   display: flex;
-  flex-direction: column;
+  /* 改成 row 排版 */
+  flex-direction: row;
   align-items: center;
+  /* 垂直置中 */
   background: white;
   border-radius: 10px;
   padding: 1em;
-  width: 150px;
+  width: 350px;
+  /* 視情況調整寬度 */
 }
 
-/* 節目圖片 */
+/* 第一張圖 (節目 logo) */
 .recommend-item img:first-child {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.5em;
+  border-radius: 5px;
+  margin-right: 1em;
+  /* 與後方文字間距 */
+  margin-bottom: 0;
+  /* 取消原本的下邊距 */
 }
 
-/* 標題文字 */
-.recommend-item .title {
-  font-weight: bold;
-  margin-top: 0.5em;
-  margin-bottom: 0.3em;
-  color: #3e373a;
-  font-size: 1em;
-  text-align: center;
-}
-
-/* 簡介文字 */
-.recommend-item .description {
-  font-size: 0.85em;
-  color: #444;
-  text-align: left;
-  margin: 0.2em 0 0.6em 0;
-  line-height: 1.4;
-  padding: 0 0.5em;
+/* 文字容器，讓標題+描述一起跑版 */
+.recommend-item .text {
+  flex: 1;
+  /* 搶剩餘空間 */
 }
 
 /* 播放按鈕 */
-.play-button {
-  width: 50px !important;
-  height: 50px !important;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  align-self: center;
-  top: 10px;
-  left: 10px;
-}
-
-
-.play-button:hover {
-  transform: scale(1.1);
-}
-
-
-.play-button:hover {
-  transform: scale(1.1);
-}
-
-.recommend-item {
-  position: relative;
-  /* 🔑 為內部絕對定位的子元素定位參考 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  padding: 1em;
-  width: 150px;
-}
-
-/* 關閉按鈕 */
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  z-index: 10;
+.recommend-item .play-button {
+  width: 40px;
+  height: 40px;
+  margin-left: 1em;
+  /* 拉開與文字的距離 */
 }
 
 /*podri*/
@@ -3910,4 +3831,96 @@ button:disabled,
   justify-content: center;
   gap: 5em;
   /* 可自行調整為你想要的寬度 */
+}
+
+/* step4 */
+/* —— Step 4：亂碼顯示與複製 —— */
+#popup-step-4 {
+  display: none;
+  /* 預設隱藏，切換步驟時再打開 */
+  text-align: left;
+}
+
+#popup-step-4 h2 {
+  color: #583e3d;
+  font-size: 1.8em;
+  margin-bottom: 1em;
+}
+
+#popup-step-4 .code-block-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 1.5em;
+}
+
+#popup-step-4 pre#generated-code {
+  background: #f5f5f5;
+  padding: 1em;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+  /* 允許自動換行 */
+  word-break: break-all;
+  /* 長字串時強制換行 */
+  flex: 1;
+  /* 撐滿剩餘寬度 */
+  max-height: 150px;
+  overflow: auto;
+  border: 1px solid rgba(210, 215, 217, 0.75);
+}
+
+#popup-step-4 button#copy-code-btn {
+  background-color: white;
+  color: #d7b590;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6em 1.2em;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* 文字置中關鍵 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#popup-step-4 button#copy-code-btn:active {
+  transform: scale(0.95);
+}
+
+
+.quiz-type-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
+  justify-content: center;
+  /* 水平置中整個 grid */
+  align-items: center;
+  /* 垂直置中按鈕 */
+}
+
+button[onclick="closePopup()"] {
+  display: block;
+  margin: 1em auto 0;
+}
+
+
+/*取得專屬ID*/
+#popup-step-3 {
+  /* 如果 quiz-recommendations 本身有 margin-bottom，可以先清掉 */
+  margin-bottom: 0;
+}
+
+#popup-step-3 .button.primary {
+  margin-top: 2em;
+  /* 或者直接 0，視你要的緊密度 */
+  display: block;
+  /* 讓按鈕獨佔一行 */
+  margin-left: auto;
+  /* 置中 */
+  margin-right: auto;
 }

@@ -138,4 +138,76 @@ secrets/
 # 其他
 *.pid
 *.seed
-*.pid.lock 
+*.pid.lock
+
+# =============================================================================
+# Shell 腳本 (本地開發用，不上傳到 Git)
+# =============================================================================
+*.sh
+deploy-podman.sh
+start-podman.sh
+backend/*.sh
+deploy/k8s/*/*.sh
+deploy/k8s/*/*/*.sh
+
+# =============================================================================
+# 測試和臨時檔案
+# =============================================================================
+# 測試音訊檔案
+frontend/chat/test_*.wav
+frontend/chat/test_*.mp3
+frontend/chat/test_*.flac
+
+# 測試圖片檔案
+frontend/**/test_*.jpg
+frontend/**/test_*.png
+frontend/**/test_*.gif
+
+# 測試 HTML 檔案
+frontend/**/test_*.html
+frontend/**/*_test.html
+
+# 測試 Python 檔案
+frontend/**/test_*.py
+frontend/**/*_test.py
+
+# =============================================================================
+# 開發工具配置
+# =============================================================================
+# VSCode 配置
+frontend/**/.vscode/
+**/.vscode/settings.json
+**/.vscode/launch.json
+**/.vscode/tasks.json
+
+# IDE 配置
+frontend/**/.idea/
+**/.idea/workspace.xml
+**/.idea/modules.xml
+
+# =============================================================================
+# 本地開發檔案
+# =============================================================================
+# 本地 Flask/Streamlit 應用
+frontend/**/flask_app.py
+frontend/**/streamlit_app.py
+frontend/**/app.py
+
+# 本地測試腳本
+frontend/**/test_*.py
+frontend/**/debug_*.py
+frontend/**/local_*.py
+
+# =============================================================================
+# 部署相關檔案
+# =============================================================================
+# 本地部署腳本
+deploy-local.sh
+start-local.sh
+test-local.sh
+build-local.sh
+
+# 環境特定配置
+.env.local
+.env.development
+.env.test 

@@ -1,5 +1,5 @@
 # 使用 Nginx 作為基礎映像
-FROM nginx:alpine
+FROM docker.io/library/nginx:alpine
 
 # 複製靜態檔案
 COPY . /usr/share/nginx/html/

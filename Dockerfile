@@ -1,6 +1,6 @@
 # RAG Pipeline Dockerfile
 # 使用 Python 3.11 精簡映像，適合現代 AI 應用
-FROM python:3.11-slim
+FROM docker.io/library/python:3.11-slim
 
 # 設定工作目錄
 WORKDIR /app

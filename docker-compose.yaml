@@ -1,93 +1,16 @@
+version: '3.8'
+
+# =============================================================================
+# Podwise 微服務架構 Docker Compose 配置
+# 遵循 Google Clean Code 原則和 OOP 設計模式
+# =============================================================================
+
 services:
-  # 資料庫服務
-  postgres:
-    image: postgres:15
-    container_name: podwise_postgres
-    environment:
-      POSTGRES_DB: podcast
-      POSTGRES_USER: bdse37
-      POSTGRES_PASSWORD: 111111
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U bdse37 -d podcast" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  mongodb:
-    image: mongo:7
-    container_name: podwise_mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: bdse37
-      MONGO_INITDB_ROOT_PASSWORD: 111111
-      MONGO_INITDB_DATABASE: podcast
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # 向量資料庫
-  milvus:
-    image: milvusdb/milvus:v2.3.3
-    container_name: podwise_milvus
-    command: [ "milvus", "run", "standalone" ]
-    environment:
-      ETCD_USE_EMBED: "true"
-      ETCD_DATA_DIR: "/var/lib/milvus/etcd"
-      ETCD_CONFIG_PATH: "/milvus/configs/etcd.yaml"
-      MINIO_ADDRESS: "minio:9000"
-      MINIO_ACCESS_KEY: "bdse37"
-      MINIO_SECRET_KEY: "11111111"
-    ports:
-      - "19530:19530"
-      - "9091:9091"
-    volumes:
-      - milvus_data:/var/lib/milvus
-    networks:
-      - podwise
-    depends_on:
-      - minio
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9091/healthz" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # 物件儲存
-  minio:
-    image: minio/minio:latest
-    container_name: podwise_minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: bdse37
-      MINIO_ROOT_PASSWORD: 11111111
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # LLM 服務
+  # =============================================================================
+  # 核心 AI 服務層
+  # =============================================================================
+  
+  # LLM 服務 - 大語言模型處理
   llm:
     build:
       context: ./backend/llm
@@ -95,40 +18,24 @@ services:
     container_name: podwise_llm
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - DEBUG=false
-      - LANGFUSE_PUBLIC_KEY=your-real-langfuse-public-key
-      - LANGFUSE_SECRET_KEY=your-real-langfuse-secret-key
-      - LANGFUSE_HOST=http://langfuse:3000
+      - OLLAMA_HOST=http://192.168.32.38:31134
+      - DEBUG=${DEBUG_MODE}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_HOST=http://192.168.32.38:30000
     networks:
       - podwise
-    depends_on:
-      - ollama
-      - langfuse
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # Ollama 服務
-  ollama:
-    image: ollama/ollama:latest
-    container_name: podwise_ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/tags" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # STT 服務
+  # STT 服務 - 語音轉文字
   stt:
     build:
       context: ./backend/stt
@@ -136,24 +43,25 @@ services:
     container_name: podwise_stt
     ports:
       - "8001:8001"
+    env_file:
+      - ./backend/.env
     environment:
-      - DEBUG=false
-      - MONGODB_HOST=mongodb
+      - DEBUG=${DEBUG_MODE}
+      - MONGODB_HOST=mongodb.podwise.svc.cluster.local
       - MONGODB_PORT=27017
-      - MONGODB_USER=bdse37
-      - MONGODB_PASSWORD=111111
-      - MONGODB_DB=podcast
+      - MONGODB_USER=${MONGO_USER}
+      - MONGODB_PASSWORD=${MONGO_PASSWORD}
+      - MONGODB_DB=${MONGO_DB}
     networks:
       - podwise
-    depends_on:
-      - mongodb
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8001/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # TTS 服務
+  # TTS 服務 - 文字轉語音
   tts:
     build:
       context: ./backend/tts
@@ -165,8 +73,10 @@ services:
       - "7860:7860" # GPT-SoVITS WebUI
       - "7861:7861" # GPT-SoVITS API
       - "9880:9880" # GPT-SoVITS 推理端口
+    env_file:
+      - ./backend/.env
     environment:
-      - DEBUG=false
+      - DEBUG=${DEBUG_MODE}
       - DEFAULT_VOICE=podri
       - GRADIO_SERVER_PORT=7860
       - GRADIO_SERVER_NAME=0.0.0.0
@@ -193,8 +103,13 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # ML Pipeline 服務
+  # =============================================================================
+  # 資料處理服務層
+  # =============================================================================
+  
+  # ML Pipeline 服務 - 機器學習推薦
   ml_pipeline:
     build:
       context: ./backend/ml_pipeline
@@ -202,119 +117,76 @@ services:
     container_name: podwise_ml_pipeline
     ports:
       - "8004:8004"
+    env_file:
+      - ./backend/.env
     environment:
-      - DEBUG=false
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=podcast
-      - POSTGRES_USER=bdse37
-      - POSTGRES_PASSWORD=111111
-      - MONGODB_HOST=mongodb
-      - MONGODB_USER=bdse37
-      - MONGODB_PASSWORD=111111
-      - MONGODB_DB=podcast
-      - MILVUS_HOST=milvus
+      - DEBUG=${DEBUG_MODE}
+      - POSTGRES_HOST=postgres.podwise.svc.cluster.local
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MONGODB_HOST=mongodb.podwise.svc.cluster.local
+      - MONGODB_USER=${MONGO_USER}
+      - MONGODB_PASSWORD=${MONGO_PASSWORD}
+      - MONGODB_DB=${MONGO_DB}
+      - MILVUS_HOST=worker3
     networks:
       - podwise
-    depends_on:
-      - postgres
-      - mongodb
-      - milvus
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8004/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # RAG Pipeline 服務
+  # RAG Pipeline 服務 - 檢索增強生成
   rag_pipeline:
     build:
       context: ./backend/rag_pipeline
       dockerfile: Dockerfile
     container_name: podwise_rag_pipeline
-    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8004 --reload
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
     ports:
-      - "8005:8004"
+      - "8005:8005"
+    env_file:
+      - ./backend/.env
     environment:
       - PYTHONPATH=/app
-      - DEBUG=false
-      - OLLAMA_HOST=http://ollama:11434
+      - DEBUG=${DEBUG_MODE}
+      - OLLAMA_HOST=http://192.168.32.38:31134
       - TTS_HOST=http://tts:8003
-      - MILVUS_HOST=milvus
-      - MONGODB_HOST=mongodb
-      - MONGODB_USER=bdse37
-      - MONGODB_PASSWORD=111111
-      - MONGODB_DB=podcast
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=podcast
-      - POSTGRES_USER=bdse37
-      - POSTGRES_PASSWORD=111111
-      - LANGFUSE_HOST=http://langfuse:3000
-      - LANGFUSE_PUBLIC_KEY=your-real-langfuse-public-key
-      - LANGFUSE_SECRET_KEY=your-real-langfuse-secret-key
+      - MILVUS_HOST=worker3
+      - MONGODB_HOST=mongodb.podwise.svc.cluster.local
+      - MONGODB_USER=${MONGO_USER}
+      - MONGODB_PASSWORD=${MONGO_PASSWORD}
+      - MONGODB_DB=${MONGO_DB}
+      - POSTGRES_HOST=postgres.podwise.svc.cluster.local
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - LANGFUSE_HOST=http://192.168.32.38:30000
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
       - ANYTHINGLLM_HOST=anythingllm
       - ANYTHINGLLM_PORT=3001
       - ANYTHINGLLM_WORKSPACE_ID=podwise_workspace
-      - ANYTHINGLLM_API_KEY=your-anythingllm-api-key
+      - ANYTHINGLLM_API_KEY=${ANYTHINGLLM_API_KEY}
     networks:
       - podwise
     depends_on:
-      - ollama
-      - milvus
-      - mongodb
-      - postgres
-      - langfuse
       - tts
-      - anythingllm
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8004/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8005/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # ClickHouse 資料庫（Langfuse v3 需要）
-  clickhouse:
-    image: clickhouse/clickhouse-server:23.8
-    container_name: podwise_clickhouse
-    ports:
-      - "8123:8123"
-      - "9002:9000"
-    environment:
-      - CLICKHOUSE_DB=langfuse
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Langfuse 監控
-  langfuse:
-    image: langfuse/langfuse:latest
-    container_name: podwise_langfuse
-    ports:
-      - "3100:3000"
-    environment:
-      - DATABASE_URL=postgresql://bdse37:111111@postgres:5432/langfuse
-      - CLICKHOUSE_URL=http://clickhouse:8123
-      - NEXTAUTH_SECRET=your-secret-key
-      - NEXTAUTH_URL=http://localhost:3100
-    networks:
-      - podwise
-    depends_on:
-      - postgres
-      - clickhouse
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # 前端服務
+  # =============================================================================
+  # 前端服務層
+  # =============================================================================
+  
+  # 前端服務 - 主要 Web 介面
   frontend:
     build:
       context: ./frontend
@@ -322,6 +194,8 @@ services:
     container_name: podwise_frontend
     ports:
       - "80:80"
+    env_file:
+      - ./backend/.env
     environment:
       - RAG_API_URL=http://rag_pipeline:8005
       - TTS_API_URL=http://tts:8003
@@ -339,8 +213,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # Streamlit 聊天服務
+  # Streamlit 聊天服務 - 互動式聊天介面
   podri_chat:
     build:
       context: ./frontend/chat
@@ -348,12 +223,14 @@ services:
     container_name: podwise_podri_chat
     ports:
       - "8501:8501"
+    env_file:
+      - ./backend/.env
     environment:
-      - RAG_URL=http://rag_pipeline:8004
+      - RAG_URL=http://rag_pipeline:8005
       - ML_URL=http://ml_pipeline:8004
       - TTS_URL=http://tts:8003/generate_speech
       - STT_URL=http://stt:8001
-      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_URL=http://192.168.32.38:31134
     networks:
       - podwise
     depends_on:
@@ -361,217 +238,103 @@ services:
       - ml_pipeline
       - tts
       - stt
-      - ollama
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8501/_stcore/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
-  # 自動化爬蟲服務
+  # =============================================================================
+  # 資料處理服務層
+  # =============================================================================
+  
+  # 自動化爬蟲服務 - 資料收集
   crawler:
     build:
       context: ./data/ingestion
       dockerfile: Dockerfile
     container_name: podwise_crawler
+    env_file:
+      - ./backend/.env
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=podcast
-      - POSTGRES_USER=bdse37
-      - POSTGRES_PASSWORD=111111
-      - MINIO_HOST=minio
+      - POSTGRES_HOST=postgres.podwise.svc.cluster.local
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MINIO_HOST=minio.podwise.svc.cluster.local
       - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=bdse37
-      - MINIO_SECRET_KEY=111111
-      - MONGODB_HOST=mongodb
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MONGODB_HOST=mongodb.podwise.svc.cluster.local
       - MONGODB_PORT=27017
-      - MONGODB_USER=bdse37
-      - MONGODB_PASSWORD=111111
-      - MONGODB_DB=podcast
-      - MILVUS_HOST=milvus
+      - MONGODB_USER=${MONGO_USER}
+      - MONGODB_PASSWORD=${MONGO_PASSWORD}
+      - MONGODB_DB=${MONGO_DB}
+      - MILVUS_HOST=worker3
       - MILVUS_PORT=19530
       - CRAWL_COUNT=10
     networks:
       - podwise
-    depends_on:
-      - postgres
-      - minio
-      - mongodb
-      - milvus
     volumes:
       - ./data:/app/data
     restart: "no"
 
-  # 資料處理服務
+  # 資料處理服務 - 資料清理和轉換
   data_processor:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: podwise_data_processor
     command: [ "python", "data_processor.py" ]
+    env_file:
+      - ./backend/.env
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=podcast
-      - POSTGRES_USER=bdse37
-      - POSTGRES_PASSWORD=111111
-      - MONGODB_HOST=mongodb
-      - MONGODB_USER=bdse37
-      - MONGODB_PASSWORD=111111
-      - MONGODB_DB=podcast
-      - MILVUS_HOST=milvus
-      - MINIO_HOST=minio
-      - MINIO_ACCESS_KEY=bdse37
-      - MINIO_SECRET_KEY=11111111
+      - POSTGRES_HOST=postgres.podwise.svc.cluster.local
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MONGODB_HOST=mongodb.podwise.svc.cluster.local
+      - MONGODB_USER=${MONGO_USER}
+      - MONGODB_PASSWORD=${MONGO_PASSWORD}
+      - MONGODB_DB=${MONGO_DB}
+      - MILVUS_HOST=worker3
+      - MINIO_HOST=minio.podwise.svc.cluster.local
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     networks:
       - podwise
-    depends_on:
-      - postgres
-      - mongodb
-      - milvus
-      - minio
     volumes:
       - ./data:/app/data
     restart: "no"
 
-  # 管理工具
-  # Attu - Milvus 管理介面
-  attu:
-    image: zilliz/attu:v2.3.3
-    container_name: podwise_attu
-    ports:
-      - "3101:3000"
-    environment:
-      - MILVUS_URL=http://milvus:19530
-    networks:
-      - podwise
-    depends_on:
-      - milvus
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # =============================================================================
+  # 外部服務連接 (K8s 已部署)
+  # =============================================================================
+  # 以下服務已在 K8s 中部署，本地服務將連接到 K8s 服務：
+  # - Attu (Milvus 管理): 192.168.32.38:3101
+  # - Portainer (Docker 管理): 192.168.32.38:3003
+  # - Grafana (監控儀表板): 192.168.32.38:3004
+  # - Prometheus (監控資料): 192.168.32.38:30090
 
-  # pgAdmin - PostgreSQL 管理介面
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: podwise_pgadmin
-    ports:
-      - "3002:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=bdse37@podwise.com
-      - PGADMIN_DEFAULT_PASSWORD=111111
-      - PGADMIN_CONFIG_SERVER_MODE=False
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - podwise
-    depends_on:
-      - postgres
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/80/misc/ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+# =============================================================================
+# 外部服務連接 (K8s 已部署)
+# =============================================================================
+# 注意：以下服務已在 K8s 中部署，本地服務將連接到 K8s 服務
+# - PostgreSQL: postgres.podwise.svc.cluster.local:5432
+# - MongoDB: mongodb.podwise.svc.cluster.local:27017
+# - Milvus: worker3:19530
+# - MinIO: minio.podwise.svc.cluster.local:9000
+# - Grafana: 192.168.32.38:30004
+# - Prometheus: 192.168.32.38:30090
+# - Portainer: 192.168.32.38:30003
 
-  # Portainer - Docker 管理介面
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: podwise_portainer
-    ports:
-      - "3003:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/api/status" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Grafana - 監控儀表板
-  grafana:
-    image: grafana/grafana:latest
-    container_name: podwise_grafana
-    ports:
-      - "3004:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=bdse37
-      - GF_SECURITY_ADMIN_PASSWORD=111111
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Prometheus - 監控資料收集
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: podwise_prometheus
-    ports:
-      - "3005:9090"
-    volumes:
-      - ./monitoring/prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # AnythingLLM 服務
-  anythingllm:
-    image: mintplexlabs/anythingllm:latest
-    container_name: podwise_anythingllm
-    ports:
-      - "3001:3001"
-    environment:
-      - STORAGE_DIR=/app/server/storage
-      - UID=1000
-      - GID=1000
-      - DISABLE_TELEMETRY=true
-    volumes:
-      - anythingllm_storage:/app/server/storage
-    networks:
-      - podwise
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3001/api/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-volumes:
-  postgres_data:
-  mongodb_data:
-  milvus_data:
-  minio_data:
-  ollama_data:
-  pgadmin_data:
-  portainer_data:
-  grafana_data:
-  prometheus_data:
-  clickhouse_data:
-  anythingllm_storage:
-
-
+# =============================================================================
+# 網路配置
+# =============================================================================
 networks:
   podwise:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

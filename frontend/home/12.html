@@ -1,0 +1,302 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <title>PodWise Podcast自動摘要與個人化推薦系統</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+
+    <style>
+        /* —— Step 4：亂碼顯示與複製 —— */
+        #popup-step-4 {
+            display: none;
+            text-align: left;
+        }
+
+        #popup-step-4 h2 {
+            color: #583e3d;
+            font-size: 1.8em;
+            margin-bottom: 1em;
+        }
+
+        #popup-step-4 .code-block-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 1.5em;
+        }
+
+        #popup-step-4 pre#generated-code {
+            background: #f5f5f5;
+            padding: 1em;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-break: break-all;
+            flex: 1;
+            max-height: 150px;
+            overflow: auto;
+            border: 1px solid rgba(210, 215, 217, 0.75);
+        }
+
+        #popup-step-4 button#copy-code-btn {
+            background-color: #d7b590;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 0.6em 1.2em;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        #popup-step-4 button#copy-code-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="is-preload">
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+
+                <!-- Header -->
+                <header id="header">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo_black.png" alt="PodWise Logo"
+                            style="height: 60px; vertical-align: middle; margin-right: 5px;">
+                        <strong>PodWise</strong> Podcast自動摘要與個人化推薦系統
+                    </a>
+                    <ul class="icons">
+                        <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+                        <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+                        <li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
+                        </li>
+                        <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+                        <li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+                    </ul>
+                </header>
+
+                <!-- Banner -->
+                <section id="banner">
+                    <div class="content">
+                        <header>
+                            <h1>PodWise</h1>
+                            <h2>AI 精準調頻，打造你的個人聲音空間。</h2>
+                            <p>PodWise希望成為你的智能嚮導,透過分析節目內容與聲音特質,幫助你發現符合你聆聽習
+                                慣的專屬精彩內容。讓每一次收聽,都更貼近你的需求。</p>
+                        </header>
+                        <p>目前市面上尚無結合語音向量模型的推薦系統,因此我們選擇開發PodWise,提供更精準及個人化
+                            的Podcast推薦。面對琳瑯滿目的節目內容,許多使用者常常難以找到真正感興趣、適合自己的主題,
+                            而PodWise正是為了解決這樣的選擇困難,協助用戶更輕鬆發現屬於自己的Podcast。</p>
+                        <ul class="actions">
+                            <li><a href="podri.html" class="button big">開始你的PodWise</a></li>
+                        </ul>
+                    </div>
+                    <span class="image object">
+                        <img src="images/podcasts.png" alt="" />
+                    </span>
+                </section>
+
+                <!-- Other Sections omitted for brevity -->
+
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <div class="inner">
+
+                <!-- Search -->
+                <section id="search" class="alt">
+                    <form method="post" action="#">
+                        <input type="text" name="query" id="query" placeholder="Search" />
+                    </form>
+                </section>
+
+                <!-- Menu -->
+                <nav id="menu">
+                    <header class="major">
+                        <h2>Menu</h2>
+                    </header>
+                    <ul>
+                        <li><a href="index.html">Homepage</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="podri.html">Podri</a></li>
+
+                        <li>
+                            <span class="opener">熱門推薦</span>
+                            <ul>
+                                <li><a href="#">商業</a></li>
+                                <li><a href="#">教育</a></li>
+                            </ul>
+                        <li><a href="elements.html">每日聲音卡</a></li>
+                    </ul>
+                </nav>
+
+
+                <!-- Section -->
+                <section>
+                    <header class="major">
+                        <h2>Get in touch</h2>
+                    </header>
+                    <ul class="contact">
+                        <li class="icon solid fa-envelope"><a href="#">information@podwise.com</a></li>
+                    </ul>
+                </section>
+
+                <!-- Footer -->
+                <footer id="footer">
+                    <p class="copyright">&copy; PodWise. All rights reserved.</p>
+                </footer>
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Quiz Overlay -->
+    <div id="popup-overlay"
+        style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center;">
+        <div id="popup-container"
+            style="background:#f6ece3; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
+
+            <!-- 關閉按鈕 -->
+            <img src="images/delete.png" alt="關閉" class="close-button"
+                style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; cursor:pointer; z-index:10;"
+                onclick="closePopup()">
+
+            <!-- Step 1 -->
+            <div class="popup-step" id="popup-step-1">
+                <h2>Taste of PodWise !</h2>
+                <div class="quiz-option-container">
+                    <div class="quiz-option" onclick="goToStep(2)">
+                        <img src="images/financial-profit_golden.png" alt="商業">
+                        <div>商業</div>
+                    </div>
+                    <div class="quiz-option" onclick="goToStep(2)">
+                        <img src="images/school_golden.png" alt="教育">
+                        <div>教育</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="popup-step" id="popup-step-2" style="display:none;">
+                <h2>Which type?</h2>
+                <div class="quiz-type-container">
+                    <button class="quiz-type-btn" onclick="goToStep(3)">財經</button>
+                    <button class="quiz-type-btn" onclick="goToStep(3)">職業</button>
+                    <button class="quiz-type-btn" onclick="goToStep(3)">房地產</button>
+                    <button class="quiz-type-btn" onclick="goToStep(3)">行銷</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="popup-step" id="popup-step-3" style="display:none;">
+                <h2>You may like…</h2>
+                <div class="quiz-recommendations">
+                    <!-- 1. 股癌 -->
+                    <div class="recommend-item">
+                        <img src="images/股癌.png" alt="股癌">
+                        <div class="title">股癌 Gooaye</div>
+                        <p class="description">晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。</p>
+                        <img src="images/play_gray.png" alt="播放" class="play-button"
+                            onclick="playAudio('audio/sample1.mp3')">
+                    </div>
+
+                    <!-- 2. 矽谷輕鬆談 -->
+                    <div class="recommend-item">
+                        <img src="images/矽谷輕鬆談.png" alt="矽谷輕鬆談">
+                        <div class="title">矽谷輕鬆談</div>
+                        <p class="description">Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。</p>
+                        <img src="images/play_gray.png" alt="播放" class="play-button"
+                            onclick="playAudio('audio/sample2.mp3')">
+                    </div>
+
+                    <!-- 3. 天下學習 -->
+                    <div class="recommend-item">
+                        <img src="images/天下學習.png" alt="天下學習">
+                        <div class="title">天下學習</div>
+                        <p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
+                        <img src="images/play_gray.png" alt="播放" class="play-button"
+                            onclick="playAudio('audio/sample3.mp3')">
+                    </div>
+                </div>
+
+                <button class="button primary" onclick="goToStep(4)">取得專屬ID</button>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="popup-step" id="popup-step-4">
+                <h2>Your ID Code</h2>
+                <div class="code-block-container">
+                    <pre id="generated-code">請稍後…</pre>
+                    <button id="copy-code-btn">Copy</button>
+                </div>
+                <button class="button" onclick="closePopup()">進入Podwise</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        // 初次顯示
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('popup-overlay').style.display = 'flex';
+        });
+
+        // 切換步驟
+        function goToStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`popup-step-${i}`);
+                if (el) el.style.display = (i === step) ? 'block' : 'none';
+            }
+            if (step === 4) fetchGeneratedCode();
+        }
+
+        // 向後端取得 ID 並顯示
+        function fetchGeneratedCode() {
+            fetch('/api/get-id')
+                .then(res => res.text())
+                .then(code => {
+                    document.getElementById('generated-code').textContent = code;
+                })
+                .catch(() => {
+                    document.getElementById('generated-code').textContent = '取得失敗';
+                });
+        }
+
+        // 複製按鈕
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('copy-code-btn').addEventListener('click', () => {
+                const code = document.getElementById('generated-code').textContent;
+                navigator.clipboard.writeText(code)
+                    .then(() => alert('已複製到剪貼簿！'))
+                    .catch(() => alert('複製失敗'));
+            });
+        });
+
+        // 關閉
+        function closePopup() {
+            document.getElementById('popup-overlay').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,9 +1,5 @@
 <!DOCTYPE HTML>
-<!--
-	Editorial by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+
 <html>
 
 <head>
@@ -11,6 +7,56 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="assets/css/main.css" />
+
+	<style>
+		/* —— Step 4：亂碼顯示與複製 —— */
+		#popup-step-4 {
+			display: none;
+			text-align: left;
+		}
+
+		#popup-step-4 h2 {
+			color: #583e3d;
+			font-size: 1.8em;
+			margin-bottom: 1em;
+		}
+
+		#popup-step-4 .code-block-container {
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 1.5em;
+		}
+
+		#popup-step-4 pre#generated-code {
+			background: #f5f5f5;
+			padding: 1em;
+			border-radius: 4px;
+			font-family: monospace;
+			font-size: 0.9em;
+			white-space: pre-wrap;
+			word-break: break-all;
+			flex: 1;
+			max-height: 150px;
+			overflow: auto;
+			border: 1px solid rgba(210, 215, 217, 0.75);
+		}
+
+		#popup-step-4 button#copy-code-btn {
+			background-color: #d7b590;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			padding: 0.6em 1.2em;
+			font-size: 0.9em;
+			cursor: pointer;
+			transition: transform 0.1s ease;
+		}
+
+		#popup-step-4 button#copy-code-btn:active {
+			transform: scale(0.95);
+		}
+	</style>
 </head>
 
 <body class="is-preload">
@@ -159,43 +205,14 @@
 					</ul>
 				</nav>
 
-				<!-- Section -->
-				<!-- <section>
-					<header class="major">
-						<h2>Ante interdum</h2>
-					</header>
-					<div class="mini-posts">
-						<article>
-							<a href="#" class="image"><img src="images/pic07.jpg" alt="" /></a>
-							<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-						</article>
-						<article>
-							<a href="#" class="image"><img src="images/pic08.jpg" alt="" /></a>
-							<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-						</article>
-						<article>
-							<a href="#" class="image"><img src="images/pic09.jpg" alt="" /></a>
-							<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-						</article>
-					</div>
-					<ul class="actions">
-						<li><a href="#" class="button">More</a></li>
-					</ul>
-				</section> -->
 
 				<!-- Section -->
 				<section>
 					<header class="major">
 						<h2>Get in touch</h2>
 					</header>
-					<!-- <p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem
-						ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat
-						tempus aliquam.</p> -->
 					<ul class="contact">
 						<li class="icon solid fa-envelope"><a href="#">information@podwise.com</a></li>
-						<!-- <li class="icon solid fa-phone">(000) 000-0000</li> -->
-						<!-- <li class="icon solid fa-home">1234 Somewhere Road #8254<br />
-							Nashville, TN 00000-0000</li> -->
 					</ul>
 				</section>
 
@@ -233,15 +250,18 @@
 	<script src="assets/js/main.js"></script>
 
 	<!-- Quiz Overlay -->
-	<div id="popup-overlay" style="display: none;">
+	<div id="popup-overlay"
+		style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center;">
+		<div id="popup-container"
+			style="background:#f6ece3; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
 
-		<div id="popup-container">
 			<!-- 關閉按鈕 -->
-			<img src="images/delete.png" alt="關閉" class="close-button" onclick="closePopup()">
+			<img src="images/delete.png" alt="關閉" class="close-button"
+				style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; cursor:pointer; z-index:10;"
+				onclick="closePopup()">
 
-			<!-- Step 1: 類別偏好 -->
+			<!-- Step 1 -->
 			<div class="popup-step" id="popup-step-1">
-				<!-- <h1>試聽精選</h1> -->
 				<h2>Taste of PodWise !</h2>
 				<div class="quiz-option-container">
 					<div class="quiz-option" onclick="goToStep(2)">
@@ -255,7 +275,7 @@
 				</div>
 			</div>
 
-			<!-- Step 2: 類型選擇 -->
+			<!-- Step 2 -->
 			<div class="popup-step" id="popup-step-2" style="display:none;">
 				<h2>Which type?</h2>
 				<div class="quiz-type-container">
@@ -266,17 +286,19 @@
 				</div>
 			</div>
 
-
-			<!-- Step 3: 推薦節目 -->
-			<div class="popup-step" id="popup-step-3" style="display: none;">
+			<!-- Step 3 -->
+			<div class="popup-step" id="popup-step-3" style="display:none;">
 				<h2>You may like…</h2>
 				<div class="quiz-recommendations">
-
 					<!-- 1. 股癌 -->
 					<div class="recommend-item">
 						<img src="images/股癌.png" alt="股癌">
-						<div class="title">股癌 Gooaye</div>
-						<p class="description">晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。</p>
+						<div class="text">
+							<div class="title">股癌 Gooaye</div>
+							<p class="description">
+								晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。
+							</p>
+						</div>
 						<img src="images/play_gray.png" alt="播放" class="play-button"
 							onclick="playAudio('audio/sample1.mp3')">
 					</div>
@@ -284,8 +306,10 @@
 					<!-- 2. 矽谷輕鬆談 -->
 					<div class="recommend-item">
 						<img src="images/矽谷輕鬆談.png" alt="矽谷輕鬆談">
-						<div class="title">矽谷輕鬆談</div>
-						<p class="description">Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。</p>
+						<div class="text">
+							<div class="title">矽谷輕鬆談</div>
+							<p class="description">Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。</p>
+						</div>
 						<img src="images/play_gray.png" alt="播放" class="play-button"
 							onclick="playAudio('audio/sample2.mp3')">
 					</div>
@@ -293,45 +317,112 @@
 					<!-- 3. 天下學習 -->
 					<div class="recommend-item">
 						<img src="images/天下學習.png" alt="天下學習">
-						<div class="title">天下學習</div>
-						<p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
+						<div class="text">
+							<div class="title">天下學習</div>
+							<p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
+						</div>
 						<img src="images/play_gray.png" alt="播放" class="play-button"
 							onclick="playAudio('audio/sample3.mp3')">
 					</div>
-
 				</div>
+
+				<button class="button primary" onclick="goToStep(4)">Next</button>
 			</div>
-		</div>
-	</div>
 
-	<script>
-		window.addEventListener('DOMContentLoaded', () => {
-			document.getElementById('popup-overlay').style.display = 'flex';
-		});
+			<!-- Step 4 -->
+			<div class="popup-step" id="popup-step-4">
+				<h2>Signin Your Podwise</h2>
+				<div class="row">
+					<div class="col-6 col-12-small">
 
-		function goToStep(step) {
-			for (let i = 1; i <= 3; i++) {
-				document.getElementById(`popup-step-${i}`).style.display = (i === step) ? 'block' : 'none';
-			}
-		}
+						<!-- Form -->
+						<h3>輸入我的Podwise ID</h3>
+						<form method="post" action="#">
+							<div class="row gtr-uniform">
+								<div class="col-6 col-12-xsmall">
+									<input type="text" name="demo-name" id="demo-name" value=""
+										placeholder="Podwise ID" />
+								</div>
+								<!-- Break -->
+								<div class="col-12">
+									<ul class="actions">
 
-		let currentAudio = null;
+										<li>
+											<input type="button" value="產生我的Podwise ID" id="generateIdBtn"
+												class="secondary" onclick="generatePodwiseID()" />
+										</li>
+									</ul>
 
-		function playAudio(src) {
-			const audio = new Audio(src);
-			audio.play();
-		}
+									<!-- 下面這個欄位用來顯示產生的 ID -->
+									<div>
+										<input type="text" id="podwiseIdField" readonly placeholder="尚未產生"
+											style="width: 200px;" />
+									</div>
+								</div>
 
-		function closePopup() {
-			document.getElementById("popup-overlay").style.display = "none";
-		}
+								<script>
+									function generatePodwiseID() {
+										// 這裡放你的 ID 產生邏輯
+										const newId = 'PW-' + Date.now();
+										// 把新 ID 塞到下方欄位
+										document.getElementById('podwiseIdField').value = newId;
+									}
+								</script>
+								<button class="button" onclick="closePopup()">進入Podwise</button>
+							</div>
 
+					</div>
+				</div>
 
+				<!-- Scripts -->
+				<script src="assets/js/jquery.min.js"></script>
+				<script src="assets/js/browser.min.js"></script>
+				<script src="assets/js/breakpoints.min.js"></script>
+				<script src="assets/js/util.js"></script>
+				<script src="assets/js/main.js"></script>
+				<script>
+					// 初次顯示
+					window.addEventListener('DOMContentLoaded', () => {
+						document.getElementById('popup-overlay').style.display = 'flex';
+					});
 
-	</script>
+					// 切換步驟
+					function goToStep(step) {
+						for (let i = 1; i <= 4; i++) {
+							const el = document.getElementById(`popup-step-${i}`);
+							if (el) el.style.display = (i === step) ? 'block' : 'none';
+						}
+						if (step === 4) fetchGeneratedCode();
+					}
 
+					// 向後端取得 ID 並顯示
+					function fetchGeneratedCode() {
+						fetch('/api/get-id')
+							.then(res => res.text())
+							.then(code => {
+								document.getElementById('generated-code').textContent = code;
+							})
+							.catch(() => {
+								document.getElementById('generated-code').textContent = '取得失敗';
+							});
+					}
 
+					// 複製按鈕
+					document.addEventListener('DOMContentLoaded', () => {
+						document.getElementById('copy-code-btn').addEventListener('click', () => {
+							const code = document.getElementById('generated-code').textContent;
+							navigator.clipboard.writeText(code)
+								.then(() => alert('已複製到剪貼簿！'))
+								.catch(() => alert('複製失敗'));
+						});
+					});
 
+					// 關閉
+					function closePopup() {
+						document.getElementById('popup-overlay').style.display = 'none';
+					}
+				</script>
 </body>
+
 
 </html>
