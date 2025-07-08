@@ -43,7 +43,11 @@ COLLABORATIVE_FILTERING_CONFIG = {
     "playtime_weight": 1.0,    # 播放時間權重
     "like_weight": 0.5,        # 喜歡權重
     "dislike_weight": -0.5,    # 不喜歡權重
-    "play_count_weight": 1.0   # 播放次數權重
+    "play_count_weight": 1.0,  # 播放次數權重
+    "use_knn": True,           # 是否使用 KNN 協同過濾
+    "k_neighbors": 5,          # KNN 的 k 值
+    "knn_weights": "distance", # KNN 權重方式 ('uniform', 'distance')
+    "knn_metric": "cosine"     # KNN 距離度量 ('cosine', 'euclidean', 'manhattan')
 }
 
 # 基於時間的推薦配置

@@ -19,6 +19,7 @@ import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import json
+import os
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +34,7 @@ from core.qwen_llm_manager import Qwen3LLMManager
 from core.chat_history_service import get_chat_history_service
 from config.prompt_templates import PodwisePromptTemplates
 from config.integrated_config import get_config
-from utils.langfuse_integration import get_langfuse_monitor
+# Langfuse 整合已移除，使用 Langfuse Cloud 服務
 
 
 class PodwiseRAGPipeline:
@@ -63,8 +64,19 @@ class PodwiseRAGPipeline:
         self.enable_chat_history = enable_chat_history
         self.confidence_threshold = confidence_threshold
         
-        # 初始化監控器
-        self.monitor = get_langfuse_monitor() if enable_monitoring else None
+        # 初始化監控器 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+        self.monitor = None
+        self.langfuse = None
+        if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):
+            try:
+                from langfuse import Langfuse
+                self.langfuse = Langfuse(
+                    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+                    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+                    host=os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+                )
+            except ImportError:
+                self.langfuse = None
         
         # 初始化整合配置
         self.config = get_config()
@@ -148,19 +160,10 @@ class PodwiseRAGPipeline:
             except Exception as e:
                 logger.warning(f"記錄用戶查詢失敗: {e}")
         
-        # 創建追蹤
-        trace_id = None
-        if self.monitor and self.monitor.is_enabled():
-            trace_id = self.monitor.create_trace(
-                name="RAG Pipeline 查詢處理",
-                user_id=user_id,
-                metadata={
-                    "query": query,
-                    "enable_semantic_retrieval": self.enable_semantic_retrieval,
-                    "confidence_threshold": self.confidence_threshold,
-                    **(metadata or {})
-                }
-            )
+        # 創建追蹤 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+        trace = None
+        if self.langfuse:
+            trace = self.langfuse.trace(name="RAG Pipeline Query", user_id=user_id, input=query)
         
         try:
             # 使用層級化 RAG Pipeline 處理
@@ -185,22 +188,9 @@ class PodwiseRAGPipeline:
                 except Exception as e:
                     logger.warning(f"記錄助手回應失敗: {e}")
             
-            # 追蹤完整流程
-            if trace_id and self.monitor:
-                processing_time = (datetime.now() - start_time).total_seconds()
-                self.monitor.trace_rag_pipeline(
-                    trace_id=trace_id,
-                    query=query,
-                    category="其他",  # 預設類別
-                    rag_results={
-                        "category_result": {"category": "其他", "confidence": response.confidence},
-                        "rag_result": response.sources
-                    },
-                    final_response=response.content,
-                    confidence=response.confidence,
-                    processing_time=processing_time
-                )
-                self.monitor.end_trace(trace_id, "success")
+            # 追蹤完整流程 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+            if trace:
+                trace.end(output=response.content, metadata={"confidence": response.confidence})
             
             return response
             
@@ -221,9 +211,9 @@ class PodwiseRAGPipeline:
                 except Exception as chat_error:
                     logger.warning(f"記錄錯誤回應失敗: {chat_error}")
             
-            # 追蹤錯誤
-            if trace_id and self.monitor:
-                self.monitor.end_trace(trace_id, "error")
+            # 追蹤錯誤 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+            if trace:
+                trace.end(output=str(e), metadata={"error": True})
             
             # 返回錯誤回應
             return RAGResponse(
@@ -250,14 +240,10 @@ class PodwiseRAGPipeline:
         """
         start_time = datetime.now()
         
-        # 創建追蹤
-        trace_id = None
-        if self.monitor and self.monitor.is_enabled():
-            trace_id = self.monitor.create_trace(
-                name="CrewAI 代理處理",
-                user_id=user_id,
-                metadata={"query": query}
-            )
+        # 創建追蹤 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+        trace = None
+        if self.langfuse:
+            trace = self.langfuse.trace(name="CrewAI Agent Query", user_id=user_id, input=query)
         
         try:
             # 創建用戶查詢物件
@@ -271,27 +257,18 @@ class PodwiseRAGPipeline:
             # 使用領導者代理處理
             response = await self.leader_agent.process(user_query)
             
-            # 追蹤代理互動
-            if trace_id and self.monitor:
-                processing_time = (datetime.now() - start_time).total_seconds()
-                self.monitor.trace_agent_interactions(
-                    trace_id=trace_id,
-                    agent_name="LeaderAgent",
-                    agent_role="領導者",
-                    input_data={"query": query},
-                    output_data={"response": response.content, "confidence": response.confidence},
-                    confidence=response.confidence,
-                    processing_time=processing_time
-                )
-                self.monitor.end_trace(trace_id, "success")
+            # 追蹤代理互動 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+            if trace:
+                trace.end(output=response.content, metadata={"confidence": response.confidence})
             
             return response
             
         except Exception as e:
             logger.error(f"代理處理失敗: {e}")
             
-            if trace_id and self.monitor:
-                self.monitor.end_trace(trace_id, "error")
+            # 追蹤錯誤 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)
+            if trace:
+                trace.end(output=str(e), metadata={"error": True})
             
             return AgentResponse(
                 content=f"代理處理時發生錯誤: {str(e)}",
@@ -302,13 +279,13 @@ class PodwiseRAGPipeline:
     
     def get_semantic_config(self) -> Optional[Dict[str, Any]]:
         """獲取語意檢索配置"""
-        if not self.config.get("semantic_retrieval"):
+        if not hasattr(self.config, 'semantic_retrieval') or not self.config.semantic_retrieval:
             return None
         
         return {
-            "model_config": self.config["semantic_retrieval"].get("model_config"),
-            "retrieval_config": self.config["semantic_retrieval"].get("retrieval_config"),
-            "tag_statistics": self.config["semantic_retrieval"].get("tag_statistics")
+            "model_config": getattr(self.config.semantic_retrieval, 'model_config', None),
+            "retrieval_config": getattr(self.config.semantic_retrieval, 'retrieval_config', None),
+            "tag_statistics": getattr(self.config.semantic_retrieval, 'tag_statistics', None)
         }
     
     def get_prompt_templates(self) -> Dict[str, str]:
@@ -323,13 +300,11 @@ class PodwiseRAGPipeline:
         }
     
     def is_monitoring_enabled(self) -> bool:
-        """檢查監控是否啟用"""
-        return self.monitor is not None and self.monitor.is_enabled()
+        """檢查監控是否啟用 (Langfuse 整合已移除，使用 Langfuse Cloud 服務)"""
+        return False
     
     def get_monitor_url(self, trace_id: str) -> Optional[str]:
-        """獲取監控 URL"""
-        if self.monitor and self.monitor.is_enabled():
-            return self.monitor.get_trace_url(trace_id)
+        """獲取監控 URL (Langfuse 整合已移除，使用 Langfuse Cloud 服務)"""
         return None
     
     async def health_check(self) -> Dict[str, Any]:
@@ -348,12 +323,12 @@ class PodwiseRAGPipeline:
             health_status["status"] = "degraded"
         
         # 檢查語意檢索
-        if self.config.get("semantic_retrieval"):
+        if hasattr(self.config, 'semantic_retrieval') and self.config.semantic_retrieval:
             try:
-                semantic_status = self.config["semantic_retrieval"].get("model_config")
+                semantic_status = getattr(self.config.semantic_retrieval, 'model_config', None)
                 health_status["components"]["semantic_retrieval"] = {
                     "status": "healthy",
-                    "model": semantic_status.get("model_name", "unknown")
+                    "model": getattr(semantic_status, 'model_name', 'unknown') if semantic_status else "unknown"
                 }
             except Exception as e:
                 health_status["components"]["semantic_retrieval"] = {"status": "error", "error": str(e)}

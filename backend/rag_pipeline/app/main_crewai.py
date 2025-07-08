@@ -338,32 +338,114 @@ async def process_query(
 
 
 async def _get_recommendations(query: str, manager: ApplicationManager) -> List[Dict[str, Any]]:
-    """獲取推薦項目"""
-    if manager.vector_search_tool is None:
-        return []
+    """獲取推薦項目（整合 ML Pipeline）"""
+    recommendations = []
     
     try:
-        # 使用統一向量搜尋工具
-        search_results = await manager.vector_search_tool.search(query, top_k=3)
+        # 1. 使用統一向量搜尋工具
+        if manager.vector_search_tool:
+            search_results = await manager.vector_search_tool.search(query, top_k=3)
+            
+            # 轉換向量搜尋結果
+            for result in search_results.get("combined_results", [])[:3]:
+                recommendations.append({
+                    "id": result.get("id", ""),
+                    "title": result.get("title", ""),
+                    "content": result.get("content", ""),
+                    "category": result.get("category", ""),
+                    "tags": result.get("tags", []),
+                    "score": result.get("score", 0.0),
+                    "source": "vector_search",
+                    "type": "content_based"
+                })
         
-        # 轉換為字典格式
-        recommendations = []
-        for result in search_results.get("combined_results", [])[:3]:
+        # 2. 整合 ML Pipeline 推薦功能
+        try:
+            # 動態導入 ML Pipeline 服務
+            import sys
+            import os
+            ml_pipeline_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                'ml_pipeline'
+            )
+            if ml_pipeline_path not in sys.path:
+                sys.path.insert(0, ml_pipeline_path)
+            
+            from services.api_service import RecommendationService
+            from config.recommender_config import get_recommender_config
+            
+            # 初始化推薦服務（使用模擬數據）
+            config = get_recommender_config()
+            db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
+            
+            # 創建推薦服務實例
+            recommendation_service = RecommendationService(db_url or "mock://localhost", config)
+            
+            # 獲取 ML 推薦結果（使用預設用戶 ID）
+            ml_recommendations = await recommendation_service.get_recommendations(
+                user_id=1,  # 預設用戶 ID
+                top_k=3,
+                category_filter=None,
+                context={"query": query}
+            )
+            
+            # 轉換 ML 推薦結果
+            for i, rec in enumerate(ml_recommendations[:3]):
+                recommendations.append({
+                    "id": rec.get("podcast_id", f"ml_rec_{i}"),
+                    "title": rec.get("title", f"ML 推薦 {i+1}"),
+                    "content": rec.get("description", "基於機器學習的推薦"),
+                    "category": rec.get("category", "推薦"),
+                    "tags": rec.get("tags", []),
+                    "score": rec.get("average_rating", 0.0),
+                    "source": "ml_pipeline",
+                    "type": "collaborative_filtering",
+                    "recommendation_reason": rec.get("recommendation_reason", "基於協同過濾推薦")
+                })
+            
+            logger.info(f"ML Pipeline 推薦成功，獲得 {len(ml_recommendations)} 個推薦")
+            
+        except Exception as ml_error:
+            logger.warning(f"ML Pipeline 推薦失敗: {str(ml_error)}")
+            # 添加備用推薦
             recommendations.append({
-                "id": result.get("id", ""),
-                "title": result.get("title", ""),
-                "content": result.get("content", ""),
-                "category": result.get("category", ""),
-                "tags": result.get("tags", []),
-                "score": result.get("score", 0.0),
-                "source": result.get("source", "")
+                "id": "fallback_1",
+                "title": "熱門商業 Podcast",
+                "content": "基於查詢內容的智能推薦",
+                "category": "商業",
+                "tags": ["商業", "投資", "理財"],
+                "score": 0.8,
+                "source": "fallback",
+                "type": "popular",
+                "recommendation_reason": "基於查詢關鍵詞的熱門推薦"
             })
         
-        return recommendations
+        # 3. 去重並限制數量
+        seen_ids = set()
+        unique_recommendations = []
+        for rec in recommendations:
+            if rec["id"] not in seen_ids:
+                seen_ids.add(rec["id"])
+                unique_recommendations.append(rec)
+                if len(unique_recommendations) >= 5:  # 最多返回 5 個推薦
+                    break
+        
+        logger.info(f"總共生成 {len(unique_recommendations)} 個推薦")
+        return unique_recommendations
         
     except Exception as e:
         logger.error(f"獲取推薦失敗: {str(e)}")
-        return []
+        # 返回基本推薦
+        return [{
+            "id": "basic_1",
+            "title": "推薦內容",
+            "content": "基於您的查詢提供的推薦",
+            "category": "一般",
+            "tags": [],
+            "score": 0.5,
+            "source": "basic",
+            "type": "fallback"
+        }]
 
 
 async def _log_query_history(

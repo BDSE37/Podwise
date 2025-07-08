@@ -59,9 +59,9 @@ class PodcastItem:
     title: str
     description: str
     category: str
-    tags: List[str] = field(default_factory=list)
     vector: np.ndarray
     updated_at: str
+    tags: List[str] = field(default_factory=list)
     confidence: float = 0.0
 
 
@@ -236,21 +236,21 @@ class KNNRecommender:
     def _calculate_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
         """計算相似度"""
         if self.metric == "cosine":
-            dot_product = np.dot(vec1, vec2)
-            norm1 = np.linalg.norm(vec1)
-            norm2 = np.linalg.norm(vec2)
+            dot_product = float(np.dot(vec1, vec2))
+            norm1 = float(np.linalg.norm(vec1))
+            norm2 = float(np.linalg.norm(vec2))
             if norm1 == 0 or norm2 == 0:
                 return 0.0
             return dot_product / (norm1 * norm2)
         elif self.metric == "euclidean":
-            return 1.0 / (1.0 + np.linalg.norm(vec1 - vec2))
+            return 1.0 / (1.0 + float(np.linalg.norm(vec1 - vec2)))
         else:
             return 0.0
     
     def recommend(self, 
                  query_vector: np.ndarray, 
-                 category_filter: Optional[str] = None,
-                 top_k: int = 5) -> RecommendationResult:
+                 top_k: int = 5,
+                 category_filter: Optional[str] = None) -> RecommendationResult:
         """執行推薦"""
         start_time = datetime.now()
         

@@ -9,6 +9,8 @@ import logging
 import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +38,7 @@ class RecommenderData:
         self.episodes = []
         self.users = []
         self.interactions = []
+        self.transcripts = []
         self._load_data()
         
         logger.info("推薦系統資料管理器初始化完成")
@@ -68,7 +71,10 @@ class RecommenderData:
             # 載入互動資料
             self.interactions = self._load_interactions()
             
-            logger.info(f"已載入 {len(self.episodes)} 個節目，{len(self.users)} 個使用者，{len(self.interactions)} 個互動")
+            # 載入轉錄資料
+            self.transcripts = self._load_episode_transcripts()
+            
+            logger.info(f"已載入 {len(self.episodes)} 個節目，{len(self.users)} 個使用者，{len(self.interactions)} 個互動，{len(self.transcripts)} 個轉錄")
             
         except Exception as e:
             logger.error(f"資料載入失敗: {str(e)}")
@@ -152,6 +158,132 @@ class RecommenderData:
             logger.error(f"互動資料載入失敗: {str(e)}")
             return []
     
+    def _load_episode_transcripts(self, min_length: int = 30, language_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        載入節目轉錄數據（整合自 EmbeddingDataLoader）
+        
+        Args:
+            min_length: 最小轉錄長度
+            language_filter: 語言篩選
+            
+        Returns:
+            節目轉錄數據列表
+        """
+        try:
+            query = """
+                SELECT 
+                    episode_id, 
+                    transcript_path, 
+                    transcript_length, 
+                    language,
+                    created_at,
+                    updated_at
+                FROM transcripts
+                WHERE transcript_length > %s
+            """
+            params = [min_length]
+            
+            if language_filter:
+                query += " AND language = %s"
+                params.append(language_filter)
+            
+            query += " ORDER BY created_at DESC"
+            
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params)
+                transcripts = [dict(row) for row in result]
+            
+            logger.info(f"載入 {len(transcripts)} 個節目轉錄")
+            return transcripts
+            
+        except Exception as e:
+            logger.error(f"載入轉錄數據失敗: {str(e)}")
+            return []
+    
+    def load_episode_metadata(self, episode_ids: List[int]) -> List[Dict[str, Any]]:
+        """
+        載入節目元數據（整合自 EmbeddingDataLoader）
+        
+        Args:
+            episode_ids: 節目ID列表
+            
+        Returns:
+            節目元數據列表
+        """
+        try:
+            if not episode_ids:
+                return []
+            
+            # 建立 IN 查詢的參數
+            placeholders = ','.join(['%s'] * len(episode_ids))
+            
+            query = f"""
+                SELECT 
+                    e.episode_id,
+                    e.episode_title,
+                    e.podcast_id,
+                    p.podcast_name,
+                    p.author,
+                    p.category,
+                    e.duration,
+                    e.published_date
+                FROM episodes e
+                JOIN podcasts p ON e.podcast_id = p.podcast_id
+                WHERE e.episode_id IN ({placeholders})
+            """
+            
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), episode_ids)
+                metadata = [dict(row) for row in result]
+            
+            logger.info(f"載入 {len(metadata)} 個節目元數據")
+            return metadata
+            
+        except Exception as e:
+            logger.error(f"載入元數據失敗: {str(e)}")
+            return []
+    
+    def get_transcript_statistics(self) -> Dict[str, Any]:
+        """
+        獲取轉錄統計信息（整合自 EmbeddingDataLoader）
+        
+        Returns:
+            統計信息字典
+        """
+        try:
+            # 總數量統計
+            total_count = len(self.transcripts)
+            
+            # 語言分布
+            language_dist = {}
+            for transcript in self.transcripts:
+                lang = transcript.get('language', 'unknown')
+                language_dist[lang] = language_dist.get(lang, 0) + 1
+            
+            # 長度分布
+            if self.transcripts:
+                lengths = [t.get('transcript_length', 0) for t in self.transcripts]
+                length_stats = {
+                    'avg_length': sum(lengths) / len(lengths),
+                    'min_length': min(lengths),
+                    'max_length': max(lengths)
+                }
+            else:
+                length_stats = {'avg_length': 0, 'min_length': 0, 'max_length': 0}
+            
+            stats = {
+                'total_transcripts': total_count,
+                'language_distribution': language_dist,
+                'length_statistics': length_stats
+            }
+            
+            logger.info(f"統計信息: {total_count} 個轉錄")
+            return stats
+            
+        except Exception as e:
+            logger.error(f"獲取統計信息失敗: {str(e)}")
+            return {}
+    
     def get_user_data(self, user_id: int) -> Dict[str, Any]:
         """
         獲取使用者資料
@@ -210,31 +342,25 @@ class RecommenderData:
             if not episode:
                 return {}
             
-            # 獲取節目互動統計
+            # 獲取節目互動
             episode_interactions = [
                 i for i in self.interactions 
                 if i['episode_id'] == episode_id
             ]
             
-            # 計算統計資訊
-            total_listeners = len(set(i['user_id'] for i in episode_interactions))
-            average_rating = self._calculate_average_rating([
-                i for i in episode_interactions 
-                if i['interaction_type'] == 'rating'
-            ])
-            total_listen_time = sum(
-                i['listen_time'] for i in episode_interactions 
-                if i['interaction_type'] == 'listen'
-            )
+            # 獲取轉錄資料
+            transcript = next((t for t in self.transcripts if t['episode_id'] == episode_id), None)
             
-            episode.update({
-                'total_listeners': total_listeners,
-                'average_rating': average_rating,
-                'total_listen_time': total_listen_time,
-                'interaction_count': len(episode_interactions)
-            })
-            
-            return episode
+            return {
+                'episode_info': episode,
+                'interactions': episode_interactions,
+                'transcript': transcript,
+                'total_interactions': len(episode_interactions),
+                'average_rating': self._calculate_average_rating([
+                    i for i in episode_interactions 
+                    if i['interaction_type'] == 'rating'
+                ])
+            }
             
         except Exception as e:
             logger.error(f"獲取節目資料失敗: {str(e)}")
@@ -246,44 +372,34 @@ class RecommenderData:
         
         Args:
             episode_id: 節目ID
-            limit: 返回數量限制
+            limit: 返回數量
             
         Returns:
             List[Dict[str, Any]]: 相似節目列表
         """
         try:
+            # 獲取目標節目資料
             target_episode = self.get_episode_data(episode_id)
             
             if not target_episode:
                 return []
             
-            # 基於類別和標籤的簡單相似度計算
-            similar_episodes = []
+            target_category = target_episode['episode_info']['category']
             
-            for episode in self.episodes:
-                if episode['episode_id'] == episode_id:
-                    continue
-                
-                # 計算相似度分數
-                similarity_score = 0
-                
-                # 類別相似度
-                if episode['category'] == target_episode['category']:
-                    similarity_score += 0.5
-                
-                # 標籤相似度
-                target_tags = set(target_episode.get('tags', '').split(','))
-                episode_tags = set(episode.get('tags', '').split(','))
-                tag_overlap = len(target_tags.intersection(episode_tags))
-                similarity_score += min(tag_overlap * 0.1, 0.3)
-                
-                if similarity_score > 0:
-                    episode_copy = episode.copy()
-                    episode_copy['similarity_score'] = similarity_score
-                    similar_episodes.append(episode_copy)
+            # 找出同類別的節目
+            similar_episodes = [
+                e for e in self.episodes 
+                if e['category'] == target_category and e['episode_id'] != episode_id
+            ]
             
-            # 按相似度排序
-            similar_episodes.sort(key=lambda x: x['similarity_score'], reverse=True)
+            # 按評分排序
+            similar_episodes.sort(
+                key=lambda x: self._calculate_average_rating([
+                    i for i in self.interactions 
+                    if i['episode_id'] == x['episode_id'] and i['interaction_type'] == 'rating'
+                ]),
+                reverse=True
+            )
             
             return similar_episodes[:limit]
             
@@ -292,22 +408,24 @@ class RecommenderData:
             return []
     
     def _calculate_average_rating(self, ratings: List[Dict[str, Any]]) -> float:
-        """計算平均評分"""
-        try:
-            if not ratings:
-                return 0.0
+        """
+        計算平均評分
+        
+        Args:
+            ratings: 評分列表
             
-            total_rating = sum(r['rating'] for r in ratings)
-            return round(total_rating / len(ratings), 2)
-            
-        except Exception as e:
-            logger.error(f"平均評分計算失敗: {str(e)}")
+        Returns:
+            float: 平均評分
+        """
+        if not ratings:
             return 0.0
+        
+        total_rating = sum(r.get('rating', 0) for r in ratings)
+        return total_rating / len(ratings)
     
     def update_data(self):
         """更新資料快取"""
         try:
-            logger.info("開始更新資料快取...")
             self._load_data()
             logger.info("資料快取更新完成")
             
@@ -315,16 +433,22 @@ class RecommenderData:
             logger.error(f"資料快取更新失敗: {str(e)}")
     
     def get_data_summary(self) -> Dict[str, Any]:
-        """獲取資料摘要"""
+        """
+        獲取資料摘要
+        
+        Returns:
+            Dict[str, Any]: 資料摘要
+        """
         try:
             return {
                 'total_episodes': len(self.episodes),
                 'total_users': len(self.users),
                 'total_interactions': len(self.interactions),
-                'categories': list(set(e['category'] for e in self.episodes)),
-                'data_last_updated': pd.Timestamp.now().isoformat()
+                'total_transcripts': len(self.transcripts),
+                'transcript_stats': self.get_transcript_statistics(),
+                'last_update': '2024-01-01 00:00:00'
             }
             
         except Exception as e:
-            logger.error(f"資料摘要獲取失敗: {str(e)}")
+            logger.error(f"獲取資料摘要失敗: {str(e)}")
             return {} 

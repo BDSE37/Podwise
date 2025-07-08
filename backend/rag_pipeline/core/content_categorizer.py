@@ -58,9 +58,9 @@ class CategoryResult:
 class ContentSummary:
     """內容摘要"""
     summary: str
-    key_points: List[str] = field(default_factory=list)
     category: ContentCategory
     confidence: float
+    key_points: List[str] = field(default_factory=list)
     processing_time: float = 0.0
 
 

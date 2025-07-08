@@ -1,4 +1,15 @@
-# 使 config 資料夾成為 Python 套件，並匯出 get_config
-from .integrated_config import get_config
+"""
+RAG Pipeline 配置模組
+包含所有配置管理和設定
+"""
 
-__all__ = ['get_config'] 
+from .integrated_config import get_config
+from .agent_roles_config import get_agent_roles_manager
+from .prompt_templates import get_prompt_template, format_prompt
+
+__all__ = [
+    'get_config',
+    'get_agent_roles_manager',
+    'get_prompt_template',
+    'format_prompt'
+] 

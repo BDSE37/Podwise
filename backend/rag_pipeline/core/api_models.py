@@ -239,7 +239,7 @@ class ConfigRequest(BaseModel):
     @validator('config_type')
     def validate_config_type(cls, v: str) -> str:
         """驗證配置類型"""
-        valid_types = ["llm", "vector", "semantic", "crewai", "rag", "langfuse"]
+        valid_types = ["llm", "vector", "semantic", "crewai", "rag"]
         if v not in valid_types:
             raise ValueError(f"配置類型必須是以下之一: {', '.join(valid_types)}")
         return v

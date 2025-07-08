@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import time
 from datetime import datetime
+from core.prompt_processor import PromptProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -388,27 +389,34 @@ class SummaryExpertAgent(BaseAgent):
         return "基於內容分析生成的 Podcast 摘要"
 
 
-class RatingExpertAgent(BaseAgent):
+class TagClassificationExpertAgent(BaseAgent):
     """
-    評分專家代理人
+    TAG 分類專家代理人
     
-    此代理人負責質量評估和評分，提供多維度的
-    內容質量評估功能。
+    此代理人負責使用 Excel 關聯詞庫對用戶輸入進行精準分類，
+    提供商業/教育/其他類別的分類服務。
     """
     
     def __init__(self, config: Dict[str, Any]) -> None:
-        """初始化評分專家代理人"""
-        super().__init__("Rating Expert", "質量評估和評分專家", config)
+        """初始化 TAG 分類專家代理人"""
+        super().__init__("TAG Classification Expert", "關鍵詞映射與內容分類專家", config)
+        
+        # 載入配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("tag_classification_expert")
+        
+        # 初始化提示詞處理器
+        self.prompt_processor = PromptProcessor()
     
-    async def process(self, input_data: List[Dict[str, Any]]) -> AgentResponse:
+    async def process(self, input_data: UserQuery) -> AgentResponse:
         """
-        處理評分請求
+        處理 TAG 分類請求
         
         Args:
-            input_data: 內容列表
+            input_data: 用戶查詢
             
         Returns:
-            AgentResponse: 評分結果
+            AgentResponse: 分類結果
         """
         start_time = time.time()
         
@@ -421,31 +429,199 @@ class RatingExpertAgent(BaseAgent):
             )
         
         try:
-            # 評估內容質量
-            ratings = await self._evaluate_quality(input_data)
+            # 使用 Excel 關聯詞庫進行分類
+            classification_result = await self._classify_with_excel_word_bank(input_data.query)
+            
+            # 格式化分類結果
+            formatted_result = self._format_classification_result(classification_result)
             
             processing_time = time.time() - start_time
             
             return AgentResponse(
-                content=f"評估完成，平均評分: {sum(ratings)/len(ratings):.2f}",
-                confidence=0.8,
-                reasoning="基於多維度指標進行質量評估",
-                metadata={"ratings": ratings, "evaluation_criteria": ["relevance", "quality", "popularity"]},
+                content=formatted_result["content"],
+                confidence=classification_result["primary_confidence"],
+                reasoning=classification_result["classification_reasoning"],
+                metadata={
+                    "primary_category": classification_result["primary_category"],
+                    "secondary_category": classification_result.get("secondary_category"),
+                    "is_cross_category": classification_result["is_cross_category"],
+                    "matched_keywords": classification_result["matched_keywords"],
+                    "excel_word_bank_stats": classification_result["excel_word_bank_stats"]
+                },
                 processing_time=processing_time
             )
                 
         except Exception as e:
-            logger.error(f"評分專家處理失敗: {str(e)}")
+            logger.error(f"TAG 分類專家處理失敗: {str(e)}")
             return AgentResponse(
-                content="評分過程中發生錯誤",
+                content="分類過程中發生錯誤",
                 confidence=0.3,
                 reasoning=f"處理失敗: {str(e)}",
                 processing_time=time.time() - start_time
             )
     
-    async def _evaluate_quality(self, content: List[Dict[str, Any]]) -> List[float]:
-        """評估內容質量"""
-        return [0.8, 0.9, 0.7]  # 示例評分
+    async def _classify_with_excel_word_bank(self, query: str) -> Dict[str, Any]:
+        """
+        使用 Excel 關聯詞庫進行分類
+        
+        Args:
+            query: 用戶查詢
+            
+        Returns:
+            Dict[str, Any]: 分類結果
+        """
+        # 載入 Excel 關聯詞庫（模擬）
+        word_bank = self._load_excel_word_bank()
+        
+        # 分析查詢中的關鍵詞
+        matched_keywords = []
+        business_score = 0.0
+        education_score = 0.0
+        other_score = 0.0
+        
+        query_lower = query.lower()
+        
+        # 商業類關鍵詞匹配
+        for keyword in word_bank["business"]:
+            if keyword in query_lower:
+                business_score += 0.1
+                matched_keywords.append({
+                    "keyword": keyword,
+                    "category": "商業",
+                    "match_type": "精確匹配",
+                    "weight": 0.8
+                })
+        
+        # 教育類關鍵詞匹配
+        for keyword in word_bank["education"]:
+            if keyword in query_lower:
+                education_score += 0.1
+                matched_keywords.append({
+                    "keyword": keyword,
+                    "category": "教育",
+                    "match_type": "精確匹配",
+                    "weight": 0.8
+                })
+        
+        # 其他類關鍵詞匹配
+        for keyword in word_bank["other"]:
+            if keyword in query_lower:
+                other_score += 0.1
+                matched_keywords.append({
+                    "keyword": keyword,
+                    "category": "其他",
+                    "match_type": "精確匹配",
+                    "weight": 0.8
+                })
+        
+        # 正規化分數
+        business_score = min(business_score, 1.0)
+        education_score = min(education_score, 1.0)
+        other_score = min(other_score, 1.0)
+        
+        # 決定主要類別
+        scores = {
+            "商業": business_score,
+            "教育": education_score,
+            "其他": other_score
+        }
+        
+        primary_category = max(scores.items(), key=lambda x: x[1])[0]
+        primary_confidence = scores[primary_category]
+        
+        # 決定次要類別
+        remaining_scores = {k: v for k, v in scores.items() if k != primary_category}
+        secondary_category = max(remaining_scores.items(), key=lambda x: x[1])[0] if remaining_scores else None
+        secondary_confidence = remaining_scores[secondary_category] if secondary_category else 0.0
+        
+        # 判斷是否為跨類別
+        is_cross_category = (primary_confidence > 0.6 and secondary_confidence > 0.4)
+        
+        # 生成分類理由
+        if is_cross_category:
+            reasoning = f"查詢同時包含{primary_category}({primary_confidence:.2f})和{secondary_category}({secondary_confidence:.2f})的特徵，屬於跨類別查詢"
+        else:
+            reasoning = f"查詢主要屬於{primary_category}類別，信心度: {primary_confidence:.2f}"
+        
+        return {
+            "primary_category": primary_category,
+            "primary_confidence": primary_confidence,
+            "secondary_category": secondary_category,
+            "secondary_confidence": secondary_confidence,
+            "is_cross_category": is_cross_category,
+            "matched_keywords": matched_keywords,
+            "classification_reasoning": reasoning,
+            "processing_suggestions": [
+                f"建議1：針對{primary_category}類別進行深度處理",
+                f"建議2：考慮{secondary_category}類別的相關內容" if secondary_category else "建議2：專注於單一類別處理"
+            ],
+            "excel_word_bank_stats": {
+                "total_keywords_checked": len(word_bank["business"]) + len(word_bank["education"]) + len(word_bank["other"]),
+                "business_matches": len([k for k in matched_keywords if k["category"] == "商業"]),
+                "education_matches": len([k for k in matched_keywords if k["category"] == "教育"]),
+                "other_matches": len([k for k in matched_keywords if k["category"] == "其他"])
+            }
+        }
+    
+    def _load_excel_word_bank(self) -> Dict[str, List[str]]:
+        """
+        載入 Excel 關聯詞庫
+        
+        Returns:
+            Dict[str, List[str]]: 詞庫字典
+        """
+        # 模擬 Excel 詞庫數據
+        return {
+            "business": [
+                "投資", "理財", "股票", "基金", "ETF", "債券", "期貨", "創業", 
+                "職場", "科技", "經濟", "財務", "台積電", "美股", "台股", "獲利",
+                "分析", "趨勢", "市場", "產業", "商業", "企業", "管理", "策略"
+            ],
+            "education": [
+                "學習", "成長", "職涯", "心理", "溝通", "語言", "親子", "教育",
+                "技能", "知識", "發展", "培訓", "課程", "讀書", "考試", "證照",
+                "自我", "提升", "能力", "方法", "習慣", "目標", "規劃", "指導"
+            ],
+            "other": [
+                "放鬆", "通勤", "睡前", "娛樂", "背景", "隨機", "音樂", "聊天",
+                "生活", "日常", "休閒", "輕鬆", "有趣", "好玩", "消遣", "陪伴",
+                "故事", "分享", "經驗", "心得", "感想", "討論", "話題", "閒聊"
+            ]
+        }
+    
+    def _format_classification_result(self, result: Dict[str, Any]) -> Dict[str, str]:
+        """
+        格式化分類結果
+        
+        Args:
+            result: 分類結果
+            
+        Returns:
+            Dict[str, str]: 格式化後的結果
+        """
+        content = f"📊 TAG 分類結果\n\n"
+        content += f"🎯 主要類別: {result['primary_category']} (信心度: {result['primary_confidence']:.2f})\n"
+        
+        if result['secondary_category']:
+            content += f"🎯 次要類別: {result['secondary_category']} (信心度: {result['secondary_confidence']:.2f})\n"
+        
+        if result['is_cross_category']:
+            content += f"⚠️ 跨類別查詢: 是\n"
+        
+        content += f"\n🔍 匹配關鍵詞:\n"
+        for keyword in result['matched_keywords'][:5]:  # 只顯示前5個
+            content += f"  • {keyword['keyword']} ({keyword['category']})\n"
+        
+        content += f"\n📈 詞庫統計:\n"
+        stats = result['excel_word_bank_stats']
+        content += f"  • 商業匹配: {stats['business_matches']} 個\n"
+        content += f"  • 教育匹配: {stats['education_matches']} 個\n"
+        content += f"  • 其他匹配: {stats['other_matches']} 個\n"
+        
+        return {"content": content}
+
+
+
 
 
 class TTSExpertAgent(BaseAgent):
@@ -588,6 +764,7 @@ class BusinessExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化商業專家代理人"""
         super().__init__("Business Expert", "商業類別專家", config)
+        self.prompt_processor = PromptProcessor()
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -610,19 +787,24 @@ class BusinessExpertAgent(BaseAgent):
             )
         
         try:
-            # 分析商業相關性
-            relevance_score = self._analyze_business_relevance(input_data.query)
+            # 使用 PromptProcessor 進行專家評估
+            # 首先需要獲取檢索結果（這裡暫時使用模擬數據）
+            search_results = await self._get_search_results(input_data.query)
             
-            # 生成商業推薦
-            recommendations = await self._generate_business_recommendations(input_data.query)
+            # 使用提示詞模板進行商業專家評估
+            prompt_result = await self.prompt_processor.process_business_expert(
+                search_results=search_results,
+                user_question=input_data.query,
+                trace_id=input_data.context  # 假設 context 包含 trace_id
+            )
             
             processing_time = time.time() - start_time
             
             return AgentResponse(
-                content=f"商業分析完成，相關性: {relevance_score:.2f}",
-                confidence=relevance_score,
-                reasoning="基於商業關鍵詞和市場趨勢進行分析",
-                metadata={"recommendations": recommendations, "relevance_score": relevance_score},
+                content=prompt_result.content,
+                confidence=prompt_result.confidence,
+                reasoning="使用商業專家提示詞模板進行評估",
+                metadata=prompt_result.metadata,
                 processing_time=processing_time
             )
                 
@@ -635,6 +817,23 @@ class BusinessExpertAgent(BaseAgent):
                 processing_time=time.time() - start_time
             )
     
+    async def _get_search_results(self, query: str) -> List[Dict[str, Any]]:
+        """獲取檢索結果（暫時使用模擬數據）"""
+        return [
+            {
+                "title": "股癌 EP123_投資新手必聽",
+                "episode": "EP123",
+                "rss_id": "stock_cancer_123",
+                "category": "商業",
+                "similarity_score": 0.85,
+                "tag_score": 0.7,
+                "hybrid_score": 0.805,
+                "updated_at": "2024-01-15",
+                "summary": "專門為投資新手設計的理財觀念分享"
+            }
+        ]
+    
+    # 保留原有的方法作為備用
     def _analyze_business_relevance(self, query: str) -> float:
         """分析商業相關性"""
         business_keywords = ["股票", "投資", "理財", "財經", "市場", "經濟"]
@@ -663,6 +862,7 @@ class EducationExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化教育專家代理人"""
         super().__init__("Education Expert", "教育類別專家", config)
+        self.prompt_processor = PromptProcessor()
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -685,19 +885,24 @@ class EducationExpertAgent(BaseAgent):
             )
         
         try:
-            # 分析教育相關性
-            relevance_score = self._analyze_education_relevance(input_data.query)
+            # 使用 PromptProcessor 進行專家評估
+            # 首先需要獲取檢索結果（這裡暫時使用模擬數據）
+            search_results = await self._get_search_results(input_data.query)
             
-            # 生成教育推薦
-            recommendations = await self._generate_education_recommendations(input_data.query)
+            # 使用提示詞模板進行教育專家評估
+            prompt_result = await self.prompt_processor.process_education_expert(
+                search_results=search_results,
+                user_question=input_data.query,
+                trace_id=input_data.context  # 假設 context 包含 trace_id
+            )
             
             processing_time = time.time() - start_time
             
             return AgentResponse(
-                content=f"教育分析完成，相關性: {relevance_score:.2f}",
-                confidence=relevance_score,
-                reasoning="基於教育關鍵詞和學習需求進行分析",
-                metadata={"recommendations": recommendations, "relevance_score": relevance_score},
+                content=prompt_result.content,
+                confidence=prompt_result.confidence,
+                reasoning="使用教育專家提示詞模板進行評估",
+                metadata=prompt_result.metadata,
                 processing_time=processing_time
             )
                 
@@ -710,6 +915,23 @@ class EducationExpertAgent(BaseAgent):
                 processing_time=time.time() - start_time
             )
     
+    async def _get_search_results(self, query: str) -> List[Dict[str, Any]]:
+        """獲取檢索結果（暫時使用模擬數據）"""
+        return [
+            {
+                "title": "好葉 EP56_學習方法大公開",
+                "episode": "EP56",
+                "rss_id": "better_leaf_56",
+                "category": "教育",
+                "similarity_score": 0.8,
+                "tag_score": 0.75,
+                "hybrid_score": 0.785,
+                "updated_at": "2024-01-12",
+                "summary": "分享高效學習方法和技巧"
+            }
+        ]
+    
+    # 保留原有的方法作為備用
     def _analyze_education_relevance(self, query: str) -> float:
         """分析教育相關性"""
         education_keywords = ["學習", "技能", "成長", "職涯", "發展", "教育"]
@@ -744,7 +966,7 @@ class LeaderAgent(BaseAgent):
         # 初始化下層專家
         self.rag_expert = RAGExpertAgent(config.get('rag_expert', {}))
         self.summary_expert = SummaryExpertAgent(config.get('summary_expert', {}))
-        self.rating_expert = RatingExpertAgent(config.get('rating_expert', {}))
+        self.tag_classification_expert = TagClassificationExpertAgent(config.get('tag_classification_expert', {}))
         self.tts_expert = TTSExpertAgent(config.get('tts_expert', {}))
         self.user_manager = UserManagerAgent(config.get('user_manager', {}))
         
@@ -797,11 +1019,12 @@ class LeaderAgent(BaseAgent):
             
             # 3. 功能專家層（所有類別都使用）
             summary_result = await self.summary_expert.process(rag_result.metadata.get("results", []))
-            rating_result = await self.rating_expert.process(rag_result.metadata.get("results", []))
+            # 使用 TAG 分類專家進行分類
+            tag_classification_result = await self.tag_classification_expert.process(input_data)
             
             # 4. 最終決策
             final_response = await self._make_final_decision(
-                input_data, rag_result, category_result, summary_result, rating_result
+                input_data, rag_result, category_result, summary_result, tag_classification_result
             )
             
             processing_time = time.time() - start_time
@@ -815,7 +1038,7 @@ class LeaderAgent(BaseAgent):
                     "rag_result": rag_result.metadata,
                     "category_result": category_result.metadata,
                     "summary_result": summary_result.metadata,
-                    "rating_result": rating_result.metadata
+                    "tag_classification_result": tag_classification_result.metadata
                 },
                 processing_time=processing_time
             )
@@ -842,7 +1065,7 @@ class LeaderAgent(BaseAgent):
     
     async def _make_final_decision(self, query: UserQuery, rag_result: AgentResponse, 
                                  category_result: AgentResponse, summary_result: AgentResponse, 
-                                 rating_result: AgentResponse) -> str:
+                                 tag_classification_result: AgentResponse) -> str:
         """做出最終決策"""
         # 整合各專家的結果
         response_parts = []
@@ -857,9 +1080,9 @@ class LeaderAgent(BaseAgent):
         if summary_result.content:
             response_parts.append(f"內容摘要: {summary_result.content}")
         
-        # 添加評分
-        if rating_result.content:
-            response_parts.append(f"質量評估: {rating_result.content}")
+        # 添加 TAG 分類結果
+        if tag_classification_result.content:
+            response_parts.append(f"TAG 分類: {tag_classification_result.content}")
         
         return "\n\n".join(response_parts)
 

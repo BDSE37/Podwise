@@ -12,6 +12,8 @@ ML Pipeline 是一個基於機器學習的播客推薦系統，採用層級化�
 
 #### 基礎推薦器 (PodcastRecommender)
 - 基於協同過濾的推薦
+- **KNN 協同過濾**：使用 sklearn KNeighborsRegressor 進行評分預測
+- **傳統協同過濾**：基於餘弦相似度的用戶相似度計算
 - 支援用戶-項目矩陣
 - 可配置的相似度計算
 
@@ -58,6 +60,27 @@ stats = loader.get_transcript_statistics()
 - 用戶滿意度評估
 
 ## 使用方法
+
+### KNN 協同過濾
+
+```python
+from core.podcast_recommender import PodcastRecommender
+
+# 初始化 KNN 協同過濾推薦器
+recommender = PodcastRecommender(
+    podcast_data=podcast_df,
+    user_history=user_history_df,
+    use_knn=True,        # 啟用 KNN
+    k_neighbors=5        # 設定 k 值
+)
+
+# 獲取推薦
+recommendations = recommender.get_recommendations(
+    user_id="user_123",
+    top_k=10,
+    category_filter="財經"
+)
+```
 
 ### 推薦服務 (RecommendationService)
 
@@ -132,6 +155,15 @@ base:
   algorithm: "collaborative_filtering"
   similarity_metric: "cosine"
   top_k: 10
+
+collaborative:
+  use_knn: true           # 是否使用 KNN 協同過濾
+  k_neighbors: 5          # KNN 的 k 值
+  knn_weights: "distance" # KNN 權重方式 ('uniform', 'distance')
+  knn_metric: "cosine"    # KNN 距離度量 ('cosine', 'euclidean', 'manhattan')
+  rating_weight: 2.0      # 評分權重
+  preview_weight: 1.0     # 預覽播放權重
+  playtime_weight: 1.0    # 播放時間權重
 
 gnn:
   hidden_dim: 64

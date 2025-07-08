@@ -63,17 +63,17 @@ class ModelConfig:
 @dataclass
 class DatabaseConfig:
     """資料庫配置"""
-    # MongoDB (K8s 服務)
-    mongodb_uri: str = "mongodb://bdse37:111111@mongodb.podwise.svc.cluster.local:27017/podwise"
+    # MongoDB
+    mongodb_uri: str = "mongodb://worker3:27017/podwise"
     mongodb_database: str = "podwise"
     mongodb_collection: str = "conversations"
     
-    # PostgreSQL (K8s 服務)
-    postgres_host: str = "postgres.podwise.svc.cluster.local"
+    # PostgreSQL
+    postgres_host: str = "worker3"
     postgres_port: int = 5432
-    postgres_db: str = "podcast"
-    postgres_user: str = "bdse37"
-    postgres_password: str = "111111"
+    postgres_db: str = "podwise"
+    postgres_user: str = "podwise_user"
+    postgres_password: str = ""
     
     # Redis
     redis_host: str = "worker3"
@@ -81,7 +81,7 @@ class DatabaseConfig:
     redis_db: int = 0
     redis_password: str = ""
     
-    # Milvus (worker3 docker container)
+    # Milvus
     milvus_host: str = "worker3"
     milvus_port: int = 19530
     milvus_collection: str = "podwise_vectors"
@@ -112,17 +112,17 @@ class APIConfig:
 
 @dataclass
 class LangfuseConfig:
-    """Langfuse 追蹤配置"""
+    """Langfuse 追蹤配置 (已移除，使用 Langfuse Cloud)"""
     public_key: str = ""
     secret_key: str = ""
     host: str = "https://cloud.langfuse.com"
-    enabled: bool = True
+    enabled: bool = False  # 已停用
     
     # 追蹤配置
-    trace_thinking_process: bool = True
-    trace_model_selection: bool = True
-    trace_agent_interactions: bool = True
-    trace_vector_search: bool = True
+    trace_thinking_process: bool = False
+    trace_model_selection: bool = False
+    trace_agent_interactions: bool = False
+    trace_vector_search: bool = False
 
 
 @dataclass
@@ -504,7 +504,7 @@ class PodwiseIntegratedConfig(BaseSettings):
         }
     
     def print_config_summary(self):
-        """打印配置摘要"""
+        """顯示配置摘要"""
         validation = self.validate_config()
         
         print("🔧 Podwise 統一配置摘要")
