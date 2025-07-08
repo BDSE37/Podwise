@@ -36,8 +36,8 @@ class EdgeTTSVoice:
     """Edge TTS 語音配置類別"""
     
     def __init__(self, name: str, voice_id: str, description: str, 
-                 rate: str = "+0%", volume: str = "+0%", 
-                 pitch: str = "+0%", style: str = "general"):
+                 rate: Optional[str] = None, volume: Optional[str] = None, 
+                 pitch: Optional[str] = None, style: str = "general"):
         """
         初始化語音配置
         
@@ -45,9 +45,9 @@ class EdgeTTSVoice:
             name: 語音名稱
             voice_id: Edge TTS 語音 ID
             description: 語音描述
-            rate: 語速調整
-            volume: 音量調整
-            pitch: 音調調整
+            rate: 語速調整（預設 None，edge-tts 7.x 建議用 'default' 或 None）
+            volume: 音量調整（預設 None）
+            pitch: 音調調整（預設 None）
             style: 語音風格
         """
         self.name = name
@@ -59,14 +59,14 @@ class EdgeTTSVoice:
         self.style = style
     
     def to_dict(self) -> Dict[str, str]:
-        """轉換為字典格式"""
+        """轉換為字典格式，None 轉為 'default'"""
         return {
             "name": self.name,
             "voice_id": self.voice_id,
             "description": self.description,
-            "rate": self.rate,
-            "volume": self.volume,
-            "pitch": self.pitch,
+            "rate": self.rate if self.rate is not None else "default",
+            "volume": self.volume if self.volume is not None else "default",
+            "pitch": self.pitch if self.pitch is not None else "default",
             "style": self.style
         }
 
@@ -82,44 +82,56 @@ class EdgeTTSProvider:
         self.voices = self._initialize_voices()
         self.default_voice = "podrina"
         logger.info("Edge TTS Provider initialized successfully")
-    
+
+    def _normalize_param(self, value):
+        """
+        自動轉換 rate/volume/pitch 參數格式，edge-tts 7.x 僅接受 None、'default'、'+10%'、'-2dB'、'+1st' 等
+        若為 '+0%'、'+0Hz'、'+0dB'、'+0st'、'0%'、'0Hz'、'0dB'、'0st'、''、None，則轉為 None
+        """
+        if value is None:
+            return None
+        v = str(value).strip().lower()
+        if v in ("", "default", "+0%", "+0hz", "+0db", "+0st", "0%", "0hz", "0db", "0st"):
+            return None
+        return value
+
     def _initialize_voices(self) -> Dict[str, EdgeTTSVoice]:
-        """初始化四種台灣語音"""
+        """初始化四種台灣語音（預設參數皆為 None）"""
         voices = {
             "podrina": EdgeTTSVoice(
                 name="Podrina (溫柔女聲)",
                 voice_id="zh-TW-HsiaoChenNeural",
                 description="溫柔親切的女聲，適合日常對話和情感表達",
-                rate="+0%",
-                volume="+0%",
-                pitch="+0%",
+                rate=None,
+                volume=None,
+                pitch=None,
                 style="friendly"
             ),
             "podrisa": EdgeTTSVoice(
                 name="Podrisa (活潑女聲)",
                 voice_id="zh-TW-HsiaoYuNeural", 
                 description="活潑開朗的女聲，適合娛樂內容和輕鬆話題",
-                rate="+0%",
-                volume="+0%",
-                pitch="+0%",
+                rate=None,
+                volume=None,
+                pitch=None,
                 style="cheerful"
             ),
             "podrino": EdgeTTSVoice(
                 name="Podrino (穩重男聲)",
                 voice_id="zh-TW-YunJheNeural",
                 description="穩重可靠的男聲，適合正式場合和專業內容",
-                rate="+0%",
-                volume="+0%",
-                pitch="+0%",
+                rate=None,
+                volume=None,
+                pitch=None,
                 style="serious"
             ),
             "podriso": EdgeTTSVoice(
                 name="Podriso (專業男聲)",
                 voice_id="zh-TW-ZhiYuanNeural",
                 description="專業權威的男聲，適合新聞播報和學術內容",
-                rate="+0%",
-                volume="+0%",
-                pitch="+0%",
+                rate=None,
+                volume=None,
+                pitch=None,
                 style="professional"
             )
         }
@@ -169,25 +181,24 @@ class EdgeTTSProvider:
             if not voice:
                 logger.error(f"Unknown voice_id: {voice_id}")
                 return None
-            
-            # 使用提供的參數或預設值
-            actual_rate = rate or voice.rate
-            actual_volume = volume or voice.volume
-            actual_pitch = pitch or voice.pitch
-            
+            # 自動轉換參數格式
+            actual_rate = self._normalize_param(rate if rate is not None else voice.rate)
+            actual_volume = self._normalize_param(volume if volume is not None else voice.volume)
+            actual_pitch = self._normalize_param(pitch if pitch is not None else voice.pitch)
+            # 構建參數 dict，只傳遞有效參數
+            communicate_kwargs = {"text": text, "voice": voice.voice_id}
+            if actual_rate is not None:
+                communicate_kwargs["rate"] = actual_rate
+            if actual_volume is not None:
+                communicate_kwargs["volume"] = actual_volume
+            if actual_pitch is not None:
+                communicate_kwargs["pitch"] = actual_pitch
             # 創建臨時文件
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
                 temp_path = temp_file.name
-            
             try:
                 # 使用 Edge TTS 合成
-                communicate = edge_tts.Communicate(
-                    text, 
-                    voice.voice_id,
-                    rate=actual_rate,
-                    volume=actual_volume,
-                    pitch=actual_pitch
-                )
+                communicate = edge_tts.Communicate(**communicate_kwargs)
                 await communicate.save(temp_path)
                 
                 # 讀取音頻文件

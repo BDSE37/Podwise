@@ -361,14 +361,52 @@
 								</div>
 
 								<script>
-									function generatePodwiseID() {
-										// 這裡放你的 ID 產生邏輯
-										const newId = 'PW-' + Date.now();
-										// 把新 ID 塞到下方欄位
-										document.getElementById('podwiseIdField').value = newId;
+									// 檢查並創建用戶 ID
+									async function generatePodwiseID() {
+										try {
+											// 檢查是否已有用戶代碼
+											let userCode = localStorage.getItem("user_code");
+											
+											if (!userCode) {
+												// 呼叫後端建立新使用者
+												const res = await fetch("/api/create_user", { 
+													method: "POST",
+													headers: {
+														'Content-Type': 'application/json'
+													}
+												});
+												
+												if (!res.ok) {
+													throw new Error('創建用戶失敗');
+												}
+												
+												const data = await res.json();
+												userCode = data.user_code;
+												
+												// 儲存到 localStorage
+												localStorage.setItem("user_code", userCode);
+												alert("已為你建立身份碼：" + userCode);
+											}
+											
+											// 顯示用戶代碼
+											document.getElementById('podwiseIdField').value = userCode;
+											
+										} catch (error) {
+											console.error('生成用戶 ID 失敗:', error);
+											alert('生成用戶 ID 失敗，請稍後再試');
+											document.getElementById('podwiseIdField').value = '生成失敗';
+										}
 									}
+									
+									// 頁面載入時自動檢查用戶代碼
+									window.addEventListener('DOMContentLoaded', () => {
+										const userCode = localStorage.getItem("user_code");
+										if (userCode) {
+											document.getElementById('podwiseIdField').value = userCode;
+										}
+									});
 								</script>
-								<button class="button" onclick="closePopup()">進入Podwise</button>
+								                                                                <button type="button" class="button" onclick="closePopup()">進入Podwise</button>
 							</div>
 
 					</div>
@@ -392,20 +430,10 @@
 							const el = document.getElementById(`popup-step-${i}`);
 							if (el) el.style.display = (i === step) ? 'block' : 'none';
 						}
-						if (step === 4) fetchGeneratedCode();
+						// 移除 fetchGeneratedCode 調用，因為現在使用新的邏輯
 					}
 
-					// 向後端取得 ID 並顯示
-					function fetchGeneratedCode() {
-						fetch('/api/get-id')
-							.then(res => res.text())
-							.then(code => {
-								document.getElementById('generated-code').textContent = code;
-							})
-							.catch(() => {
-								document.getElementById('generated-code').textContent = '取得失敗';
-							});
-					}
+					// 移除舊的 fetchGeneratedCode 函數，因為現在使用 generatePodwiseID
 
 					// 複製按鈕
 					document.addEventListener('DOMContentLoaded', () => {

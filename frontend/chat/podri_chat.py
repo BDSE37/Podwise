@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Podri 智能助理 - 簡化版本
+Podri 智能助理 - 完整版本
 整合 TTS 語音回覆功能
 """
 
@@ -100,12 +100,11 @@ if "voice_reply" not in st.session_state:
     st.session_state["voice_reply"] = False
 
 # TTS Backend 整合函數
-async def call_tts_backend(text: str, voice: str, volume: str, speed: str, pitch: str) -> Optional[str]:
+async def call_tts_backend(text: str, voice: str, volume: Optional[str], speed: Optional[str], pitch: Optional[str]) -> Optional[str]:
     """調用 Podri TTS Backend 生成語音"""
     try:
-        # 調用本地 Podri TTS 服務
-        tts_url = "http://localhost:8003/synthesize"
-        
+        # 使用容器名稱連接 TTS 服務
+        tts_url = "http://podwise_tts:8003/synthesize"
         payload = {
             "文字": text,
             "語音": voice,
@@ -113,20 +112,14 @@ async def call_tts_backend(text: str, voice: str, volume: str, speed: str, pitch
             "音量": volume,
             "音調": pitch
         }
-        
         response = requests.post(tts_url, json=payload, timeout=30)
-        
         if response.status_code == 200:
             result = response.json()
             if result.get("成功"):
-                # 將 Base64 音頻數據轉換為臨時文件
                 audio_data = base64.b64decode(result["音訊檔案"])
-                
-                # 創建臨時音頻文件
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_file:
                     temp_file.write(audio_data)
                     temp_file_path = temp_file.name
-                
                 return temp_file_path
             else:
                 st.error(f"TTS 生成失敗: {result.get('錯誤訊息', '未知錯誤')}")
@@ -134,13 +127,17 @@ async def call_tts_backend(text: str, voice: str, volume: str, speed: str, pitch
         else:
             st.error(f"TTS 服務請求失敗: {response.status_code}")
             return None
-        
     except requests.exceptions.ConnectionError:
         st.error("無法連接到 TTS 服務，請確認服務是否啟動")
         return None
     except Exception as e:
         st.error(f"TTS 服務調用失敗: {e}")
         return None
+
+# 參數格式化輔助函數
+
+def format_param(val: int, unit: str):
+    return None if val == 0 else f"{val:+d}{unit}"
 
 # 智能處理函數
 async def process_with_intelligent_services(query: str, user_id: str = "default_user") -> str:
@@ -160,14 +157,13 @@ async def generate_voice_reply(text: str, voice: str, volume: int, speed: int, p
     """為機器人回覆生成語音"""
     if not st.session_state["voice_reply"]:
         return None
-    
     try:
         audio_file = await call_tts_backend(
             text=text,
             voice=voice,
-            volume=f"{volume:+d}%",
-            speed=f"{speed:+d}%",
-            pitch=f"{pitch:+d}Hz"
+            volume=format_param(volume, "%"),
+            speed=format_param(speed, "%"),
+            pitch=format_param(pitch, "Hz")
         )
         return audio_file
     except Exception as e:
@@ -214,9 +210,9 @@ with st.sidebar:
             audio_url = asyncio.run(call_tts_backend(
                 text=test_text,
                 voice=tts_voice,
-                volume=f"{volume:+d}%",
-                speed=f"{speed:+d}%",
-                pitch=f"{pitch:+d}Hz"
+                volume=format_param(volume, "%"),
+                speed=format_param(speed, "%"),
+                pitch=format_param(pitch, "Hz")
             ))
             
             if audio_url:
@@ -234,7 +230,7 @@ with st.sidebar:
     
     # 檢查 TTS 服務狀態
     try:
-        response = requests.get("http://localhost:8003/health", timeout=5)
+        response = requests.get("http://podwise_tts:8003/health", timeout=5)
         if response.status_code == 200:
             st.success("✅ TTS 服務正常")
         else:

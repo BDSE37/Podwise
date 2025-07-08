@@ -2,7 +2,7 @@
 FROM docker.io/library/nginx:alpine
 
 # 複製靜態檔案
-COPY . /usr/share/nginx/html/
+COPY home/ /usr/share/nginx/html/
 
 # 複製 nginx 設定檔
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf

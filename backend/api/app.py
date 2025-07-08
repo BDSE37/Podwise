@@ -232,15 +232,71 @@ async def init_database():
     """初始化資料庫"""
     try:
         config_url = SERVICE_CONFIGS["config"]["url"]
-        async with httpx.AsyncClient(timeout=300.0) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(f"{config_url}/api/v1/init/database")
             if response.status_code == 200:
                 return response.json()
             else:
-                raise HTTPException(status_code=response.status_code, detail="資料庫初始化失敗")
+                raise HTTPException(status_code=500, detail="資料庫初始化失敗")
     except Exception as e:
         logger.error(f"資料庫初始化失敗: {str(e)}")
         raise HTTPException(status_code=500, detail=f"資料庫初始化失敗: {str(e)}")
+
+@app.post("/api/create_user")
+async def create_user():
+    """創建新用戶並返回 user_code"""
+    try:
+        import psycopg2
+        import os
+        
+        # 從環境變數獲取資料庫配置，使用 K8s PostgreSQL IP 地址
+        db_config = {
+            "host": os.getenv("POSTGRES_HOST", "10.233.50.117"),  # 使用 K8s PostgreSQL IP
+            "port": int(os.getenv("POSTGRES_PORT", "5432")),
+            "database": os.getenv("POSTGRES_DB", "podcast"),
+            "user": os.getenv("POSTGRES_USER", "bdse37"),
+            "password": os.getenv("POSTGRES_PASSWORD", "111111")
+        }
+        
+        # 連接到 PostgreSQL
+        conn = psycopg2.connect(
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["database"],
+            user=db_config["user"],
+            password=db_config["password"]
+        )
+        
+        cursor = conn.cursor()
+        
+        # 插入新用戶記錄，user_code 會自動生成
+        insert_query = """
+            INSERT INTO users (is_active) 
+            VALUES (true)
+            RETURNING user_code
+        """
+        
+        cursor.execute(insert_query)
+        conn.commit()
+        
+        # 獲取生成的 user_code
+        result = cursor.fetchone()
+        if not result:
+            raise HTTPException(status_code=500, detail="無法獲取生成的用戶代碼")
+        
+        user_code = result[0]
+        
+        cursor.close()
+        conn.close()
+        
+        return {"user_code": user_code}
+            
+    except ImportError as e:
+        logger.error(f"導入 psycopg2 失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail="資料庫驅動不可用")
+    except Exception as e:
+        logger.error(f"創建用戶失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"創建用戶失敗: {str(e)}")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
