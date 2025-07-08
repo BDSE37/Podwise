@@ -44,7 +44,7 @@ class StockCancerCleaner(BaseCleaner):
         Returns:
             清理後的資料字典
         """
-            cleaned_data = data.copy()
+        cleaned_data = data.copy()
         # 特殊處理標題
         if 'episode_title' in cleaned_data:
             cleaned_data['episode_title'] = self._clean_stock_cancer_title(
@@ -56,10 +56,10 @@ class StockCancerCleaner(BaseCleaner):
             if field in cleaned_data and cleaned_data[field]:
                 cleaned_data[field] = self.longtext_cleaner.clean(cleaned_data[field])
         # 添加清理資訊
-            cleaned_data['cleaned_at'] = datetime.now().isoformat()
-            cleaned_data['cleaning_status'] = 'completed'
-            cleaned_data['cleaner_type'] = 'stock_cancer_specialized'
-            return cleaned_data
+        cleaned_data['cleaned_at'] = datetime.now().isoformat()
+        cleaned_data['cleaning_status'] = 'completed'
+        cleaned_data['cleaner_type'] = 'stock_cancer_specialized'
+        return cleaned_data
     
     def _is_stock_cancer_podcast(self, data: Dict[str, Any]) -> bool:
         """檢查是否為股癌 podcast"""
