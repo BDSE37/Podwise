@@ -2,87 +2,100 @@
 """
 Podwise RAG Pipeline 模組
 
-整合三層 CrewAI 架構、智能 TAG 提取、向量搜尋、Web Search 備援等功能。
-遵循 Google Clean Code 原則，提供統一的 OOP 介面。
+提供統一的 OOP 介面，整合所有 RAG Pipeline 功能：
+- Apple Podcast 優先推薦系統
+- 層級化 CrewAI 架構
+- 語意檢索（text2vec-base-chinese + TAG_info.csv）
+- 提示詞模板系統
+- 聊天歷史記錄
+- 效能優化
 
 作者: Podwise Team
-版本: 3.0.0
+版本: 2.0.0
 """
 
-# 核心 RAG Pipeline
-from .main import (
-    PodwiseRAGPipeline,
-    get_rag_pipeline
-)
+# 主要介面
+from .main import PodwiseRAGPipeline, get_rag_pipeline
 
-# 核心組件
-from .core.base_agent import BaseAgent, AgentResponse, UserQuery
-from .core.agent_manager import AgentManager
+# 核心模組
+from .core.apple_podcast_ranking import ApplePodcastRankingSystem, get_apple_podcast_ranking
+from .core.integrated_core import UnifiedQueryProcessor, get_query_processor
+from .core.hierarchical_rag_pipeline import HierarchicalRAGPipeline, RAGResponse
 from .core.crew_agents import (
-    LeaderAgent,
-    BusinessExpertAgent,
-    EducationExpertAgent,
-    RAGExpertAgent,
-    SummaryExpertAgent,
-    TagClassificationExpertAgent,
-    TTSExpertAgent,
-    UserManagerAgent
+    LeaderAgent, BusinessExpertAgent, EducationExpertAgent, 
+    UserManagerAgent, UserQuery, AgentResponse
 )
+from .core.content_categorizer import ContentCategorizer, get_content_processor
+from .core.qwen_llm_manager import Qwen3LLMManager, get_qwen3_llm_manager
+from .core.chat_history_service import ChatHistoryService, get_chat_history_service
 
-# 配置管理
-from .config.integrated_config import get_config
-from .config.agent_roles_config import get_agent_roles_manager
-from .config.prompt_templates import get_prompt_template, format_prompt
+# 配置模組
+from .config.integrated_config import get_config, PodwiseIntegratedConfig
+from .config.prompt_templates import PodwisePromptTemplates, get_prompt_template, format_prompt
+from .config.agent_roles_config import AgentRolesManager, get_agent_roles_manager
 
-# 工具和服務
-from .tools.enhanced_vector_search import UnifiedVectorSearch
-from .tools.podcast_formatter import PodcastFormatter
-from .tools.web_search_tool import WebSearchTool
-from .core.content_categorizer import ContentProcessor
-from .core.hierarchical_rag_pipeline import HierarchicalRAGPipeline
+# 工具模組
+from .tools.enhanced_podcast_recommender import EnhancedPodcastRecommender
+from .tools.enhanced_vector_search import RAGVectorSearch, create_rag_vector_search
+from .tools.podcast_formatter import PodcastFormatter, FormattedPodcast
 
-# 監控和工具
-from .utils.langfuse_integration import get_langfuse_monitor
-from .core.chat_history_service import get_chat_history_service
+# 腳本模組
+# from .scripts.tag_processor import SmartTagExtractor  # 暫時註解，避免導入錯誤
+# from .scripts.audio_transcription_pipeline import AudioTranscriptionPipeline  # 暫時註解，避免導入錯誤
 
-__version__ = "3.0.0"
+# 版本資訊
+__version__ = "2.0.0"
 __author__ = "Podwise Team"
+__description__ = "整合 Apple Podcast 排名系統的智能推薦引擎"
 
+# 主要導出
 __all__ = [
-    # 核心 RAG Pipeline
+    # 主要介面
     "PodwiseRAGPipeline",
     "get_rag_pipeline",
     
-    # 基礎代理組件
-    "BaseAgent",
-    "AgentResponse", 
-    "UserQuery",
-    "AgentManager",
-    
-    # CrewAI 代理
+    # 核心模組
+    "ApplePodcastRankingSystem",
+    "get_apple_podcast_ranking",
+    "UnifiedQueryProcessor",
+    "get_query_processor",
+    "HierarchicalRAGPipeline",
+    "RAGResponse",
     "LeaderAgent",
-    "BusinessExpertAgent",
+    "BusinessExpertAgent", 
     "EducationExpertAgent",
-    "RAGExpertAgent",
-    "SummaryExpertAgent",
-    "TagClassificationExpertAgent",
-    "TTSExpertAgent",
     "UserManagerAgent",
+    "UserQuery",
+    "AgentResponse",
+    "ContentCategorizer",
+    "get_content_processor",
+    "Qwen3LLMManager",
+    "get_qwen3_llm_manager",
+    "ChatHistoryService",
+    "get_chat_history_service",
     
-    # 配置管理
+    # 配置模組
     "get_config",
-    "get_agent_roles_manager",
+    "PodwiseIntegratedConfig",
+    "PodwisePromptTemplates",
     "get_prompt_template",
     "format_prompt",
+    "AgentRolesManager",
+    "get_agent_roles_manager",
     
-    # 工具和服務
-    "UnifiedVectorSearch",
+    # 工具模組
+    "EnhancedPodcastRecommender",
+    "RAGVectorSearch",
+    "create_rag_vector_search",
     "PodcastFormatter",
-    "WebSearchTool",
-    "ContentProcessor",
-    "HierarchicalRAGPipeline",
+    "FormattedPodcast",
     
-    # 監控和工具
-    "get_langfuse_monitor",
-    "get_chat_history_service"
+    # 腳本模組
+    # "SmartTagExtractor",  # 暫時註解
+    # "AudioTranscriptionPipeline",  # 暫時註解
+    
+    # 版本資訊
+    "__version__",
+    "__author__",
+    "__description__"
 ] 

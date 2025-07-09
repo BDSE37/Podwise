@@ -1,93 +1,62 @@
-# Podwise RAG Pipeline 系統
+# Podwise RAG Pipeline
 
-## 📋 概述
+整合 Apple Podcast 排名系統的智能推薦引擎，提供統一的 OOP 介面。
 
-Podwise RAG Pipeline 是一個基於 CrewAI 的三層架構檢索增強生成系統，整合了層級化 RAG 處理、智能代理人協作和向量搜尋功能。系統遵循 OOP 原則和 Google Clean Code 標準，提供高效的播客推薦和內容檢索服務。
+## 功能特色
 
-## 🏗️ 三層架構設計
+### 🎯 核心功能
+- **Apple Podcast 優先推薦系統** - 基於評分、評論、使用者反饋的綜合評分
+- **層級化 CrewAI 架構** - 三層代理協作處理複雜查詢
+- **語意檢索** - text2vec-base-chinese + TAG_info.csv 混合檢索
+- **提示詞模板系統** - 標準化的提示詞管理
+- **聊天歷史記錄** - 完整的對話歷史追蹤
+- **效能優化** - 多層級快取和並行處理
 
-### 代理人層級結構
+### 📊 Apple Podcast 排名系統
+- **Apple Podcast 星等** (50%) - 官方評分權重最高
+- **評論情感分析** (40%) - 使用 vaderSentiment 模組分析
+- **使用者點擊率** (5%) - 用戶行為數據
+- **Apple Podcast 評論數** (5%) - 熱度指標
+
+## 系統架構
+
 ```
-第一層：領導者層 (Leader Layer)
-├── chief_decision_orchestrator - 決策統籌長
-
-第二層：類別專家層 (Category Expert Layer)  
-├── business_intelligence_expert - 商業智慧專家
-└── educational_growth_strategist - 教育成長專家
-
-第三層：功能專家層 (Functional Expert Layer)
-├── intelligent_retrieval_expert - 智能檢索專家
-├── content_summary_expert - 內容摘要專家
-├── tag_classification_expert - TAG 分類專家
-├── tts_expert - 語音合成專家
-├── user_experience_expert - 用戶體驗專家
-└── web_search_expert - Web 搜尋專家
+rag_pipeline/
+├── main.py                    # 統一主介面
+├── core/                      # 核心模組
+│   ├── apple_podcast_ranking.py    # Apple Podcast 排名系統
+│   ├── integrated_core.py          # 整合核心功能
+│   ├── hierarchical_rag_pipeline.py # 層級化 RAG 架構
+│   ├── crew_agents.py              # CrewAI 代理系統
+│   ├── content_categorizer.py      # 內容分類器
+│   ├── qwen_llm_manager.py         # LLM 管理器
+│   └── chat_history_service.py     # 聊天歷史服務
+├── config/                    # 配置模組
+│   ├── integrated_config.py        # 統一配置
+│   ├── prompt_templates.py         # 提示詞模板
+│   └── agent_roles_config.py       # 代理角色配置
+├── tools/                     # 工具模組
+│   ├── enhanced_podcast_recommender.py # 增強推薦器
+│   ├── enhanced_vector_search.py       # 向量搜尋
+│   └── podcast_formatter.py           # Podcast 格式化
+└── scripts/                   # 腳本模組
+    ├── tag_processor.py             # 標籤處理器
+    └── audio_transcription_pipeline.py # 音頻轉錄
 ```
 
-### 六層 RAG 處理架構
-1. **Level 1 - 查詢處理**: 查詢重寫、意圖識別、實體提取
-2. **Level 2 - 混合搜尋**: 密集檢索、稀疏檢索、語義搜尋
-3. **Level 3 - 檢索增強**: 上下文增強、知識圖譜整合
-4. **Level 4 - 重新排序**: 多準則排序、個人化、多樣性
-5. **Level 5 - 上下文壓縮**: 內容壓縮、信息過濾
-6. **Level 6 - 混合式RAG**: 多模型生成、自適應生成
-
-## 🎯 核心功能
-
-### 📝 統一核心模組 (integrated_core.py)
-- **統一數據模型**: SearchResult、QueryContext、RAGResponse、AgentResponse
-- **信心值控制器**: 多因素評估的統一信心值計算
-- **基礎代理類別**: BaseAgent 抽象基類，內建監控和錯誤處理
-
-### 🤖 智能代理人系統 (crew_agents.py)
-- **WebSearchAgent**: OpenAI 驅動的網路搜尋備援
-- **RAGExpertAgent**: 專業 RAG 檢索處理
-- **SummaryExpertAgent**: 內容摘要生成
-- **TagClassificationExpertAgent**: 智能標籤分類
-- **TTSExpertAgent**: 語音合成服務
-- **UserManagerAgent**: 用戶管理和體驗優化
-
-### 🔍 層級化 RAG 處理 (hierarchical_rag_pipeline.py)
-- **多層級處理**: 六層樹狀結構，逐層優化
-- **並行處理**: 多個檢索策略並行執行
-- **自適應生成**: 根據查詢類型選擇最佳生成策略
-- **上下文壓縮**: 智能內容過濾和壓縮
-
-### 🛠️ 統一向量處理器 (unified_vector_processor.py)
-- **文本分塊**: UnifiedTextChunker 統一分塊策略
-- **向量搜尋**: 整合 Milvus 向量資料庫
-- **標籤管理**: 統一標籤提取和管理
-- **混合搜尋**: 結合密集和稀疏檢索
-
-### 🔧 增強向量搜尋 (enhanced_vector_search.py)
-- **ML Pipeline 整合**: 協同過濾推薦
-- **多策略搜尋**: 向量搜尋、協同過濾、Web 搜尋
-- **智能備援**: 自動選擇最佳搜尋策略
-- **結果融合**: 多來源結果智能融合
-
-## 🚀 快速開始
-
-### 環境設置
-```bash
-# 進入虛擬環境
-source venv_podwise/bin/activate
-
-# 安裝依賴
-pip install -r requirements.txt
-```
+## 快速開始
 
 ### 基本使用
 
-#### 1. 層級化 RAG 處理
 ```python
-from rag_pipeline.core.hierarchical_rag_pipeline import HierarchicalRAGPipeline
+from backend.rag_pipeline import get_rag_pipeline
 
-# 創建 RAG 管道
-pipeline = HierarchicalRAGPipeline()
+# 獲取 RAG Pipeline 實例
+pipeline = get_rag_pipeline()
 
 # 處理查詢
 response = await pipeline.process_query(
-    query="推薦一些科技播客",
+    query="推薦一些投資理財的 Podcast",
     user_id="user123"
 )
 
@@ -95,328 +64,167 @@ print(f"回應: {response.content}")
 print(f"信心度: {response.confidence}")
 ```
 
-#### 2. 代理人管理器
+### Apple Podcast 排名使用
+
 ```python
-from rag_pipeline.core.crew_agents import AgentManager
+from backend.rag_pipeline import ApplePodcastRankingSystem
 
-# 創建代理人管理器
-config = {
-    'openai_api_key': 'your_api_key',
-    'confidence_threshold': 0.7
-}
-manager = AgentManager(config)
+# 創建排名系統
+ranking_system = ApplePodcastRankingSystem()
 
-# 處理查詢
-response = await manager.process_query(
-    query="推薦商業類的 podcast",
-    user_id="user_001",
-    category="商業"
-)
-```
-
-#### 3. 向量搜尋
-```python
-from rag_pipeline.core.unified_vector_processor import UnifiedVectorProcessor
-
-# 創建向量處理器
-processor = UnifiedVectorProcessor(config)
-
-# 執行混合搜尋
-results = await processor.hybrid_search(
-    query="科技播客推薦",
-    top_k=5
+# 獲取增強推薦
+enhanced_results = await pipeline.get_enhanced_recommendations(
+    query="科技趨勢分析",
+    user_id="user123"
 )
 
-for result in results:
-    print(f"標題: {result.title}")
-    print(f"相似度: {result.similarity}")
+print(f"推薦結果: {enhanced_results}")
 ```
 
-#### 4. 增強向量搜尋
+### 健康檢查
+
 ```python
-from rag_pipeline.tools.enhanced_vector_search import EnhancedVectorSearch
+# 檢查系統健康狀態
+health = await pipeline.health_check()
+print(f"系統狀態: {health['status']}")
 
-# 創建增強搜尋
-search = EnhancedVectorSearch()
-
-# 執行搜尋
-results = await search.search(
-    query="投資理財播客",
-    user_id="user123",
-    top_k=10
-)
-
-print(f"找到 {len(results)} 個結果")
-for result in results:
-    print(f"- {result.title} (信心度: {result.confidence})")
+# 獲取系統資訊
+info = pipeline.get_system_info()
+print(f"版本: {info['version']}")
 ```
 
-## 🔧 配置管理
+## 配置說明
 
-### 環境變數設置
+### 環境變數
+
 ```bash
-# OpenAI 配置
-export OPENAI_API_KEY="your_api_key"
+# LLM 配置
+OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key
 
 # 資料庫配置
-export DATABASE_URL="postgresql://user:pass@host:port/db"
-export POSTGRES_PASSWORD="your_password"
+MONGODB_URI=mongodb://localhost:27017/podwise
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
 
-# 服務配置
-export ML_PIPELINE_URL="http://ml-pipeline-service:8004"
-export VECTOR_PIPELINE_URL="http://vector-pipeline-service:8003"
+# 向量資料庫
+MILVUS_HOST=localhost
+MILVUS_PORT=19530
+
+# 監控配置
+LANGFUSE_PUBLIC_KEY=your_langfuse_key
+LANGFUSE_SECRET_KEY=your_langfuse_secret
 ```
 
-### 配置檔案 (config/hierarchical_rag_config.yaml)
-```yaml
-# 層級配置
-levels:
-  level1:
-    query_processing:
-      enable_rewrite: true
-      enable_intent_detection: true
-  level2:
-    hybrid_search:
-      dense_weight: 0.6
-      sparse_weight: 0.4
+### 權重配置
 
-# 向量搜尋配置
-vector_search:
-  milvus:
-    host: "worker3"
-    port: 19530
-    collection_name: "podwise_vectors"
-  
-# 代理人配置
-agents:
-  web_search_expert:
-    confidence_threshold: 0.7
-    max_retries: 3
+```python
+# Apple Podcast 排名權重
+weights = {
+    'apple_rating': 0.50,      # Apple Podcast 星等 (50%)
+    'comment_sentiment': 0.40, # 評論情感分析 (40%)
+    'click_rate': 0.05,        # 使用者點擊率 (5%)
+    'review_count': 0.05       # Apple Podcast 評論數 (5%)
+}
 ```
 
-## 📁 檔案結構
+## 與 vaderSentiment 整合
 
-```
-rag_pipeline/
-├── __init__.py
-├── main.py                          # 主程式入口
-├── Dockerfile                       # Docker 容器配置
-├── requirements.txt                 # 依賴包清單
-├── env.local                       # 本地環境變數
-├── app/
-│   ├── __init__.py
-│   └── main_crewai.py              # CrewAI 主程式
-├── config/
-│   ├── __init__.py
-│   ├── agent_roles_config.py       # 代理人角色配置
-│   ├── integrated_config.py        # 整合配置
-│   ├── prompt_templates.py         # 提示模板
-│   └── hierarchical_rag_config.yaml # RAG 配置
-├── core/
-│   ├── __init__.py
-│   ├── integrated_core.py          # 統一核心模組
-│   ├── crew_agents.py              # 代理人系統
-│   ├── hierarchical_rag_pipeline.py # 層級化 RAG
-│   ├── unified_vector_processor.py  # 統一向量處理
-│   ├── agent_manager.py            # 代理人管理器
-│   ├── api_models.py               # API 數據模型
-│   ├── chat_history_service.py     # 聊天歷史服務
-│   ├── content_categorizer.py      # 內容分類器
-│   ├── prompt_processor.py         # 提示處理器
-│   └── qwen_llm_manager.py         # Qwen LLM 管理器
-├── tools/
-│   ├── __init__.py
-│   ├── enhanced_vector_search.py   # 增強向量搜尋
-│   ├── podcast_formatter.py        # 播客格式化
-│   └── train_word2vec_model.py     # Word2Vec 模型訓練
-├── scripts/
-│   ├── __init__.py
-│   ├── audio_transcription_pipeline.py # 音頻轉錄
-│   └── tag_processor.py            # 標籤處理器
-└── evaluation/
-    ├── __init__.py
-    ├── README.md                   # 評估說明
-    └── rag_evaluator.py            # RAG 評估器
+RAG Pipeline 使用 vaderSentiment 模組進行評論情感分析：
+
+```python
+from backend.vaderSentiment import get_sentiment_analysis
+
+# 獲取情感分析實例
+sentiment_analyzer = get_sentiment_analysis()
+
+# 分析評論情感
+result = sentiment_analyzer.analyze_text(
+    text="這個 Podcast 真的很棒！",
+    analyzer_type="chinese"
+)
+
+print(f"情感標籤: {result.label}")
+print(f"信心度: {result.confidence}")
 ```
 
-## 🔄 工作流程
+## 效能優化
 
-### 1. 正常處理流程
-```
-用戶查詢 → 查詢處理 → 混合搜尋 → 檢索增強 → 重新排序 → 上下文壓縮 → 混合式RAG → 回應生成
-```
-
-### 2. 備援處理流程
-```
-用戶查詢 → RAG 檢索 → 信心度評估 → 信心度 < 0.7 → Web 搜尋 → OpenAI 處理 → 回應生成
-```
-
-### 3. 代理人協作流程
-```
-查詢接收 → 領導者層分析 → 類別專家層處理 → 功能專家層執行 → 結果整合 → 最終回應
-```
-
-## 🎯 整合成果
-
-### 已整合的重複功能
-1. **標籤管理**: 統一標籤提取和管理策略
-2. **文本分塊**: 統一文本分塊介面和邏輯
-3. **向量搜尋**: 整合多種向量搜尋策略
-4. **Milvus 操作**: 統一向量資料庫操作
-5. **信心值計算**: 統一信心值評估邏輯
-
-### 已刪除的重複檔案
-- `unified_models.py` → 整合到 `integrated_core.py`
-- `confidence_controller.py` → 整合到 `integrated_core.py`
-- `base_agent.py` → 整合到 `integrated_core.py`
-- `web_search_tool.py` → 整合到 `crew_agents.py`
-- 各種測試和範例檔案
-
-## 🧪 測試和評估
-
-### 架構驗證
-```bash
-# 執行架構驗證
-python test_unified_architecture.py
-```
-
-### RAG 評估
-```bash
-# 執行 RAG 評估
-python evaluation/rag_evaluator.py
-```
-
-### 代理人配置測試
-```bash
-# 測試代理人配置整合
-python test_agent_config_integration.py
-```
-
-## 📊 效能優化
+### 快取策略
+- **LLM 回應快取** - 避免重複計算
+- **向量搜尋快取** - 提升檢索速度
+- **用戶偏好快取** - 個人化推薦
 
 ### 並行處理
-- 多個代理人並行執行
-- 異步 I/O 操作
-- 批次處理優化
+- **多代理並行** - CrewAI 代理協作
+- **向量搜尋並行** - 多來源同時檢索
+- **批次處理** - 大量數據處理
 
-### 快取機制
-- Redis 查詢結果快取
-- 向量搜尋結果快取
-- 代理人回應快取
+## 監控與日誌
 
-### 監控指標
-- 處理時間統計
-- 信心值分佈
-- 錯誤率追蹤
-- 各層級使用統計
-
-## 🔍 故障排除
-
-### 常見問題
-
-1. **OpenAI API 錯誤**
-   ```bash
-   # 檢查 API 金鑰
-   echo $OPENAI_API_KEY
-   
-   # 測試 API 連接
-   curl -H "Authorization: Bearer $OPENAI_API_KEY" \
-        https://api.openai.com/v1/models
-   ```
-
-2. **Milvus 連接失敗**
-   ```bash
-   # 檢查 Milvus 服務
-   curl http://worker3:19530/health
-   
-   # 檢查集合狀態
-   python -c "from pymilvus import connections; connections.connect('default', host='worker3', port='19530')"
-   ```
-
-3. **ML Pipeline 整合問題**
-   ```bash
-   # 檢查 ML Pipeline 服務
-   curl http://ml-pipeline-service:8004/health
-   
-   # 測試協同過濾
-   curl -X POST http://ml-pipeline-service:8004/recommend \
-        -H "Content-Type: application/json" \
-        -d '{"user_id": "test", "top_k": 5}'
-   ```
-
-## 🚀 部署指南
-
-### Docker 部署
-```bash
-# 構建鏡像
-docker build -t rag-pipeline .
-
-# 運行容器
-docker run -p 8004:8004 \
-  -e OPENAI_API_KEY=$OPENAI_API_KEY \
-  -e DATABASE_URL=$DATABASE_URL \
-  rag-pipeline
+### 健康檢查
+```python
+health = await pipeline.health_check()
+# 返回各組件狀態和配置資訊
 ```
 
-### Kubernetes 部署
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rag-pipeline
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: rag-pipeline
-  template:
-    metadata:
-      labels:
-        app: rag-pipeline
-    spec:
-      containers:
-      - name: rag-pipeline
-        image: rag-pipeline:latest
-        ports:
-        - containerPort: 8004
-        env:
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: openai-secret
-              key: api-key
+### 系統資訊
+```python
+info = pipeline.get_system_info()
+# 返回版本、功能列表、配置摘要
 ```
 
-## 🤝 貢獻指南
+## 錯誤處理
 
-1. **代碼風格**: 遵循 PEP 8 和 Google Python Style Guide
-2. **測試覆蓋**: 新功能需要添加相應測試
-3. **文檔更新**: 更新相關文檔和註釋
-4. **OOP 原則**: 遵循 SOLID 原則
-5. **Clean Code**: 遵循 Google Clean Code 標準
+系統提供完整的錯誤處理機制：
 
-## 📄 授權
+```python
+try:
+    response = await pipeline.process_query(query, user_id)
+except Exception as e:
+    # 自動記錄錯誤並返回友善訊息
+    print(f"處理失敗: {e}")
+```
 
-MIT License
+## 開發指南
+
+### 添加新的代理
+1. 繼承 `BaseAgent` 類別
+2. 實現 `process` 方法
+3. 在 `AgentManager` 中註冊
+
+### 擴展排名系統
+1. 修改 `ApplePodcastRankingSystem` 權重
+2. 添加新的評分維度
+3. 更新計算邏輯
+
+### 自定義提示詞
+1. 在 `prompt_templates.py` 中添加模板
+2. 使用 `format_prompt` 函數格式化
+3. 在代理中使用
+
+## 版本歷史
+
+### v2.0.0 (當前版本)
+- ✅ 整合 Apple Podcast 排名系統
+- ✅ 統一 OOP 介面設計
+- ✅ 符合 Google Clean Code 原則
+- ✅ 完整的錯誤處理機制
+- ✅ 與 vaderSentiment 模組整合
+
+### v1.0.0
+- ✅ 基礎 RAG Pipeline 功能
+- ✅ CrewAI 代理架構
+- ✅ 語意檢索系統
+
+## 授權
+
+本專案採用 MIT 授權條款。
+
+## 貢獻
+
+歡迎提交 Issue 和 Pull Request！
 
 ---
 
-**Podwise Team** | 版本: 2.0.0
-
-## CrewAI 整合指南
-
-### 配置系統
-所有代理人的角色定義都在 `config/agent_roles_config.py` 中統一管理，使用 `AgentRoleConfig` 數據類別進行配置。
-
-### Web Search Expert 詳細說明
-- **角色**: 網路搜尋備援專家
-- **觸發條件**: 當 RAG 檢索信心度 < 0.7 時啟動
-- **主要功能**: OpenAI 搜尋、結果格式化、備援日誌記錄
-
-### 最佳實踐
-- ✅ 所有代理人都應該載入 `role_config`
-- ✅ 使用配置系統的參數設定
-- ✅ 在 `crew_agents.py` 中統一管理
-- ❌ 不要創建獨立的代理人檔案
-
-通過統一的配置系統，確保所有代理人都遵循相同的架構模式，配置管理集中化和標準化，系統具有良好的可維護性和擴展性。 
+**Podwise Team** - 打造最智能的 Podcast 推薦系統 
