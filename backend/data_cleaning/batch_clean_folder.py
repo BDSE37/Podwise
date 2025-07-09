@@ -7,8 +7,11 @@
 - 若 batch_input 資料夾不存在則自動建立
 
 用法：
-    python batch_clean_folder.py --input-folder backend/data_cleaning/batch_input
+    python batch_clean_folder.py --input-folder batch_input --output-folder batch_output
     # 可加 --output-folder 指定輸出資料夾
+    請直接cd Podwise/backend/data_cleaning 這個資料夾
+    將待清理的檔案放進batch_input
+    執行上面的程式
 """
 
 import os
