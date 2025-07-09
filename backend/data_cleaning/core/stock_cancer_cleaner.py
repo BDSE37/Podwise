@@ -216,8 +216,8 @@ class StockCancerCleaner(BaseCleaner):
         return text
     
     def _remove_special_chars(self, text: str) -> str:
-        """移除特殊字元，保留中英文和基本標點"""
-        allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_')
+        """移除特殊字元，保留中英文和基本標點（含網址 /）"""
+        allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_/')
         return ''.join(c for c in text if c.isalnum() or '\u4e00' <= c <= '\u9fff' or c in allowed_chars)
     
     def _normalize_stock_cancer_title(self, title: str) -> str:
