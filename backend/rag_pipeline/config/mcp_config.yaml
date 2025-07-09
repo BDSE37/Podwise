@@ -1,0 +1,99 @@
+# Podwise RAG Pipeline - MCP 配置檔案
+# Model Context Protocol 整合配置
+
+mcp:
+  # 基本設定
+  enabled: true
+  version: "1.0.0"
+  
+  # 工具配置
+  tools:
+    enabled: true
+    auto_register: true
+    max_concurrent_calls: 10
+    
+    # 內建工具設定
+    builtin_tools:
+      search_podcasts:
+        enabled: true
+        cache_results: true
+        cache_ttl: 3600  # 秒
+        
+      analyze_sentiment:
+        enabled: true
+        default_analyzer: "chinese"
+        confidence_threshold: 0.7
+        
+      get_apple_podcast_ranking:
+        enabled: true
+        include_metadata: true
+        cache_ranking_data: true
+        
+      vector_search:
+        enabled: true
+        default_top_k: 5
+        default_similarity_threshold: 0.7
+        enable_reranking: true
+        
+      classify_content:
+        enabled: true
+        default_categories: ["business", "education", "technology", "entertainment"]
+        confidence_threshold: 0.6
+  
+  # 資源配置
+  resources:
+    enabled: true
+    max_cache_size: 100  # MB
+    cache_ttl: 7200  # 秒
+    allowed_mime_types:
+      - "text/plain"
+      - "application/json"
+      - "text/markdown"
+      - "image/png"
+      - "image/jpeg"
+  
+  # 日誌配置
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "logs/mcp_integration.log"
+    max_file_size: 10  # MB
+    backup_count: 5
+  
+  # 性能配置
+  performance:
+    connection_timeout: 30  # 秒
+    request_timeout: 60  # 秒
+    max_retries: 3
+    retry_delay: 1  # 秒
+    
+  # 安全配置
+  security:
+    enable_authentication: false
+    allowed_origins: ["*"]
+    rate_limit_enabled: true
+    rate_limit_requests: 100  # 每分鐘
+    rate_limit_window: 60  # 秒
+
+# Podwise 特定配置
+podwise:
+  # RAG Pipeline 整合
+  rag_pipeline:
+    enable_mcp_integration: true
+    use_mcp_for_tool_calls: true
+    fallback_to_local_tools: true
+    
+  # 向量搜尋整合
+  vector_search:
+    enable_mcp_enhancement: true
+    use_mcp_for_ranking: true
+    
+  # 情感分析整合
+  sentiment_analysis:
+    enable_mcp_integration: true
+    use_mcp_for_analysis: true
+    
+  # Apple Podcast 排名整合
+  apple_podcast_ranking:
+    enable_mcp_integration: true
+    use_mcp_for_ranking_data: true 

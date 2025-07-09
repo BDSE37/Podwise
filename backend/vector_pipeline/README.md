@@ -1,10 +1,10 @@
 # Vector Pipeline 模組
 
-## 功能概述
+## 📋 概述
 
 Vector Pipeline 是一個完整的資料處理流程模組，專門處理 MongoDB 中的 podcast 資料，將其轉換為向量並存入 Milvus 向量資料庫。
 
-### 主要功能
+## 🎯 功能特色
 
 - **MongoDB 資料處理**: 從 MongoDB 讀取 podcast 文檔
 - **資料清理**: 整合 data_cleaning 模組進行文本清理
@@ -14,7 +14,7 @@ Vector Pipeline 是一個完整的資料處理流程模組，專門處理 MongoD
 - **Milvus 寫入**: 將處理結果批次寫入 Milvus
 - **錯誤處理**: 完整的錯誤記錄和報告機制
 
-## 架構設計
+## 🏗️ 系統架構
 
 ### 核心組件
 
@@ -33,7 +33,7 @@ Vector Pipeline 是一個完整的資料處理流程模組，專門處理 MongoD
 MongoDB → 資料清理 → 文本切分 → 標籤提取 → PostgreSQL metadata → 向量化 → Milvus
 ```
 
-## 使用方法
+## 🚀 快速開始
 
 ### 1. 基本使用
 
@@ -107,7 +107,46 @@ python main.py --process-rss RSS_1500839292
 python main.py --run-pipeline
 ```
 
-## 錯誤處理
+## 🔧 主要設定
+
+### MongoDB 配置
+
+```python
+mongo_config = {
+    "host": "localhost",
+    "port": 27017,
+    "database": "podcast",
+    "username": "user",
+    "password": "password"
+}
+```
+
+### PostgreSQL 配置
+
+```python
+postgres_config = {
+    "host": "localhost",
+    "port": 5432,
+    "database": "podcast",
+    "user": "user",
+    "password": "password"
+}
+```
+
+### Milvus 配置
+
+```python
+milvus_config = {
+    "host": "localhost",
+    "port": "19530",
+    "collection_name": "podcast_chunks",
+    "dim": 1024,
+    "index_type": "IVF_FLAT",
+    "metric_type": "L2"
+}
+```
+
+## 📊 錯誤處理
 
 ### 錯誤記錄
 
@@ -153,75 +192,9 @@ for error in error_report["error_files"]:
     print(f"RSS_{error['rss_id']} - {error['title']}")
 ```
 
-## 配置選項
+## ⚠️ 注意事項
 
-### MongoDB 配置
-
-```python
-mongo_config = {
-    "host": "localhost",
-    "port": 27017,
-    "database": "podcast",
-    "username": "user",
-    "password": "password"
-}
-```
-
-### PostgreSQL 配置
-
-```python
-postgres_config = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "podcast",
-    "user": "user",
-    "password": "password"
-}
-```
-
-### Milvus 配置
-
-```python
-milvus_config = {
-    "host": "localhost",
-    "port": "19530",
-    "collection_name": "podcast_chunks",
-    "dim": 1024,
-    "index_type": "IVF_FLAT",
-    "metric_type": "L2"
-}
-```
-
-## 特殊處理
-
-### 股癌節目 (RSS_1500839292)
-
-對於股癌節目，模組會自動使用專門的清理器：
-
-- 移除表情符號和 kaomoji
-- 統一標題格式
-- 提取集數資訊
-- 特殊字符處理
-
-### 標籤提取策略
-
-1. **CSV 優先**: 使用預定義的標籤分類
-2. **智能提取**: 使用 AI 模型提取標籤
-3. **備援提取**: 基於關鍵字匹配
-
-## 依賴項目
-
-- pymongo
-- psycopg2-binary
-- pymilvus
-- sentence-transformers
-- numpy
-- pandas
-- data_cleaning 模組
-
-## 注意事項
-
-- 確保 MongoDB、PostgreSQL 和 Milvus 服務正在運行
-- 向量化需要足夠的記憶體和 GPU 資源
-- 大量資料處理時建議使用批次處理
-- 錯誤報告會自動儲存在 `error_logs` 目錄中 
+- 確保 MongoDB 和 PostgreSQL 服務正在運行
+- 檢查 Milvus 連接配置
+- 大量數據處理時注意記憶體使用
+- 定期檢查錯誤報告並處理異常 

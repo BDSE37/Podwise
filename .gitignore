@@ -85,6 +85,9 @@ backend/data_cleaning/batch_input/*.json
 backend/data_cleaning/batch_output/*.json
 data/cleaned_data/*.json
 
+# n8n ETL 原始資料（不上傳到 GitHub）
+backend/n8n_pipline/raw/
+
 # 圖片檔案（不上傳到 GitHub）
 backend/vaderSentiment/*.png
 backend/vaderSentiment/*.jpg

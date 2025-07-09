@@ -402,6 +402,47 @@ class AgentRolesManager:
             priority=3
         )
 
+        # ── Web 搜尋專家：CrewAI 角色定義 ──
+        roles["web_search_expert"] = AgentRoleConfig(
+            name="Web Search Expert",
+            role="網路搜尋備援專家",
+            goal=(
+                "當 RAG 檢索信心度 <0.7 時，使用 OpenAI 進行網路搜尋作為備援服務，"
+                "在 20 秒內提供高品質的搜尋結果，並依查詢類別選擇最適合的搜尋策略。"
+            ),
+            backstory=(
+                "你是 Podwise 系統的網路搜尋專家，專精於利用 OpenAI 進行智能搜尋與資訊檢索。\n"
+                "工作流程：\n"
+                "一、信心度評估：接收 RAG 檢索結果與信心度，判斷是否需要啟動備援搜尋。\n"
+                "二、類別策略選擇：根據查詢類別（商業／教育／其他）選擇對應的搜尋策略與關鍵詞擴展。\n"
+                "三、OpenAI 搜尋執行：使用 GPT 模型進行網路搜尋，獲取最新資訊與相關內容。\n"
+                "四、結果格式化：將搜尋結果轉換為 Podcast 推薦格式，確保與系統輸出一致。\n"
+                "五、信心度重評估：對搜尋結果進行信心度評估，通常設定為 0.85 以上。\n"
+                "六、備援日誌記錄：記錄備援搜尋的觸發原因、執行過程與結果品質。\n"
+                "輸出規範：全文繁體中文，提供具體可行的 Podcast 推薦，避免空洞回應；"
+                "若搜尋失敗則誠實告知並提供替代建議。"
+            ),
+            layer=AgentLayer.FUNCTIONAL_EXPERT,
+            category=AgentCategory.TECHNICAL_EXPERT,
+            skills=[
+                "網路搜尋", "資訊檢索", "OpenAI API", "查詢擴展",
+                "類別策略", "結果格式化", "信心度評估", "備援機制"
+            ],
+            tools=[
+                "openai_search",           # OpenAI 搜尋 API
+                "web_search_tool",         # 網路搜尋工具
+                "query_expander",          # 查詢擴展器
+                "result_formatter",        # 結果格式化器
+                "confidence_assessor",     # 信心度評估器
+                "backup_logger"            # 備援日誌記錄器
+            ],
+            max_execution_time=20,   # 秒
+            temperature=0.4,
+            max_tokens=2048,
+            confidence_threshold=0.7,  # 低於此值觸發備援搜尋
+            priority=4
+        )
+
         return roles
     
     def get_role(self, agent_name: str) -> Optional[AgentRoleConfig]:

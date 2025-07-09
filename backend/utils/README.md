@@ -130,25 +130,7 @@ logger = get_logger(__name__)
 logger.info("這是一條資訊日誌")
 ```
 
-## 📁 檔案結構
-
-```
-utils/
-├── __init__.py              # 模組導出介面
-├── text_processing.py       # 文本處理工具
-├── vector_search.py         # 向量搜尋工具
-├── common_utils.py          # 共用工具函數
-├── env_config.py           # 環境配置管理
-├── logging_config.py       # 日誌配置
-├── audio_search.py         # 音頻搜尋服務
-├── user_auth_service.py    # 用戶認證服務
-├── core_services.py        # 核心服務基類
-├── langfuse_client.py      # Langfuse 整合
-├── intelligent_audio_search.py  # 智能音頻搜尋
-└── main.py                 # 主程式入口
-```
-
-## 🔧 配置說明
+## 🔧 主要設定
 
 ### 環境變數
 ```bash
@@ -175,6 +157,24 @@ LANGFUSE_PUBLIC_KEY=your_public_key
 LANGFUSE_SECRET_KEY=your_secret_key
 ```
 
+## 📁 檔案結構
+
+```
+utils/
+├── __init__.py              # 模組導出介面
+├── text_processing.py       # 文本處理工具
+├── vector_search.py         # 向量搜尋工具
+├── common_utils.py          # 共用工具函數
+├── env_config.py           # 環境配置管理
+├── logging_config.py       # 日誌配置
+├── audio_search.py         # 音頻搜尋服務
+├── user_auth_service.py    # 用戶認證服務
+├── core_services.py        # 核心服務基類
+├── langfuse_client.py      # Langfuse 整合
+├── intelligent_audio_search.py  # 智能音頻搜尋
+└── main.py                 # 主程式入口
+```
+
 ## 🎯 設計原則
 
 ### OOP 原則
@@ -199,49 +199,4 @@ python -c "from utils import create_text_processor; print('Text processing OK')"
 
 # 測試向量搜尋
 python -c "from utils import create_vector_search; print('Vector search OK')"
-```
-
-## 📊 效能優化
-
-- **並行處理**: 支援多執行緒文本處理
-- **快取機制**: 向量搜尋結果快取
-- **記憶體管理**: 大文件分批處理
-- **連接池**: 資料庫連接復用
-
-## 🔍 故障排除
-
-### 常見問題
-
-1. **模組導入失敗**
-   ```bash
-   # 確保在正確的虛擬環境
-   source venv_podwise/bin/activate
-   pip install -r requirements.txt
-   ```
-
-2. **Milvus 連接失敗**
-   ```bash
-   # 檢查 Milvus 服務狀態
-   curl http://worker3:19530/health
-   ```
-
-3. **MongoDB 連接失敗**
-   ```bash
-   # 檢查 MongoDB 服務
-   mongo --host worker3:27017
-   ```
-
-## 🤝 貢獻指南
-
-1. 遵循現有的代碼風格
-2. 添加適當的測試
-3. 更新文檔
-4. 提交 Pull Request
-
-## 📄 授權
-
-MIT License
-
----
-
-**Podwise Team** | 版本: 1.0.0 
+``` 

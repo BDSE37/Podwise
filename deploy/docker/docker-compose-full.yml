@@ -1,0 +1,217 @@
+version: '3.8'
+
+services:
+  # ==================== Milvus 向量資料庫 ====================
+  milvus:
+    image: milvusdb/milvus:v2.3.3
+    container_name: podwise_milvus
+    command: [ "milvus", "run", "standalone" ]
+    environment:
+      ETCD_USE_EMBED: "true"
+      ETCD_DATA_DIR: "/var/lib/milvus/etcd"
+      ETCD_CONFIG_PATH: "/milvus/configs/etcd.yaml"
+      MINIO_ADDRESS: "minio:9000"
+      MINIO_ACCESS_KEY: "bdse37"
+      MINIO_SECRET_KEY: "11111111"
+    ports:
+      - "19530:19530" # Milvus 服務埠
+      - "9091:9091" # 健康檢查埠
+    volumes:
+      - milvus_data:/var/lib/milvus
+    networks:
+      - podwise_network
+    depends_on:
+      - minio
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9091/healthz" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== Attu Milvus 可視化 ====================
+  attu:
+    image: zilliz/attu:v2.3.3
+    container_name: podwise_attu
+    environment:
+      MILVUS_URL: "http://milvus:19530"
+      HOST_URL: "http://localhost:3000"
+    ports:
+      - "3000:3000"
+    networks:
+      - podwise_network
+    depends_on:
+      - milvus
+    restart: unless-stopped
+
+  # ==================== MinIO 物件儲存 ====================
+  minio:
+    image: minio/minio:latest
+    container_name: podwise_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "bdse37"
+      MINIO_ROOT_PASSWORD: "11111111"
+    ports:
+      - "9000:9000" # API 埠
+      - "9001:9001" # Console 埠
+    volumes:
+      - minio_data:/data
+      - ./minio/init-buckets.sh:/docker-entrypoint-initdb.d/init-buckets.sh
+    networks:
+      - podwise_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== PostgreSQL 資料庫 ====================
+  postgresql:
+    image: postgres:15
+    container_name: podwise_postgresql
+    environment:
+      POSTGRES_DB: "podcast"
+      POSTGRES_USER: "bdse37"
+      POSTGRES_PASSWORD: "111111"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - podwise_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U bdse37 -d podcast" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== pgAdmin ====================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: podwise_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@podwise.com"
+      PGADMIN_DEFAULT_PASSWORD: "111111"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - podwise_network
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+
+  # ==================== MongoDB ====================
+  mongodb:
+    image: mongo:7
+    container_name: podwise_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "bdse37"
+      MONGO_INITDB_ROOT_PASSWORD: "11111111"
+      MONGO_INITDB_DATABASE: "podcast"
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - podwise_network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== MongoDB Express ====================
+  mongo-express:
+    image: mongo-express:latest
+    container_name: podwise_mongo_express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "bdse37"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "11111111"
+      ME_CONFIG_MONGODB_URL: "mongodb://bdse37:11111111@mongodb:27017/"
+      ME_CONFIG_BASICAUTH_USERNAME: "bdse37"
+      ME_CONFIG_BASICAUTH_PASSWORD: "11111111"
+    ports:
+      - "8081:8081"
+    networks:
+      - podwise_network
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  # ==================== Portainer ====================
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: podwise_portainer
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - podwise_network
+    restart: unless-stopped
+
+# ==================== 網路配置 ====================
+networks:
+  podwise_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ==================== 資料卷配置 ====================
+volumes:
+  # Milvus 資料
+  milvus_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/milvus
+
+  # MinIO 資料
+  minio_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/minio
+
+  # PostgreSQL 資料
+  postgresql_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/postgresql
+
+  # pgAdmin 資料
+  pgadmin_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/pgadmin
+
+  # MongoDB 資料
+  mongodb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/mongodb
+
+  # Portainer 資料
+  portainer_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Volumes/Transcend/docker-data/portainer

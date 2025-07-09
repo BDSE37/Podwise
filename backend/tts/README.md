@@ -2,7 +2,7 @@
 
 基於 Microsoft Podri TTS 的高品質語音合成服務，專為台灣語音優化設計。
 
-## 功能特色
+## 🎯 功能特色
 
 - **四種台灣語音**：溫柔女聲、活潑女聲、穩重男聲、專業男聲
 - **高品質合成**：基於 Microsoft Podri TTS 技術
@@ -10,7 +10,7 @@
 - **OOP 設計**：符合 Google Code Style 的物件導向設計
 - **完整測試**：包含單元測試和整合測試
 
-## 系統架構
+## 🏗️ 系統架構
 
 ```
 tts/
@@ -30,7 +30,7 @@ tts/
     └── logging_config.py  # 日誌配置
 ```
 
-## 支援語音
+## 🎵 支援語音
 
 ### Podri TTS 語音
 - **Podrina (溫柔女聲)**：溫柔親切的女聲，適合日常對話和情感表達
@@ -38,7 +38,7 @@ tts/
 - **Podrino (穩重男聲)**：穩重可靠的男聲，適合正式場合和專業內容
 - **Podriso (專業男聲)**：專業權威的男聲，適合新聞播報和學術內容
 
-## 使用方法
+## 🚀 快速開始
 
 ### 1. 安裝依賴
 
@@ -58,7 +58,7 @@ python main.py
 
 訪問 `http://localhost:8501/docs` 查看互動式 API 文檔
 
-## API 參考
+## 📋 API 參考
 
 ### 主要端點
 
@@ -83,54 +83,7 @@ curl -X POST "http://localhost:8501/synthesize" \
      }'
 ```
 
-## 程式碼架構
-
-### 核心類別
-
-#### TTSService
-主要的 TTS 服務類別，提供統一的語音合成介面。
-
-```python
-class TTSService:
-    """Podri TTS 服務類別"""
-    
-    async def synthesize_speech(self, text: str, voice_id: str = None) -> bytes:
-        """語音合成主方法"""
-    
-    def get_available_voices(self) -> List[Dict[str, str]]:
-        """獲取可用語音列表"""
-```
-
-#### PodriTTSManager
-Podri TTS 管理器，處理語音合成邏輯。
-
-```python
-class PodriTTSManager:
-    """Podri TTS 管理器類別"""
-    
-    async def synthesize_speech(self, text: str, voice_id: str) -> Dict[str, Any]:
-        """語音合成主方法"""
-```
-
-#### VoiceConfig
-語音配置管理器，管理四種台灣語音配置。
-
-```python
-class VoiceConfig:
-    """Podri TTS 語音配置管理類別"""
-    
-    def get_all_voices(self) -> Dict[str, List[Dict[str, Any]]]:
-        """獲取所有語音配置"""
-```
-
-### 設計原則
-
-1. **單一職責原則**：每個類別只負責一個特定功能
-2. **開放封閉原則**：對擴展開放，對修改封閉
-3. **依賴反轉原則**：依賴抽象而非具體實現
-4. **介面隔離原則**：提供精確的介面
-
-## 配置
+## 🔧 主要設定
 
 ### 語音配置
 
@@ -160,7 +113,7 @@ class AudioConfig:
     CHANNELS = 1                # 單聲道
 ```
 
-## Docker 部署
+## 🐳 Docker 部署
 
 ### 建置映像
 
@@ -174,7 +127,7 @@ docker build -t podwise-tts .
 docker run -p 8501:8501 podwise-tts
 ```
 
-## 依賴項目
+## 🛠️ 依賴項目
 
 - fastapi
 - uvicorn
@@ -182,7 +135,7 @@ docker run -p 8501:8501 podwise-tts
 - pydantic
 - python-multipart
 
-## 重要注意事項
+## ⚠️ 重要注意事項
 
 - 確保網路連接正常（需要連接到 Microsoft TTS 服務）
 - 語音合成需要一定的處理時間

@@ -33,6 +33,7 @@ from .core.integrated_core import UnifiedQueryProcessor
 from .core.content_categorizer import ContentCategorizer
 from .core.qwen_llm_manager import Qwen3LLMManager
 from .core.chat_history_service import get_chat_history_service
+from .core.mcp_integration import get_mcp_integration
 from .config.prompt_templates import PodwisePromptTemplates
 from .config.integrated_config import get_config
 from .tools.enhanced_podcast_recommender import EnhancedPodcastRecommender

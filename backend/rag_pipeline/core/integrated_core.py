@@ -348,60 +348,79 @@ class BaseAgent(ABC):
 
 # ==================== 統一查詢處理器 ====================
 
+# 導入 Apple Podcast 排名系統
+from .apple_podcast_ranking import (
+    ApplePodcastRankingSystem,
+    ApplePodcastRating,
+    RankingScore,
+    get_apple_podcast_ranking
+)
+
+# 導入 Langfuse 追蹤
+from .langfuse_tracking import langfuse_trace
+
 class UnifiedQueryProcessor:
     """統一查詢處理器"""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self.confidence_controller = UnifiedConfidenceController()
-        
+        # 初始化 Apple Podcast 排名系統
+        self.apple_ranking = get_apple_podcast_ranking()
+    
+    @langfuse_trace("query")
     async def process_query(self, user_query: UserQuery) -> RAGResponse:
-        """統一處理查詢"""
-        start_time = time.time()
+        """
+        處理用戶查詢（整合 Apple Podcast 優先推薦）
+        
+        Args:
+            user_query: 用戶查詢
+            
+        Returns:
+            RAGResponse: 處理結果
+        """
+        start_time = datetime.now()
         
         try:
-            # 1. 查詢重寫和意圖識別
+            # 1. 查詢分析
             query_context = await self._analyze_query(user_query)
             
-            # 2. 檢索相關內容
+            # 2. 內容檢索
             search_results = await self._retrieve_content(query_context)
             
-            # 3. 生成回應
-            response_content = await self._generate_response(query_context, search_results)
+            # 3. 應用 Apple Podcast 優先推薦
+            enhanced_results = await self._apply_apple_podcast_ranking(search_results, user_query)
             
-            # 4. 計算信心值
-            processing_time = time.time() - start_time
-            confidence = self.confidence_controller.calculate_confidence(
-                response=response_content,
-                sources=[r.source for r in search_results],
-                query=user_query.query,
-                processing_time=processing_time,
-                context=user_query.context
-            )
+            # 4. 生成回應
+            response_content = await self._generate_response(query_context, enhanced_results)
+            
+            # 5. 計算處理時間和信心度
+            processing_time = (datetime.now() - start_time).total_seconds()
+            confidence = self._calculate_response_confidence(response_content, enhanced_results)
             
             return RAGResponse(
                 content=response_content,
                 confidence=confidence,
-                sources=[f"{r.source}:{r.id}" for r in search_results],
+                sources=[result.id for result in enhanced_results],
                 processing_time=processing_time,
-                level_used="unified_processor",
+                level_used="enhanced_with_apple_ranking",
                 metadata={
-                    "query_context": query_context,
-                    "search_results_count": len(search_results),
-                    "user_id": user_query.user_id
+                    "apple_ranking_applied": True,
+                    "original_results_count": len(search_results),
+                    "enhanced_results_count": len(enhanced_results),
+                    "user_id": user_query.user_id,
+                    "category": user_query.category
                 }
             )
             
         except Exception as e:
             logger.error(f"查詢處理失敗: {e}")
-            processing_time = time.time() - start_time
-            
+            processing_time = (datetime.now() - start_time).total_seconds()
             return RAGResponse(
-                content=f"查詢處理失敗: {str(e)}",
+                content="抱歉，處理您的查詢時發生錯誤。",
                 confidence=0.0,
                 sources=[],
                 processing_time=processing_time,
-                level_used="error_fallback",
+                level_used="error",
                 metadata={"error": str(e)}
             )
     
@@ -469,6 +488,186 @@ class UnifiedQueryProcessor:
             entities.append("education")
             
         return entities
+
+    async def _apply_apple_podcast_ranking(self, 
+                                         search_results: List[SearchResult], 
+                                         user_query: UserQuery) -> List[SearchResult]:
+        """
+        應用 Apple Podcast 優先推薦
+        
+        Args:
+            search_results: 原始搜尋結果
+            user_query: 用戶查詢
+            
+        Returns:
+            List[SearchResult]: 增強後的搜尋結果
+        """
+        try:
+            # 1. 獲取 Apple Podcast 排名數據
+            apple_podcast_data = await self._get_apple_podcast_data(search_results)
+            
+            if not apple_podcast_data:
+                logger.warning("無法獲取 Apple Podcast 排名數據，使用原始結果")
+                return search_results
+            
+            # 2. 計算 Apple Podcast 排名分數
+            ranking_scores = self.apple_ranking.rank_podcasts(apple_podcast_data)
+            
+            # 3. 創建 RSS ID 到排名分數的映射
+            ranking_map = {score.rss_id: score for score in ranking_scores}
+            
+            # 4. 增強搜尋結果
+            enhanced_results = []
+            for result in search_results:
+                enhanced_result = result
+                
+                # 查找對應的 Apple Podcast 排名
+                apple_score = ranking_map.get(result.id)
+                if apple_score:
+                    # 計算混合分數（向量搜尋分數 + Apple 排名分數）
+                    vector_score = result.score
+                    apple_ranking_score = apple_score.total_score
+                    
+                    # 權重配置：Apple 排名 60%，向量搜尋 40%
+                    hybrid_score = (
+                        vector_score * 0.4 + 
+                        apple_ranking_score * 0.6
+                    )
+                    
+                    # 更新結果分數和元數據
+                    enhanced_result.score = hybrid_score
+                    enhanced_result.metadata.update({
+                        "apple_ranking_score": apple_ranking_score,
+                        "vector_score": vector_score,
+                        "hybrid_score": hybrid_score,
+                        "apple_rating": apple_score.apple_rating_score,
+                        "comment_score": apple_score.comment_score,
+                        "click_rate_score": apple_score.click_rate_score,
+                        "review_count_score": apple_score.review_count_score
+                    })
+                
+                enhanced_results.append(enhanced_result)
+            
+            # 5. 按混合分數重新排序
+            enhanced_results.sort(key=lambda x: x.score, reverse=True)
+            
+            logger.info(f"Apple Podcast 優先推薦完成: {len(enhanced_results)} 個結果")
+            return enhanced_results
+            
+        except Exception as e:
+            logger.error(f"Apple Podcast 優先推薦失敗: {e}")
+            return search_results
+    
+    async def _get_apple_podcast_data(self, search_results: List[SearchResult]) -> List[ApplePodcastRating]:
+        """
+        獲取 Apple Podcast 排名數據
+        
+        Args:
+            search_results: 搜尋結果
+            
+        Returns:
+            List[ApplePodcastRating]: Apple Podcast 排名數據
+        """
+        try:
+            # 這裡應該從資料庫或 API 獲取實際的 Apple Podcast 數據
+            # 目前使用模擬數據進行演示
+            apple_podcast_data = []
+            
+            for result in search_results:
+                # 根據 RSS ID 查找對應的 Apple Podcast 數據
+                # 實際應用中應該查詢資料庫
+                apple_data = self._get_sample_apple_data(result.id)
+                if apple_data:
+                    apple_podcast_data.append(apple_data)
+            
+            return apple_podcast_data
+            
+        except Exception as e:
+            logger.error(f"獲取 Apple Podcast 數據失敗: {e}")
+            return []
+    
+    def _get_sample_apple_data(self, rss_id: str) -> Optional[ApplePodcastRating]:
+        """
+        獲取範例 Apple Podcast 數據（實際應用中應從資料庫獲取）
+        
+        Args:
+            rss_id: RSS ID
+            
+        Returns:
+            Optional[ApplePodcastRating]: Apple Podcast 數據
+        """
+        # 模擬數據庫查詢
+        sample_data = {
+            "1234567890": ApplePodcastRating(
+                rss_id="1234567890",
+                title="投資理財大師",
+                apple_rating=4.8,
+                apple_review_count=150,
+                user_click_rate=0.85,
+                comment_sentiment_score=0.75,
+                total_comments=45,
+                positive_comments=35,
+                negative_comments=5,
+                neutral_comments=5
+            ),
+            "2345678901": ApplePodcastRating(
+                rss_id="2345678901",
+                title="科技趨勢分析",
+                apple_rating=4.5,
+                apple_review_count=80,
+                user_click_rate=0.72,
+                comment_sentiment_score=0.60,
+                total_comments=30,
+                positive_comments=22,
+                negative_comments=3,
+                neutral_comments=5
+            ),
+            "3456789012": ApplePodcastRating(
+                rss_id="3456789012",
+                title="職涯發展指南",
+                apple_rating=4.2,
+                apple_review_count=45,
+                user_click_rate=0.65,
+                comment_sentiment_score=0.45,
+                total_comments=20,
+                positive_comments=12,
+                negative_comments=4,
+                neutral_comments=4
+            )
+        }
+        
+        return sample_data.get(rss_id)
+    
+    def _calculate_response_confidence(self, response: str, results: List[SearchResult]) -> float:
+        """
+        計算回應信心度（整合 Apple Podcast 排名）
+        
+        Args:
+            response: 回應內容
+            results: 搜尋結果
+            
+        Returns:
+            float: 信心度
+        """
+        if not results:
+            return 0.0
+        
+        # 獲取最高分數作為基礎信心度
+        max_score = max([result.score for result in results])
+        
+        # 檢查是否有 Apple Podcast 排名數據
+        has_apple_ranking = any(
+            "apple_ranking_score" in result.metadata 
+            for result in results
+        )
+        
+        # 如果有 Apple Podcast 排名，提升信心度
+        if has_apple_ranking:
+            confidence_boost = 0.1
+        else:
+            confidence_boost = 0.0
+        
+        return min(1.0, max_score + confidence_boost)
 
 # ==================== 全局實例管理 ====================
 

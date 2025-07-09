@@ -26,34 +26,8 @@ from core.prompt_processor import PromptProcessor
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class AgentResponse:
-    """
-    代理人回應數據類別
-    
-    此類別封裝了代理人的處理結果，包含內容、信心值、
-    推理說明和元數據。
-    
-    Attributes:
-        content: 回應內容
-        confidence: 信心值 (0.0-1.0)
-        reasoning: 推理說明
-        metadata: 元數據字典
-        processing_time: 處理時間
-    """
-    content: str
-    confidence: float
-    reasoning: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    processing_time: float = 0.0
-    
-    def __post_init__(self) -> None:
-        """驗證數據完整性"""
-        if not 0.0 <= self.confidence <= 1.0:
-            raise ValueError("信心值必須在 0.0 到 1.0 之間")
-        
-        if self.processing_time < 0:
-            raise ValueError("處理時間不能為負數")
+# 導入統一數據模型
+from .integrated_core import AgentResponse
 
 
 @dataclass(frozen=True)
@@ -84,83 +58,153 @@ class UserQuery:
             raise ValueError("用戶 ID 不能為空")
 
 
-class BaseAgent(ABC):
-    """
-    代理人基礎抽象類別
-    
-    此類別定義了所有代理人的基本介面和共同功能，
-    包括信心值計算和基本配置管理。
-    """
-    
-    def __init__(self, name: str, role: str, config: Dict[str, Any]) -> None:
-        """
-        初始化基礎代理人
-        
-        Args:
-            name: 代理人名稱
-            role: 代理人角色
-            config: 配置字典
-        """
-        self.name = name
-        self.role = role
-        self.config = config
-        self.confidence_threshold = config.get('confidence_threshold', 0.7)
-        self.max_processing_time = config.get('max_processing_time', 30.0)
-    
-    @abstractmethod
-    async def process(self, input_data: Any) -> AgentResponse:
-        """
-        處理輸入數據
-        
-        Args:
-            input_data: 輸入數據
-            
-        Returns:
-            AgentResponse: 處理結果
-        """
-        raise NotImplementedError("子類別必須實作 process 方法")
-    
-    def calculate_confidence(self, response: str, context: str) -> float:
-        """
-        計算信心值
-        
-        Args:
-            response: 回應內容
-            context: 上下文資訊
-            
-        Returns:
-            float: 信心值 (0.0-1.0)
-        """
-        confidence = 0.8  # 基礎信心值
-        
-        # 根據回應長度調整
-        if len(response) > 100:
-            confidence += 0.1
-        
-        # 根據關鍵詞匹配調整
-        if any(keyword in response.lower() for keyword in ['podcast', '推薦', '建議']):
-            confidence += 0.1
-        
-        # 根據上下文相關性調整
-        if context and any(word in response.lower() for word in context.lower().split()):
-            confidence += 0.1
-            
-        return min(confidence, 1.0)
-    
-    def validate_input(self, input_data: Any) -> bool:
-        """
-        驗證輸入數據
-        
-        Args:
-            input_data: 輸入數據
-            
-        Returns:
-            bool: 驗證結果
-        """
-        return input_data is not None
+# 導入統一基礎代理類別
+from .integrated_core import BaseAgent
 
 
 # ==================== 第三層：功能專家層 ====================
+
+class WebSearchAgent(BaseAgent):
+    """
+    Web 搜尋專家代理人
+    
+    此代理人負責當 RAG 檢索信心度不足時，使用 OpenAI 進行
+    網路搜尋作為備援服務。
+    """
+    
+    def __init__(self, config: Dict[str, Any]) -> None:
+        """初始化 Web 搜尋專家代理人"""
+        super().__init__("Web Search Expert", "網路搜尋備援專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("web_search_expert")
+        
+        # 初始化 Web Search 工具
+        from tools.web_search_tool import WebSearchTool
+        self.web_search_tool = WebSearchTool()
+        
+        # 設定信心度閾值（使用配置系統）
+        self.confidence_threshold = self.role_config.confidence_threshold if self.role_config else 0.7
+        
+    async def process(self, input_data: Dict[str, Any]) -> AgentResponse:
+        """
+        處理 Web 搜尋請求
+        
+        Args:
+            input_data: 包含查詢和原始信心度的字典
+                - query: 用戶查詢
+                - original_confidence: 原始檢索信心度
+                - category: 查詢分類
+                - context: 上下文資訊
+            
+        Returns:
+            AgentResponse: 搜尋結果
+        """
+        start_time = time.time()
+        
+        if not self.validate_input(input_data):
+            return AgentResponse(
+                content="輸入數據無效",
+                confidence=0.0,
+                reasoning="輸入數據驗證失敗",
+                processing_time=time.time() - start_time
+            )
+        
+        try:
+            query = input_data.get('query', '')
+            original_confidence = input_data.get('original_confidence', 0.0)
+            category = input_data.get('category', '其他')
+            context = input_data.get('context', '')
+            
+            # 檢查是否需要 Web 搜尋
+            if not self._should_use_web_search(original_confidence):
+                return AgentResponse(
+                    content="原始檢索信心度足夠，無需 Web 搜尋",
+                    confidence=original_confidence,
+                    reasoning=f"原始信心度 {original_confidence:.2f} 高於閾值 {self.confidence_threshold}",
+                    processing_time=time.time() - start_time
+                )
+            
+            # 檢查 Web Search 工具是否可用
+            if not self.web_search_tool.is_configured():
+                return AgentResponse(
+                    content="Web 搜尋服務未配置，無法執行備援搜尋",
+                    confidence=0.2,
+                    reasoning="OpenAI API 未配置",
+                    metadata={"web_search_available": False},
+                    processing_time=time.time() - start_time
+                )
+            
+            # 根據類別選擇搜尋策略
+            search_result = await self._execute_category_search(query, category, context)
+            
+            processing_time = time.time() - start_time
+            
+            if search_result["success"]:
+                return AgentResponse(
+                    content=search_result["response"],
+                    confidence=0.85,  # Web 搜尋通常有較高信心度
+                    reasoning="使用 OpenAI Web 搜尋獲得回應",
+                    metadata={
+                        "web_search_used": True,
+                        "search_method": search_result.get("method", "openai"),
+                        "original_confidence": original_confidence,
+                        "improvement": 0.85 - original_confidence
+                    },
+                    processing_time=processing_time
+                )
+            else:
+                return AgentResponse(
+                    content=f"Web 搜尋失敗: {search_result.get('error', 'Unknown error')}",
+                    confidence=0.3,
+                    reasoning="Web 搜尋執行失敗",
+                    metadata={
+                        "web_search_used": False,
+                        "error": search_result.get("error", "Unknown error")
+                    },
+                    processing_time=processing_time
+                )
+                
+        except Exception as e:
+            logger.error(f"Web 搜尋專家處理失敗: {str(e)}")
+            return AgentResponse(
+                content="Web 搜尋過程中發生錯誤",
+                confidence=0.1,
+                reasoning=f"處理失敗: {str(e)}",
+                processing_time=time.time() - start_time
+            )
+    
+    def _should_use_web_search(self, original_confidence: float) -> bool:
+        """判斷是否需要使用 Web 搜尋"""
+        return original_confidence < self.confidence_threshold
+    
+    async def _execute_category_search(self, query: str, category: str, context: str) -> Dict[str, Any]:
+        """根據類別執行搜尋"""
+        try:
+            if category == "商業":
+                return await self.web_search_tool.search_business_topic(query)
+            elif category == "教育":
+                return await self.web_search_tool.search_education_topic(query)
+            else:
+                # 其他類別使用通用搜尋
+                return await self.web_search_tool.search_with_openai(query, context)
+                
+        except Exception as e:
+            logger.error(f"類別搜尋執行失敗: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e),
+                "response": ""
+            }
+    
+    def validate_input(self, input_data: Any) -> bool:
+        """驗證輸入數據"""
+        if not isinstance(input_data, dict):
+            return False
+        
+        required_fields = ['query']
+        return all(field in input_data for field in required_fields)
 
 class RAGExpertAgent(BaseAgent):
     """
@@ -172,7 +216,11 @@ class RAGExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 RAG 專家代理人"""
-        super().__init__("RAG Expert", "語意檢索和向量搜尋專家", config)
+        super().__init__("rag_expert", "RAG 檢索專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -340,6 +388,10 @@ class SummaryExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化摘要專家代理人"""
         super().__init__("Summary Expert", "內容摘要生成專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("content_summary_expert")
     
     async def process(self, input_data: List[Dict[str, Any]]) -> AgentResponse:
         """
@@ -401,7 +453,7 @@ class TagClassificationExpertAgent(BaseAgent):
         """初始化 TAG 分類專家代理人"""
         super().__init__("TAG Classification Expert", "關鍵詞映射與內容分類專家", config)
         
-        # 載入配置
+        # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager
         self.role_config = get_agent_roles_manager().get_role("tag_classification_expert")
         
@@ -635,6 +687,10 @@ class TTSExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 TTS 專家代理人"""
         super().__init__("TTS Expert", "語音合成專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("tts_expert")
     
     async def process(self, input_data: str) -> AgentResponse:
         """
@@ -695,6 +751,10 @@ class UserManagerAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化用戶管理專家代理人"""
         super().__init__("User Manager", "用戶 ID 管理和記錄追蹤專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("user_experience_expert")
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -764,6 +824,11 @@ class BusinessExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化商業專家代理人"""
         super().__init__("Business Expert", "商業類別專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("business_intelligence_expert")
+        
         self.prompt_processor = PromptProcessor()
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
@@ -862,6 +927,11 @@ class EducationExpertAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化教育專家代理人"""
         super().__init__("Education Expert", "教育類別專家", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("educational_growth_strategist")
+        
         self.prompt_processor = PromptProcessor()
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
@@ -962,6 +1032,10 @@ class LeaderAgent(BaseAgent):
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化領導者代理人"""
         super().__init__("Leader", "三層架構協調者", config)
+        
+        # 載入角色配置
+        from config.agent_roles_config import get_agent_roles_manager
+        self.role_config = get_agent_roles_manager().get_role("chief_decision_orchestrator")
         
         # 初始化下層專家
         self.rag_expert = RAGExpertAgent(config.get('rag_expert', {}))
@@ -1151,7 +1225,7 @@ class AgentManager:
         """
         return {
             "leader_agent": {
-                "name": self.leader_agent.name,
+                "name": self.leader_agent.agent_name,
                 "role": self.leader_agent.role,
                 "status": "active"
             },

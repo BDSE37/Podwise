@@ -4,11 +4,11 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![OOP](https://img.shields.io/badge/Architecture-OOP-orange.svg)](https://en.wikipedia.org/wiki/Object-oriented_programming)
 
-## 📖 專案簡介
+## 📋 概述
 
 這是一個專為繁體中文設計的情感分析引擎，基於 **NLTK** 和自定義中文情感詞典，採用 **OOP 架構** 和 **Google Clean Code 原則** 開發。專案整合了 [繁體中文 NLP 從 word2vec 到情感分析](https://studentcodebank.wordpress.com/2019/02/22/%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-nlp-%E5%BE%9Eword2vec%E5%88%B0-%E6%83%85%E6%84%9F%E5%88%86%E6%9E%90/) 的完整邏輯，提供高準確度的中文情感分析服務。
 
-### 🎯 主要特色
+## 🎯 功能特色
 
 - **繁體中文優化**: 專門針對台灣繁體中文語境設計
 - **多維度分析**: 提供 Compound、正面、負面、中性分數
@@ -17,7 +17,7 @@
 - **OOP 架構**: 符合 Google Clean Code 原則
 - **可擴展性**: 模組化設計，易於維護和擴展
 
-## 🏗️ 專案架構
+## 🏗️ 系統架構
 
 ```
 vaderSentiment/
@@ -43,24 +43,6 @@ vaderSentiment/
 ├── emoji_utf8_lexicon.txt        # 表情符號詞典
 └── README.md                     # 專案說明
 ```
-
-## 🔧 技術架構
-
-### 1. 核心模組設計
-```
-主程式 (main.py)
-├── 文本預處理器 (TextPreprocessor)
-├── 詞典管理器 (LexiconManager)
-├── 情感分析器 (ChineseSentimentAnalyzer, VADERSentimentAnalyzer)
-└── 資料處理器 (DataProcessor)
-```
-
-### 2. OOP 設計原則
-- **單一職責原則 (SRP)**: 每個類別專責特定功能
-- **開放封閉原則 (OCP)**: 可擴展新的分析器
-- **依賴反轉原則 (DIP)**: 高層模組依賴抽象介面
-- **介面隔離原則 (ISP)**: 明確的職責分工
-- **里氏替換原則 (LSP)**: 子類別可替換父類別
 
 ## 🧠 情感分析邏輯
 
@@ -199,161 +181,39 @@ def _calculate_sentiment_scores(self, tokens: List[str]) -> Dict[str, float]:
     }
 ```
 
-#### 2. 分數正規化
+## 🚀 快速開始
+
+### 基本使用
+
 ```python
-# 正規化分數
-total_score = abs(scores['positive']) + abs(scores['negative'])
-if total_score > 0:
-    positive_norm = scores['positive'] / total_score
-    negative_norm = scores['negative'] / total_score
-    neutral_norm = 1.0 - positive_norm - negative_norm
-else:
-    positive_norm = 0.0
-    negative_norm = 0.0
-    neutral_norm = 1.0
+from vaderSentiment import get_sentiment_analysis
 
-# 計算 compound 分數
-compound_score = positive_norm - negative_norm
+# 獲取情感分析實例
+sentiment_analyzer = get_sentiment_analysis()
+
+# 分析評論情感
+result = sentiment_analyzer.analyze_text(
+    text="這個 Podcast 真的很棒！",
+    analyzer_type="chinese"
+)
+
+print(f"情感標籤: {result.label}")
+print(f"信心度: {result.confidence}")
 ```
 
-#### 3. 情感標籤判斷
-```python
-def _get_sentiment_label(self, compound_score: float) -> str:
-    if compound_score >= 0.3:
-        return "正面"
-    elif compound_score <= -0.3:
-        return "負面"
-    else:
-        return "中性"
-```
+## 🎯 設計原則
 
-## 📊 分析結果統計
+### OOP 設計原則
+- **單一職責原則 (SRP)**: 每個類別專責特定功能
+- **開放封閉原則 (OCP)**: 可擴展新的分析器
+- **依賴反轉原則 (DIP)**: 高層模組依賴抽象介面
+- **介面隔離原則 (ISP)**: 明確的職責分工
+- **里氏替換原則 (LSP)**: 子類別可替換父類別
 
-### A. 資料處理範圍
-- **總筆數**: 696 筆分析結果
-- **檔案數**: 734 個 JSON 檔案
-- **資料來源**: Apple Podcast 評論資料
+## 🛠️ 依賴項目
 
-### B. 情感分布
-```
-標籤分布:
-- 中性: 397 筆 (57.0%)
-- 正面: 155 筆 (22.3%)
-- 負面: 144 筆 (20.7%)
-
-平均分數:
-- 平均情感分數: 0.022
-- 平均主題相關性: 0.013
-- 平均滿意度: 0.806
-- 平均綜合評分: 0.244
-```
-
-## 🚀 使用方式
-
-### 1. 基本使用
-```python
-from main import SentimentAnalysisSystem
-
-# 初始化系統
-system = SentimentAnalysisSystem()
-
-# 分析單一文本
-result = system.analyze_single_text("這個產品很棒！")
-
-# 分析整個目錄
-df = system.analyze_directory()
-```
-
-### 2. 使用核心模組
-```python
-from core import ChineseSentimentAnalyzer, DataProcessor
-
-# 直接使用分析器
-analyzer = ChineseSentimentAnalyzer()
-result = analyzer.analyze("文本內容")
-
-# 使用資料處理器
-processor = DataProcessor("comment_data")
-items = processor.process_directory()
-```
-
-### 3. 工具腳本使用
-```bash
-# 修正 JSON 格式
-cd scripts
-python fix_json_format.py
-
-# 清理檔名
-python clean_filenames.py
-
-# 轉換為繁體中文
-python convert_to_traditional.py
-```
-
-## 🔧 安裝與設定
-
-### 1. 環境需求
-```bash
-Python 3.8+
-pip install jieba pandas vaderSentiment opencc-python-reimplemented
-```
-
-### 2. 快速開始
-```bash
-# 克隆專案
-git clone <repository-url>
-cd vaderSentiment
-
-# 安裝依賴
-pip install -r requirements.txt
-
-# 執行分析
-python main.py
-```
-
-## 📝 詞典統計
-
-- **正面詞彙**: 約 120 個
-- **負面詞彙**: 約 150 個（已清理重複）
-- **程度詞**: 50 個
-- **否定詞**: 80+ 個
-- **中性詞彙（停用詞）**: 131 個
-- **總計**: 531+ 個詞彙
-
-## 🔄 版本更新
-
-- **v1.0**: 基礎詞典建立
-- **v1.1**: 新增用戶反饋的負面詞彙
-- **v1.2**: 優化程度詞權重
-- **v1.3**: 擴充否定詞組合
-- **v2.0**: 重構為 OOP 架構，整合所有功能
-
-## 📚 技術參考與延伸閱讀
-
-本專案設計與流程參考自 [繁體中文/NLP 從word2vec到情感分析](https://studentcodebank.wordpress.com/2019/02/22/%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-nlp-%E5%BE%9Eword2vec%E5%88%B0-%E6%83%85%E6%84%9F%E5%88%86%E6%9E%90/)，重點如下：
-
-### 1. 繁體中文詞典與分詞
-- 使用 jieba 分詞器，匯入台灣繁體詞庫與常見口語詞彙，提升分詞與情感分析準確度。
-- 可用 `jieba.load_userdict()` 匯入自建繁體詞典。
-
-### 2. 資料來源與標註
-- 利用爬蟲從 booking.com、scitechvista.nat.gov.tw、維基百科等取得大量正負面評論與文章，並進行簡體轉繁體處理。
-- 這些資料可用於訓練 word2vec、LSTM 或 Transformer 等模型，並建立繁體中文情感詞典。
-
-### 3. 向量化與深度學習
-- 先用 word2vec 將詞彙向量化，再用 LSTM 神經網路訓練情感分類模型。
-- 可用於自動標註詞典或驗證詞彙極性。
-
-### 4. 簡繁轉換
-- 建議用 opencc 或 nstools 進行簡體轉繁體，確保詞彙與語料一致性。
-
----
-
-**參考來源：**
-- [繁體中文/NLP 從word2vec到情感分析](https://studentcodebank.wordpress.com/2019/02/22/%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-nlp-%E5%BE%9Eword2vec%E5%88%B0-%E6%83%85%E6%84%9F%E5%88%86%E6%9E%90/)
-
----
-
-**最後更新**: 2024年7月9日  
-**專案版本**: v2.0  
-**適用語言**: 繁體中文（台灣） 
+- nltk
+- jieba
+- pandas
+- numpy
+- scikit-learn 

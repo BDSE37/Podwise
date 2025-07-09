@@ -9,7 +9,7 @@ services:
   # =============================================================================
   # 核心 AI 服務層
   # =============================================================================
-  
+
   # LLM 服務 - 大語言模型處理
   llm:
     build:
@@ -171,6 +171,40 @@ services:
       - ANYTHINGLLM_PORT=3001
       - ANYTHINGLLM_WORKSPACE_ID=podwise_workspace
       - ANYTHINGLLM_API_KEY=${ANYTHINGLLM_API_KEY}
+      # MCP 整合配置
+      - MCP_ENABLED=true
+      - MCP_CONFIG_PATH=config/mcp_config.yaml
+      - MCP_TOOLS_ENABLED=true
+      - MCP_RESOURCES_ENABLED=true
+      - MCP_MAX_CONCURRENT_CALLS=10
+      - MCP_CONNECTION_TIMEOUT=30
+      - MCP_REQUEST_TIMEOUT=60
+      - MCP_MAX_RETRIES=3
+      - MCP_RETRY_DELAY=1
+      - MCP_RATE_LIMIT_ENABLED=true
+      - MCP_RATE_LIMIT_REQUESTS=100
+      - MCP_RATE_LIMIT_WINDOW=60
+      - MCP_LOG_LEVEL=INFO
+      - MCP_LOG_FILE=logs/mcp_integration.log
+      - MCP_MAX_CACHE_SIZE=100
+      - MCP_CACHE_TTL=7200
+      # MCP 工具特定配置
+      - MCP_SENTIMENT_ANALYZER=chinese
+      - MCP_SENTIMENT_CONFIDENCE_THRESHOLD=0.7
+      - MCP_VECTOR_SEARCH_TOP_K=5
+      - MCP_VECTOR_SEARCH_SIMILARITY_THRESHOLD=0.7
+      - MCP_CONTENT_CLASSIFICATION_CATEGORIES=business,education,technology,entertainment
+      - MCP_CONTENT_CLASSIFICATION_CONFIDENCE_THRESHOLD=0.6
+      # Podwise MCP 整合配置
+      - PODWISE_MCP_INTEGRATION_ENABLED=true
+      - PODWISE_MCP_TOOL_CALLS_ENABLED=true
+      - PODWISE_MCP_FALLBACK_TO_LOCAL=true
+      - PODWISE_MCP_VECTOR_SEARCH_ENHANCEMENT=true
+      - PODWISE_MCP_SENTIMENT_ANALYSIS_ENABLED=true
+      - PODWISE_MCP_APPLE_PODCAST_RANKING_ENABLED=true
+    volumes:
+      - ./backend/rag_pipeline/config:/app/config
+      - ./backend/rag_pipeline/logs:/app/logs
     networks:
       - podwise
     depends_on:
@@ -185,7 +219,7 @@ services:
   # =============================================================================
   # 前端服務層
   # =============================================================================
-  
+
   # 前端服務 - 主要 Web 介面
   frontend:
     build:
@@ -307,7 +341,6 @@ services:
     volumes:
       - ./data:/app/data
     restart: "no"
-
   # =============================================================================
   # 外部服務連接 (K8s 已部署)
   # =============================================================================
@@ -317,21 +350,21 @@ services:
   # - Grafana (監控儀表板): 192.168.32.38:3004
   # - Prometheus (監控資料): 192.168.32.38:30090
 
-# =============================================================================
-# 外部服務連接 (K8s 已部署)
-# =============================================================================
-# 注意：以下服務已在 K8s 中部署，本地服務將連接到 K8s 服務
-# - PostgreSQL: postgres.podwise.svc.cluster.local:5432
-# - MongoDB: mongodb.podwise.svc.cluster.local:27017
-# - Milvus: worker3:19530
-# - MinIO: minio.podwise.svc.cluster.local:9000
-# - Grafana: 192.168.32.38:30004
-# - Prometheus: 192.168.32.38:30090
-# - Portainer: 192.168.32.38:30003
+  # =============================================================================
+  # 外部服務連接 (K8s 已部署)
+  # =============================================================================
+  # 注意：以下服務已在 K8s 中部署，本地服務將連接到 K8s 服務
+  # - PostgreSQL: postgres.podwise.svc.cluster.local:5432
+  # - MongoDB: mongodb.podwise.svc.cluster.local:27017
+  # - Milvus: worker3:19530
+  # - MinIO: minio.podwise.svc.cluster.local:9000
+  # - Grafana: 192.168.32.38:30004
+  # - Prometheus: 192.168.32.38:30090
+  # - Portainer: 192.168.32.38:30003
 
-# =============================================================================
-# 網路配置
-# =============================================================================
+  # =============================================================================
+  # 網路配置
+  # =============================================================================
 networks:
   podwise:
     driver: bridge
