@@ -6,12 +6,15 @@ Data Cleaning 模組提供完整的資料清理功能，專門處理 podcast 相
 
 ### 主要功能
 
+- **統一清理器**: 整合所有清理功能，提供統一的 OOP 介面
 - **MongoDB 文檔清理**: 專門處理 MongoDB 中的 podcast 文檔
 - **股癌節目清理**: 針對股癌節目的特殊清理邏輯
 - **長文本清理**: 處理長文本內容的清理
 - **PostgreSQL 資料清理**: 清理和轉換 PostgreSQL 資料
 - **批次處理**: 支援遞迴批次清理指定資料夾下所有檔案與子資料夾
 - **多格式輸出**: 支援 JSON、CSV 等輸出格式
+- **JSON 格式修正**: 自動修正 JSON 檔案格式
+- **檔案名稱清理**: 清理檔案名稱中的特殊字元
 
 ## 架構設計
 
@@ -30,7 +33,28 @@ Data Cleaning 模組提供完整的資料清理功能，專門處理 podcast 相
 
 ## 使用方法
 
-### 1. 單一檔案清理
+### 1. 統一清理器（推薦）
+
+```python
+from data_cleaning import UnifiedCleaner
+
+# 建立統一清理器
+cleaner = UnifiedCleaner()
+
+# 清理文本
+cleaned_text = cleaner.clean_text("Hello 😊 World :)")
+
+# 清理檔案
+cleaned_file = cleaner.clean_file("input.json")
+
+# 批次清理
+cleaned_files = cleaner.batch_clean_files(["file1.json", "file2.json"])
+
+# 修正 JSON 格式
+fixed_count = cleaner.batch_fix_json_format("directory/")
+```
+
+### 2. 單一檔案清理
 
 ```python
 from data_cleaning.services import CleanerOrchestrator

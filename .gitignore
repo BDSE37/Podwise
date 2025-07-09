@@ -74,11 +74,31 @@ Thumbs.db
 data/raw/
 data/processed/
 *.csv
-*.json
 *.xml
 *.zip
 *.tar.gz
 *.rar
+
+# 敏感資料檔案（不上傳到 GitHub）
+backend/vaderSentiment/comment_data/*.json
+backend/data_cleaning/batch_input/*.json
+backend/data_cleaning/batch_output/*.json
+data/cleaned_data/*.json
+
+# 圖片檔案（不上傳到 GitHub）
+backend/vaderSentiment/*.png
+backend/vaderSentiment/*.jpg
+backend/vaderSentiment/*.jpeg
+backend/vaderSentiment/*.gif
+backend/vaderSentiment/*.bmp
+backend/vaderSentiment/*.tiff
+backend/vaderSentiment/*.svg
+backend/vaderSentiment/*.ico
+backend/vaderSentiment/*.webp
+
+# HTML 檔案（不上傳到 GitHub）
+backend/vaderSentiment/*.html
+backend/vaderSentiment/interactive_*.html
 
 # 音訊檔案
 *.wav
