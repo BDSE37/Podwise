@@ -60,6 +60,6 @@ class EpisodeCleaner(BaseCleaner):
         return text
 
     def _remove_special_chars(self, text: str) -> str:
-        """移除特殊字元，保留中英文和基本標點。"""
-        allowed = set(' .,!?()[]{}:;\'"#@&+=%$*-_')
+        """移除特殊字元，保留中英文和基本標點，包括 URL 相關字元。"""
+        allowed = set(' .,!?()[]{}:;\'"#@&+=%$*-_/')
         return ''.join(c for c in text if c.isalnum() or '\u4e00' <= c <= '\u9fff' or c in allowed) 

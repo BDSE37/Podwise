@@ -51,5 +51,5 @@ class LongTextCleaner(BaseCleaner):
         return re.sub(r'<[^>]+>', '', text)
 
     def _remove_special_chars(self, text: str) -> str:
-        allowed = set(' .,!?()[]{}:;\'"#@&+=%$*-_')
+        allowed = set(' .,!?()[]{}:;\'"#@&+=%$*-_/')
         return ''.join(c for c in text if c.isalnum() or '\u4e00' <= c <= '\u9fff' or c in allowed) 

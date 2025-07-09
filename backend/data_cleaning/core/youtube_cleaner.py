@@ -377,7 +377,7 @@ class YouTubeCleaner(BaseCleaner):
                 
                 # 移除特殊符號
                 if rules.get("remove_special_symbols"):
-                    allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_')
+                    allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_/')
                     cleaned_item = ''.join(c for c in cleaned_item if c.isalnum() or '\u4e00' <= c <= '\u9fff' or c in allowed_chars)
                 
                 # 標準化文本
@@ -450,8 +450,8 @@ class YouTubeCleaner(BaseCleaner):
             "]+", flags=re.UNICODE)
         text = emoji_pattern.sub('', text)
         
-        # 移除特殊符號（保留中文、英文、數字和基本標點）
-        allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_')
+        # 移除特殊符號（保留中文、英文、數字和基本標點，包括 URL 相關字元）
+        allowed_chars = set(' .,!?()[]{}:;\'"#@&+=%$*-_/')
         text = ''.join(c for c in text if c.isalnum() or '\u4e00' <= c <= '\u9fff' or c in allowed_chars)
         
         return text
