@@ -96,7 +96,7 @@ class EdgeTTSProvider:
         return value
 
     def _initialize_voices(self) -> Dict[str, EdgeTTSVoice]:
-        """初始化四種台灣語音（預設參數皆為 None）"""
+        """初始化三種台灣語音（預設參數皆為 None）"""
         voices = {
             "podrina": EdgeTTSVoice(
                 name="Podrina (溫柔女聲)",
@@ -124,15 +124,6 @@ class EdgeTTSProvider:
                 volume=None,
                 pitch=None,
                 style="serious"
-            ),
-            "podriso": EdgeTTSVoice(
-                name="Podriso (專業男聲)",
-                voice_id="zh-TW-ZhiYuanNeural",
-                description="專業權威的男聲，適合新聞播報和學術內容",
-                rate=None,
-                volume=None,
-                pitch=None,
-                style="professional"
             )
         }
         return voices
