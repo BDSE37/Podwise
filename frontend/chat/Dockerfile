@@ -1,5 +1,5 @@
 # 使用 Python 3.10 作為基礎映像
-FROM docker.io/library/python:3.10-slim
+FROM python:3.10-slim
 
 # 設定工作目錄
 WORKDIR /app

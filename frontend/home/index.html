@@ -56,6 +56,85 @@
 		#popup-step-4 button#copy-code-btn:active {
 			transform: scale(0.95);
 		}
+		.music-cards {
+			display: flex;
+			gap: 2em;
+			margin-top: 2em;
+		}
+		.music-card {
+			background: #f6ece3;
+			border-radius: 1em;
+			box-shadow: 0 4px 16px rgba(88,62,61,0.08);
+			width: 220px;
+			overflow: hidden;
+			transition: box-shadow 0.2s;
+		}
+		.music-card:hover {
+			box-shadow: 0 8px 24px rgba(88,62,61,0.18);
+		}
+		.music-card-img {
+			position: relative;
+			width: 100%;
+			height: 180px;
+			overflow: hidden;
+		}
+		.music-card-img img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+		.play-btn {
+			position: absolute;
+			bottom: 12px;
+			right: 12px;
+			background: rgba(215,181,144,0.9);
+			border: none;
+			border-radius: 50%;
+			width: 44px;
+			height: 44px;
+			font-size: 1.5em;
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 2px 8px rgba(88,62,61,0.15);
+			transition: background 0.2s;
+		}
+		.play-btn:hover {
+			background: #583e3d;
+		}
+		.music-card-info {
+			padding: 1em;
+			text-align: left;
+		}
+		.music-card-title {
+			font-weight: bold;
+			font-size: 1.1em;
+			color: #583e3d;
+		}
+		.music-card-author {
+			color: #a08c7d;
+			font-size: 0.95em;
+			margin-top: 0.3em;
+		}
+		header.major {
+			text-align: center;
+		}
+		.music-cards,
+		.quiz-recommendations {
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			gap: 2em;
+			flex-wrap: wrap;
+		}
+
+		header.major h2 { 
+  color: inherit; 
+}
+
+/* 只把前面的 dash 設為白色 */
+header.major .dash {
+  color: #fff;
+}
 	</style>
 </head>
 
@@ -73,14 +152,26 @@
 					<a href="index.html" class="logo"><img src="images/logo_black.png" alt="PodWise Logo"
 							style="height: 60px; vertical-align: middle; margin-right: 5px;"><strong>PodWise</strong>
 						Podcast自動摘要與個人化推薦系統</a>
-					<ul class="icons">
+					<!-- 登入 user.png 按鈕 -->
+					<div style="position: absolute; top: 20px; right: 30px;">
+						<img src="images/user.png" id="user-login-btn" alt="登入" style="width:40px; height:40px; cursor:pointer; border-radius:50%; border:2px solid #e0e0e0; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+					</div>
+					<!-- 登入彈窗 -->
+					<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:9999;">
+						<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.18); padding:2em 2.5em; min-width:260px;">
+							<div style="text-align:center; margin-bottom:1em; font-weight:bold; font-size:1.1em;">請輸入使用者ID</div>
+							<input type="text" id="user-id-input" placeholder="TYPE YOUR ID" style="width:100%; padding:0.7em; border-radius:8px; border:1px solid #1dd195; margin-bottom:1em; text-align:center; font-size:1em;">
+							<div id="login-close-btn" style="position:absolute; top:10px; right:14px; font-size:1.3em; color:#aaa; cursor:pointer;">&times;</div>
+						</div>
+					</div>
+					<!-- <ul class="icons">
 						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
 						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
 						<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
 						</li>
 						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 						<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
-					</ul>
+					</ul> -->
 				</header>
 
 				<!-- Banner -->
@@ -89,143 +180,401 @@
 						<header>
 							<h1>PodWise<br /></h1>
 							<h2>AI 精準調頻，打造你的個人聲音空間。</h2>
-							<p>PodWise希望成為你的智能嚮導,透過分析節目內容與
-								聲音特質,幫助你發現符合你聆聽習慣的專屬精彩內容。讓每一次收聽,都更貼近你的需求。</p>
+							<p> PodWise希望成為你的智能嚮導,幫助你發現符合你聆聽習慣的專屬精彩內容。</p>
+							<p>讓每一次收聽,都更貼近你的需求。
+							</p>
 						</header>
-						<p>目前市面上尚無結合語音向量模型的推薦系統,因此我們選擇開發PodWise,提供更精準及個人化的Podcast推薦。面對琳瑯滿目的節目內容,許多使用者常常難以找到真正感興趣、適合自己的主題,而PodWise正是為了解決這樣的選擇困難,協助用戶更輕鬆發現屬於自己的
-							Podcast。</p>
-						<ul class="actions">
-							<li><a href="http://localhost:8501" class="button big" target="_blank">開始你的PodWise</a></li>
+<!-- 搜尋欄置中外層 -->
+<div class="searchbar-outer">
+  <div class="InputContainer">
+    <input placeholder="Ask Podri.." id="input" class="input" name="text" type="text">
+  </div>
+</div>
 
-						</ul>
-					</div>
-					<span class="image object">
-						<img src="images/podcasts.png" alt="" />
-					</span>
-				</section>
+<script>
+// 搜尋欄 Enter 鍵跳轉功能
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('input');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const searchText = this.value.trim();
+                if (searchText) {
+                    // 跳轉到 podri.html 並帶入搜尋文字參數
+                    window.location.href = `podri.html?search=${encodeURIComponent(searchText)}`;
+                }
+            }
+        });
+    }
+});
+// 登入彈窗互動
+(function(){
+	const loginBtn = document.getElementById('user-login-btn');
+	const loginModal = document.getElementById('login-modal');
+	const closeBtn = document.getElementById('login-close-btn');
+	const userIdInput = document.getElementById('user-id-input');
 
-				<!-- Section -->
-				<section>
-					<header class="major">
-						<h2>熱門推薦</h2>
-					</header>
-					<div class="features">
-						<article style="display: flex; align-items: flex-start;">
-							<div>
-								<h2>商業</h2>
-								<img src="images/股癌.png" alt="Gooaye 股癌" style="height: 10em; margin-top: 0.5em;">
-							</div>
-							<div class="content" style="margin-left: 1em; margin-top: 5em;">
-								<h3>Gooaye 股癌</h3>
-								<p>晦澀金融投資知識直白講，重要海內外時事輕鬆談；不管老司機還是菜雞，散戶們都進來取暖，也在這裡找到樂趣。</p>
-								<ul class="actions">
-									<li><a href="#" class="button big">試聽30秒</a></li>
-								</ul>
-							</div>
-						</article>
-						<article style="display: flex; align-items: flex-start;">
-							<div>
-								<h2>教育</h2>
-								<img src="images/天下學習.png" alt="天下學習" style="height: 10em; margin-top: 0.5em;">
-							</div>
-							<div class="content" style="margin-left: 1em; margin-top: 5em;">
-								<h3>天下學習</h3>
-								<p>在這裡，我們一起向最厲害的人學習——
-									聽他們暢談趨勢與管理，啟發你的視野與格局。 </p>
-								<ul class="actions">
-									<li><a href="#" class="button big">試聽30秒</a></li>
-								</ul>
-							</div>
-						</article>
-					</div>
-				</section>
-
-				<!-- Section -->
-				<section>
-					<header class="major">
-						<h2>每日聲音卡</h2>
-					</header>
-					<div class="posts">
-						<article>
-							<a href="#" class="image">
-								<img src="images/科技報橘.png" alt="科技早餐"
-									style="width: 20em; height: 20em; object-fit: cover; margin-top: 0.5em;" />
-							</a>
-							<h3>科技報橘</h3>
-							<p>科技早餐 05/29｜ 小馬智行進軍杜拜，中國 Robotaxi 三巨頭中東大會師</p>
-							<ul class="actions">
-								<li><a href="#" class="button">More</a></li>
-							</ul>
-						</article>
-						<article>
-							<a href="#" class="image">
-								<img src="images/矽谷輕鬆談.png" alt="矽谷輕鬆談 Just Kidding Tech"
-									style="width: 20em; height: 20em; object-fit: cover; margin-top: 0.5em;" />
-							</a>
-							<h3>矽谷輕鬆談 Just Kidding Tech</h3>
-							<p>S2E14 Google 搜尋 22 年來首次下滑：I/O 能否板回一城、追上 AI 搜尋？</p>
-							<ul class="actions">
-								<li><a href="#" class="button">More</a></li>
-							</ul>
-						</article>
-					</div>
-				</section>
-
-			</div>
-		</div>
-
-		<!-- Sidebar -->
-		<div id="sidebar">
-			<div class="inner">
-
-				<!-- Search -->
-				<section id="search" class="alt">
-					<form method="post" action="#">
-						<input type="text" name="query" id="query" placeholder="Search" />
-					</form>
-				</section>
-
-				<!-- Menu -->
-				<nav id="menu">
-					<header class="major">
-						<h2>Menu</h2>
-					</header>
-					<ul>
-						<li><a href="index.html">Homepage</a></li>
-						<li><a href="login.html">Login</a></li>
-						<li><a href="http://localhost:8501" target="_blank">Podri Chat</a></li>
-
-						<li>
-							<span class="opener">熱門推薦</span>
-							<ul>
-								<li><a href="#">商業</a></li>
-								<li><a href="#">教育</a></li>
-							</ul>
-						<li><a href="elements.html">每日聲音卡</a></li>
-					</ul>
-				</nav>
+	if(loginBtn && loginModal) {
+		loginBtn.onclick = function(e) {
+			loginModal.style.display = 'block';
+			userIdInput.value = '';
+			userIdInput.focus();
+			e.stopPropagation();
+		};
+	}
+	if(closeBtn && loginModal) {
+		closeBtn.onclick = function() {
+			loginModal.style.display = 'none';
+		};
+	}
+	if(loginModal) {
+		loginModal.onclick = function(e) {
+			if(e.target === loginModal) loginModal.style.display = 'none';
+		};
+	}
+	if(userIdInput) {
+		userIdInput.addEventListener('keydown', function(e){
+			if(e.key === 'Enter') {
+				alert('已輸入ID：' + userIdInput.value);
+				loginModal.style.display = 'none';
+			}
+		});
+	}
+})();
+</script>
 
 
 				<!-- Section -->
 				<section>
 					<header class="major">
-						<h2>Get in touch</h2>
-					</header>
-					<ul class="contact">
-						<li class="icon solid fa-envelope"><a href="#">information@podwise.com</a></li>
-					</ul>
-				</section>
-
-				<!-- Footer -->
-				<footer id="footer">
-					<p class="copyright">&copy; PodWise. All rights reserved.</p>
-				</footer>
-
-			</div>
-		</div>
+						<h2 style="margin-top:em; text-align:center;">
+						  <span class="dash">--</span>熱門推薦
+						</h2>
+					  </header>
+					  
+					<div class="music-cards">
+						<!-- 卡片1 -->
+<div class="card">
+	<div class="one">
+	  <div class="music">
+		<svg
+		  viewBox="0 0 16 16"
+		  class="note bi bi-music-note"
+		  fill="currentColor"
+		  height="18"
+		  width="18"
+		  xmlns="http://www.w3.org/2000/svg"
+		>
+		  <path
+			d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"
+		  ></path>
+		  <path d="M9 3v10H8V3h1z" fill-rule="evenodd"></path>
+		  <path
+			d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"
+		  ></path>
+		</svg>
+	  </div>
+	  <span class="name"
+		><div></div>
+		One piece first ending</span
+	  >
+	  <span class="name1"
+		><div></div>
+		Desconhecido</span
+	  >
+	  <div class="bar">
+		<svg
+		  viewBox="0 0 16 16"
+		  class="color bi bi-fast-forward-fill"
+		  fill="currentColor"
+		  height="16"
+		  width="16"
+		  xmlns="http://www.w3.org/2000/svg"
+		>
+		  <path
+			d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+		  ></path>
+		  <path
+			d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+		  ></path>
+		</svg>
+		<svg
+		  viewBox="0 0 16 16"
+		  class="color bi bi-caret-right-fill"
+		  fill="currentColor"
+		  height="18"
+		  width="18"
+		  xmlns="http://www.w3.org/2000/svg"
+		>
+		  <path
+			d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+		  ></path>
+		</svg>
+		<svg
+		  viewBox="0 0 16 16"
+		  class="color bi bi-fast-forward-fill"
+		  fill="currentColor"
+		  height="16"
+		  width="16"
+		  xmlns="http://www.w3.org/2000/svg"
+		>
+		  <path
+			d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+		  ></path>
+		  <path
+			d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+		  ></path>
+		</svg>
+	  </div>
 
 	</div>
+	<div class="two"></div>
+	<div class="three"></div>
+  </div>
+						<!-- 卡片2 -->
+						<div class="card">
+							<div class="one">
+							  <div class="music">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="note bi bi-music-note"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"
+								  ></path>
+								  <path d="M9 3v10H8V3h1z" fill-rule="evenodd"></path>
+								  <path
+									d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"
+								  ></path>
+								</svg>
+							  </div>
+							  <span class="name"
+								><div></div>
+								One piece first ending</span
+							  >
+							  <span class="name1"
+								><div></div>
+								Desconhecido</span
+							  >
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+						
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						  </div>
+<!-- 卡片2 -->
+						<div class="card">
+							<div class="one">
+							  <div class="music">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="note bi bi-music-note"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"
+								  ></path>
+								  <path d="M9 3v10H8V3h1z" fill-rule="evenodd"></path>
+								  <path
+									d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"
+								  ></path>
+								</svg>
+							  </div>
+							  <span class="name"
+								><div></div>
+								One piece first ending</span
+							  >
+							  <span class="name1"
+								><div></div>
+								Desconhecido</span
+							  >
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+						
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						  </div>
+<!-- 卡片2 -->
+						<div class="card">
+							<div class="one">
+							  <div class="music">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="note bi bi-music-note"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"
+								  ></path>
+								  <path d="M9 3v10H8V3h1z" fill-rule="evenodd"></path>
+								  <path
+									d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"
+								  ></path>
+								</svg>
+							  </div>
+							  <span class="name"
+								><div></div>
+								One piece first ending</span
+							  >
+							  <span class="name1"
+								><div></div>
+								Desconhecido</span
+							  >
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+						
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						  </div>
 
+					</div>
+					<audio id="audio-player"></audio>
+				</section>
+			</div>
+		</div>
+		<!--sidebay-->
+	</div>
+	
 	<!-- Scripts -->
 	<script>
 		window.addEventListener('DOMContentLoaded', () => {
@@ -254,12 +603,10 @@
 		style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center;">
 		<div id="popup-container"
 			style="background:#f6ece3; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
-
 			<!-- 關閉按鈕 -->
 			<img src="images/delete.png" alt="關閉" class="close-button"
 				style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; cursor:pointer; z-index:10;"
 				onclick="closePopup()">
-
 			<!-- Step 1 -->
 			<div class="popup-step" id="popup-step-1">
 				<h2>Taste of PodWise !</h2>
@@ -286,49 +633,253 @@
 				</div>
 			</div>
 
-			<!-- Step 3 -->
-			<div class="popup-step" id="popup-step-3" style="display:none;">
-				<h2>You may like…</h2>
-				<div class="quiz-recommendations">
-					<!-- 1. 股癌 -->
-					<div class="recommend-item">
-						<img src="images/股癌.png" alt="股癌">
-						<div class="text">
-							<div class="title">股癌 Gooaye</div>
-							<p class="description">
-								晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。
-							</p>
-						</div>
-						<img src="images/play_gray.png" alt="播放" class="play-button"
-							onclick="playAudio('audio/sample1.mp3')">
-					</div>
-
-					<!-- 2. 矽谷輕鬆談 -->
-					<div class="recommend-item">
-						<img src="images/矽谷輕鬆談.png" alt="矽谷輕鬆談">
-						<div class="text">
-							<div class="title">矽谷輕鬆談</div>
-							<p class="description">Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。</p>
-						</div>
-						<img src="images/play_gray.png" alt="播放" class="play-button"
-							onclick="playAudio('audio/sample2.mp3')">
-					</div>
-
-					<!-- 3. 天下學習 -->
-					<div class="recommend-item">
-						<img src="images/天下學習.png" alt="天下學習">
-						<div class="text">
-							<div class="title">天下學習</div>
-							<p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
-						</div>
-						<img src="images/play_gray.png" alt="播放" class="play-button"
-							onclick="playAudio('audio/sample3.mp3')">
-					</div>
-				</div>
-
-				<button class="button primary" onclick="goToStep(4)">Next</button>
+<!-- Step 3 -->
+<div class="popup-step" id="popup-step-3" style="display:none;">
+	<h2>You may like…</h2>
+	<h3 style="text-align:left; margin-left:0; padding-left:0;">
+	  試聽你有興趣的節目 並按下喜歡
+	</h3>
+	<div class="quiz-recommendations" style="display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: center; align-items: center;">
+	  <!-- 推薦 1 -->
+	  <div class="w-full max-w-[320px] mx-auto bg-white shadow-md rounded-lg overflow-hidden dark:bg-zinc-900">
+		<div class="flex justify-between items-center px-6 py-4">
+		  <div class="flex items-center">
+			<svg
+			  class="h-6 w-6"
+			  style="color: rgb(131,25,163)"
+			  fill="none"
+			  height="24"
+			  stroke="currentColor"
+			  stroke-linecap="round"
+			  stroke-linejoin="round"
+			  stroke-width="2"
+			  viewBox="0 0 24 24"
+			  width="24"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+			  <path d="M9 18V5l12-2v13"></path>
+			  <circle cx="6" cy="18" r="3"></circle>
+			  <circle cx="18" cy="16" r="3"></circle>
+			</svg>
+			<div class="mx-3">
+			  <h3 class="text-lg font-medium text-gray-700 dark:text-gray-200">
+				Timro Mann
+			  </h3>
+			  <p class="text-gray-500 dark:text-gray-400">Dibbya Subba</p>
 			</div>
-
+		  </div>
+		  <div class="flex items-center">
+			<svg
+			  class="h-6 w-6 text-red-500"
+			  fill="none"
+			  height="24"
+			  stroke="currentColor"
+			  stroke-linecap="round"
+			  stroke-linejoin="round"
+			  stroke-width="2"
+			  viewBox="0 0 24 24"
+			  width="24"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+			  <path
+				d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+			  ></path>
+			</svg>
+			<svg
+			  class="h-6 w-6 text-gray-500 dark:text-gray-400 ml-4"
+			  fill="none"
+			  height="24"
+			  stroke="currentColor"
+			  stroke-linecap="round"
+			  stroke-linejoin="round"
+			  stroke-width="2"
+			  viewBox="0 0 24 24"
+			  width="24"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+			  <polygon
+				points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+			  ></polygon>
+			</svg>
+		  </div>
+		</div>
+		<div class="relative">
+		  <div class="absolute inset-0 flex items-center justify-center"></div>
+		</div>
+		<div class="px-6 py-4">
+		  <div class="flex items-center">
+			<svg
+			  class="h-5 w-5 text-gray-500 dark:text-gray-400"
+			  fill="none"
+			  height="24"
+			  stroke="currentColor"
+			  stroke-linecap="round"
+			  stroke-linejoin="round"
+			  stroke-width="2"
+			  viewBox="0 0 24 24"
+			  width="24"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+			  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+			</svg>
+			<div class="w-full mx-3">
+			  <div
+				class="relative mt-1 h-1 bg-gray-200 rounded overflow-hidden dark:bg-gray-800"
+			  >
+				<div
+				  class="absolute left-0 top-0 h-full w-1/2"
+				  style="background-color: rgb(131,25,163)"
+				></div>
+			  </div>
+			</div>
+			<p class="text-sm text-gray-500 dark:text-gray-400">50%</p>
+		  </div>
+		  <div
+			class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-3"
+		  >
+			<span> 00:03 </span><span> 3:35 </span>
+		  </div>
+		</div>
+	  </div>
+  
+	  <!-- 推薦 2 -->
+	  
+  
+	  <!-- 推薦 3 -->
+	  <div class="recommend-item">
+		<img src="images/天下學習.png" alt="天下學習">
+		<img src="images/play_gray.png" alt="播放" class="play-button"
+		  onclick="playAudio('audio/sample3.mp3')">
+		<div class="text">
+		  <div class="title">天下學習</div>
+		  <p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
+		</div>
+		<!-- like button -->
+		<div class="heart-container" title="Like">
+		  <input type="checkbox" class="checkbox">
+		  <div class="svg-container">
+			<svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z">
+			  </path>
+			</svg>
+			<svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+			  <path
+				d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z">
+			  </path>
+			</svg>
+			<svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+			  <polygon points="10,10 20,20"></polygon>
+			  <polygon points="10,50 20,50"></polygon>
+			  <polygon points="20,80 30,70"></polygon>
+			  <polygon points="90,10 80,20"></polygon>
+			  <polygon points="90,50 80,50"></polygon>
+			  <polygon points="80,80 70,70"></polygon>
+			</svg>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  
+	<button class="button secondary" onclick="refreshChannels()">Refresh</button>
+	<button class="button primary" onclick="goToStep(4)">Next</button>
+  
+	<script>
+	  // 1. 準備一份所有可推薦的頻道清單
+	  const allChannels = [
+		{
+		  img: 'images/股癌.png',
+		  alt: '股癌',
+		  audio: 'audio/sample1.mp3',
+		  title: '股癌 Gooaye',
+		  desc: '晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。'
+		},
+		{
+		  img: 'images/矽谷輕鬆談.png',
+		  alt: '矽谷輕鬆談',
+		  audio: 'audio/sample2.mp3',
+		  title: '矽谷輕鬆談',
+		  desc: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。'
+		},
+		{
+		  img: 'images/天下學習.png',
+		  alt: '天下學習',
+		  audio: 'audio/sample3.mp3',
+		  title: '天下學習',
+		  desc: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。'
+		},
+		{
+		  img: 'images/新節目A.png',
+		  alt: '新節目A',
+		  audio: 'audio/sample4.mp3',
+		  title: '新節目 A',
+		  desc: '這是一個新的推薦節目 A。'
+		},
+		{
+		  img: 'images/新節目B.png',
+		  alt: '新節目B',
+		  audio: 'audio/sample5.mp3',
+		  title: '新節目 B',
+		  desc: '這是一個新的推薦節目 B。'
+		},
+		// …還可以更多
+	  ];
+  
+	  // 2. 隨機打散陣列
+	  function shuffle(arr) {
+		for (let i = arr.length - 1; i > 0; i--) {
+		  const j = Math.floor(Math.random() * (i + 1));
+		  [arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+	  }
+  
+	  // 3. 重新渲染前三名
+	  function refreshChannels() {
+		const copy = [...allChannels];
+		shuffle(copy);
+		const picks = copy.slice(0, 3);
+  
+		const container = document.querySelector('.quiz-recommendations');
+		container.innerHTML = '';  // 清空舊項目
+  
+		picks.forEach(ch => {
+		  const item = document.createElement('div');
+		  item.className = 'recommend-item';
+		  item.innerHTML = `
+	<img src="${ch.img}" alt="${ch.alt}">
+	<img src="images/play_gray.png" class="play-button" onclick="playAudio('${ch.audio}')">
+	<div class="text">
+	  <div class="title">${ch.title}</div>
+	  <p class="description">${ch.desc}</p>
+	</div>
+	<div class="heart-container" title="Like">
+	  <input type="checkbox" class="checkbox">
+	  <div class="svg-container">
+		<!-- outline -->
+		<svg viewBox="0 0 24 24" class="svg-outline">
+		  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3…"></path>
+		</svg>
+		<!-- filled -->
+		<svg viewBox="0 0 24 24" class="svg-filled">
+		  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3…"></path>
+		</svg>
+		<!-- celebrate -->
+		<svg class="svg-celebrate" width="100" height="100">
+		  <polygon points="10,10 20,20"></polygon>
+		  <!-- 其他 confetti -->
+		</svg>
+	  </div>
+	</div>
+  `;
+		  container.appendChild(item);
+		});
+	  }
+  
+	  // 頁面載入時先呼叫一次
+	  document.addEventListener('DOMContentLoaded', refreshChannels);
+	</script>
+  </div>
+  
 			<!-- Step 4 -->
 			<div class="popup-step" id="popup-step-4">
 				<h2>Signin Your Podwise</h2>
@@ -336,121 +887,98 @@
 					<div class="col-6 col-12-small">
 
 						<!-- Form -->
-						<h3>輸入我的Podwise ID</h3>
-						<form method="post" action="#">
-							<div class="row gtr-uniform">
-								<div class="col-6 col-12-xsmall">
-									<input type="text" name="demo-name" id="demo-name" value=""
-										placeholder="Podwise ID" />
-								</div>
-								<!-- Break -->
-								<div class="col-12">
-									<ul class="actions">
-
-										<li>
-											<input type="button" value="產生我的Podwise ID" id="generateIdBtn"
-												class="secondary" onclick="generatePodwiseID()" />
-										</li>
-									</ul>
-
-									<!-- 下面這個欄位用來顯示產生的 ID -->
-									<div>
-										<input type="text" id="podwiseIdField" readonly placeholder="尚未產生"
-											style="width: 200px;" />
+						<div class="row gtr-uniform" style="text-align: center;">
+							<h3>輸入我的Podwise ID</h3>
+							<form method="post" action="#">
+								<div class="row gtr-uniform">
+									<div class="col-6 col-12-xsmall">
+										<input type="text" name="demo-name" id="demo-name" value=""
+											placeholder="Podwise ID" />
 									</div>
+
+									<!--  or  -->
+									<div class="col-12" style="text-align: center; margin: 1rem 0;">
+										<h3 style="margin: 0; font-weight: normal; color: #666;">or</h3>
+									</div>
+									<!-- Break -->
+									<div class="col-12">
+										<ul class="actions">
+
+											<li>
+												<input type="button" value="產生Podwise ID" id="generateIdBtn"
+													class="secondary" onclick="generatePodwiseID()" />
+											</li>
+										</ul>
+
+										<!-- 下面這個欄位用來顯示產生的 ID -->
+										<div>
+											<input type="text" id="podwiseIdField" readonly placeholder="尚未產生"
+												style="width: 200px;" />
+										</div>
+									</div>
+
+									<script>
+										function generatePodwiseID() {
+											// 這裡放你的 ID 產生邏輯
+											const newId = 'PW-' + Date.now();
+											// 把新 ID 塞到下方欄位
+											document.getElementById('podwiseIdField').value = newId;
+										}
+									</script>
+
+									<button class="button" onclick="closePopup()">進入Podwise</button>
 								</div>
 
-								<script>
-									// 檢查並創建用戶 ID
-									async function generatePodwiseID() {
-										try {
-											// 檢查是否已有用戶代碼
-											let userCode = localStorage.getItem("user_code");
-											
-											if (!userCode) {
-												// 呼叫後端建立新使用者
-												const res = await fetch("/api/create_user", { 
-													method: "POST",
-													headers: {
-														'Content-Type': 'application/json'
-													}
-												});
-												
-												if (!res.ok) {
-													throw new Error('創建用戶失敗');
-												}
-												
-												const data = await res.json();
-												userCode = data.user_code;
-												
-												// 儲存到 localStorage
-												localStorage.setItem("user_code", userCode);
-												alert("已為你建立身份碼：" + userCode);
-											}
-											
-											// 顯示用戶代碼
-											document.getElementById('podwiseIdField').value = userCode;
-											
-										} catch (error) {
-											console.error('生成用戶 ID 失敗:', error);
-											alert('生成用戶 ID 失敗，請稍後再試');
-											document.getElementById('podwiseIdField').value = '生成失敗';
-										}
-									}
-									
-									// 頁面載入時自動檢查用戶代碼
-									window.addEventListener('DOMContentLoaded', () => {
-										const userCode = localStorage.getItem("user_code");
-										if (userCode) {
-											document.getElementById('podwiseIdField').value = userCode;
-										}
-									});
-								</script>
-								                                                                <button type="button" class="button" onclick="closePopup()">進入Podwise</button>
-							</div>
-
+						</div>
 					</div>
-				</div>
 
-				<!-- Scripts -->
-				<script src="assets/js/jquery.min.js"></script>
-				<script src="assets/js/browser.min.js"></script>
-				<script src="assets/js/breakpoints.min.js"></script>
-				<script src="assets/js/util.js"></script>
-				<script src="assets/js/main.js"></script>
-				<script>
-					// 初次顯示
-					window.addEventListener('DOMContentLoaded', () => {
-						document.getElementById('popup-overlay').style.display = 'flex';
-					});
-
-					// 切換步驟
-					function goToStep(step) {
-						for (let i = 1; i <= 4; i++) {
-							const el = document.getElementById(`popup-step-${i}`);
-							if (el) el.style.display = (i === step) ? 'block' : 'none';
-						}
-						// 移除 fetchGeneratedCode 調用，因為現在使用新的邏輯
-					}
-
-					// 移除舊的 fetchGeneratedCode 函數，因為現在使用 generatePodwiseID
-
-					// 複製按鈕
-					document.addEventListener('DOMContentLoaded', () => {
-						document.getElementById('copy-code-btn').addEventListener('click', () => {
-							const code = document.getElementById('generated-code').textContent;
-							navigator.clipboard.writeText(code)
-								.then(() => alert('已複製到剪貼簿！'))
-								.catch(() => alert('複製失敗'));
+					<!-- Scripts -->
+					<script src="assets/js/jquery.min.js"></script>
+					<script src="assets/js/browser.min.js"></script>
+					<script src="assets/js/breakpoints.min.js"></script>
+					<script src="assets/js/util.js"></script>
+					<script src="assets/js/main.js"></script>
+					<script>
+						// 初次顯示
+						window.addEventListener('DOMContentLoaded', () => {
+							document.getElementById('popup-overlay').style.display = 'flex';
 						});
-					});
 
-					// 關閉
-					function closePopup() {
-						document.getElementById('popup-overlay').style.display = 'none';
-					}
-				</script>
+						// 切換步驟
+						function goToStep(step) {
+							for (let i = 1; i <= 4; i++) {
+								const el = document.getElementById(`popup-step-${i}`);
+								if (el) el.style.display = (i === step) ? 'block' : 'none';
+							}
+							if (step === 4) fetchGeneratedCode();
+						}
+
+						// 向後端取得 ID 並顯示
+						function fetchGeneratedCode() {
+							fetch('/api/get-id')
+								.then(res => res.text())
+								.then(code => {
+									document.getElementById('generated-code').textContent = code;
+								})
+								.catch(() => {
+									document.getElementById('generated-code').textContent = '取得失敗';
+								});
+						}
+
+						// 複製按鈕
+						document.addEventListener('DOMContentLoaded', () => {
+							document.getElementById('copy-code-btn').addEventListener('click', () => {
+								const code = document.getElementById('generated-code').textContent;
+								navigator.clipboard.writeText(code)
+									.then(() => alert('已複製到剪貼簿！'))
+									.catch(() => alert('複製失敗'));
+							});
+						});
+
+						// 關閉
+						function closePopup() {
+							document.getElementById('popup-overlay').style.display = 'none';
+						}
+					</script>
 </body>
-
-
 </html>
