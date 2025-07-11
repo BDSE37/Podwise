@@ -1,290 +1,269 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Vector Pipeline 主程式入口點
-
-提供統一的命令列介面，方便調用所有向量處理功能。
-
-Author: Podri Team
-License: MIT
+Vector Pipeline 主程式 - 重構版本
+統一入口點，整合所有功能
+符合 Google Clean Code 原則
 """
 
-import argparse
-import sys
 import logging
+import sys
+import argparse
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from datetime import datetime
 
-# 設定日誌
+from config.settings import config
+from services.tagging_service import TaggingService
+from services.embedding_service import EmbeddingService
+from services.search_service import SearchService
+from utils.data_quality_checker import DataQualityChecker
+
+# 設置日誌
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=getattr(logging, config.log_level),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(config.log_file, encoding='utf-8'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
-# 添加父目錄到路徑
-sys.path.append(str(Path(__file__).parent.parent))
 
-def list_components():
-    """列出所有可用的組件"""
-    try:
-        from vector_pipeline import (
-            PipelineOrchestrator, MongoDBProcessor, PostgreSQLMapper,
-            TextChunker, VectorProcessor, MilvusWriter
+class VectorPipeline:
+    """Vector Pipeline 主類別 - 重構版本"""
+    
+    def __init__(self):
+        """初始化 Vector Pipeline"""
+        self.tagging_service = TaggingService()
+        self.embedding_service = EmbeddingService()
+        self.search_service = SearchService()
+        self.data_quality_checker = DataQualityChecker()
+        
+        logger.info("Vector Pipeline 初始化完成")
+    
+    def process_tagging(self, stage1_dir: Optional[str] = None, 
+                       stage3_dir: Optional[str] = None) -> Dict[str, Any]:
+        """
+        執行標籤處理
+        
+        Args:
+            stage1_dir: stage1 目錄路徑
+            stage3_dir: stage3 目錄路徑
+            
+        Returns:
+            處理結果
+        """
+        stage1_path = Path(stage1_dir or config.stage1_dir)
+        stage3_path = Path(stage3_dir or config.stage3_dir)
+        
+        if not stage1_path.exists():
+            return {"error": f"輸入路徑不存在: {stage1_path}"}
+        
+        # 獲取所有 RSS 資料夾
+        rss_folders = [f.name for f in stage1_path.iterdir() 
+                      if f.is_dir() and f.name.startswith('RSS_')]
+        
+        if not rss_folders:
+            return {"error": "沒有找到 RSS 資料夾"}
+        
+        logger.info(f"開始標籤處理，找到 {len(rss_folders)} 個 RSS 資料夾")
+        
+        # 執行標籤處理
+        results = self.tagging_service.process_multiple_rss_folders(
+            rss_folders, str(stage1_path), str(stage3_path)
         )
         
-        components = {
-            "PipelineOrchestrator": "主要協調器，整合所有處理流程",
-            "MongoDBProcessor": "MongoDB 資料處理器（整合 data_cleaning）",
-            "PostgreSQLMapper": "PostgreSQL metadata mapping",
-            "TextChunker": "文本切分處理器",
-            "VectorProcessor": "向量化處理器",
-            "MilvusWriter": "Milvus 資料寫入器"
-        }
-        
-        print("可用的組件：")
-        print("=" * 60)
-        for name, description in components.items():
-            print(f"• {name}: {description}")
-        print("=" * 60)
-        
-    except ImportError as e:
-        logger.error(f"無法載入組件: {e}")
-        return False
+        return results
     
-    return True
+    def process_embedding(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
+        """
+        執行嵌入處理
+        
+        Args:
+            stage3_dir: stage3 目錄路徑
+            
+        Returns:
+            嵌入結果
+        """
+        logger.info("開始嵌入處理")
+        
+        results = self.embedding_service.embed_stage3_data(stage3_dir)
+        
+        if "error" not in results:
+            logger.info(f"嵌入完成: {results['successful_files']}/{results['total_files']} 檔案成功")
+        
+        return results
+    
+    def search_content(self, query: str, top_k: int = 5) -> Dict[str, Any]:
+        """
+        搜尋內容
+        
+        Args:
+            query: 查詢文本
+            top_k: 返回結果數量
+            
+        Returns:
+            搜尋結果
+        """
+        logger.info(f"搜尋內容: '{query}'")
+        
+        results = self.search_service.search_similar_content(query, top_k)
+        
+        return {
+            "query": query,
+            "results": results,
+            "count": len(results)
+        }
+    
+    def test_search(self) -> Dict[str, Any]:
+        """
+        測試搜尋功能
+        
+        Returns:
+            測試結果
+        """
+        logger.info("開始搜尋功能測試")
+        
+        return self.search_service.test_search_functionality()
+    
+    def get_collection_stats(self) -> Dict[str, Any]:
+        """
+        獲取集合統計資訊
+        
+        Returns:
+            集合統計資訊
+        """
+        return self.search_service.get_collection_stats()
+    
+    def get_tag_statistics(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
+        """
+        獲取標籤統計資訊
+        
+        Args:
+            stage3_dir: stage3 目錄路徑
+            
+        Returns:
+            標籤統計資訊
+        """
+        return self.tagging_service.get_tag_statistics(stage3_dir)
+    
+    def check_data_quality(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
+        """
+        檢查資料品質
+        
+        Args:
+            stage3_dir: stage3 目錄路徑
+            
+        Returns:
+            資料品質報告
+        """
+        stage3_path = Path(stage3_dir or config.stage3_dir)
+        
+        if not stage3_path.exists():
+            return {"error": f"目錄不存在: {stage3_path}"}
+        
+        logger.info("開始資料品質檢查")
+        
+        return self.data_quality_checker.check_stage3_data(str(stage3_path))
+    
+    def run_full_pipeline(self) -> Dict[str, Any]:
+        """
+        執行完整管線
+        
+        Returns:
+            完整管線結果
+        """
+        logger.info("🚀 開始執行完整 Vector Pipeline")
+        
+        results = {
+            "timestamp": datetime.now().isoformat(),
+            "stages": {}
+        }
+        
+        try:
+            # 階段 1: 標籤處理
+            logger.info("=== 階段 1: 標籤處理 ===")
+            tagging_results = self.process_tagging()
+            results["stages"]["tagging"] = tagging_results
+            
+            # 階段 2: 嵌入處理
+            logger.info("=== 階段 2: 嵌入處理 ===")
+            embedding_results = self.process_embedding()
+            results["stages"]["embedding"] = embedding_results
+            
+            # 階段 3: 搜尋測試
+            logger.info("=== 階段 3: 搜尋測試 ===")
+            search_results = self.test_search()
+            results["stages"]["search_test"] = search_results
+            
+            logger.info("🎉 完整管線執行完成")
+            
+        except Exception as e:
+            logger.error(f"管線執行失敗: {e}")
+            results["error"] = str(e)
+        
+        return results
 
-def test_components():
-    """測試所有組件"""
-    try:
-        from vector_pipeline import MongoDBProcessor, TextChunker, VectorProcessor
-        
-        print("測試組件功能...")
-        print("=" * 60)
-        
-        # 測試 TextChunker
-        print("1. 測試 TextChunker")
-        chunker = TextChunker()
-        test_text = "這是一個測試文本。它包含多個句子。我們要測試文本切分功能。"
-        chunks = chunker.split_text_into_chunks(test_text, "test_doc")
-        print(f"   原始文本: {test_text}")
-        print(f"   切分結果: {len(chunks)} 個 chunks")
-        for i, chunk in enumerate(chunks[:3]):  # 只顯示前3個
-            print(f"     Chunk {i+1}: {chunk.chunk_text[:30]}...")
-        print()
-        
-        # 測試 VectorProcessor
-        print("2. 測試 VectorProcessor")
-        processor = VectorProcessor()
-        test_chunks = [
-            {"text": "這是第一個文本塊", "metadata": {"source": "test"}},
-            {"text": "這是第二個文本塊", "metadata": {"source": "test"}}
-        ]
-        print(f"   測試文本塊數量: {len(test_chunks)}")
-        print("   (向量化需要模型載入，這裡只測試初始化)")
-        print()
-        
-        # 測試 MongoDBProcessor
-        print("3. 測試 MongoDBProcessor")
-        processor = MongoDBProcessor("mongodb://localhost:27017", "test_db")
-        print("   MongoDBProcessor 初始化成功")
-        print("   (實際處理需要 MongoDB 連接)")
-        print()
-        
-        print("所有組件測試完成！")
-        return True
-        
-    except Exception as e:
-        logger.error(f"測試組件失敗: {e}")
-        return False
-
-def process_rss_collection(collection_name: str, mongo_config: Dict[str, Any]):
-    """處理 RSS collection"""
-    try:
-        from vector_pipeline.rss_processor import RSSProcessor
-        
-        print(f"開始處理 RSS collection: {collection_name}")
-        
-        # 初始化 RSS 處理器
-        postgres_config = {
-            "host": "localhost",
-            "port": 5432,
-            "database": "podcast",
-            "user": "user",
-            "password": "password"
-        }
-        
-        milvus_config = {
-            "host": "localhost",
-            "port": "19530",
-            "collection_name": "podcast_chunks",
-            "dim": 1024
-        }
-        
-        processor = RSSProcessor(mongo_config, postgres_config, milvus_config)
-        
-        # 處理 collection
-        result = processor.process_rss_collection(collection_name)
-        
-        print(f"RSS collection 處理完成！")
-        print(f"結果: {result}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"處理 RSS collection 失敗: {e}")
-        return False
-
-def run_pipeline(input_config: Dict[str, Any]):
-    """執行完整的 Pipeline"""
-    try:
-        from vector_pipeline import PipelineOrchestrator
-        
-        print("開始執行完整 Pipeline...")
-        
-        # 準備配置
-        mongo_config = input_config.get('mongo', {})
-        postgres_config = {
-            "host": "localhost",
-            "port": 5432,
-            "database": "podcast",
-            "user": "user",
-            "password": "password"
-        }
-        milvus_config = {
-            "host": "localhost",
-            "port": "19530",
-            "collection_name": "podcast_chunks",
-            "dim": 1024
-        }
-        
-        # 初始化協調器
-        orchestrator = PipelineOrchestrator(mongo_config, postgres_config, milvus_config)
-        
-        # 執行 Pipeline
-        collections = input_config.get('collections', [])
-        results = []
-        
-        for collection in collections:
-            result = orchestrator.process_collection(collection, "podcast_chunks")
-            results.append(result)
-        
-        print(f"Pipeline 執行完成！")
-        print(f"結果: {results}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"執行 Pipeline 失敗: {e}")
-        return False
-
-def test_data_cleaning_integration():
-    """測試 data_cleaning 整合"""
-    try:
-        print("測試 data_cleaning 模組整合...")
-        print("=" * 60)
-        
-        # 測試導入
-        from vector_pipeline.core import MongoDBProcessor
-        
-        # 初始化處理器
-        processor = MongoDBProcessor("mongodb://localhost:27017", "test_db")
-        
-        # 測試清理功能
-        test_doc = {
-            "text": "這是一個測試文檔 😊 包含表情符號 :)",
-            "title": "測試標題 🚀",
-            "description": "測試描述 :D"
-        }
-        
-        # 測試清理（需要實際的清理器）
-        print("MongoDBProcessor 初始化成功")
-        print("data_cleaning 模組整合正常")
-        print()
-        
-        return True
-        
-    except Exception as e:
-        logger.error(f"測試 data_cleaning 整合失敗: {e}")
-        return False
 
 def main():
-    """主程式入口點"""
-    parser = argparse.ArgumentParser(
-        description="Vector Pipeline 命令列工具",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-使用範例:
-  # 列出所有組件
-  python main.py --list-components
-  
-  # 測試組件
-  python main.py --test-components
-  
-  # 測試 data_cleaning 整合
-  python main.py --test-data-cleaning
-  
-  # 處理 RSS collection
-  python main.py --process-rss RSS_1500839292
-  
-  # 執行完整 Pipeline
-  python main.py --run-pipeline
-        """
-    )
+    """主函數"""
+    parser = argparse.ArgumentParser(description="Vector Pipeline 主程式")
+    parser.add_argument("--action", choices=[
+        "tagging", "embedding", "search", "test_search", 
+        "stats", "tag_stats", "quality", "full_pipeline"
+    ], default="full_pipeline", help="執行動作")
     
-    # 基本選項
-    parser.add_argument('--list-components', action='store_true',
-                       help='列出所有可用的組件')
-    parser.add_argument('--test-components', action='store_true',
-                       help='測試所有組件功能')
-    parser.add_argument('--test-data-cleaning', action='store_true',
-                       help='測試 data_cleaning 模組整合')
-    
-    # 處理選項
-    parser.add_argument('--process-rss', type=str,
-                       help='處理指定的 RSS collection')
-    parser.add_argument('--run-pipeline', action='store_true',
-                       help='執行完整的 Pipeline')
-    
-    # 配置選項
-    parser.add_argument('--mongo-host', type=str, default='localhost',
-                       help='MongoDB 主機 (預設: localhost)')
-    parser.add_argument('--mongo-port', type=int, default=27017,
-                       help='MongoDB 埠號 (預設: 27017)')
-    parser.add_argument('--mongo-db', type=str, default='podwise',
-                       help='MongoDB 資料庫名稱 (預設: podwise)')
+    parser.add_argument("--query", type=str, help="搜尋查詢")
+    parser.add_argument("--top_k", type=int, default=5, help="搜尋結果數量")
+    parser.add_argument("--stage1_dir", type=str, help="stage1 目錄路徑")
+    parser.add_argument("--stage3_dir", type=str, help="stage3 目錄路徑")
     
     args = parser.parse_args()
     
-    # 準備配置
-    mongo_config = {
-        'host': args.mongo_host,
-        'port': args.mongo_port,
-        'database': args.mongo_db
-    }
+    # 初始化 Vector Pipeline
+    pipeline = VectorPipeline()
     
-    # 執行對應功能
-    if args.list_components:
-        return list_components()
-    
-    elif args.test_components:
-        return test_components()
-    
-    elif args.test_data_cleaning:
-        return test_data_cleaning_integration()
-    
-    elif args.process_rss:
-        return process_rss_collection(args.process_rss, mongo_config)
-    
-    elif args.run_pipeline:
-        input_config = {
-            'mongo': mongo_config,
-            'collections': ['RSS_1500839292']  # 預設處理股癌 collection
-        }
-        return run_pipeline(input_config)
-    
-    else:
-        parser.print_help()
-        return False
+    try:
+        if args.action == "tagging":
+            results = pipeline.process_tagging(args.stage1_dir, args.stage3_dir)
+            print("標籤處理結果:", results)
+            
+        elif args.action == "embedding":
+            results = pipeline.process_embedding(args.stage3_dir)
+            print("嵌入處理結果:", results)
+            
+        elif args.action == "search":
+            if not args.query:
+                print("錯誤: 搜尋需要提供 --query 參數")
+                return
+            results = pipeline.search_content(args.query, args.top_k)
+            print("搜尋結果:", results)
+            
+        elif args.action == "test_search":
+            results = pipeline.test_search()
+            print("搜尋測試結果:", results)
+            
+        elif args.action == "stats":
+            results = pipeline.get_collection_stats()
+            print("集合統計:", results)
+            
+        elif args.action == "tag_stats":
+            results = pipeline.get_tag_statistics(args.stage3_dir)
+            print("標籤統計:", results)
+            
+        elif args.action == "quality":
+            results = pipeline.check_data_quality(args.stage3_dir)
+            print("資料品質報告:", results)
+            
+        elif args.action == "full_pipeline":
+            results = pipeline.run_full_pipeline()
+            print("完整管線結果:", results)
+            
+    except Exception as e:
+        logger.error(f"執行失敗: {e}")
+        print(f"錯誤: {e}")
+
 
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1) 
+    main() 

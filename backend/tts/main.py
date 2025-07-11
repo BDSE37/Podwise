@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 # 添加 backend 路徑以引用共用工具
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from tts_service import TTSService
+from core.tts_service import TTSService
 from utils.logging_config import get_logger
 
 # 配置日誌
@@ -43,7 +43,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 生產環境中應該限制具體域名
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -63,9 +63,9 @@ class TTSRequest(BaseModel):
 class TTSResponse(BaseModel):
     """TTS 回應模型"""
     成功: bool = Field(..., description="是否成功")
-    音訊檔案: Optional[str] = Field(None, description="Base64 編碼的音訊檔案")
-    錯誤訊息: Optional[str] = Field(None, description="錯誤訊息")
-    處理時間: Optional[float] = Field(None, description="處理時間（秒）")
+    音訊檔案: Optional[str] = Field(default=None, description="Base64 編碼的音訊檔案")
+    錯誤訊息: Optional[str] = Field(default=None, description="錯誤訊息")
+    處理時間: Optional[float] = Field(default=None, description="處理時間（秒）")
 
 
 class VoiceInfo(BaseModel):
@@ -99,7 +99,7 @@ async def root():
         "服務名稱": "PodWise Edge TTS 語音合成服務",
         "狀態": "運行中",
         "版本": "1.0.0",
-        "支援語音": ["podrina", "podrisa", "podrino"]
+        "支援語音": ["podrina", "podrisa", "podrino", "podriso"]
     }
 
 
@@ -116,7 +116,7 @@ async def get_available_voices():
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        語音列表 = tts_service.get_available_voices()
+        語音列表 = tts_service.獲取可用語音()
         return [
             VoiceInfo(
                 id=voice["id"],
@@ -141,12 +141,12 @@ async def synthesize_speech(request: TTSRequest):
         
         # 執行語音合成
         開始時間 = asyncio.get_event_loop().time()
-        音訊數據 = await tts_service.synthesize_speech(
+        音訊數據 = await tts_service.語音合成(
             text=request.文字,
-            voice_id=request.語音,
-            rate=request.語速,
-            volume=request.音量,
-            pitch=request.音調
+            語音=request.語音,
+            語速=request.語速,
+            音量=request.音量,
+            音調=request.音調
         )
         結束時間 = asyncio.get_event_loop().time()
         處理時間 = 結束時間 - 開始時間
@@ -183,7 +183,7 @@ async def get_voice_info(voice_id: str):
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        語音信息 = tts_service.get_voice_info(voice_id)
+        語音信息 = tts_service.獲取語音信息(voice_id)
         if not 語音信息:
             raise HTTPException(status_code=404, detail=f"語音 {voice_id} 不存在")
         
@@ -199,26 +199,6 @@ async def get_voice_info(voice_id: str):
         raise HTTPException(status_code=500, detail=f"獲取語音信息失敗: {str(e)}")
 
 
-@app.get("/voice-config", response_model=Dict[str, Any])
-async def get_voice_config():
-    """獲取完整的語音配置信息"""
-    try:
-        if not tts_service:
-            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
-        
-        # 獲取標準化的語音列表
-        voices = tts_service.get_available_voices()
-        
-        return {
-            "voices": voices,
-            "total_count": len(voices),
-            "default_voice": "podrina"
-        }
-    except Exception as e:
-        logger.error(f"獲取語音配置失敗: {e}")
-        raise HTTPException(status_code=500, detail=f"獲取語音配置失敗: {str(e)}")
-
-
 @app.get("/status", response_model=ServiceStatus)
 async def get_service_status():
     """獲取服務狀態"""
@@ -226,7 +206,7 @@ async def get_service_status():
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        狀態 = await tts_service.get_service_status()
+        狀態 = await tts_service.獲取服務狀態()
         return ServiceStatus(podri_tts=狀態["podri_tts"])
     except Exception as e:
         logger.error(f"獲取服務狀態失敗: {e}")
@@ -243,12 +223,12 @@ async def synthesize_speech_stream(request: TTSRequest):
         logger.info(f"收到串流語音合成請求: {request.文字[:50]}...")
         
         # 目前返回標準回應，未來可實現真正的串流
-        音訊數據 = await tts_service.synthesize_speech(
+        音訊數據 = await tts_service.語音合成(
             text=request.文字,
-            voice_id=request.語音,
-            rate=request.語速,
-            volume=request.音量,
-            pitch=request.音調
+            語音=request.語音,
+            語速=request.語速,
+            音量=request.音量,
+            音調=request.音調
         )
         
         if 音訊數據:

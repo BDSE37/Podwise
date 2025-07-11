@@ -1,0 +1,28 @@
+{
+  "filename": "RSS_1707757888_podcast_1321_Podcast 聽什麼 EP3人人都可以是藝術家自媒體創作另類成功心法 ft. 藝術家製造公司 執行導演 Keno Tung.json",
+  "episode_id": "6860f46ce627c18f164a28dc",
+  "collection_name": "RSS_1707757888",
+  "total_chunks": 1,
+  "chunks": [
+    {
+      "chunk_id": "fb705c95-30f3-41c0-ad29-a4556d301b84",
+      "chunk_index": 0,
+      "episode_id": "6860f46ce627c18f164a28dc",
+      "podcast_id": "1321",
+      "podcast_name": "",
+      "author": "",
+      "category": "",
+      "episode_title": "Podcast 聽什麼 EP3人人都可以是藝術家自媒體創作另類成功心法 ft. 藝術家製造公司 執行導演 Keno Tung",
+      "duration": "",
+      "published_date": "",
+      "apple_rating": 0,
+      "chunk_text": "老公老公你看是白大廚還是黑大廚餐點好喫啊白的黑的別一直滑手機了我們換上米其林輪胎嘗鮮趣",
+      "embedding": [],
+      "language": "zh",
+      "created_at": "2025-07-10T14:50:56.533744",
+      "source_model": "text-embedding-ada-002",
+      "tags": "[]"
+    }
+  ],
+  "standardized_at": "2025-07-10T17:27:14.588471"
+}

@@ -60,7 +60,7 @@ class VoiceConfig:
                 {
                     "id": "podrisa",
                     "name": "Podrisa (活潑女聲)",
-                    "voice_id": "zh-TW-HsiaoYuNeural",
+                    "voice_id": "zh-TW-HanHanNeural",
                     "description": "活潑開朗的女聲，適合娛樂內容和輕鬆話題",
                     "type": "edge_tts",
                     "language": "zh-TW",
@@ -83,7 +83,19 @@ class VoiceConfig:
                     "volume": "+0%",
                     "pitch": "+0%"
                 },
-
+                {
+                    "id": "podriso",
+                    "name": "Podriso (專業男聲)",
+                    "voice_id": "zh-TW-ZhiYuanNeural",
+                    "description": "專業權威的男聲，適合新聞播報和學術內容",
+                    "type": "edge_tts",
+                    "language": "zh-TW",
+                    "gender": "male",
+                    "style": "professional",
+                    "rate": "+0%",
+                    "volume": "+0%",
+                    "pitch": "+0%"
+                }
             ]
         }
     

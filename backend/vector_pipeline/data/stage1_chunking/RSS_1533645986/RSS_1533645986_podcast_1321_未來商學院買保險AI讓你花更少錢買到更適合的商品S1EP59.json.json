@@ -1,0 +1,666 @@
+{
+  "filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+  "episode_id": "6867815454dac0f7fe975a17",
+  "collection_name": "RSS_1533645986",
+  "total_chunks": 73,
+  "chunks": [
+    {
+      "chunk_text": "早安,歡迎收聽未來商學院在這裡我們一起認識未來的商業大家好,我是瘋傳媒的財經副總編輯周啟源今天還是要來和大家聊一聊AI我們都知道在超高齡化的社會任何與健康有關的社會",
+      "chunk_id": "d42954c7-7173-4a18-b713-1590227db576",
+      "chunk_index": 0,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 82
+    },
+    {
+      "chunk_text": "都會非常受到注目我們也都知道在AI的發展之下越是數量龐大的資料或者是程序重複的工作它導入AI的話它的效率都會越來越高我們看到有一家AI的相關新創公司叫做Lydia AI它是透過自主研發的學習演算法來分析疾病並且預測民眾患病的風險它成為許多國外保險公司的重要夥伴",
+      "chunk_id": "e3f73bb8-aae3-40a1-bd05-88bbd68b3feb",
+      "chunk_index": 1,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "是怎樣的價值呢?我們今天很高興的邀請到了Lydia AI的共同創辦人及執行長李俊義Anthony我們邀請Anthony和大家介紹一下Lydia它的經營的價值還有你們經營的一些理念讓我們歡迎Anthony哈囉,你好嗨,你好,我是Anthony Lee,謝謝今天有這個機會來參加這個很棒的這個訪問,謝謝我想先請教一下Lydia它的整個經營的面向的一些客戶大概是什麼",
+      "chunk_id": "b790813e-62c5-487d-bd94-80996ad07579",
+      "chunk_index": 2,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 180
+    },
+    {
+      "chunk_text": "先前我看到一些新聞資料但是其實我還不了解就是它背後所謂的這個提供健康解讀資訊的這個價值所以我想先請Anthony介紹一下到底你們的這個經營提供一些什麼樣的服務那又是面對哪些客戶來提供這樣子的服務其實我們就是個B2B2C那2B的對象就是保險公司那解決他們的痛點同時也會解決消費者的痛點那保險公司的痛點其實就是在",
+      "chunk_id": "5cd49ff7-0e31-449c-ac64-dde8116dadf7",
+      "chunk_index": 3,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 154
+    },
+    {
+      "chunk_text": "核保尤其是醫療核保是很難自動化不像AppleCare不像Tesla Insurance它是很人為去判斷的那當然健康也是很難判斷的那我們做了一個叫健康分的一個東西它是吸收健康資料然後去產生一個風險分那這個風險分有精算的基礎也許應該是亞洲裡面我們是唯有計算基礎的風險分那我們刪掉原始的",
+      "chunk_id": "cbe991cd-28f5-470d-bad1-c0174cb6cae8",
+      "chunk_index": 4,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 140
+    },
+    {
+      "chunk_text": "數據很像信用分一樣然後保險公司就可以基於那個去做一些核保的優化核保的福利核保的自動化等等所以等於是我幫大家稍微整理一下這個資料的話就是你們透過資訊的解讀去為保險公司創造更大的價值當然也讓終端的消費者也就是民眾去更了解自己的這個大致上的健康情況這個2C的部分我覺得有趣就是說原本",
+      "chunk_id": "46379f6c-90b3-4de4-9142-c86aa8d12913",
+      "chunk_index": 5,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 138
+    },
+    {
+      "chunk_text": "做這個AI公司健康AI公司就是要給大眾免費的AI免費的AI可是免費的AI對於創投是很難做的就是一定要有人付錢所以就是消費者的健康怎麼讓他們自己先看到自己的三年後五年後的這個不同的癌症啊或者是慢性病的這些發生我覺得是很重要因為可以先有一些準備的一些機會規劃",
+      "chunk_id": "043f392c-586d-4b5e-b781-0e072c191071",
+      "chunk_index": 6,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "一些計畫的一些機會所以在保險界裡面當我們讓消費者有這個能力的時候那基本上就是可以讓就是買保險的過程當中變成更順暢自動化基本上就很像AppleCare一樣因為它是一個還蠻中立的一個參考指數那也不會洩漏自己的一些資料",
+      "chunk_id": "4d7b74d9-b6bb-449d-bc7f-1d72d00b7023",
+      "chunk_index": 7,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 106
+    },
+    {
+      "chunk_text": "也不會洩漏你上個月去用信用卡買什麼東西這種概念一樣我想請教在2015年的時候是什麼樣的機緣讓你有這個願景然後你想要創造一個面對解決終端消費者可能健康風險的事業那時候我覺得是第一波的AI公司開始出來然後其實做AI的",
+      "chunk_id": "7677861f-2708-4884-a14f-31147a53cc85",
+      "chunk_index": 8,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 106
+    },
+    {
+      "chunk_text": "其實最大那時候的數據就是健康數據那我們就是想要做健康AI的原因就是其實很簡單就是這樣當然可是還是要找到一個business model對沒錯所以老闆不能免費做這個東西就很難那客戶對就是保險公司來說你感受到當時他們普遍的一些問題或者說用創業的語言來說的話普遍的痛點困難在於什麼",
+      "chunk_id": "cc958cf3-ee2c-46b1-9aab-4104a82f839c",
+      "chunk_index": 9,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "這個概念去幫他們解決了我覺得其中一個當然就是從保險公司看的話他們是請人在看就是你想要買的東西那你的健康狀況那如果有一個分數來代表健康狀況的時候它是很中立的那還是跟全人口比較的那就代表說我如果有慢性病或者是我是超越這個產品的65歲或是70歲我還是有機會可以買得到",
+      "chunk_id": "439410ad-2775-4f14-a41e-48352e776fb3",
+      "chunk_index": 10,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "我覺得這是一個蠻大的一個社會的一個價值然後差不多這樣那其實保險公司它本身的資料庫當中我相信它的數據量肯定是非常巨大的因為一個人它可能帶來一個客戶可能帶來非常多組的數據那本身我相信他們的可能是精算或者是核保等等的部門一定也有一些就是套用跟解讀這些數據的機制那他們是怎麼樣看到Lydia AI的一些機會",
+      "chunk_id": "fd1ba02f-7222-4131-aacc-bf466861b1c6",
+      "chunk_index": 11,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "跟能夠解決他們什麼樣的問題然後和你們合作呢其實我們看保險精算我常講這一句就是說我們解決了大概200年以上沒人解決的問題那時候我們的投資人員一直叫我們說focus on pinpoint那這個 pinpoint就是其實是很複雜的一個問題因為大家都是用國家給的就是健保資料庫嗎死亡率或者是病的發生率",
+      "chunk_id": "5c2daeca-fbd1-41c3-901b-3f438a698b27",
+      "chunk_index": 12,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 147
+    },
+    {
+      "chunk_text": "然後去看50年20年10年基本上就是用精算去算所以它不太care你當下除了你年齡跟你性別之外你還有什麼東西你還有什麼資料可以給它所以它就是它的定價的方面就已經只有性別跟年齡那就是國家給的所以就很困難如果你想保更多人你想要設計更多產品去比較有特殊的",
+      "chunk_id": "2bf98b5d-65ae-4e2b-b8ae-3e6f331a7f34",
+      "chunk_index": 13,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 123
+    },
+    {
+      "chunk_text": "適合慢性病等等完全做不到因為它的大家的各家的資料庫都是來源幾乎一模一樣的它也連資料庫都不算因為那是表那是表格那是保險協會跟國家給的發生率表格但是全部都是這些數字而已所以當他們開始去思考說ok那我在產品設計過程或者是我在核保過程",
+      "chunk_id": "cf281a07-0b14-44a0-b7ec-981d546cfc9d",
+      "chunk_index": 14,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "要加入一個AI產出的一個數字然後它有精算的意義那其實那就已經改變整個就是整個就是保險業的一些想法因為你開始去使用健康數據了那我覺得這樣比較合理因為我們講說老年話我們講說慢性病的這些研發就是變嚴重那你如果永遠都是年齡跟性別那你怎麼",
+      "chunk_id": "35efaa55-3845-4eb9-8ede-6425b148b845",
+      "chunk_index": 15,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 114
+    },
+    {
+      "chunk_text": "再做更多的東西就做不了它就是那麼貴它就是就是被拒保就是這樣如果有一個指標的話那絕對就是有價值所以我覺得我們解決那個200年來沒有人解決的那個有意義有精算意義的風險分那就看你要埋在哪裡像我們埋在那個就是消費者可以自己看自己的那個健康狀況就是埋在這裡的一個方式",
+      "chunk_id": "13842763-4089-4d3b-bd3f-4668fac43189",
+      "chunk_index": 16,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "然後可以埋在online banking裡面它也可以當成信用的一種評鑑往後是其實因為有自律去規劃自己的健康通常在金融的就是financial health也是從deposit savings跟default rate來講都有直接的關聯性所以其實有這一一個指標加入的時候我覺得會比較多面向來去看一個人",
+      "chunk_id": "f65c59a1-bfd1-449d-a7a4-b22a7b6ee22b",
+      "chunk_index": 17,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "算是他的credit worthiness或者他的health等等比沒有好很多比沒有好或是比一個自己判斷坐在辦公室後面判斷說這個人健不健康好很多因為他是一個數據推出來的AI推出來的一個東西比起問為什麼創投覺得你們解決了一個200年來的pinpoint我更想問Lydia這個名字是怎麼來的這是你的家人嗎Lydia是一個",
+      "chunk_id": "9c178622-94ac-419a-8443-ab0326548fce",
+      "chunk_index": 18,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 158
+    },
+    {
+      "chunk_text": "在希臘之前的一個時代那時候因為我們一開始在學校的時候是做NLP自然語言處理他是做多語言的自然語言處理所以我們選Lydia的原因是因為Lydia的語言本身是參了不同國家的語言可是就是很獨特就是這樣所以這個名字背後的含義還是蠻有含義的蠻有意義的對對對所以在這個過程當中就是",
+      "chunk_id": "d64351f6-6983-4356-a0cf-c0f393a4b122",
+      "chunk_index": 19,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "你們可能曾經碰到過一些什麼樣的痛點比如說保險公司不理解你們提供的服務有類似這樣子的障礙過嗎",
+      "chunk_id": "d5b8e9ed-dbcc-44c9-b79f-b6fbfa0ac307",
+      "chunk_index": 20,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 45
+    },
+    {
+      "chunk_text": "請他回去看那他為什麼相信這個分數風險優先風險優先那他為什麼相信這個分數要怎麼證明這個分數給他讓他去在普通的業務流程裡面去使用然後再推廣到前線去使用這個花了蠻多時間可是現在就是我說為什麼我們有很多就是在亞洲被認可是有清算基礎的原因是因為其實跟國際的一些債務公司有直接的合作",
+      "chunk_id": "571dcdd8-456c-4684-885e-72de5ba8e96f",
+      "chunk_index": 21,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "然後就是有這些驗證那當然跟辦公室也有做這些驗證這讓大家比較舒服一點說ok這是我可以相信的分數你們最初拿下來的客戶是在保險公司是這樣子嗎最初拿下來就是第一個其實是保險公司是哪家呢可以透露嗎最初在台灣的話是台灣人手台灣人手其實是國台人手可是那是另外一個應用場景",
+      "chunk_id": "fc7a47bb-f2fc-4972-a021-1d8a71c6f4c4",
+      "chunk_index": 22,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "也是分數可是是另外一個應用場景是離配相關的國台是我台灣的第一個客人然後台灣人手是健康分的第一個客人那以健康分為例的話就是他們是體驗到了這個導入之後的流程或者說產品的設計或者說它的多樣性可以更豐富所以他們決定跟外部的這樣子的策略夥伴合作我相信可能對保險公司來說很多東西會覺得是",
+      "chunk_id": "12ad8828-1319-49fe-bb43-999858141868",
+      "chunk_index": 23,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "流程可能不能改動或者說機密資料不能外洩所以你們一定有一些非常不一樣的價值才會被台灣的客戶看到我覺得絕對會是因為是AI健康AI但現在大家都很喜歡講這個LLM就是這個CHRGP裡面的LM我們從學校的時候就已經開始在做那時候當然沒有現在那麼大的LLM我們現在LM也非常大非常非常大",
+      "chunk_id": "1e87a6fd-4113-478c-a81a-a9ca4640648e",
+      "chunk_index": 24,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "就是全世界的全亞洲因為我們會跟不同的一些醫院合作跟政府合作但是它基本上已經學習到的醫療知識全部都包含在這個裡面所以當有公司跟我們合作說他們可以用到那個知識那其實是非常寶貴其實沒有這個專業他們第一個沒有AI的專業第二個也沒有時間去跟政府什麼醫院去做這種研究之類的",
+      "chunk_id": "5e115ee1-dd37-44a1-80d7-7bf5e73c481d",
+      "chunk_index": 25,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "這樣我們全部都整理好做好然後就是產品很直接就是大家認可的分數那就導入業務場景會比較順利一點我對Lidia AI的一個很大的興趣就是說保險的資訊它不只是商品而已它很大一部分是個人的資訊就像您剛才提到不管是慢性病也好不管是身高體重它其實都是很敏感的那怎麼樣在這十年當中從2015年創立到現在",
+      "chunk_id": "588f03c7-2366-41d7-a469-9b77212b2b59",
+      "chunk_index": 26,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 143
+    },
+    {
+      "chunk_text": "你們選定了題目然後其實你們能夠符合比如說個資的資安的要求然後你們去摸索出這些保險公司這麼大的這些大公司們他們的痛點就是你們怎麼樣去在合規的情況下去跟保險公司去溝通其實這可能是很多的聽眾沒有過的經驗其實這個是蠻有趣的那我先從就是現在的這個現況來討論這個compliance跟security",
+      "chunk_id": "02f3fde1-4417-466a-a0a7-ce99d1b7395c",
+      "chunk_index": 27,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 144
+    },
+    {
+      "chunk_text": "那從COVID之後就基本上每一個國家都開始去做像健康存摺一樣的一個機制但是控管所有的醫療資源然後醫療資料把它中心化放在一個地方那他們開始去跟民間企業去做合作的時候他用意是什麼他用意就很像是open finance一樣如果要做遠距離醫療",
+      "chunk_id": "938afa7b-b15f-4ff4-89d8-471755ec7585",
+      "chunk_index": 28,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 117
+    },
+    {
+      "chunk_text": "如果要做健康管理慢性病管理這些數位的這部分那就絕對需要更多民間的企業去開始去做的東西使用那些數據那使用那些API那為了使用這些API的話他們又要去這些民間企業像我們就要去做很多不同的認證那這些就非常貴是非常貴然後又非常長又花很多時間那我覺得蠻好的一個事情是",
+      "chunk_id": "b1e722bf-9596-4a0b-94c0-d733341adc86",
+      "chunk_index": 29,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "我們在健康存摺台灣的健康存摺的框架下我們也獲得recognition就是健保署的recognition其實我看上一年的那個健康存摺流量我們應該帶了蠻多給你說台灣的這個健保APP對 健保APP對啊我們其實很努力的去推廣所以我覺得他們也很大力的去支持我們",
+      "chunk_id": "5997cc80-0351-403c-86e6-b8bb810482b7",
+      "chunk_index": 30,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "這種效果可是那條件就是說一定要有好的security那一部分我覺得從dataflow去驗證說你真的刪除就是原始數據是最重要的那你真的保留的東西是消費者看得到的東西然後覺得說我就算分享給別人也ok我覺得那就是最重要的部分然後第二個部分就是我們",
+      "chunk_id": "1b934caa-bb0d-496b-99c2-d6fe6ce9cfb0",
+      "chunk_index": 31,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 120
+    },
+    {
+      "chunk_text": "跟非常就是被監控的領域的公司合作那因為他每個月都會去做不同的經檢在不同的不管是銀行或是保險公司我們的科技也在他們的業務流程裡面所以理當我們要符合這些所以我們對這個業業是蠻多經驗的所以我覺得一直以來的經驗就是說就是security是最重要的",
+      "chunk_id": "1c0539e0-4d72-4f5e-b3dc-32e428e68d3f",
+      "chunk_index": 32,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "不管是從消費者的這個privacy的角度來看要不就是看說業務場景如果我們被罰的話或者是做不好的話那我們在台灣也不用再做了就是因為金管會就是很嚴格就是這樣所以我覺得沒有那麼多concernprivacy當然如果你真的把security跟compliance做好的話其實我覺得有一件事情很好奇就是我在看你們的資料的時候我有發現到你們是一家",
+      "chunk_id": "b698376d-9a04-4a39-9f09-7516b8a208e2",
+      "chunk_index": 33,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 167
+    },
+    {
+      "chunk_text": "來自加拿大的新創的公司然後而且可能跟台灣其他新創比較不一樣的地方在於其實你們在全亞幾乎全亞洲都有自己的版圖你可以跟大家介紹一下你們目前的整個事業的分佈跟規劃嗎其實健康分是一個一個很簡單的一個科技就是如果用語言來解釋的話當然它後面是很複雜花了很多年去做的前面的四年",
+      "chunk_id": "cad5355b-8dee-4173-82f6-d3316929e1f5",
+      "chunk_index": 34,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 131
+    },
+    {
+      "chunk_text": "四五年我們其實都是在做科研做我們AI的那個基礎是全部都是自己做出來的我們也做很多出版就是這個computer science跟醫學界的一些出版然後也有一些pattern那些東西都是真的是獨一無二的pipeline因為那時候沒有什麼general AI platform大家都在使用所以真的是要自己做出一個很偽醫學",
+      "chunk_id": "1da0d25a-5f50-4419-a6af-42cc98d3b5df",
+      "chunk_index": 35,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 156
+    },
+    {
+      "chunk_text": "做出來的pipeline做完的時候就有一些價值存在那我覺得就是產生那個分數可是應用場景就很簡單盡量就是免體檢盡量就是自動化核保就那麼簡單可是要看你要埋在哪裡像我剛剛講的你可以埋在健康管理你可以埋在online banking你可以埋在PC home可以埋在family mart",
+      "chunk_id": "91f49327-93d8-48e1-b210-722a4ca594da",
+      "chunk_index": 36,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "要看你要埋在哪裡這個概念那我們其實到韓國就是複製一模一樣的健康分的概念因為在韓國他們也有一個健康存摺那我們去到日本他們也有一個健康存摺所以同樣的應用場景在各國都可以去複製韓國比台灣是啥大兩倍韓國人口是差不多五千萬然後日本是大四",
+      "chunk_id": "1107171c-5122-4260-bf5b-305cc0ada89a",
+      "chunk_index": 37,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "所以當我們過去的時候他們反而看到說台灣的經驗怎麼會那麼先進反而在他們那邊都還沒有達到所以我們大概半年以內在韓國跟日本開了branch然後很迅速地就on board了像大都會韓國",
+      "chunk_id": "b52efa3e-88e1-4666-a48c-893eab54d0e9",
+      "chunk_index": 38,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 88
+    },
+    {
+      "chunk_text": "現在有幾個日本的保險公司文明正在進行當中反而變比較快因為他們看到成功的案例所以你們在日本跟韓國的保險公司也都順利的斬獲了一些客戶是那我們又從VCE的角度創投的角度去看的話台灣是一個很棒的市場沒有錯很棒的數據沒有錯很棒的",
+      "chunk_id": "e04f171c-dfcf-4253-b06f-0a546e179fcb",
+      "chunk_index": 39,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 109
+    },
+    {
+      "chunk_text": "就是保險市場沒有錯可是我們他們投資我們在加拿大政府投資我們不是為了當台灣only的公司但創投投資是要全球性對不對像uber一樣全球性所以這個應用場景一定要是在各國都一定行得通東南亞印度泰國全部都要行得通所以我們才會去韓國跟日本",
+      "chunk_id": "7bebe2ba-878d-4ebd-941e-c827d157c220",
+      "chunk_index": 40,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "從uber的模式複製在健康諮詢或者是比較個人金融的諮詢上面你同意嗎我覺得完全不一樣的model因為uber是market place那先有至少一萬台車子你才能開始offer消費者這個服務那我們offer比較是像信用分就是一個信用分一樣但是看說你這信用分",
+      "chunk_id": "1bdd930b-aa1d-45bc-8310-48a6b5ad0df7",
+      "chunk_index": 41,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "要在哪一個場景去使用那如果是很簡單的就是核保核准那是很好就是解決可是如果是有有趣的應用場景像比如說什麼鼓勵在一個保險產品裡面大家更健康一點那健康或者是日常生活裡面保險這個概念其實往後退一步變成是健康的概念健康的生活往前一步",
+      "chunk_id": "0a6e5c23-9749-4698-b91a-ecaec161f60c",
+      "chunk_index": 42,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "那個我覺得就是比較有意義的第二層那我們在韓國日本其實就是在做這一其實其實已經在開始在做這一塊那我可以再解釋再深度一點就是說像SNBC日信銀行他們有自己的online banking app那你可以把它想成是中心的home bank一樣的一個app那它的app叫olive",
+      "chunk_id": "56e74b92-4a5a-4e80-97ae-3072f4405c87",
+      "chunk_index": 43,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "那在olive這部分其實大家打開手機的時候應該很少會有人想要打開健康管理的app通常都是跟健康有關的需求的時候可能要去打個疫苗啊什麼的時候你就順便看一下看牙齒的時候之類的可是大家會打開一次digital bankingonline banking那是絕對會打開的東西所以在這個狀況裡面其實SNBColive裡面",
+      "chunk_id": "4af21427-1988-4a16-9b00-3e215da8f560",
+      "chunk_index": 44,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 155
+    },
+    {
+      "chunk_text": "跟不同的保險公司就開始有一些合作那本來是一個online banking可是它裡面也想要推就是不只是financial planning啊不只是investment product啊也想要推就是保險產品啊越來越是financial的規劃的一部分那這當然就是Sumitomo LifeLiveNet等等",
+      "chunk_id": "bbecf48c-e56c-4633-9fd6-265dd499e279",
+      "chunk_index": 45,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 150
+    },
+    {
+      "chunk_text": "那有趣的事情是當online banking跟insurance結合的時候online banking就變成新的數位通路本來還沒有這個功能本來它只是看你你打開只是看你的帳號轉帳啊等等可忽然還有一個功能那就是玉荷堡你已經pre-approved這一個產品了你隨時想要就可以就很像AppleCare我回到AppleCare",
+      "chunk_id": "a32d4858-49bc-4785-b565-c13d5ea73ae3",
+      "chunk_index": 46,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 159
+    },
+    {
+      "chunk_text": "其實想要你可以直接用MacBook現在就按一個按鈕說我想要再買三個月的AppleCare所以在日本的狀況是這樣在香港的狀況HSBC跟HSBC Live早期已經結合在同一個APP的裡面所以你可以看到HSBC Live裡面的它的well plus的一些分數點數產品全部都已經結合起來了",
+      "chunk_id": "3296363c-8197-406c-bcf7-8de268c86463",
+      "chunk_index": 47,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 140
+    },
+    {
+      "chunk_text": "所以我在看這整個業界intratech的業界其實我看到的是insuranceintratech的部分慢慢被fintech被吸收就是住往fintech這一塊然後留下來的那些insurance technology就變成是核心系統變成是真的是比較我認為比較傳統類型的startup的technology",
+      "chunk_id": "b00b2ebb-2be5-41e2-b897-e0b6ffbc27af",
+      "chunk_index": 48,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "像我們這種embedded insuranceembedded finance的公司就變成fintech比較fintech的類型這種概念我好奇的是在亞洲也好或者在加拿大也好你們有長得類似不完全一樣長得類似的競爭者嗎我認為有很多這種想要先以比較marketing的方式",
+      "chunk_id": "916a070d-f84a-491f-a6f1-687079005e6f",
+      "chunk_index": 49,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "像我去各國像我去韓國韓國當地就有一個比較以marketing方式說我把你歸類成1到10然後你如果你是2的話就是代表說你非常健康那就可以很便宜的買保險的這種概念我有看過很多這種公司老闆就是遊戲公司他們是把它遊戲化遊戲化對遊戲化就這種感覺遊戲化但這是to see的部分",
+      "chunk_id": "58d9e894-2969-4ebb-8946-014434e2bffa",
+      "chunk_index": 50,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "他們還是會把那個這叫做infrastructure as a serviceIaaS他就賣這個東西因為保險公司沒有時間沒有架構這樣一個遊戲對啊所以他就會直接買這個架構然後就放他們的東西在這裡面所以我看到的是這種一個是比較是marketing類型然後想要走保費低的部分另外類型就是infrastructure的這個類型",
+      "chunk_id": "00814ab0-e41d-4f3e-a708-ceef608e41b8",
+      "chunk_index": 51,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 158
+    },
+    {
+      "chunk_text": "我比較少看到是有就是精算基礎的這個風險分的概念如果真的是要說一個比較的話那可能是阿里之父的芝麻分芝麻分芝麻分跟你們可能是比較接近的概念比較類似的一個概念當然芝麻分又是一個很有趣的東西因為它有兩個用場景一個是比較是國家的那種不討論國家的部分我們只討論阿里集團裡面",
+      "chunk_id": "33b4918e-02d4-4264-8cdc-a0d02d15f9d7",
+      "chunk_index": 52,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "那在阿里集團的AliPay裡面它是在鼓勵消費者怎麼繼續在阿里集團的T-Mall裡面去消費因為你好的信用你當然就可以去消費更多它是一個很簡單的一個應用場景可是它背後當然是很複雜那我們也是同樣的概念就是說我們也是個很簡單的應用場景我們就只是想要保更多人想要自動合保想要就是pre-approved insurance想要免提前就這樣可是要看說是",
+      "chunk_id": "62950497-bd0e-4cdf-a7a4-09631f566592",
+      "chunk_index": 53,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 170
+    },
+    {
+      "chunk_text": "放在哪一個數位環境裡面會比較好就像芝麻分要放在哪一個數位環境裡面比較好放在T-Mall裡面嗎放在AliPay裡面嗎放在其他的一些合作夥伴裡面所以就變成是比較有趣的一個話題AnthonyLidia AI是你第一個創業的項目嗎是對這就是我大學畢業之後就做的第一個公司所以你大學一畢業投入的事業就是自己理想中的創業的路線",
+      "chunk_id": "39b89836-c6f6-4999-a93d-41142f71c0c1",
+      "chunk_index": 54,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 157
+    },
+    {
+      "chunk_text": "我很想講是這樣可是我一開始沒有想要走入保險我一開始就只是像我剛剛講的就是盡量給大家健康AI甚至希望跟政府合作各政府合作把健康AI尤其當政府有那麼多醫療數據的時候海量的應該是提供給消費者那些能力去自己規劃",
+      "chunk_id": "4a981e91-0ad9-4398-b443-678d3270a4c8",
+      "chunk_index": 55,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 101
+    },
+    {
+      "chunk_text": "未來因為已經可以有這個非常恐怖的準確度可以讓你去規劃好你的未來就很像是基因檢測一樣我認為基因檢測本來就應該要做每個人都應該做有些人就是已經懷孕的時候就已經開始做了我覺得AI健康分也是一樣的概念我們如果用一個比較普世的語言或者說用比較商業雜誌的語言來請教你已經經過了九年",
+      "chunk_id": "9fc0a825-4f87-44bb-8d2f-b5f8c2cd2ac9",
+      "chunk_index": 56,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "然後你也正在努力準備下一輪的融資在當前的情況你會定義自己的事業自己創業到現在已經到了一個有成就或者說是類似成功的階段嗎你會這樣定義嗎在VCE界裡面在投資界裡面沒有liquidity event沒有出場的話就是沒有成功其實就是最很現實的一面可是對於個人",
+      "chunk_id": "e18a3514-1a21-4973-bb8a-00ec35df69a2",
+      "chunk_index": 57,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "有沒有覺得說個人這十年有成長有學習到什麼對 達到一個里程碑我覺得從完全不知道自己在幹嘛到最後管理到差不多五十幾個當然也不是那麼多大的一個公司可是管理到五十幾個這個員工然後又幫就是很多",
+      "chunk_id": "d85277a1-c1ca-4aa7-83d9-4de9edc096f2",
+      "chunk_index": 58,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 91
+    },
+    {
+      "chunk_text": "以前在AI的員工在其他公司也繼續成長那個career planning我覺得我學了很多我覺得我學了很多所以對於我自己的成長的部分我很高興我不是那個十年前的我而且你們的員工如果去看你們的事業地圖的話在多倫多有一部分在台灣有一部分",
+      "chunk_id": "2247ab67-1d47-4836-a74a-2b73b36a3188",
+      "chunk_index": 59,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "在中國都各有一部分那你只有一個人你要怎麼樣去分配你的時間你最常待在哪裡我現在是最常是待在日本然後每個月飛索爾跟台灣然後來來回回來來回回這樣但跟加拿大有時差你這樣子的管理能夠所以能夠溝通嗎溝通順利嗎我反而覺得是因為疫情讓我們整個公司本來就已經是就是分remote的狀況好幾個部門",
+      "chunk_id": "92bcb634-eb70-4438-a24d-c7b94dfea4c1",
+      "chunk_index": 60,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 138
+    },
+    {
+      "chunk_text": "讓更多remote的technology還有管理方式去讓我們去規劃說怎麼跟部門跟部門之間溝通這花了我們很多很多時間畢竟研發在多倫多可是他們又是跟前線是對就是他們沒有看過真正的客人用因為他們是AI工程師研究員那他們需要知道說前線的需求他們現在知道說前線人怎麼用可是剛好有時差",
+      "chunk_id": "d3c9a5ec-9502-4fd5-914b-635426ac60c2",
+      "chunk_index": 61,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "又不同所以在這幾年裡面我覺得我們數一數二最當然不是完美可是算是蠻成功的一個就是我覺得內部的溝通是已經是還是可以進步非常多可是我覺得能夠到這個程度然後繼續去服務客人然後繼續再on board新的客人我覺得內部溝通可以做到這樣",
+      "chunk_id": "693c4fa0-1663-46dc-ac16-9f85134a389e",
+      "chunk_index": 62,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "有這種時差存在語言的barry存在我覺得幾乎是奇蹟然後其實就是這樣我覺得除了談這個資本市場進度之外我其實有個問題蠻好奇的剛好也可以藉機會請教你就如果有你們的客戶對你們非常感興趣的話你會賣給他嗎身為CEO有CEO的正確的答案是對所以第一個就是說任何",
+      "chunk_id": "b49e4147-4e85-4117-95e6-37fe6b5e423f",
+      "chunk_index": 63,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 123
+    },
+    {
+      "chunk_text": "offer都會進入董事會然後強加討論對現在在討論然後我們會以board的方式去討論好最後我們覺得適不適合公司這個決定不適合的話我們當然會直接跟對方講所以就是這樣這就是正統每個CEO都會回答的一個答案那可是回到我想的我當然還是覺得說如果",
+      "chunk_id": "32cbccf9-718d-40c2-8d94-6491669e9026",
+      "chunk_index": 64,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 117
+    },
+    {
+      "chunk_text": "我們的mission當然就是protect the next billion那如果可以繼續做下去的話我覺得當然是很棒的一回事當然不排斥就是加入非常大的國際的集團在各市場都已經有基礎的對因為像我這樣跑韓國日本那我要跑多久才能跑到東南亞我才能跑到印度可是如果有一個保險公司",
+      "chunk_id": "c96a99f2-c25e-4a2c-89f4-d4a145fe2295",
+      "chunk_index": 65,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "已經全球都已經都在了那也許可以很迅速的達到我想要達到的目標那所以我完全不排斥可是那一定要對方一定要有規模讓我去充分的去為他們就是導入這個東西在節目的最後我覺得作為Lydia AI的CEO你平常或者說自己或者是公司你們常常會應用到的一些AI的小城市或者是一些你覺得很好用的",
+      "chunk_id": "aa87976c-5c50-4ca2-93e2-285886a7552e",
+      "chunk_index": 66,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "AI可以推薦給大家的有這樣子的工具嗎我覺得大家都已經開始在用了就是Chargability你覺得它有變笨嗎自從被大量應用之後我覺得現在有Chargability之外的一些選擇都可以試試看包括Cloud對所以可是我發現好多領域裡面像我最近在跟我另外一個朋友他是做音樂的是那",
+      "chunk_id": "cf2cdf9e-1aab-4b4c-baf5-ebe85c56c2a2",
+      "chunk_index": 67,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "他的基本上他的先做好他也許一個Track一個Melody剩下的他可以用AI去就是先自動配那種鼓啊什麼Bass啊什麼他已經在做音樂的過程當中已經在使用AI在去做的東西那我們回到BD就是業務發展那業務發展要什麼工具他的工具主要就是PPT啊就是文字啊這些東西",
+      "chunk_id": "0155ea23-beac-428c-b462-07667ddee57e",
+      "chunk_index": 68,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "語言啊就是描述一個Value Proposition給客戶那這是不是可以使用Chargability來幫忙我覺得可以啊然後我覺得很多人都在用這個我個人是沒有用為什麼我個人是因為我如果腦子不清楚的話然後我要依賴Chargability來描述我在做什麼東西那我公司一定會完蛋所以我一定要我一定要是我不需要Chargability就一定要能夠講得清楚才能",
+      "chunk_id": "c3429c8c-ff8f-40f6-bab4-d95bcdb1bdb0",
+      "chunk_index": 69,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 174
+    },
+    {
+      "chunk_text": "才能做好你CEO的工作Lydia AI的CEO竟然沒有用Chargability我覺得是一個不錯的結尾對我這個我也是Computer Science我還是有就是玩就是不同GenAI的一些東西了解因為我覺得是趨勢嘛就是趨勢要了解一下那我相信公司的人裡面尤其是在Marketing部門裡面的人應該有在用Chargability",
+      "chunk_id": "251f6e9e-8442-4afb-a834-896dc15cf058",
+      "chunk_index": 70,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 161
+    },
+    {
+      "chunk_text": "其實今天我們在跟Anthony聊天的過程當中呢除了更加了解Lydia AI這家公司還有他們的願景他們的歷史之外呢其實我們也看到了在保險這個其實已經可能數百年的領域它透過AI的力量可以怎麼樣的更好幫助這些企業客戶們去設計出商品然後去解決更多人的問題甚至是達到Anthony所說這個Protect the next billion這件事情所以今天非常謝謝Anthony帶到我們的節目現場",
+      "chunk_id": "d79d7c7d-f0e2-4a43-9a7b-f453617f1f4f",
+      "chunk_index": 71,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 191
+    },
+    {
+      "chunk_text": "也期待我們更多進度的時候可以回到這個節目跟大家分享謝謝Peter謝謝大家未來商學院讓我們下一集見謝謝掰掰",
+      "chunk_id": "45bce5bf-c048-4f35-b31d-a29732868ad6",
+      "chunk_index": 72,
+      "episode_id": "6867815454dac0f7fe975a17",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院買保險AI讓你花更少錢買到更適合的商品S1EP59.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 52
+    }
+  ],
+  "original_text_length": 9643
+}

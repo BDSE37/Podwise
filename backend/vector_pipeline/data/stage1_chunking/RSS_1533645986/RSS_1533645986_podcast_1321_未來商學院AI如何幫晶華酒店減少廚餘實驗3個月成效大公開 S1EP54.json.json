@@ -1,0 +1,477 @@
+{
+  "filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+  "episode_id": "6867815454dac0f7fe9759db",
+  "collection_name": "RSS_1533645986",
+  "total_chunks": 52,
+  "chunks": [
+    {
+      "chunk_text": "早安 歡迎收聽未來商學院在這裡我們一起認識未來的商業大家好 我是瘋傳媒的財經副總編輯周啟源你去吃過自助餐嗎你對於自助餐當中的哪一些菜色通常會最感興趣呢",
+      "chunk_id": "f41bab29-68da-4ef7-a314-64bd024a0fc0",
+      "chunk_index": 0,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 75
+    },
+    {
+      "chunk_text": "我們今天要特別來聊一下AI在五星級飯店當中廚餘的問題可以如何透過AI的系統來解決會發展到這個問題其實是因為我們今年想要多推廣一些跟AI有關的各行各業的應用到底有一些什麼樣的實際案例今天我們就很高興的邀請到了精華酒店的永續發展協理廖國秀廖協理邀請Sharon和我們來聊一下在五星級飯店當中是如何引進",
+      "chunk_id": "a68f6c72-58e2-43b6-ae61-f1bb27377a32",
+      "chunk_index": 1,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 148
+    },
+    {
+      "chunk_text": "AI的廚餘辨識系統來幫助減少廚餘並且達到更多ESG的相關的成效讓我們歡迎Sharon",
+      "chunk_id": "5c32999f-04df-4cb6-9d05-547581e756fc",
+      "chunk_index": 2,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 42
+    },
+    {
+      "chunk_text": "就想到確實其實不只精華酒店我相信在每一家的大飯店當中自助餐的廚餘的問題肯定都是大家想要節約成本的一個起始點但是在解決問題的方法上面如果沒有AI的話我們可能很容易就留於一種無邊無際的推論今天的天氣不好大家吃不下冷的或者說今天比較熱所以大家就想吃冰的沒有辦法有一個比較科學的解決的方案出來",
+      "chunk_id": "03699023-9682-4a39-9a89-873bfe43831d",
+      "chunk_index": 3,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 142
+    },
+    {
+      "chunk_text": "所以我想先請教一下以前在AI這個系統引進以前你們是碰到一些什麼樣的廚餘問題那你們如何去著手去嘗試改善它呢沒錯其實就像剛剛副總編輯講的就是說如果是一般的單點餐廳因為它通常是接到單才生產才製作所以它的廚餘量不會到非常多但是自助餐廳",
+      "chunk_id": "fbe46f6a-c862-45af-abf2-8fde1c9efc67",
+      "chunk_index": 4,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "它是做好了放在餐台上讓客人來取用雖然我們會因應定位數或是住房的房客數來做量的調整但是還是會遇到很多剩餘下來的一個問題所以這是我們會遇到的一個煩惱其實很多很多的同業應該也都是這樣但以前你們在嘗試解決廚餘的問題",
+      "chunk_id": "1864c47d-54e8-40df-9dfb-5c02e285c00a",
+      "chunk_index": 5,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 103
+    },
+    {
+      "chunk_text": "你們試過哪些方法嗎以前的話可能就會變成是說比較用人工的方式除了就是說會去調配它廚餐的量之外剩餘下來這些廚餘我們就需要用人力的方式去秤它去記錄一樣一樣去記錄初期的時候可能就是說一個餐期結束之後我就去秤總重量然後去做計算",
+      "chunk_id": "35d95c01-2f59-4437-aa14-8f0b73b8d3d0",
+      "chunk_index": 6,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 108
+    },
+    {
+      "chunk_text": "然後慢慢會發現說這樣子我可能只知道說今天大概是多少量那可能一段時間下來我只是會知道說有沒有增加有沒有減少但是我還是就像剛剛講會有點不著邊際我根本不知道說我應該從哪邊著手我只知道說多了一點或是少了一點但是問題在哪裡我還是搞不清楚而且同樣的這個重量成本結構可能完全不一樣今天可能剩下生魚片比較多昨天是水果",
+      "chunk_id": "c5b7da2b-5acc-4c44-a24d-95c0deec7031",
+      "chunk_index": 7,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 150
+    },
+    {
+      "chunk_text": "可是生魚片的價格可能是遠高於水果沒錯所以就會覺得說我雖然只知道說重量增加了或減少了但是我卻不知道就像剛剛的成本結構或是說到底是什麼東西增加了什麼東西減少了那是怎麼樣導致的所以後來我們就想說那不行我們想要更細緻的去分析所以雖然一樣是用人力我會變成一道一道的去量測但是後來發現",
+      "chunk_id": "48d31666-825c-417a-83fc-9d141b009f00",
+      "chunk_index": 8,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "這個菜色其實非常非常的多我蠻想問的請問貴自助餐廳有幾種菜色我沒有量過但是我這樣放眼望去我就可能應該上百種沒錯真的有上百種有上百種所以就會變成是說當然雖然可能餐期結束之後每餐食有一些沒有辦法再利用然後需要去直接丟棄的這些可能每道菜只有幾百公克但是其實集合在一起",
+      "chunk_id": "205a5f7b-e139-4797-96e5-f7ef28aa9e2f",
+      "chunk_index": 9,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "很多那加上如果我們需要用人力的方式來去做記錄就是去秤去記錄甚至才要再把key到電腦裡面去哇這個工程其實非常非常浩大會耗費很長很長的一個時間而且你們一天有早餐午餐下午茶還有晚餐沒錯有四個期間四個餐期等於你們要量四次要量四次而且你要想想看可能你說有一百多道的菜肴",
+      "chunk_id": "0bce37ae-7a82-49c7-8235-d64c96abb19b",
+      "chunk_index": 10,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "那搞不好有可能會有差不多一半的他都有剩一些些不管是剩10克20克或是多一點的問題是他都要做同樣的一個動作都要去量然後去記錄然後在後端再要key進電腦所以其實是一個非常耗時很大的一個工程後來在這樣子的選項似乎不那麼可行人工的選項不那麼可行的狀態下你們是大概什麼時候開始",
+      "chunk_id": "1945fa35-dfd5-4bc1-a0c3-da9ccf71e2af",
+      "chunk_index": 11,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "這個想法就是有沒有可能用AI來解決這大概是什麼時候發展出來的其實應該比較比較具體的話應該是在差不多疫情的那個期間因為疫情期間反而是說整個可能生意量或是生意的模式都有了一定就是會有了一些改變那那個時候呢我們開始也投注了就是開始在思考一個數位轉型的一個模式不管營運模式或者是一些現場操作的模式那那個時候當然也有",
+      "chunk_id": "71330e75-f054-4da7-b672-12b99bcd2a93",
+      "chunk_index": 12,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 153
+    },
+    {
+      "chunk_text": "講到就是說在疫情期間不管是成本管控或是一些食材的運用對我們也都是很特別的一個敏感跟重要所以那個時候就開始研究有沒有這樣的一個方式可以來用AI的方式來代替我們之前那麼耗時那麼費力的一個模式所以就做了一些研究然後後續就找到原來在雖然台灣沒有引進其實在市面上已經有了這樣的一個系統",
+      "chunk_id": "aefc3d2f-96ca-4c7b-a404-bef81dd457d7",
+      "chunk_index": 13,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "我們想說縱使台灣沒有但是我們還是很想把它引進台灣可以在飯店裡面來做一個使用所以我們就跟它做了一個接洽所以你們引進了這套新的系統是那你們在實際導入的時候大概中間這個摸索的期間然後溝通的期間大概花了多長呢其實在前端就是說可能跟它開會跟它聯繫那我們也雖然我們做了很多功課",
+      "chunk_id": "82d3be1b-7dbc-446d-9af9-809d8261053c",
+      "chunk_index": 14,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "但是我們也需要知道說它的運用這個系統是不是可以符合我們真正的操作的一個模式是不是真的合用所以可能來來回回在線上會議或者是相關的這個它有很多不同的一個軟體的一個方案這些討論的話應該有半年多的時間然後這個系統是實際在什麼時候上線的其實應該是在",
+      "chunk_id": "880db9e2-8ccb-4dda-8b70-e90177579e5b",
+      "chunk_index": 15,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "去年底2023年底對2023年底它才運來台灣然後才我們才開始做一個安裝測試那也得讓這個系統符合我們的這些亞洲還有台灣這邊的一個營運模式我們的菜色啊我們的這些的需求所以呢我們有做一些調整然後接下來呢也有一個基礎線的一個設定然後還有訓練啊這些其實",
+      "chunk_id": "097a9b85-fe03-4065-9e15-fd7bc02c6a3b",
+      "chunk_index": 16,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 121
+    },
+    {
+      "chunk_text": "也花了不少的時間",
+      "chunk_id": "b357c697-d6f2-4c60-bf28-c711ab8aacfd",
+      "chunk_index": 17,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 8
+    },
+    {
+      "chunk_text": "然後它就會幫你記錄下來應該是這樣子的意思嗎類似它應該是說我們有很多不同的餐臺不同的區域所以呢我們其實前期呢會有一個訓練我們會跟廚師他們已經確認好那可能我們已經確認說餐臺上面在餐席結束之後剩餘的這些菜肴可能在食品安全的考量上或者是說在它的二次運動",
+      "chunk_id": "0d319171-d5d6-4265-b0be-a37ee94cd744",
+      "chunk_index": 18,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "運用上都會有困難的我們需要去拋棄的這一些呢他們就會收集那以每一個station當一個單位然後呢我們就會送到這個AI廚餘機這邊然後呢每一道倒下去那這個AI系統呢它會同步的秤重跟拍照然後它的這個電腦呢會運作然後辨識它是什麼東西然後呢我只需要去確認說它辨識的結果",
+      "chunk_id": "e4e35288-aa39-4a64-925c-0c2a8cbdb53e",
+      "chunk_index": 19,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "是否正確然後呢就完成記錄我就可以再下一道所以呢其實大家其實也培養了一個默契那每一區的比如這區做完了處理之後就會請下一區的同事過去雖然可能100多道的菜肴但是呢我們做這個處理的可能大概差不多10分鐘15分鐘就已經可以完成了它這個辨識的效果我蠻好奇的你們覺得它辨識的效果如何呢",
+      "chunk_id": "4a6343e4-80ae-4f2c-a909-c37926e474e0",
+      "chunk_index": 20,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "就是白色的東西它要確認不是白飯而是生魚片它這個真的能夠做到這樣子嗎其實應該是說雖然在我們跟對方開會的期間雖然對方介紹啦展示影片啦但是老實說我個人我心裡面也是會有點覺得說不可能吧真的有那麼厲害嗎你看我也想要問這個問題然後就它真的來之後其實有點出乎我意料比我想像的好",
+      "chunk_id": "3d20ae00-7b63-4f0a-a80e-43bef73aa59d",
+      "chunk_index": 21,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 131
+    },
+    {
+      "chunk_text": "所以呢好吧那這邊可以透露一個小秘密其實呢它裡面搭載的呢其實是輝達的超級電腦所以我們繞了一圈又開始說NVIDIA的厲害了糟糕太厲害了所以它的這個辨識確實有達到你們希望的水準當然它沒有辦法到百分之百那特別又是我們是這種亞洲菜系的比例算是比較高的",
+      "chunk_id": "8d3f0e4d-0444-4b88-97ea-2cd9cf5f26a8",
+      "chunk_index": 22,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 120
+    },
+    {
+      "chunk_text": "其實這個系統開發的母公司它是英國出來的所以當然你說它要那麼貼近說亞洲的這些菜色的文化應該是有點困難或是台灣的一些當地小吃沒有辦法那麼完全的貼近但是其實還是比我原本預期的要好一些它的每一道菜就是每一道菜裡面它內建了一千多張照片",
+      "chunk_id": "74ec9efb-59af-461d-8761-04445654c1bb",
+      "chunk_index": 23,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 112
+    },
+    {
+      "chunk_text": "然後它會從顏色形態等等的去做一個辨識那當然還有另外一個就是說我們常講AI它是可以被訓練它會越來越聰明所以前期一定是比較需要調教的對需要調教所以一開始我們可能丟下去的時候它可能在辨識之後它有可能如果不是那麼容易辨識了它可能會跳出它就沒有辦法馬上告訴你說它認為那個是什麼它會跳出可能八種東西然後你要告訴它說這是它八種東西",
+      "chunk_id": "7a826864-dcc9-4ff9-a2ef-efab9f57b6f0",
+      "chunk_index": 24,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 158
+    },
+    {
+      "chunk_text": "八種東西裡面的哪一個甚至你以後會遇到說八種都辨識錯了那我可能需要進它的系統告訴它說其實這個是什麼給它一個新的選項對但是越來越運用之後發現的確它會變得越來越聰明它可能就會變成說它很快的就可以辨識出這個東西到底是什麼東西了甚至可以區分馬蹄條跟春捲是這個意思嗎",
+      "chunk_id": "10e789d7-2904-4b9b-8ae5-bc3928efbc3b",
+      "chunk_index": 25,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "馬蹄條跟春捲長得很像這個老實講馬蹄條跟春捲我就不敢保證了因為的確的確很相像不過它的辨識的能力倒是比想像中的好一些還有就是說可能只是菜肴的某些部分它也可以我們之前也會想說想要測試它一下所以會故意拿一些比如說水果的皮或是什麼的一部分",
+      "chunk_id": "8a7b1064-d985-4197-8505-d174aea0ebe4",
+      "chunk_index": 26,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 114
+    },
+    {
+      "chunk_text": "就是它並不是完整的樣子那你可以辨識嗎但是有一些哇原來它還是可以辨識它抓得到那當然有一些還是有一些當然可以蓋更好的地方那我們也有因應就是說我們剛有講到的台灣的一些菜系或是亞洲菜系可能沒有完全內建在它的系統裡面那我們有些比較獨特的",
+      "chunk_id": "656281db-6ef2-4266-a478-f88bfab624b4",
+      "chunk_index": 27,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "會提出來然後請他們幫我們建到這個系統裡面去希望可以更貼近我們的使用的一個習慣跟模式那我做一個財經組的記者我們就很想問一個問題這樣子看起來上線幾個月內它的效益是符合甚至超過你們期待的嗎其實您可以知道說我們使用到現在其實並不是很長很長的時間有幾個月的時間",
+      "chunk_id": "5eab4410-cdeb-4ff2-a748-a0ba90955c2a",
+      "chunk_index": 28,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "其實又有訓練跟這個調整的一個階段所以說如果要說是很具體的一個很大量的一個減量或者是說成本的壓低可能目前還沒有辦法看到那麼卓越的一個效果不過第一個就是我們剛剛一開始講的就是我們如果用人工來做同樣的事情的時候我們花了很多的時間跟人力那第一個最顯著就是說這個時間",
+      "chunk_id": "378e6b50-7966-4aaf-b023-c891a027472b",
+      "chunk_index": 29,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "跟人力已經先節省起來了那我們都知道說飯店業或者是餐飲業現在最缺工的這個問題就是大家都很頭痛的問題所以人力省起來那就是一個對我們來講很有價值的事情那再來還有一個很有趣的事情就是說它這個系統它除了記錄之後它不是說只有記錄它記錄之後當然它每天每個月它會出一個分析報告",
+      "chunk_id": "00aad5bf-f631-477c-8db5-0056712da9a2",
+      "chunk_index": 30,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "這個分析報告它可能可以從比如說成本我的每一筆然後這樣的丟棄我耗費了多少成本或是多少的重量然後什麼樣的種類它都可以去做一個分析跟一個比較那加上我也可以知道說我不同的餐期我可能丟了什麼東西丟比較多或者是說甚至我禮拜一到禮拜天我丟的量的曲線",
+      "chunk_id": "3b9ed6f4-a93e-43c7-9e1e-bffcd727ccb5",
+      "chunk_index": 31,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 117
+    },
+    {
+      "chunk_text": "怎麼分佈的那它也可以對應到說我今天的萊克數我今天萊克數比較多然後對應到我的這個丟棄的量那這樣是不是合理那還有一個很有趣的就是說它除了會記出這個日報表周報表之外那還有另外一個就是說我可以直接在我的電腦我坐在我的電腦桌前面從它的後台我就可以可能很即時的五分鐘之後我就會知道說",
+      "chunk_id": "be89b605-453d-40b8-a3db-d8cae4a00962",
+      "chunk_index": 32,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "廚房那邊它丟了什麼東西我甚至可以看到照片因為它每一筆它都會拍照所以我就可以直接看到說剛剛有什麼東西被丟掉了大概是多少的重量然後它的價值是多少錢然後我還可以看到它的形態所以在這樣的情況之下每個餐台的廚師們也知道說我他們這些都有在被管控反應速度非常快然後他自己在做",
+      "chunk_id": "f357c821-67e1-45b4-ada3-5cd106b755ce",
+      "chunk_index": 33,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "這些處理的時候他也會更謹慎他就會知道說我這個一直有被這個monitor所以呢比如說我現在已經餐體快結束了我就不會做一大堆東西放在餐台上因為他很有可能等一下就會變成廚餘會被浪費掉而且很快的就會被我發現了因為甚至有拍照對他每一筆都會拍照而且蠻清楚的那我就會知道他每一筆丟了什麼東西所以我們常常在笑說別人都在滑這個IG看這個照片",
+      "chunk_id": "96147888-add0-415b-bbcd-b1bac3e56bb9",
+      "chunk_index": 34,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 161
+    },
+    {
+      "chunk_text": "結果呢我的電腦打開呢也是一格一格的照片結果我看的都是廚餘對我就一直在看廚餘桶的照片所以這套系統讓精華的自助餐廳在廚餘的問題上面比較有了一個客觀的基準可能跟來客數可能跟日期可能跟當天的天氣有一個比較能夠去科學分類跟歸因的一個基準去討論沒錯那他在他在整個這個使用",
+      "chunk_id": "58855910-32d5-4025-b09c-3a54978ebc8d",
+      "chunk_index": 35,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "上面我覺得很好奇的一點就是說好那假設今天魚剩下比較多或者說是麵點類剩下比較多假設慢慢有這樣子的趨勢出來的話他可以成為你們在改善這個組合菜色組合上面一個很重要參考是這個意思嗎這個也是其中一部分如果有一些菜肴我們會發現說他被丟棄的量比較多而且他可能重複的出現了那他可能就會變成是說他就不是一個很隨機",
+      "chunk_id": "6448c488-197d-43d6-8320-1af5c2aec9c6",
+      "chunk_index": 36,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 147
+    },
+    {
+      "chunk_text": "發生的一個問題而是他可能真正有什麼樣的原因在背後那我們就得去找出來為什麼這一類的產品或是這一項產品他被丟棄的數量跟頻率都是對都是高的那我們可能會去比較簡單的我可能會先從後台看一下他的樣態他的樣態是不是正確的那再來我們就會安排秘密的同事去就是可能跟餐飲部沒有關係的同事秘密的",
+      "chunk_id": "b854a2ad-abd4-44ef-a401-8b6fa2407b3d",
+      "chunk_index": 37,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "去試吃他的菜肴一個秘密客的概念嗎一個秘密客的概念但是他當然不是真正的客人但是我們可能會安排就是譬如說財務部的同事就是比較深面孔的或是這個客房部的同事去幫我們吃一下就是說那道菜是不是有什麼問題去嘗一下他的口味去看是到底發生在怎麼樣或者是說賣相是不是不好",
+      "chunk_id": "54193b48-0560-43a0-acd3-912ea48672a6",
+      "chunk_index": 38,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "當然也有可能是說是不是說客人他在評估下來他可能覺得說這一項會不會是客人認為CP值不高所以他比較不喜歡吃啦當然也有可能是說這個師傅他自備的時候他的量可能就沒有調整好他可能不是那麼有經驗或者是說他一次做了太多那餐旗已經快結束了但是他卻沒有考慮到這個部分他還是出了在餐旗前",
+      "chunk_id": "db14d3c9-c8e3-49b3-9b7e-8ed6525186ca",
+      "chunk_index": 39,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "一段的時候的那樣的量就是我們會去找出他的原因那如果真的是一些口味或者是說客人喜好的問題我們當然也可以從這邊來做一個菜色調整的一個依據所以看起來這個六位數到七位數的投資他其實在成效上面他比較明顯的是能夠排除隨機這件事情然後讓你們去有一個比較客觀的基準去討論說到底是數量的問題還是質量的問題",
+      "chunk_id": "71cbf07f-fcde-4a4a-81d6-b9433a91cc10",
+      "chunk_index": 40,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 143
+    },
+    {
+      "chunk_text": "這個的確因為像以前在人工記錄的一個時代那可能就是說很多我們初期可能只有一個量但是你也談不上說到底是什麼東西所以你要去跟團隊去做一個討論的時候其實他是一個很模糊的一個空間但是現在其實就有很精準的一個數值甚至有照片的一個佐證所以就會變得是比較容易的去真正探討",
+      "chunk_id": "2cc548e5-b536-491b-a71f-48f3f86272ee",
+      "chunk_index": 41,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "這個原因那當然就是說在廚師端也會有一個其實我們之前常常會講到說廚餘這個東西他的產生就是還有一個部分就是說可能師傅在製備的時候他就已經產生一些廚餘甚至就是說他煮的好不好吃也會變成廚餘量的多少的一個部分那我們之前一直都很推行的一個概念其實不只在自務",
+      "chunk_id": "e7e2943c-e4a2-4f95-a6fd-90d6caeb7c67",
+      "chunk_index": 42,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "餐廳在我們所有的餐廳裡面都是我們會再推行一個全食的概念全食什麼呢譬如說就是一個食材那我們希望他可以運用到極致譬如說我們以前很常講的我們從這個就是東部的漁港直送的魚來到了精華酒店那這條魚他可能在身體的部分他變成了生魚片那他魚皮的部分或是魚骨的部分",
+      "chunk_id": "87a97a96-21f0-468a-bfac-d3d1ef96b688",
+      "chunk_index": 43,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "他可能可以去做熬湯魚頭的話他可能可以去紅燒我們會希望說他被運用到極致那所以呢也會激發師傅這樣的一個想法就是說因為我們現在很投注了很多的精力在這個廚餘的管理上面那所以呢除了他需要去在菜單的設計上或是食材運用上",
+      "chunk_id": "55a66b11-0831-4e63-8ffb-30a12a6e6bbe",
+      "chunk_index": 44,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 103
+    },
+    {
+      "chunk_text": "一樣可以讓顧客更加的喜歡喜愛他的這些菜餚那另外就是說他在製備過程當中是不是他的廚餘量也可以降低像我們最近也有這個烤鴨的部分那可能烤鴨在之前我們可能會做一鴨三吃啊什麼但是呢因為其實烤鴨呢他會有很多油脂那以往這個油脂呢他可能就直接變成了這個肺油",
+      "chunk_id": "3b0c6725-e09c-4ac9-98f4-6d3554019642",
+      "chunk_index": 45,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 120
+    },
+    {
+      "chunk_text": "或是這個就是廢棄的油或者是廚餘的一部分那你如果有一些可能在滴在這個容器上的洗滌的時候他有一些甚至到了解油槽我還得去把它處理掉但是呢其實鴨油是一個很好的東西所以我們的這個主廚他也有想到說那也是他可以運用的一個方向所以呢最近呢除了這個液鴨三吃之外呢這個烤鴨的過程就處理過程當中呢",
+      "chunk_id": "66dae7a2-3a64-4f2c-be44-0faa499d69d6",
+      "chunk_index": 46,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "鴨油呢我們的主廚去把它煉出來他變成了是一個拌飯拌麵的一個很好的一個食品所以呢這樣子就更加 因為他很香對很香很香其實所以他就把鴨油煉出來變成了一個產品可以拌飯啊拌麵啊所以師傅們他們現在各有點是大家互別苗頭不同的餐廳的師傅都互別苗頭希望說怎麼樣的可以運用到極致",
+      "chunk_id": "b2b2ea56-3b23-46fe-b0f8-e5c03075f36c",
+      "chunk_index": 47,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "就是說我可以產品更多樣化我的這些菜肴更受歡迎那我的這個餐廳的廚餘量呢又比較低這樣子就顯得更有面子所以在拍照記錄的同時其實也會告訴大家能不能夠更有這個可以說是循環經濟的思路循環經濟可能是比較商業雜誌的語言我覺得用您的剛才的語言就是鴨油就是重複的把一個",
+      "chunk_id": "751f5c73-aa3e-4a3e-a07c-d8178f24d46a",
+      "chunk_index": 48,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 124
+    },
+    {
+      "chunk_text": "可能會被丟掉的東西其實很好吃的東西其實鴨油拿來炒菜應該也是不錯我相信是講到這邊肚子都有點餓所以我們看出來說其實新華酒店在這次導入這個AI的廚餘辨識系統之後其實他發展出來的是除了剛才講到的一個重點比較能夠客觀的科學的去分類到底是不是隨機的變數導致廚餘剩下太多之外好像也讓各個餐台的主廚們大師們",
+      "chunk_id": "0e5a0d49-7026-4dd9-a90e-7ee1f5d87a97",
+      "chunk_index": 49,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 145
+    },
+    {
+      "chunk_text": "讓他們的這個廚藝更加的有循環經濟然後更往這個環境友善的這個思維去把每一個食材都用到極致這樣當然就能夠減少廚餘了沒錯所以透過Sharon剛才的分享我覺得大家在AI的這個能耐上面似乎又學習到了更多對原來NVIDIA的電腦還真的是真的是蠻厲害的它的辨識看起來是很準確的對好我們今天非常謝謝Sharon來到現場給我們做這麼精彩的分享也期待呢",
+      "chunk_id": "1cbf0148-cc5c-4d62-9eae-aaab24985980",
+      "chunk_index": 50,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 166
+    },
+    {
+      "chunk_text": "大家能夠從我們的節目當中聽到更多跟AI有關的各行各業的應用好未來商學院讓我們下一集見謝謝拜拜",
+      "chunk_id": "907c68c7-dc98-4713-869f-2187ad0944c4",
+      "chunk_index": 51,
+      "episode_id": "6867815454dac0f7fe9759db",
+      "original_filename": "RSS_1533645986_podcast_1321_未來商學院AI如何幫晶華酒店減少廚餘實驗3個月成效大公開 S1EP54.json",
+      "collection_name": "RSS_1533645986",
+      "chunk_length": 46
+    }
+  ],
+  "original_text_length": 6469
+}

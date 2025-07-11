@@ -1,0 +1,194 @@
+{
+  "filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+  "episode_id": "6865015b66c1a4e8d11766a4",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 13,
+  "chunks": [
+    {
+      "chunk_text": "Hello, this is 6 Minute English from BBC Learning English. I'm Neil. And I'm Georgie. That's one small step for man, one giant leap for mankind. Famous words, but do you know who said them? Of course! That was Neil Armstrong, the first person to land on the Moon. Right. The Apollo 11 spacecraft landed Neil Armstrong on the Moon on the",
+      "chunk_id": "76b416f0-2886-48e1-92f3-ef9c1a29968d",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 336,
+      "enhanced_tags": [
+        "SPA",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.046583"
+    },
+    {
+      "chunk_text": "20th of July 1969. But in decades after that famous event, interest in returning to the Moon faded away. Until now…",
+      "chunk_id": "6ea0cb63-2b64-49f2-94b7-863a1a811e72",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 115,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.048857"
+    },
+    {
+      "chunk_text": "But why this sudden interest in going back to the Moon? That's what we'll be discussing in this programme and, as usual, we'll be learning some useful new vocabulary too. But before we blast off, I have a question for you, Georgie. Everyone knows that Neil Armstrong was the first man on the Moon and was followed by a second astronaut, Buzz Aldrin. But who was the third Apollo astronaut who flew the command module while his crewmates walked on the Moon?",
+      "chunk_id": "ec9cf6c6-faf6-443d-a4f3-a7c48ac6d399",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 456,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.051561"
+    },
+    {
+      "chunk_text": "Hmm. I think it was Michael Collins. OK, Georgie. We'll find out the answer at the end of the programme.",
+      "chunk_id": "bf83dc69-c6a6-4c42-9a78-de96c08d85cc",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 104,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:07.053813"
+    },
+    {
+      "chunk_text": "Here's astronomer Dr Becky Smethurst explaining more to BBC Radio 4 programme Inside Science.",
+      "chunk_id": "bb60d804-5662-4b6d-af4d-09cad02a5c8b",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 93,
+      "enhanced_tags": [
+        "CI",
+        "XP",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.055950"
+    },
+    {
+      "chunk_text": "Every single thing that's happened to the Moon in its four and a half billion years worth of history is still recorded there on it. And so if anyone's ever seen an image of the far side of the Moon, so the side of the Moon that we cannot see from Earth is incredibly pot marked. There are craters all over that thing. And so this is a really big deal when we're thinking about what happened to the early Earth as well, because we think all of the Earth's water",
+      "chunk_id": "82fa48c3-50ec-4308-b8d3-67d8d9a34298",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 460,
+      "enhanced_tags": [
+        "BI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.058658"
+    },
+    {
+      "chunk_text": "came from impacts with comets and asteroids in the very early days of the solar system.",
+      "chunk_id": "7e7a040c-d005-4c8c-a644-61dedec97e69",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 87,
+      "enhanced_tags": [
+        "ROI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.060877"
+    },
+    {
+      "chunk_text": "That's right. Astronomers know that comets are full of ice and think comets brought water to Earth when they crashed into it. Evidence of those crashes has been erased by the constantly moving surfaces on Earth, but not on the Moon. So comparing water from the Moon with water on Earth",
+      "chunk_id": "fc90e800-51df-448f-9ba3-b2e38f0f1bba",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 285,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.063646"
+    },
+    {
+      "chunk_text": "could provide scientists with vital information, as Dr Smethurst explained to BBC Radio 4's Inside Science. Yeah, so they'll be looking essentially to see if it has the same characteristics as water here on Earth. And then we can sort of trace that back from sort of the crater history as well to working out what actually happened, how long has it been there for as well. Also, various other minerals that might be there, these very heavy minerals that we know come from comets and asteroids. Again, that'll be this sort of smoking gun to be like, yes, that's",
+      "chunk_id": "d71fa12e-caa2-41a2-ac63-392227ba96c8",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 560,
+      "enhanced_tags": [
+        "ROI",
+        "CI",
+        "VaR",
+        "XP",
+        "AI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.066501"
+    },
+    {
+      "chunk_text": "where this water came from and it's likely that Earth's water came from there as well.",
+      "chunk_id": "e2da8957-1650-4935-907e-f4ba32932b21",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 86,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:07.068678"
+    },
+    {
+      "chunk_text": "Which was the correct answer. Michael Collins never set foot on the Moon himself, but afterwards said the experience of looking back at Earth from the Apollo spacecraft changed his life forever. OK, let's recap the vocabulary we've learned from our trip to the Moon, starting with inert – not moving or unable to move.",
+      "chunk_id": "13b01275-03bf-4da9-a64c-cf3410c223df",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 318,
+      "enhanced_tags": [
+        "SPA",
+        "XP",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.071219"
+    },
+    {
+      "chunk_text": "A crater is a very large hole in the ground. Pockmarked means marked by small holes and scars. If you say something is a big deal, it's important or significant in some way. To trace something back means to discover its causes by examining how it developed. And finally, the idiom a smoking gun refers to indisputable evidence or conclusive proof of something. Once again, our six minutes are up. Join us next time for more",
+      "chunk_id": "81b1faa8-81aa-4474-84df-5ff8ad639dd9",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 423,
+      "enhanced_tags": [
+        "RTA",
+        "AI",
+        "KM",
+        "BI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.073768"
+    },
+    {
+      "chunk_text": "fascinating science and useful vocabulary here at 6 Minute English. Goodbye for now. Goodbye.",
+      "chunk_id": "027ac667-b283-4fcc-bc53-82a2dcaab9f8",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d11766a4",
+      "original_filename": "RSS_262026947_podcast_1304_Learning lessons from the Moon.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 93,
+      "enhanced_tags": [
+        "CI"
+      ],
+      "tagged_at": "2025-07-10T14:45:07.076048"
+    }
+  ],
+  "original_text_length": 3428,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:07.076053",
+    "total_chunks": 13,
+    "total_tags": 25
+  }
+}

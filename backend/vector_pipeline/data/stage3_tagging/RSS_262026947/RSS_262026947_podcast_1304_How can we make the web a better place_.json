@@ -1,0 +1,200 @@
+{
+  "filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+  "episode_id": "6865015b66c1a4e8d117667e",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 13,
+  "chunks": [
+    {
+      "chunk_text": "This is a download from BBC Learning English. To find out more visit our website.",
+      "chunk_id": "1533a55b-71c4-4f66-9e64-260578e877ee",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 81,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:10.041468"
+    },
+    {
+      "chunk_text": "Modern computers and the internet have revolutionised the way we live today, bringing us the world with a click of a button. But not everyone feels happy about these technological developments.",
+      "chunk_id": "09f86916-500e-482e-8083-32c4394dbd37",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 193,
+      "enhanced_tags": [
+        "BRI",
+        "PM",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.043823"
+    },
+    {
+      "chunk_text": "In this programme, we'll hear about a new academic subject called web science. Web science studies the technology behind the internet. But from the human side, it's also interested in how people interact with each other online. So we'll be asking whether studying web science could make the internet better for humanity in the future. But first, it's time for our quiz question. I wonder what the pioneers of the internet would think about how it is used today. So the question is",
+      "chunk_id": "1fb61370-0159-4e17-8c4e-709974b42534",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 480,
+      "enhanced_tags": [
+        "CI",
+        "LED",
+        "ES",
+        "UI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.046614"
+    },
+    {
+      "chunk_text": "Well, Bill Gates and Steve Jobs were the brains behind Microsoft and Apple Mac, so I'm going to say C – Tim Berners-Lee. OK, Sam, we'll find out later. Now, because of coronavirus, the annual Web Science Conference was held online this year. Its theme was making the web human-centric.",
+      "chunk_id": "25ad80a9-a713-45a4-8929-3090fa7d0cdd",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 285,
+      "enhanced_tags": [
+        "CI",
+        "BI",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.049140"
+    },
+    {
+      "chunk_text": "The new discipline of web science was Dame Wendy Hall. Here she is speaking to the BBC World Service's Digital Planet.",
+      "chunk_id": "9ba2bdf7-75b8-4df1-81c5-931980e8fb14",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 118,
+      "enhanced_tags": [
+        "CI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.051308"
+    },
+    {
+      "chunk_text": "Web science is not only interested in the technology side of the internet. As a subject it's very interdisciplinary, involving two or more academic subjects or areas of knowledge. Web science combines digital technology with subjects ranging from psychology and robotics to economics and sociology.",
+      "chunk_id": "8cf83515-7b25-4850-bfdc-29231d3960db",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 298,
+      "enhanced_tags": [
+        "CI",
+        "BI",
+        "LED",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.053994"
+    },
+    {
+      "chunk_text": "This view of technology sees the internet as an ecosystem – a complex pattern of relationships and mutual influences that exists between all living things and their environment.",
+      "chunk_id": "b9636aed-e3ab-4faf-a920-cf0cc407fe7a",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 177,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.057162"
+    },
+    {
+      "chunk_text": "But as Carly Kind, director of the Ada Lovelace Institute in Cambridge, explained to the BBC World Service's Digital Planet, things are never that straightforward.",
+      "chunk_id": "7c8c725b-45c4-43bb-9f4f-8b9e9d298661",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 163,
+      "enhanced_tags": [
+        "BRI",
+        "XP",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.059406"
+    },
+    {
+      "chunk_text": "Apps like this are designed to support public health – services to improve the standard of health of a country's general population.",
+      "chunk_id": "5b19284a-6b02-48b6-904b-b66eee3f233b",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 132,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.061667"
+    },
+    {
+      "chunk_text": "Meaning, work exactly as it is intended to. To find this out, trials – tests to discover how effective or suitable something is – are carried out over a period of time. The kind of trials which were carried out during the invention of the internet in the first place, right, Neil? Ah yes, the invention of the internet, or to be more accurate, the World Wide Web. In our quiz question I asked you who invented the World Wide Web. What did you say, Sam?",
+      "chunk_id": "d7202b19-9b61-444f-a9d8-57101ac3e8c7",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 452,
+      "enhanced_tags": [
+        "UI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.064404"
+    },
+    {
+      "chunk_text": "I said B – Tim Berners-Lee. Well, you're a first-class web scientist, Sam, because that is the correct answer. Ah great! In this programme we've been hearing about web science – a new interdisciplinary subject combining several areas of study which investigates the ecosystem of the internet – the complex pattern of interconnections between humans and their environment.",
+      "chunk_id": "6a6916d6-efca-4c85-8805-19a635182f56",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 371,
+      "enhanced_tags": [
+        "CI",
+        "BI",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.067069"
+    },
+    {
+      "chunk_text": "A new Covid contact tracing app is currently undergoing trials – tests to see if it works effectively. This will discover, if it does, what it says on the tin – works as it's supposed to.",
+      "chunk_id": "cd379a81-10ea-4039-af95-feb6cdc857a7",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 187,
+      "enhanced_tags": [
+        "CI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.069426"
+    },
+    {
+      "chunk_text": "And that's all from us for now. And we hope you'll join us again soon for more topical English vocabulary here at 6 Minute English. Bye for now! Bye bye!",
+      "chunk_id": "76a8d297-5828-41f2-923b-032148bf91e8",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d117667e",
+      "original_filename": "RSS_262026947_podcast_1304_How can we make the web a better place_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 153,
+      "enhanced_tags": [
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.071653"
+    }
+  ],
+  "original_text_length": 3102,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:10.071657",
+    "total_chunks": 13,
+    "total_tags": 30
+  }
+}

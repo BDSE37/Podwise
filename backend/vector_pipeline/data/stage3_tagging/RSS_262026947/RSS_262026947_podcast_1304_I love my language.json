@@ -1,0 +1,190 @@
+{
+  "filename": "RSS_262026947_podcast_1304_I love my language.json",
+  "episode_id": "6865015b66c1a4e8d117668f",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 13,
+  "chunks": [
+    {
+      "chunk_text": "This is a download from BBC Learning English. To find out more visit our website.",
+      "chunk_id": "ff3064b8-dea4-4066-81d8-163c037fe2e1",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 81,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:14.220984"
+    },
+    {
+      "chunk_text": "Yes, Welsh is spoken by many people in North Wales. It's the indigenous language – the language spoken by the people who originally lived in a place, rather than by others who moved there from somewhere else. Welsh is a good example of an indigenous language that has survived. Some children speak Welsh in school and the local government has encouraged its spread. But not all indigenous languages have been so lucky, as we'll be finding out in this programme.",
+      "chunk_id": "208d4285-6534-441b-b58b-d4643ce36d4d",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 461,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.223760"
+    },
+    {
+      "chunk_text": "Of course, languages are more than just words – they carry people's history, culture and identity. So, when an indigenous language disappears, so too does the culture.",
+      "chunk_id": "26fe66f5-3f17-47a5-9e45-a32ec7eaadba",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 167,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.226102"
+    },
+    {
+      "chunk_text": "OK Sam, we'll find out the answer at the end of the programme.",
+      "chunk_id": "2f6382e0-944f-4b74-8780-9131a17888f8",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 62,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:14.228479"
+    },
+    {
+      "chunk_text": "Enter Mishka Gobwit speaking with BBC World Service programme The Conversation about how she felt learning Anishinaabemowin later in life.",
+      "chunk_id": "94fd039c-c3ef-440f-846a-8766107bb234",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 138,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:14.230962"
+    },
+    {
+      "chunk_text": "Learning to speak the language of her ancestors gave Mishka Gobwit glee – a feeling of happiness.",
+      "chunk_id": "8db5f044-44a2-4e7b-9acc-79d5fa5b3336",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 97,
+      "enhanced_tags": [
+        "PPI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.233245"
+    },
+    {
+      "chunk_text": "Pleasure or excitement. Although she didn't grow up speaking Anishinaabemowin, she now wants to pass it on to her children. To pass something on means to give it to someone, usually in your family, who lives on after you die. Mishka Gobwit's decision to raise her children speaking Anishinaabemowin turned out to be the right one, as she explained to BBC World Service programme The Conversation.",
+      "chunk_id": "4f2117ae-65af-4d67-ac29-7e4d34aa93b0",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 396,
+      "enhanced_tags": [
+        "CI",
+        "XP",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.235869"
+    },
+    {
+      "chunk_text": "Mishka Gobwit speaking with BBC World Service programme",
+      "chunk_id": "a24f77e7-2790-43b2-8b14-e759bd0a70e2",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 55,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:14.238058"
+    },
+    {
+      "chunk_text": "Bringing up her children to speak her indigenous language wasn't easy, and Mishka Gobwit said there were some bumps in the road – small problems or delays that slowed down or stopped things from developing. To help, her family spoke only Anishinaabemowin at home, using a technique called immersion – the process of learning a language or skill – by using only that and nothing else. This meant that Mishka Gobwit's children spoke both English at school",
+      "chunk_id": "bbf1bb4e-a640-4173-a28d-fa7a2e6bd4b8",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 453,
+      "enhanced_tags": [
+        "ROA",
+        "LED",
+        "RSI",
+        "ROC",
+        "AI",
+        "BRI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.240878"
+    },
+    {
+      "chunk_text": "and Anishinaabemowin at home. She noticed how they changed between languages when speaking – something known as code-switching. Mishka Gobwit believes this not only helps her children's development, but also gives them a sense of family history, as well as preserving her traditional culture. A culture she hopes they will pass on to their children in turn. So, while indigenous cultures are threatened by big global languages, there's still hope that many will",
+      "chunk_id": "e39dcf18-4de0-4e6e-9100-30157926d896",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 461,
+      "enhanced_tags": [
+        "PM",
+        "BI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.243751"
+    },
+    {
+      "chunk_text": "survive into the future. Which reminds me of your quiz question, Neil. Was my answer right? Ah yes, I asked Sam how many of the 7,000 languages spoken around the world are indigenous. And I thought it was B – 4,000 languages. Which was the correct answer! And what's amazing is that although indigenous peoples make up under 6% of the global population, they speak more than 4,000 of the world's languages. OK Neil, let's recap the vocabulary",
+      "chunk_id": "5dd63935-6908-4705-905a-6f5d697c91fa",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 442,
+      "enhanced_tags": [
+        "UI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.246582"
+    },
+    {
+      "chunk_text": "from this programme on indigenous languages – languages spoken by the people who originally lived in a place, rather than others who came later.",
+      "chunk_id": "d4a35298-fb72-435c-9dfb-6a6ea459e9b8",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 144,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.248901"
+    },
+    {
+      "chunk_text": "By using only that and nothing else. And finally, code-switching is the ability to change between two or more languages when speaking. That's all from us! Bye for now! Bye bye!",
+      "chunk_id": "760bf3d1-352c-45b5-bc96-0dd8dca20295",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d117668f",
+      "original_filename": "RSS_262026947_podcast_1304_I love my language.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 176,
+      "enhanced_tags": [
+        "BI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:14.251459"
+    }
+  ],
+  "original_text_length": 3145,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:14.251464",
+    "total_chunks": 13,
+    "total_tags": 23
+  }
+}

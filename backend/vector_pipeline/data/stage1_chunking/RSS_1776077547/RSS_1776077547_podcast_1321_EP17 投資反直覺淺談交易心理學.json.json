@@ -1,0 +1,963 @@
+{
+  "filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+  "episode_id": "6863806f13e684d30303f6c1",
+  "collection_name": "RSS_1776077547",
+  "total_chunks": 106,
+  "chunks": [
+    {
+      "chunk_text": "嗨大家好歡迎來到Fireman的Fire人生我是Chris我最近因為腸胃炎就是拉肚子拉了一天然後覺得全身痠痛我那時候覺得我的因為我本來就有重訓然後重訓大腿就很痠了結果可能因為腸胃炎那一天整個腰跟大腿痠到沒辦法坐在椅子上那後來我就去看醫生醫生說你這可是腸胃炎然後醫生就補一句",
+      "chunk_id": "0326d83f-dc24-464e-b649-c837ed964102",
+      "chunk_index": 0,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "其實腸胃炎不一定是諾羅因為其實腸胃炎有很多病毒有可能是輪狀病毒還有其他的腸胃病毒但是有時候醫生也很懶得跟你解釋那麼多因為其實你如果真的要去確診說是諾羅的話可能要去做檢驗但是其實你一般狀況沒有很嚴重醫生就說腸胃炎如果醫生要跟你解釋說是什麼東西那他可能要解釋很久所以他就跟你說沒有啦是諾羅",
+      "chunk_id": "7faea0c7-0e86-46d6-a454-776bac55bf7b",
+      "chunk_index": 1,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 142
+    },
+    {
+      "chunk_text": "所以其實我這次就是像這種諾羅類似的腸胃炎可能是因為之前去幫我老婆慶生然後去菸播因為菸播那邊很多小朋友在玩他們都也沒戴口罩所以我們去就不小心被傳染了不過還好的是我大概一天就好了這跟我上次一次拉了十天的腸胃炎比起來這是小case因為我上次的腸胃炎拉了十天",
+      "chunk_id": "0c04ce40-28e1-4b3e-92f5-e229b4c9f65c",
+      "chunk_index": 2,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "然後吃什麼就拉什麼那段時間真的非常痛苦那幾天我記得一個禮拜瘦掉三四公斤然後我這次昨天開始發作到中午就沒有再拉了今天的話就覺得精神有點不好我覺得大概今天再睡一天就恢復了所以精神還算可以所以我今天還是照激進計劃來錄podcast",
+      "chunk_id": "d21563b9-fe6b-453b-aa48-450ddc67f751",
+      "chunk_index": 3,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 112
+    },
+    {
+      "chunk_text": "這個星期的主題是反直覺投資的反直覺那緣起是這樣子我上禮拜啊我們上禮拜美國發布一個CPI的數據CPI數據看起來有那個通膨從藍的一個樣子然後其實我當下看到股市打跌其實我也覺得我當下也覺得有點恐慌就是有點恐慌感說該不會通膨要再來的吧",
+      "chunk_id": "e80f7e4d-f67a-44c3-b0dc-5b59575851ee",
+      "chunk_index": 4,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "2022的那個經驗真的是還蠻可怕的那個升息整個股市的估值往下壓然後你有什麼好有什麼好的消息全部都會被壓下去所以那個時候我當下其實覺得有點恐慌但是第二天起來看到又漲回來了那我當下就說奇怪為什麼會這樣子那我那時候去看了那個湄谷韭菜王的資訊他就有分享一個",
+      "chunk_id": "551e8efb-76ae-4d74-a926-ec7f547d2fe2",
+      "chunk_index": 5,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 124
+    },
+    {
+      "chunk_text": "線性指標那其實他已經講很久了那其實我之前沒有記在心上好就說truthflashdream那這個這個網站我等下會放在資訊欄其實我在臉書上我有放就是他這個東西是這樣子就是說他用區塊鏈的技術然後把美國所有的一些會影響物價的產品那用每天的頻率然後再公佈在他的網站上",
+      "chunk_id": "c217b296-92fe-44e9-9b93-20c1c620e726",
+      "chunk_index": 6,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "好那其實你看這個數據就是他這個數據是即時的數據那因為CPI他可能是有點用調查的方法然後來做這個數據所以其實CPI的數據可能是上個月或是上三個月的那根據韭菜王他的他的資訊是說大概會延遲兩個月好所以其實你我們再看truthflashdream的那個線性指標就看到其實在11 12月美國的那個",
+      "chunk_id": "c5178053-2c5e-4ad6-87a8-1324ec9ee38d",
+      "chunk_index": 7,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 143
+    },
+    {
+      "chunk_text": "再拉起來拉到大概百分之三左右所以現在的數據就是反映11 12月的數據所以你看到通膨又再拉起來但是在年大概一月之後整個通膨數據又急速的下降好所以這就從如果這個數據來看我們就知道說其實通膨他暫時起來有可能是因為他們年度的漲價或是因為他們在11 12月的",
+      "chunk_id": "dd987045-5d25-4404-ae94-4c3fcfc52d6b",
+      "chunk_index": 8,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 124
+    },
+    {
+      "chunk_text": "那個或是聖誕節的一些漲價的一些東西對那跟真正的通膨數據通膨重覽其實是不一樣的一個狀況好那這就是市場有時候跟你講的不一樣的東西啦你如果看那個美國公佈的CPI數據去做反應那我跟你講我們在看truthflashdream的人早就知道有這些新型數據",
+      "chunk_id": "0a054025-bf4d-41bf-84a4-637be12cc542",
+      "chunk_index": 9,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 120
+    },
+    {
+      "chunk_text": "比就是我們早就知道後續的走勢會怎樣所以當下你如果大跌那是很多算是什麼韭菜的第一個想法好那接下來呢那我們後來知道通膨數據之後會跌回來你知道是因為這個數據跌的人那你在當下就會去買嘛那之後自然就可以賺到那個他該有的報酬好這就是為什麼我沒有很喜歡看財報的數",
+      "chunk_id": "3b7ecdba-09db-4621-be9b-b816bd7f7280",
+      "chunk_index": 10,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 124
+    },
+    {
+      "chunk_text": "因為財報的數據早就有人他先推估出來啦而且其實每次那些公司他們在開法說會他們都會先預估下一季的財報數據其實他下一季的財報數據就會落在那個區間就可能是比較低的區間會比較高的區間那通常我會抓比較中中間值那其實你抓一個中間值跟高跟低其實差別也沒有很大就是反正我們就是",
+      "chunk_id": "4e0b8116-6080-4e3d-a20a-e21258edc895",
+      "chunk_index": 11,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "看一個公司有沒有在成長而已啊所以其實財報齁這只是在推估或是你說財報的數據早就有人推估出來了大家只是去驗證過去的結果而已所以坊間有些看財報數據的書一直在教你怎麼看財報的很多細項怎麼看怎麼看怎麼看怎麼看其實那些東西市場很多人在看啊那這些東西也很多人在做啊那你就只是單純",
+      "chunk_id": "da3df712-2a03-4c44-9eb7-39f721bed1e5",
+      "chunk_index": 12,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "看財報去做投資我給你保證你的投資會過得非常慘因為股市是反映未來不是反映過去財報的數據都是過去的資訊所以很多坊間的人應該說我們以前在剛學存股的時候啊那個時候存股老師都一直教你看啊你怎麼看他的財報數據啊你怎麼看他的ROA啊ROE啊那些東西好到現在",
+      "chunk_id": "04b30b6e-319b-4b47-8163-946a3ba3f057",
+      "chunk_index": 13,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 121
+    },
+    {
+      "chunk_text": "我都不看了對那些東西對我現在都是已知已知的東西在股市裡面已知的東西都已經反映在過去的價格所以就不會去不會是我現在要看的東西好所以那個時候有個網友就提問啊他說他覺得投資很反直覺啊他說那理論上要看這個true flashing的資訊啊怎麼大家會看CPI好那我是這樣回啦我當下是說",
+      "chunk_id": "547bca47-3da3-48c7-96ae-9877c845d136",
+      "chunk_index": 14,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "我只知道true flashing的資訊告訴我們未來幾季的CPI可能會可能下一季還會再一次高檔只是之後就會大幅的下降好但是我不知道市場怎麼解讀啊因為你也不知道到底多少人在看在看true flashing的資訊那很多人呢他不相信其他的資訊他只看他只看已經出來的正式數據才做反應所以變成說我們投資其實是在很多不確定性裡面推估出",
+      "chunk_id": "4ffa58a5-4805-4a22-ab24-bcdf38052160",
+      "chunk_index": 15,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 161
+    },
+    {
+      "chunk_text": "來我們想要的數據然後去做反應但是很多人他也是用真的CPI出來才去做反應那就跟很多人是看財報然後來做投資所以我是覺得我們做很多研究做了很多研究之後就會發現很多東西我們知道出去是這樣走但是你不知道市場參與的人他到底反應到什麼什麼程度對好所以我們就來講反直覺",
+      "chunk_id": "a0759456-5c5a-45af-850b-2c668b313f7b",
+      "chunk_index": 16,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "就是說你知道投資努力不一定會成功但是你不努力也不一定會失敗好這句話為什麼要講你看他多少人就是網路上很多人一直在研究說那個財報數據很好一直去研究很多公司財報數據很好就是他會發很多財報的數據好但是你說他們的投資的績效會有贏大盤嗎不一定",
+      "chunk_id": "e40c21d3-aa07-48e4-9bf8-e43ab8288d2e",
+      "chunk_index": 17,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 115
+    },
+    {
+      "chunk_text": "因為我知道有些投資人他一直發財報數據讓你覺得好像這東西很厲害那我一定要知道這些東西但是你知道的一定會比較好嗎因為我是覺得不一定會比較好因為就跟我剛才講那個trueflation的資訊一樣我知道數據好只是你不知道其他人怎麼解讀還是說現在的股價已經反應到已經反應近我們研究的東西所以這東西我們不知道",
+      "chunk_id": "62f58a67-146c-4988-a5f9-bb305dd79203",
+      "chunk_index": 18,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 147
+    },
+    {
+      "chunk_text": "市場怎麼解讀所以就只能看看現在的狀況是怎麼樣好那我們就要去判斷我們所知的資訊市場反應到哪裡解讀到哪裡那這東西就很有藝術了對不對就是有些人覺得已經反應了有些人已經覺得沒有反應了好就繞回來說投資不努力也不一定會失敗就我講的譬如說我們去投資指數型ETF那得到跟市場一樣的報酬",
+      "chunk_id": "1146f836-0922-4b5f-98b9-8d0b66228697",
+      "chunk_index": 19,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "我努力反正我就無腦把錢丟到指數型裡面我就跟有市場一樣的報酬但是你知道市面上的最重基金有八成是出給指數型基金的好那就繞回來說我就是投資我有興趣的這些公司然後他在低點的時候我做加碼高點的時候我做減碼那大部分那用這種方法我也許也是不用很努力因為其實大家看我就是去研究這些公司",
+      "chunk_id": "88a9265b-c041-471c-8e0a-b0ec7a926808",
+      "chunk_index": 20,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "其實研究這些公司是我的興趣也不是說我真的很喜歡去做公司研究因為我就是喜歡這種高科技的東西那研究高科技的東西就順便去研究這公司那順便拿真金白銀去做投資那就可以賺到一些報酬其實我也知道那個我投資指數其實現在就可以過得很滋潤但是好但是為什麼我還是有繼續投資公司因為投資公司就是跟大家",
+      "chunk_id": "87303da2-dade-4fe5-8336-0b566349c8ed",
+      "chunk_index": 21,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 138
+    },
+    {
+      "chunk_text": "講過就是我研究這些高科技公司是我的興趣其實也不代表說我投入這些心力去研究這些公司我的報酬一定會贏指數其實也不一定好那另外一個反直覺的東西就是我們財報數據是反映過去不代表未來那這個原因我剛剛有跟大家講的這東西很多人在研究那很多機構",
+      "chunk_id": "b1c425b6-9fcf-4254-a1f0-03cf6efa418f",
+      "chunk_index": 22,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114
+    },
+    {
+      "chunk_text": "他都已經把price印在過去的股價裡面所以這件事情我們就從一個很基本的問題開始為什麼有些人研究市場很多年很認真在分期做交易最後還是虧錢有些人就是買進並持有確認獲利這就是我們講到的交易心理學講到交易心理學大家會去推薦兩本書就是有一個人叫做",
+      "chunk_id": "9b785f42-5b2d-4827-ad01-403605863cbd",
+      "chunk_index": 23,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 118
+    },
+    {
+      "chunk_text": "馬克道格拉斯他出了兩本交易心理學的書那我們今天就大概從他的這個書裡面的一些重點然後來談到這個交易心理學的部分這本書他有講說其實市場是隨機的但是我們人類就很想要從隨機裡面去找到規律所以其實這就是他講的交易心理學最核心的東西就是市場是隨機的但是我們人類就想要找到",
+      "chunk_id": "503e721b-0e2e-4d81-ba5b-fc747b5a6a32",
+      "chunk_index": 24,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "規律所以為什麼我們傳統教育跟市場的運作是反過來的我們先講市場的反直覺市場是一個機率遊戲每一筆交易都是獨立的你在一次交易賺錢不代表你下次也會賺反之一然你在這次賠錢也不代表下次一定會賠錢這個跟我們以前在學業",
+      "chunk_id": "bc473e9c-c692-4856-8cdf-4b2eae57916c",
+      "chunk_index": 25,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 101
+    },
+    {
+      "chunk_text": "學校的教育是反過來的為什麼這樣講我們以前老師就這樣教我們你只要好好努力找到標準答案你就一定會成功那我們就會覺得說好那我現在這筆交易賺錢了那表示我很努力那表示我下次再努力也會賺錢其實不一定其實這是一個機率遊戲可能你這次就是中了50%裡面賺錢的那一個你下次就是50%裡面賠錢的那一個",
+      "chunk_id": "bef583fc-4aef-484a-9f13-ef82d63b3dba",
+      "chunk_index": 26,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "市場沒有標準答案它是一個機率優勢那機率優勢是什麼就是說我們從過去統計去算出來說好這個時候機率高賺錢的機率高還是低那你也不要說我們有賺錢就表示是因為努力的關係有可能是因為運氣好所以其實市場有很多都是機率的關係那大家就講說以前九妹他不是有去做過一個",
+      "chunk_id": "2c015a8d-e469-4377-a788-c72be4e154d0",
+      "chunk_index": 27,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "一個實驗就是他拿那個飛鏢去設四個號碼然後跟那個就是說他拿飛鏢去設那個四個號碼有設四個號碼之後就去買那個股票看最後會賺錢還是賠錢其實九妹那時候丟丟丟結果他也是賺錢的好那就繞回來說其實你在下跌的市場你再怎麼努力都不會賺錢譬如說我們在2022你在2022你不管再怎麼好只要",
+      "chunk_id": "d82d1e1e-ce32-4463-8df6-6d0edffe949b",
+      "chunk_index": 28,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "股市拉起來然後聯準會就把你打下去就是你在整個市場在下跌的趨勢裡面你再怎麼努力都不會賺錢好那另外一個反直覺就是說其實在市場買進或持有會比平凡進出的報酬會更高那其實這兩件事情其實都是很反直覺的對不對好那其實我們以前就是習慣考試式的思維就是說我們只要找到正確的解法然後把它背起來然後就可以永遠成功但是其實我們在投資並不是這樣子",
+      "chunk_id": "8523d0e9-824d-41cb-bb82-ecdce060a1c5",
+      "chunk_index": 29,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 160
+    },
+    {
+      "chunk_text": "其實市場是一個不斷變動的環境那如果是同樣的策略在不同的市場下結果會不一樣那其實這件事情對我們公務員比如說像我這種其實從小就是很會讀書的人然後還有我們是公務員因為公務員以前就是每天都做一樣的事情那你想要創新通常都會被打下來好你如果習慣這樣思維我們在市場都是很會過得很痛苦因為我們就一直會一直想去找一個",
+      "chunk_id": "d5d49faf-2199-4a05-a5a5-95f07f3140b4",
+      "chunk_index": 30,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "一定會成功的方法那其實市場就是就是一個機率就是說現在是一個上漲機率比較高的市場你隨便買都會賺那你在下跌的市場怎麼買都會賠所以這就是我們華人傳統教育的對於市場的局限就是說我們以前就是覺得我只要很努力我一定可以找出一個規律那你當努力的方向錯了",
+      "chunk_id": "ad3861b2-386f-43fc-9374-9a234588f93a",
+      "chunk_index": 31,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "市場可能那時候給你一個賠錢的結果你就會覺得很痛苦啊那我是不是不夠努力好那這就講到我記得我之前有推薦一本書就是股市贏者他的那個最新的那一本書他就講他2022的狀況就是說他那時候好像說他去投資債券那一開始賺錢那後面賠錢那賠錢之後他又想要用各種方法然後去看看說用這種方法看可不可以賺錢",
+      "chunk_id": "a70bd59a-6e8f-4409-90a8-ad85fa23565d",
+      "chunk_index": 32,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "結果反而又賠更多那其實他之前都是用銀四股的買法其實他銀四股的買法跟我就是跟我其實蠻像的就是我就是買進好公司然後長期持有他以前的做法是這樣但是他因為2022就是你買好股票怎麼你說你去買股票怎麼買都賠錢所以他就去操作債券結果操作債券那個CPI你又被那個聯準會巴來巴去所以有時候",
+      "chunk_id": "17dafd32-ed01-4827-9c86-6a4d610f9034",
+      "chunk_index": 33,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "努力也不代表會賺錢好那這講到說那怎麼樣在市場會賺錢其實在馬克道克拉斯裡面的書最重要的就是情緒管理跟風險控制這是為什麼我們講說努力不一定有用的原因努力我們不會改變市場的隨機性反正會讓你很執著在錯誤的決策那譬如說很多人覺得哇我害怕承認我錯了然後不願意停損讓小損失變大損失其實真正的高手也不是從來不犯錯啊",
+      "chunk_id": "8829a00f-c3bf-474a-86db-94514eb32978",
+      "chunk_index": 34,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "巴菲特巴菲特其實這幾年其實他投資還蠻韭菜的好那我就講幾個幾個譬如說他在2020的航空股他在2020年初巴菲特用很低的價格去買進美國四大航空公司股票想要超低結果疫情進一步惡化後面他說他看不懂這個航空股所以他就全部清倉結果他剛好就賣到最低點之後航空股就反彈那第二就是我們大家都知道的台積電台積電在2022年第三季",
+      "chunk_id": "d03b8986-6376-4f52-9741-86a160b2fa72",
+      "chunk_index": 35,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 154
+    },
+    {
+      "chunk_text": "買台積電的ADR就後面下一季他覺得因為地緣政治的關係他把他減持結果就剛好賣在最低點如果他減持到現在可能賺兩三倍所以其實你不要覺得巴菲特也是他買進就一定會賺錢那其實他他也是有成功的他之後去買那個日本的",
+      "chunk_id": "7d86f233-d1cf-49a6-aad0-b435c3a61c04",
+      "chunk_index": 36,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 99
+    },
+    {
+      "chunk_text": "商社也是賺了多錢所以其實就算是最成功的投資人巴菲特也不會每次決策都正確其實他的觀念就是說他可以迅速調整策略而不是跟市場去對抗好那我們還是回到說我覺得我們以前的教育就是很強調標準答案跟服從就是跟我們投資所需要的靈活",
+      "chunk_id": "e9d9f00e-bfe8-4bb7-bfb6-bce5b98231d0",
+      "chunk_index": 37,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 106
+    },
+    {
+      "chunk_text": "應變能力形成很強烈的對比我們以前就是被教育我們要努力要遵守規則但是市場就是一個動態變化東西沒有規定規則其實我這幾年我最近發現學校教的東西很多是已知那已知東西要來賺大錢很難就是學校教的東西全部都是過去已經知道的東西那你如果在這個某個領域你要去做過去已經知道的東西其實都不會很都不會賺錢因為學校的東西他通常都比較低",
+      "chunk_id": "040c9ccf-ace3-46ab-95a4-32ad73c4eb75",
+      "chunk_index": 38,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 155
+    },
+    {
+      "chunk_text": "比較舊那如果有人去在這個領域去做研究他的東西絕對都比學校的東西還要新那我們去你在學校教的東西出來你用學校教東西去賺錢你就是就只能賺那種就是最基礎的錢那你要去賺大錢的話去探索未知譬如說你要去做台積電的研發那學校絕對不會教你說",
+      "chunk_id": "36fe4c4c-c350-4959-a182-a3fbb2f3fe86",
+      "chunk_index": 39,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "兩奈米的東西兩奈米的製程要怎麼做學校直接跟你說他的製程大概是怎麼樣那你要賺錢的話你要去探索未知的東西才會賺大錢所以我今天覺得學校教的東西就只是給大家一個理解世界的一個框架但是你真的要拿學校教的東西去賺錢就應該是很難所以就這樣所以最後我們在講要怎麼辦",
+      "chunk_id": "bd3202d9-4ca0-49a0-9fbc-fc5f455bbc1d",
+      "chunk_index": 40,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 124
+    },
+    {
+      "chunk_text": "所以我們就是要第一個我們要建立正確的投資心態就是不要期待市場會給你一個標準答案我們要學會的是在不確定性中做決策第二個是說我們要去理解市場的隨機性我們要去建立機率的思維而不是說每次都想找正確的答案我們越想去找正確的答案報酬往來越來越低譬如說",
+      "chunk_id": "f93de6a3-c574-4b2b-b807-cdf159d204c6",
+      "chunk_index": 41,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "在市場上我們通常會知道的正確答案是我就投資中華電信中華電信每年有大概44%左右的股息但是你去投資中華電信你每年就只能賺4%如果我去投資市值型大阪ETF我可以達到我的年報酬率可能像台灣0050這10年可能有10%以上那這些東西就是你要找正確答案的話的報酬率就是這樣",
+      "chunk_id": "ea05194a-2c3c-4363-9477-9525e45bd8fe",
+      "chunk_index": 42,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 131
+    },
+    {
+      "chunk_text": "我們去探索未知的話我們可以去投資個股你如果再大一點你可以去投資台積電像台積電這幾年的漲幅就很好那你如果要再探索更多未知你就可以去買其他小的個股像很多個股一口氣這幾年你如果有抓到好的就是一口氣都翻好幾倍但是這些東西都是未知的東西就是越來越多你探索越多未知的東西",
+      "chunk_id": "8dce3f47-b4e7-4b44-a418-b624657fe3e0",
+      "chunk_index": 43,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "可能報酬就越來越高但是相對的風險也越來越高所以第二個給大家建議說我們要去突破直覺思維要去批判性的思考我們要從不同的角度去觀察市場也不要太執著該轉彎要轉彎要知道大氣勢在哪裡譬如說這幾年的投資主軸就是AI這幾年你如果有投資AI的你都賺得飽飽的",
+      "chunk_id": "bab82ce7-ab52-451d-9c16-2abcce6cce33",
+      "chunk_index": 44,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "你就賺不到錢所以你要知道大趨勢在哪裡你要從不同的角度去看那看整個趨勢在哪裡其實市場的運作方式往往會跟我們的直覺會不一樣這個是Howard Musk講的第二層思維但是市場有時候當它是第一層思維有時候就變成第二層思維其實這跟古白有講過其實市場並不是完全的效率市場它有時候有效率有時候沒有效率",
+      "chunk_id": "4c7967f8-a9c2-4c18-9b27-bbc4417a63c3",
+      "chunk_index": 45,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 143
+    },
+    {
+      "chunk_text": "好那我就講NVIDIA在Deepseq的事件就在我們2月我們前幾集有講在Deepseq事件出來當下跌了十幾%你看現在都漲回去了那你如果覺得當下跌十幾%是對的那你怎麼解釋現在的說法好這就是我們講的市場運行方式它可能當一開始是第一層思維的時候哇Deepseq它只要花很少的資源就可以得到一樣的模式",
+      "chunk_id": "fc99ac1f-c896-46f7-8ec7-0681ae6ac48f",
+      "chunk_index": 46,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 146
+    },
+    {
+      "chunk_text": "跟它的產出的結果所以大家以後不需要GPU了結果到現在大家有人覺得不需要GPU嗎所以你當下你就要去想這個事件現在市場跌的到底合不合理如果不合理這就是超額報酬的一個可能性你如果這個時候去投資你就會有",
+      "chunk_id": "11a0a930-a2a0-4114-9588-cd07cce214c0",
+      "chunk_index": 47,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 97
+    },
+    {
+      "chunk_text": "超額報酬的可能性好那在馬克道德拉斯這本書他是說其實要建立自己的獲利模式並持續進行他說成功的交易者其實並不是靠一個幸運的投資支付你要去透過長期穩定的獲利模式來逐步累積財富他是說讓我們去投資你用某個方法他可以賺錢了那你就持續",
+      "chunk_id": "c1e430ee-a2d0-4cbe-9fde-05ff27f86d22",
+      "chunk_index": 48,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 110
+    },
+    {
+      "chunk_text": "在做這個模式去把錢持續去把它賺出來那他的一個結論就是說其實在投資上不是失敗為成功之母而是成功為成功之母你要先建立出自己的獲利模式之後來去持續進行那這樣成功才會持續的累積這就是他那本交易心理學的一個重點其實就是",
+      "chunk_id": "2084c432-6665-4926-82a2-9f1fb9c4c80d",
+      "chunk_index": 49,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 104
+    },
+    {
+      "chunk_text": "我們要去找到自己的獲利模式然後持續執行讓成功變成成功之母好這就是今天的分享好那其實今天的節目我們講到投資的反人性還有一些交易心理學的東西以及為什麼我們傳統的教育很難幫助我們在市場獲利而且其實努力也不一定會成功不努力也不一定會失敗那真正的重點是什麼我們要去正確去建立正確的投資思維",
+      "chunk_id": "27efa39b-92e1-4d41-8def-7176ffbf27af",
+      "chunk_index": 50,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "去學習適應市場的不確定性那並掌握風險管理的能力而且我們要有獨立批判性的思維好我們今天的那個主題就講到這邊好接下來是我們的抽書活動我們這是抽書活動抽四本書第一本是《孤海老牛》的那個的書另外三本是《切老骨雪球》的書",
+      "chunk_id": "e7acd3f2-a038-4b38-be42-c56c93b361c6",
+      "chunk_index": 51,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 105
+    },
+    {
+      "chunk_text": "就抽四本那第一個人就拿《孤海老牛》的書那後面三個就拿那個《切老骨雪球》的書好那我看了一下總共有35則留言其實35分之4那個那個抽到的機率大概10%以內就是超過10%好我們先叫Siri到1到35選一個數字那稍等一下Hey SiriHey Siri",
+      "chunk_id": "8036aedf-d5a0-4966-9296-86d4e3ca172a",
+      "chunk_index": 52,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "他都不理我稍等一下再一次Hey Siri請你在1到35幫我隨機抽樣四個數字這是我在網路上找到的相關結果他在那邊雷啊對我剛才沒講就是說我們先從Spotify開始Spotify念完之後再念Apple好那我們現在就Hey Siri1到35",
+      "chunk_id": "95f348b3-8ec1-43b4-87b9-0753322c790e",
+      "chunk_index": 53,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 116
+    },
+    {
+      "chunk_text": "幫我隨機抽四個數字這是我找到的相關內容怎麼他不理我Hey Siri1到35幫我抽四個數字這是我在網路上找到的相關結果奇怪他今天出槌好那我就那因為我沒有我沒有作弊啦我就用全GPT好了因為奇怪我剛剛用那個",
+      "chunk_id": "1ea1ff62-1203-4dd7-859f-6656d6b81303",
+      "chunk_index": 54,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 100
+    },
+    {
+      "chunk_text": "我剛剛用Siri奇怪他之前可以他現在竟然不不不給我好我現在用全GPT來抽因為我本來想用Siri結果他剛剛好我現在用全GPT他抽他抽他抽472933好那我就從18",
+      "chunk_id": "9f8931fb-3685-488e-90f0-5f3ed34dc5b7",
+      "chunk_index": 55,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 80
+    },
+    {
+      "chunk_text": "Spotify開始好這是我們從最新的最新的留言開始好我們就開始好第一個圈訊他說台積電對台灣的效果的確有細頓的保護效果但是光靠台積也很難保全台灣回到投資道路感謝Chris大大把自己的看法用所有的分享出來供聽眾自己研判謝謝好其實我覺得台積電對台灣是有細頓但是其實台積電很多技術也是在美國那邊而且美國是我們的",
+      "chunk_id": "ee259275-1117-4e23-96a7-57cc262ec372",
+      "chunk_index": 56,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 151
+    },
+    {
+      "chunk_text": "大哥然後台積電的客戶也都在美國所以我覺得你要跟美國對抗我覺得有點難那大家就看但是我覺得美國他也不會說像中國一樣直接把我們的技術拿走了所以我們可以看看說到底到底會之後會有什麼結果然後我們可以來持續看下去好第二個",
+      "chunk_id": "66360a10-5446-46be-bb63-40396256fa9e",
+      "chunk_index": 57,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 104
+    },
+    {
+      "chunk_text": "他說上次三位抽一位沒中我再試試看手氣真的有那麼差嗎我每次都有聽到感謝希大每次的分享好那原則上我們是我剛剛發呆了一下就是上次有三個抽一個那麼少嗎好啦好那就感謝你了",
+      "chunk_id": "4b9487b1-274c-469c-88f7-7883478ee8b6",
+      "chunk_index": 58,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 80
+    },
+    {
+      "chunk_text": "反正感謝鐵粉沒在留言好下一個嚴章琳請問學長這是第四個留言好那感謝好那恭喜嚴章琳是我們的那個資深的那個鐵粉好就是好恭喜你抽中我們你在你再私訊給我你的那個資訊他說請問如果學長以後研究都會po在podcast那方格子還會po嗎會因為我如果有研究的話我兩邊現在都會po",
+      "chunk_id": "5561f26e-7e7e-4d31-b773-cf79a7d2aa9c",
+      "chunk_index": 59,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "好第四位那就恭喜你抽中我們的書好第五個目前看到最有條理的分析也讓持有台劇院有些發展謝謝Chris的分享因為其實我是覺得當一個事件出來那整個事件很混亂的時候然後我們去做分析分析完之後你就大概知道會走哪一個路線我是覺得應該不會像大家想一樣說我們技術入股intel然後所有的那個所有的資訊都",
+      "chunk_id": "8d3b53b5-e1a2-4661-9742-b2c667e16151",
+      "chunk_index": 60,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 142
+    },
+    {
+      "chunk_text": "就是所有的技術被他拿走我是覺得台積電也不是白癡應該不太可能會這樣子好反正我們就持續看下去好好第六個留言",
+      "chunk_id": "122c0af6-c35d-42e1-a3df-c3e8fbcb285c",
+      "chunk_index": 61,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 51
+    },
+    {
+      "chunk_text": "其實我看現在的路線應該是台積電會把先進封裝也蓋在美國那這樣其實現在台積電展出的晶片你還要回來台灣做封裝所以其實這樣其實蠻沒效率的所以他們會覺得說可能會在美國做先進封裝讓產出的晶片可以直接在美國做處理",
+      "chunk_id": "d538b192-db5a-4935-8b9b-d53931b91efd",
+      "chunk_index": 62,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 99
+    },
+    {
+      "chunk_text": "好第七個留言好五星他說的秋刃五星吹捧美肌必聽節目留言抽出希望可以跟隨Chris大人的腳步FIRE到訓練生目標好那加油啦其實那個FIRE之後其實煩惱也蠻多的我們下次再來跟大家分享蠻多奇怪的煩惱好好現在是念到第七個",
+      "chunk_id": "bde00e3a-c53a-455c-b655-8a8fa53c7789",
+      "chunk_index": 63,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 105
+    },
+    {
+      "chunk_text": "好我們第八個留言好陳家瑋他說感謝大家的分享五星吹捧現在也是中年危機中工作目前狀況不太好好想到等撐過之後再自行離職以示負責",
+      "chunk_id": "a874de6a-149c-4c45-b6d3-8350a891f921",
+      "chunk_index": 64,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 60
+    },
+    {
+      "chunk_text": "真的鬱悶中還好有老婆及小孩可以聊天不然我真是孤單寂寞絕人這是我第一次的留言分享謝謝也謝謝你其實像我本身也是不太會留言分享的所以你有留言分享的粉絲們我都很感謝其實其實中年危機是個蠻可怕的事情就是因為可能我們以前就是就跟那個陳家瑋說他的工作就是被工作狀況不好的時候你就會覺得整個人生",
+      "chunk_id": "ebfacc3d-2d18-4cf3-abd9-f2413104b217",
+      "chunk_index": 65,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "其實還蠻痛苦的所以不過看你股票有接近8位接近8位數其實8位數我是覺得以FIRE來看可能還不到這個可以FIRE的資產但是我覺得可以換個工作錢不要那麼多壓力也不要那麼大多花點時間陪小孩也是個不錯的選擇不過就看你自己怎麼去決定好這是第十這是第八個好第九個一樣是嚴彰尼他說在公部門應付很多場合",
+      "chunk_id": "39ed2156-687e-469e-a66c-2683a422b992",
+      "chunk_index": 66,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 142
+    },
+    {
+      "chunk_text": "真的很討厭繼續待著好啦你只要好好努力總有一天你可以做出不一樣的選擇好這是七八九好第十個好五星吹捧跟Mura及古白一樣美籍畢竟節目感謝觀點想請問Crysta對於估值這件事情Crysta如果是做評估是如何做評估的呢",
+      "chunk_id": "e42d3aff-c47d-4e7d-8872-67134f1b9b01",
+      "chunk_index": 67,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 105
+    },
+    {
+      "chunk_text": "我的看法是我會看過去的本益比在過去的本益比應該講說我會看未來一年的EPS再乘以他的本益比如果本益比太高我可能會做部分的賣出本益比太低",
+      "chunk_id": "d831c189-4fe5-4e45-b5ad-cc65d4b75c9a",
+      "chunk_index": 68,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 66
+    },
+    {
+      "chunk_text": "會去做買入大致上是這樣子所以我原則上有可能會報過一座山因為其實我們這種長期持有像我之前特斯拉就從那個拆股前45塊那有報到拆股前45塊報到最高400多然後又跌到100多現在又回到300多所以我已經報告現在像特斯拉我已經報到第二座山了但是其實我是有賺錢的",
+      "chunk_id": "11aa4943-2753-4490-aa15-6fabfc0835b9",
+      "chunk_index": 69,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "我在高漲的時候其實我有出但是我有保留一個基礎的一個池湯的水位就是說假設我在45塊的時候買了10%然後後面變400塊的時候我一路漲我就會一直賣到400塊的時候可能頂多到15%那他跌下來跌到130的時候",
+      "chunk_id": "37d682f1-4cb5-4230-b145-0f7712f367d3",
+      "chunk_index": 70,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 99
+    },
+    {
+      "chunk_text": "我一樣是持股10%到15%所以其實像這種股性比較波動比較大的公司你就要有一個操作的方法這樣才可以不會說報你就不會覺得說這些錢這樣漲到400塊比如說從40塊漲到400塊賺了10倍然後後面跌到130你讓他中間的10倍就被吃掉了所以其實報過一座山其實是要有一些",
+      "chunk_id": "d5b2c85d-9b7e-4c29-8d6f-e66a8b73e673",
+      "chunk_index": 71,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "進出的一個方法好第11個小雞感謝Chris分享希望自己能向您學習加油11 12 C感謝Chris分享同樣是中年離開還在探索自己探索自己其實是一個蠻痛苦的一個過程因為我們以前該探索自己的時候是那個是學生的時候但是我們現在中年之後來探索",
+      "chunk_id": "51ab17fe-0c6e-484a-9e95-89cfe0ac6025",
+      "chunk_index": 72,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 116
+    },
+    {
+      "chunk_text": "來離開職場探索自己就會有很多限制不然大家就覺得說我們可能40歲了你如果跑去7-11打工大家覺得你可能怪怪的這樣子我不是歧視說40歲還是7-11打工我們男生通常會給會被社會賦予比較大的一些社會期待所以像我之前就有分享我說我現在沒有工作那之前",
+      "chunk_id": "6e5cc865-8065-4e44-b618-5ae2c731497e",
+      "chunk_index": 73,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "我的家人就說他就莫名其妙就辭職其實講這個我們男生給的社會期待會比較大所以中年離開職場就會比較多限制好第13個",
+      "chunk_id": "9611b286-2561-4532-a613-f590e181c170",
+      "chunk_index": 74,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 54
+    },
+    {
+      "chunk_text": "就是以前我們覺得在一間公司就是做到老做到退休是一個很好的事情但其實現在不是現在的時代很動態你在一個不對的地方去努力怎麼樣就是會過得很痛苦但是所以我就講說我還是覺得我們要為了自己著想所以",
+      "chunk_id": "16a114c3-762c-482a-8c41-ffb552fb591a",
+      "chunk_index": 75,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 92
+    },
+    {
+      "chunk_text": "出來分享希望大家能夠有點才商所以就是不要很鐵頭的在一個地方那如果這地方對你很好那他在各個各個方面都都很適合那就繼續待著沒關係但是永遠不要把自己的一個希望都放在同一個人在同一個地方或是同一個公司像我們或是我們的政府一樣每個人都有可能會會變化",
+      "chunk_id": "ab970b15-3486-4f7d-bc84-de32e9747c2e",
+      "chunk_index": 76,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "好好第14個好這是ChainSHENG好第14好說Chris你好想請問自己離財務目標要多少才可以做自己呢目前淨資產只有1700萬其實1700萬還蠻多感覺離財富自由還有到一段距離不曉得設定到1億會不會太高的難以達成的一個在下方的隊員",
+      "chunk_id": "3633e373-14a3-4010-8b07-aa4b63a7e906",
+      "chunk_index": 77,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 115
+    },
+    {
+      "chunk_text": "我覺得看你自己的想法因為其實你只要你的被動支出你的收入大於支出你就可以財富自由了其實你如果自己已經有房子了然後裡面也沒有貸款那其實1700萬要來做然後而且你沒有小孩",
+      "chunk_id": "4ea5b40e-64b2-4161-9e53-fda6c525d588",
+      "chunk_index": 78,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 82
+    },
+    {
+      "chunk_text": "狀況離財富自由說不定就已經財富自由了那你說1億你現在有1700萬要到1億你可能還要有5到6倍你可以去看看以你的能力5到6倍你可不可以達到這個這個這個狀態那不然你可以不然其實我覺得以你的資產你早一點點退休也許還不錯好啦你就再思考看看好下一個剛是第14好第15",
+      "chunk_id": "18053760-6f51-4a5b-8490-bf7bae68cbf5",
+      "chunk_index": 79,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "我以前同學其實我以前都都跟你一起打籃球然後其實",
+      "chunk_id": "89f7f78f-f0e5-4360-bde9-448417d4c37c",
+      "chunk_index": 80,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 23
+    },
+    {
+      "chunk_text": "偷偷抱我這個同學聊其實他非常會念書就是在我們學校那個說到念書比我更厲害然後應該就只有他了所以我覺得也許你可以一起來思考看看就是說人生其實不是只有念書也不是只有小房其實我們可以把人生放到不同的區塊上面我們的人生會更均衡好第16他說",
+      "chunk_id": "32d99a63-b1ea-4476-b53e-2152997fee49",
+      "chunk_index": 81,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114
+    },
+    {
+      "chunk_text": "好謝謝因為其實其實醫療業跟那個消防業就都是一個做功德的事業其實做功德的事業就是很難會被情樂那你說這只是一個工作",
+      "chunk_id": "b30a0ca8-42ea-49a1-b76c-973d88955a39",
+      "chunk_index": 82,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 55
+    },
+    {
+      "chunk_text": "反正工作都會遇到很多很難的事情對所以那專職投資也我是覺得要思考看看因為其實專職投資你把你的收入來源全部都靠投資因為其實投資上上下下的有時候不見得是一個很好的唯一出入但是我是覺得投資讓你的人生更有底氣但是不代表你要去專職投資因為其實我現在退下來之後我也在找其他的事情做所以",
+      "chunk_id": "391d238d-ae90-45d6-88ac-54e227605ae3",
+      "chunk_index": 83,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 135
+    },
+    {
+      "chunk_text": "但是目前好像沒有很順利不過就是反正我有底氣可以等等一下然後我超討厭醫療賣老藥喝酒的老人但是嗆回去就被老婆罵好下一個是ALVI第17個好好麻煩你那個那個再私信給我你在那個",
+      "chunk_id": "b523b63d-befb-4619-a799-3bfb307cef1c",
+      "chunk_index": 84,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 84
+    },
+    {
+      "chunk_text": "好恭喜你抽中我們的書慢慢來私信給我他說立馬收聽每次聽完不管在每一股或人生課題的收穫慢慢因為像EFTA努力勤奮不是那種一步登天真的是值得學習謝謝因為我的人生今天就是這樣子其實我也想要一步登天但是我們就是沒有辦法我們出生就是一個很普通的家庭所以就是慢慢存錢然後剛好就有機會那我就把我的",
+      "chunk_id": "1f5a782f-fb6f-440e-8a78-06eca6009137",
+      "chunk_index": 85,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 140
+    },
+    {
+      "chunk_text": "經驗就就就分享給大家好那也恭喜你抽中我們書要記得私信給我好下一個是推推抽出想聽終年危機故事好那終年危機我覺得大家蠻多人有興趣那我下次再來分享好",
+      "chunk_id": "76aef2c2-7af2-4df3-bfcf-189a9c630aef",
+      "chunk_index": 86,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 71
+    },
+    {
+      "chunk_text": "其實對就跟你講的一樣是他以前在當軍人的時候沒辦法做自己45歲之後就會像變了一個人其實那就是他原本的樣子好謝謝好這是Spotify的留言好總共20個好接下來我們念那個APPLE PARKS好那APPLE PARKS我們反過來念我們從那個最尾巴的開始",
+      "chunk_id": "06dba947-0c88-481a-a862-31939f9fe969",
+      "chunk_index": 87,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 123
+    },
+    {
+      "chunk_text": "最後留言的開始就是",
+      "chunk_id": "370dfc6c-15c6-4387-a8fb-c1f251904029",
+      "chunk_index": 88,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 9
+    },
+    {
+      "chunk_text": "我是覺得每個人的做法不一樣那你如果你現在的做法你都你都很有自信就OK不過我給你一個我的想法就是我以前剛開始的時候也是反正就是投資M7然後其實標的也是很多但是後來我在2022遇到一個",
+      "chunk_id": "e96f0165-f9bb-438a-86cd-3b595e6d2950",
+      "chunk_index": 89,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 90
+    },
+    {
+      "chunk_text": "下跌的時候我我開始就在想這些東西我在下跌就是在2022的時候有哪些我是想要真的留著的就是說我寧願吃50%的虧損我也要把它留留著的好你也許可以思考一下然後那但是你也不一定說全部都要留小鬼谷你可以類似10%丟小鬼谷那其實我現在也會講就是大概5%或是10%去丟一些",
+      "chunk_id": "78b75fdf-7fe4-43e7-9488-8b937c491ac0",
+      "chunk_index": 90,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "亂七八糟的標的但是我大部分大部分的持股還是我有信心的標的就是說我在就是我2022問自己的那個靈魂拷問就是說這些公司有哪些是我寧願扛568虧損我也要把它留留留下來的公司好大家可以思考一下好下一個朱羅阿豪",
+      "chunk_id": "d59b6fec-f87c-4d5d-b451-00e6eadba44d",
+      "chunk_index": 91,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 100
+    },
+    {
+      "chunk_text": "對啊就是就我講的就是你我們講說自己是專業投資人就真的會被家人朋友用一樣的眼光看待然後就是就算我現在已經有這麼多粉絲了而且我也是我可以證實我自己的狀況但是你說講這些專業投資人你跟老人家要講真的是很困難",
+      "chunk_id": "0cdca6be-a571-4183-88ca-149c17199446",
+      "chunk_index": 92,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 99
+    },
+    {
+      "chunk_text": "好啦那就加油啦不過你31歲工作14小時也跟我們之前差不多血汗好啦辛苦加油啦",
+      "chunk_id": "b5e6268f-374d-4198-8d62-c90f8dc22429",
+      "chunk_index": 93,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 37
+    },
+    {
+      "chunk_text": "想有點不一樣就是也是很反直覺就是投資其實其實FIRE之後就跟我們剛進投資一樣就是也是從一個你完全不知道怎麼進行的一個一個人生中就是一片迷霧中去找出心情的規律我的想法是這樣好這23個好第24個",
+      "chunk_id": "a756baa3-3991-4888-8179-352071cefaf0",
+      "chunk_index": 94,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 95
+    },
+    {
+      "chunk_text": "他說想抽切老鼠好好很抱歉你沒抽到好來第25個哦為了福利好很感謝學長真的分享收益良多好謝謝好第26叫做昌威令他說吸到的PACSUS幫助很多人建議title可以參考一下金獅世界紀錄影片觀眾台大醫學系畢業醫生認定健康者全球百大",
+      "chunk_id": "db6ff949-dbca-4dfe-847b-8083ddd6c7f3",
+      "chunk_index": 95,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 110
+    },
+    {
+      "chunk_text": "公司產品使用者精通IOSWindows系統開關系目前各銀行也有十位數的賬戶跨戶可能這有十位數十位數出人是多少百億嗎百億百億離我太遙遠了好我們下一個剛念到第幾個稍等一下123456好第26好第27個",
+      "chunk_id": "9d092134-8ee2-4a8f-9b9a-f0cdcc6ae3a2",
+      "chunk_index": 96,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 98
+    },
+    {
+      "chunk_text": "超棒哦謝謝因為好謝謝哦因為反正我就是分享我想要看的東西就是我自己看到的自己聽到的東西對你有幫助就太好了好第28個",
+      "chunk_id": "f6014a00-f373-4e41-a294-427271c7a256",
+      "chunk_index": 97,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 56
+    },
+    {
+      "chunk_text": "五星推推好謝謝好第29個好天空空空空之城好恭喜你哦第二第29個中抽中我們的那個揭曉滾雪教書他說收獲很大尤其自媒體那一段說很大他說我的人生看來也很難變其實我覺得變現這件事情還蠻困難的尤其是像我這種比較機車然後那種有一點潔癖的人然後所以你說說自媒體要變現",
+      "chunk_id": "2da0de19-0ff3-4d8f-9b7b-b680f160b1b9",
+      "chunk_index": 98,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "其實我覺得還蠻困擾的我也沒關係啦我們就我覺得流量大之後自然就會有那個你流量小就會很多廠商就是就是可能他們想要的東西會跟我們能夠提供的不一樣好第30阿翔希望能分享美股選擇權的經驗及券商他說也希望我分享美股投資心得是否可以選擇美股選擇權的經驗",
+      "chunk_id": "ab6eca1c-0a30-4996-bc41-06d0ae6aab5b",
+      "chunk_index": 99,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "及券商呃我其實比較沒有在用選擇權好我用我在用選擇權的時候我就有點像前面的網友在講說我有時候就是會用一些小矽谷會說就是去買一些小矽谷會說我不我不想就有些東西我我想讀讀看但是我不我不想要用就是我想要用賭博的心態來看這件事情的話我就不會想去買正因為可能買正股漲了5%10%沒感覺",
+      "chunk_id": "02500b05-71eb-4bdc-9a89-1853d890c2f8",
+      "chunk_index": 100,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "我可能會就會用選擇權對那我的券商是用first trade就是那個第一證券那因為他有中文服務啦所以我就對我們這種中文的使用者是很方便的好所以那就給你參考了好好第31個裝扮收收益良多聽你的節目收益良多對手是小白的我很有幫助感謝你好謝謝",
+      "chunk_id": "fbbb08d5-877f-4e20-a69c-8345092a8770",
+      "chunk_index": 101,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 116
+    },
+    {
+      "chunk_text": "好他說想要抽書感謝Chris學長分享很多投資與研究收益良多本身也是公務員現在薪水不高只能加減投資計劃導致換完返貸你換完返貸還有可以投資那表示其實薪水也沒有很低或者你的房價沒有很貴好好啦那反正有多少的投資就是讓我們慢慢對人生有不一樣的底氣好加油好第33個好恭喜你抽中我們",
+      "chunk_id": "4ab462ea-2236-49dc-864e-d7a9851935df",
+      "chunk_index": 102,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "我聽到你這個710810是不是警大的那個還是有可是你的生日好就恭喜你恭喜你抽中我們的書那麻煩再私訊給我他說台積電未來影響分析很棒台積電未來影響分析很棒來留言想抽就被抽中謝謝好你就被抽中了恭喜你好",
+      "chunk_id": "40fd9ae6-eb75-4adc-9a49-27a70d9791fb",
+      "chunk_index": 103,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 97
+    },
+    {
+      "chunk_text": "我們就希望你努力幫幫我們大家賺錢好35則留言終於念完了我看一下念多久哇念了52分鐘好那本集節目就到這邊好感謝大家參加我們的抽書活動那有4位那個抽中書的朋友們盡快私訊給我我給大家兩個禮拜的時間私訊如果沒有我們就重抽",
+      "chunk_id": "a83c213f-0a22-468b-b0b9-9c6bf632d21b",
+      "chunk_index": 104,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 106
+    },
+    {
+      "chunk_text": "好那今天節目就到這邊好如果你感謝如果你喜歡今天的節目記得訂閱那有空的話就麻煩到留言然後給我五星吹捧每次的留言我都會把它念出來然後在帕克上面回答大家好那今天的節目就到這邊我今天講的53分鐘應該是破紀錄了好感謝大家今天節目就到這邊好拜拜",
+      "chunk_id": "8c10e2c9-954f-445c-a813-7771d75b1db6",
+      "chunk_index": 105,
+      "episode_id": "6863806f13e684d30303f6c1",
+      "original_filename": "RSS_1776077547_podcast_1321_EP17 投資反直覺淺談交易心理學.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 116
+    }
+  ],
+  "original_text_length": 12254
+}

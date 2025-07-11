@@ -53,6 +53,9 @@ class VectorProcessor:
         """
         self.load_model()
         
+        if self.model is None:
+            raise RuntimeError("模型未正確載入")
+        
         try:
             embeddings = self.model.encode(
                 texts, 
@@ -125,6 +128,9 @@ class VectorProcessor:
         """
         self.load_model()
         
+        if self.model is None:
+            raise RuntimeError("模型未正確載入")
+        
         return {
             'model_name': self.embedding_model,
             'max_seq_length': self.model.max_seq_length,
@@ -146,6 +152,9 @@ class VectorProcessor:
             嵌入向量陣列
         """
         self.load_model()
+        
+        if self.model is None:
+            raise RuntimeError("模型未正確載入")
         
         all_embeddings = []
         total_batches = (len(texts) + batch_size - 1) // batch_size

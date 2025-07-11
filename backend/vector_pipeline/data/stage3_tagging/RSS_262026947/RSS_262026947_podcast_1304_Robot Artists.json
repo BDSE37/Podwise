@@ -1,0 +1,209 @@
+{
+  "filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+  "episode_id": "6865015b66c1a4e8d11766c8",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 14,
+  "chunks": [
+    {
+      "chunk_text": "嗨! Neil from BBC Learning English here. Did you know that we are now offering a new weekly extra episode of 6 Minute English, exclusively on our website. So go to bbclearningenglish.com to find your favourite presenters on your favourite programme. The extra episodes are only available on our website bbclearningenglish.com. See you there!",
+      "chunk_id": "e98f09e8-97fc-4815-a80d-a8615f564d2d",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 340,
+      "enhanced_tags": [
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.363089"
+    },
+    {
+      "chunk_text": "Hello, this is 6 Minute English from BBC Learning English. I'm Neil. And I'm Sam.",
+      "chunk_id": "34250678-65f2-47de-899f-77db7e836a84",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 81,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:13.365406"
+    },
+    {
+      "chunk_text": "It's hard to say, but because of the huge advances in artificial intelligence over the last ten years, questions like these are being asked more and more.",
+      "chunk_id": "95c24e7a-ad7d-4da7-a32a-b1352a3aa40b",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 154,
+      "enhanced_tags": [
+        "CI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.367842"
+    },
+    {
+      "chunk_text": "We'll hear more about this extraordinary robot and the team of inventors behind her soon, but first I have a quiz question.",
+      "chunk_id": "c8905d01-c631-432f-ae1a-08130ed17653",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 123,
+      "enhanced_tags": [
+        "UI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.370162"
+    },
+    {
+      "chunk_text": "OK, Sam, we'll find out if that's right later. Of course, building a realistic robot that can see, hold a pencil and draw is not easy.",
+      "chunk_id": "9a8fa83a-837b-4e6a-baf7-0da16fa8e9d1",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 134,
+      "enhanced_tags": [
+        "CI",
+        "UI"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.372564"
+    },
+    {
+      "chunk_text": "Here's chief engineer Marcus Hold introducing presenter Carl Boss to the still unfinished Ada for the first time for BBC World Service programme in the studio.",
+      "chunk_id": "16e70e9a-0639-46b7-a7e1-e9537b3c76e9",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 159,
+      "enhanced_tags": [
+        "CI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.374928"
+    },
+    {
+      "chunk_text": "When Carl first meets Ada, he sees a wired up metal skull without skin. She looks like a robot from a dystopia, an imaginary future world where everything is bad.",
+      "chunk_id": "3d95fcac-835c-49d9-8412-92c5fd53043a",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 162,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.377374"
+    },
+    {
+      "chunk_text": "But as Carl spends more time with Ada, he begins to see her move and express herself. She smiles, blinks and uses facial expressions and hand gestures, known as non-verbal communication, to appear more human. This human-like behaviour is part of Ada's appeal – the quality in someone that makes them attractive or interesting. And soon, Carl is calling the robot she instead of it.",
+      "chunk_id": "8d76fa15-dac6-47db-a7c7-4b6b9c8ca27d",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 381,
+      "enhanced_tags": [
+        "CI",
+        "XP",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.380181"
+    },
+    {
+      "chunk_text": "Here he is speaking to the BBC World Services in the studio about the complex process involved in building a working robot.",
+      "chunk_id": "8b4a7780-44b6-4a00-aad3-bb94db53b5dc",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 123,
+      "enhanced_tags": [
+        "UI",
+        "ROC",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.382680"
+    },
+    {
+      "chunk_text": "One challenge the team faced was building a robotic arm that could allow Ada to draw pictures that were compelling, exciting, interesting and able to keep your attention.",
+      "chunk_id": "525cc6bc-857a-4418-abb2-343b32850d9f",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 170,
+      "enhanced_tags": [
+        "CI",
+        "ES",
+        "UI"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.385076"
+    },
+    {
+      "chunk_text": "In the studio, the team still had some issues to iron out, removing problems by finding solutions, before Ada's opening show, an exhibition of her artwork at the Design Museum in London. Amazing! It's nice to think that a robot could be the next Picasso instead of an out-of-control sci-fi policeman. Yes, and the whole project was inspired by a real-life woman whose name was… What was the answer to your quiz question, Neil?",
+      "chunk_id": "d8003f56-63bb-48ae-82de-06bf38aa296a",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 426,
+      "enhanced_tags": [
+        "CI",
+        "UI",
+        "EU",
+        "BI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.387905"
+    },
+    {
+      "chunk_text": "You were right, Sam. Ada is named after Ada Lovelace, the 19th century English mathematician and first computer programmer in the world. OK, Neil, let's recap the vocabulary from this programme, starting with dystopia – an imaginary future society where everything is bad.",
+      "chunk_id": "79f120c8-b5c6-4a44-beaa-0d044118dd90",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 272,
+      "enhanced_tags": [
+        "CI"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.390507"
+    },
+    {
+      "chunk_text": "A battle to be won means a problem to be solved or an obstacle to overcome. With artificial intelligence improving so fast, it may not be too long before we see robot presenters of Six Minute English.",
+      "chunk_id": "e2b568b8-00b1-4069-9c90-ee19c0f9df35",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 200,
+      "enhanced_tags": [
+        "CI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:13.392974"
+    },
+    {
+      "chunk_text": "Goodbye for now. Goodbye.",
+      "chunk_id": "e71a2eaf-22b8-4743-bfa2-24f7548dbd45",
+      "chunk_index": 13,
+      "episode_id": "6865015b66c1a4e8d11766c8",
+      "original_filename": "RSS_262026947_podcast_1304_Robot Artists.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 25,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:13.395214"
+    }
+  ],
+  "original_text_length": 2763,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:13.395221",
+    "total_chunks": 14,
+    "total_tags": 28
+  }
+}

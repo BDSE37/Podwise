@@ -1,0 +1,27 @@
+{
+  "filename": "RSS_1693352123_podcast_1304_高詩佳故事學堂讓我們來說故事.json",
+  "episode_id": "6860dd2dbb826d6ebef9daee",
+  "collection_name": "RSS_1693352123",
+  "total_chunks": 2,
+  "chunks": [
+    {
+      "chunk_text": "用心聆听 在每个故事寻找智慧",
+      "chunk_id": "22595de1-7b73-40b9-8bdb-b6aff7fd1fe5",
+      "chunk_index": 0,
+      "episode_id": "6860dd2dbb826d6ebef9daee",
+      "original_filename": "RSS_1693352123_podcast_1304_高詩佳故事學堂讓我們來說故事.json",
+      "collection_name": "RSS_1693352123",
+      "chunk_length": 14
+    },
+    {
+      "chunk_text": "所以我会用生动有趣的方式将不同主题的故事呈现给你并且透过深度解读让你能够更深入的了解故事背后的意义不论你是喜欢听故事的小朋友还是热爱思考的大朋友这里都有适合你的故事哦让我们一起听经典故事启发智慧提升阅读素养",
+      "chunk_id": "b571c9b6-6335-4b13-962a-6e02a3f76ce6",
+      "chunk_index": 1,
+      "episode_id": "6860dd2dbb826d6ebef9daee",
+      "original_filename": "RSS_1693352123_podcast_1304_高詩佳故事學堂讓我們來說故事.json",
+      "collection_name": "RSS_1693352123",
+      "chunk_length": 103
+    }
+  ],
+  "original_text_length": 118
+}

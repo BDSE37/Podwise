@@ -1,0 +1,663 @@
+{
+  "filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+  "episode_id": "6863806f13e684d30303f6c0",
+  "collection_name": "RSS_1776077547",
+  "total_chunks": 49,
+  "chunks": [
+    {
+      "chunk_text": "嗨大家好歡迎來到Fireman的Fire男生我是Chris好今天是一個特別篇因為算是一個我的新的嘗試因為其實我在在做投資其實我都會自己做研究那以前我自己的研究我就直接放在臉書上我就不特別講好那我就試試看就是說我把我最近做的研究做完就用講的方式來分享給大家好那今天的主題是",
+      "chunk_id": "175c7c7f-4cac-4caa-a890-45156c2e744c",
+      "chunk_index": 0,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 135,
+      "enhanced_tags": [
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.046280"
+    },
+    {
+      "chunk_text": "美國跟臺積電做了談判那在市面上有三個方案來做研究就是有三個第一個是臺積電他在美國直接建立先進封裝廠那在美國就可以做一個一條龍服務好第二個是Intel他把他的這個晶圓代工的事業把它分拆出去那分拆出去之後Intel他就會佔51%的股權",
+      "chunk_id": "aaeec83e-3cef-4f31-bb08-e0daaa2c81a9",
+      "chunk_index": 1,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 115,
+      "enhanced_tags": [
+        "晶圓代工",
+        "職涯"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.047463"
+    },
+    {
+      "chunk_text": "第九呢就給其他的大廠什麼NVIDIA還有亞馬遜好那就是給他們做合資那臺積電呢就是做技術入股的方式來參與好好第三個就是要求Intel把現在的3奈米跟2奈米的晶片轉入一個新的合資企業那由臺積電來負責營運那其實這個方案現在臺積電就有在做就是講那個現在的",
+      "chunk_id": "e204fe19-12cd-4c6d-97e5-6174aec655b0",
+      "chunk_index": 2,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 123,
+      "enhanced_tags": [
+        "科技",
+        "職涯",
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.048648"
+    },
+    {
+      "chunk_text": "日積電跟日積電的方式好那因為這三個方案其實我們應該說其實我們臺灣的投資人看到美國跟臺積電這種感覺就直覺說會覺得說Intel可能要偷我們臺積電的技術然後美國想要偷我們臺積電的技術我們當下可能會覺得很反感但是事情就已經發生了嘛所以我們還是要去做研究啦齁就是這三種方案",
+      "chunk_id": "0d6ff030-9433-40d0-872a-491e0e5fad73",
+      "chunk_index": 3,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 131,
+      "enhanced_tags": [
+        "感覺",
+        "科技",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.049844"
+    },
+    {
+      "chunk_text": "的差異是在哪裡好那今天這一集是我做功課的結果好那我先講一下就是說我們上一集啊有做一個抽出活動因為我看到大家的那個留言還蠻蠻熱絡的好了不過我還是要跟那個跟Apple Podcast的聽眾提醒一下就是因為Apple Podcast他可能你留言之後他可能過三天才會出來所以我預計是在",
+      "chunk_id": "10461548-062f-4c0a-8d28-405ed7199fba",
+      "chunk_index": 4,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 138,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.051032"
+    },
+    {
+      "chunk_text": "下禮拜二來做留言所以如果要抽出的朋友們可能要在三天前可能就是今天或明天最晚就是可能明天要來做留言不然可能就不會出現在我們抽出的範圍裡面好那就開始今天的內容好我們來討論三個方案的方案一他說臺積電在美國建立先進封裝廠",
+      "chunk_id": "f5f540ad-dbee-4176-a5a8-796c30e065a0",
+      "chunk_index": 5,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 106,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.052165"
+    },
+    {
+      "chunk_text": "其實是一個相對比較溫和的方案齁因為其實封裝廠相對起來建造的成本比較低那臺積電過去其實沒有在美國蓋封裝廠齁那因為是因為他的毛利率比較低啦你去那邊弄可能不會賺錢所以就沒有去蓋這個廠好但是其實美國的晶片法案他其實有特別說你如果蓋先進封裝廠我就撥25億美元給你",
+      "chunk_id": "74afd6c7-d9d8-4f38-b7cd-568fdef2648a",
+      "chunk_index": 6,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 126,
+      "enhanced_tags": [
+        "利率",
+        "毛利率",
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.053323"
+    },
+    {
+      "chunk_text": "所以在不過其實25億也沒多少錢一蓋一個廠其實沒多少錢所以這部分是一個比較溫和的做法那事實上現在在臺灣也是有跟美國的一個封裝廠龍頭叫做Anker做合作他其實本來就有在亞利桑那做先進封裝的廠線但是這部分其實對臺積電的影響也不大那這部分其實技術方面來看",
+      "chunk_id": "5b3438ec-6595-491d-ac23-d087ae274bbb",
+      "chunk_index": 7,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 123,
+      "enhanced_tags": [
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.054484"
+    },
+    {
+      "chunk_text": "先進封裝雖然有臺積電自有的這些技術但是相對技術敏感度沒有那麼高但是這部分其實是臺積電一個最新的一個技術反正你只要技術到其他國家就會有這個風險不過相對起來他的技術比較低那既然臺積電也有跟Anker做合作那表示說他也願意分享他的技術給其他國家因為這樣可以加速這個技術的週期所以這一個",
+      "chunk_id": "3086d8bc-0ae7-4a1f-b246-0380220e91a7",
+      "chunk_index": 8,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139,
+      "enhanced_tags": [
+        "科技",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.055700"
+    },
+    {
+      "chunk_text": "影響其實對臺積電來說影響的方案不大那其實有些東西也可以在美國一統統把它做完那我覺得原則上這個方案是比較溫和的那這個部分其實在美國對臺灣美國也是最好的也是這個選項最溫和的而且美國也可以說他們實現了高階晶片在美國製造然後還有封裝",
+      "chunk_id": "45943707-259b-4444-b1dd-c63ed781277d",
+      "chunk_index": 9,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 112,
+      "enhanced_tags": [
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.056825"
+    },
+    {
+      "chunk_text": "而且臺積電也不用交出製程技術的主導權雙方都有受益但是如果你知道川普政府他就是覺得這樣子可能不太夠反而川普政府可能會覺得這件事情對美國製造的那個幫助其實是有限的所以我覺得川普如果他的要求沒有很高",
+      "chunk_id": "79760506-068b-41b9-8112-f5f42168b84d",
+      "chunk_index": 10,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 96,
+      "enhanced_tags": [
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.057891"
+    },
+    {
+      "chunk_text": "他可能會接受這一個選項但是就我的看法是他我覺得美國可能會覺得利率不夠接下來是方案二就是說美國政府啊他不好意思我東西掉下來就是說方案二就是說美國政府他聯合類似Intel還有其他的廠商然後把Intel他獨立切出來的晶圓代工事業來成立一個子宮",
+      "chunk_id": "984ff5ff-6793-440c-a2f2-97b31823ea85",
+      "chunk_index": 11,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 118,
+      "enhanced_tags": [
+        "利率",
+        "晶圓代工",
+        "職涯"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.059012"
+    },
+    {
+      "chunk_text": "好這一個部分是因為Intel他一直想把他的設計跟製造分拆出來那因為現在沒有分拆出來的原因是因為他的那個製造部門就是虧損很嚴重那我們看他這幾季的財報你就看得出來說他這幾季因為他要做那個之前資本支出的攤體然後現在的他的Intel18A的製程又還沒有",
+      "chunk_id": "9e5adc81-53fc-4e66-955e-44f3b32bd2ef",
+      "chunk_index": 12,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 122,
+      "enhanced_tags": [
+        "資本支出"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.060141"
+    },
+    {
+      "chunk_text": "做出來所以現在變成說他可能未來會虧損的很嚴重然後那所以他們想要把他切出來獨立一個公司然後讓其他人來分擔這一個虧損好那這部分然後這我們臺灣人比較擔心的就是說你臺積電你做製程或者工程積電去入股啊好所以你會對我們之後的競爭力造成影響",
+      "chunk_id": "48f1af7b-5da0-4179-b206-23f40fdcaf75",
+      "chunk_index": 13,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 113,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.061253"
+    },
+    {
+      "chunk_text": "然後那我覺得現在整個局勢你說整個股價最下跌的原因就是最害怕這個第二個選項那其實你看最近臺積電一直在跌然後Intel大漲好那其實我們會擔心說臺積電如果去扶植潛在的競爭者然後你把自己的獨佔機會削弱那Intel跟其他美國晶圓廠就受惠瞭然後但是美國他們就變成他們就",
+      "chunk_id": "44174e03-00a3-49c1-b382-afcee70e1504",
+      "chunk_index": 14,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 128,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.062440"
+    },
+    {
+      "chunk_text": "得到一些技術長期來看其實對對臺灣的影響力是會比較就是會有影響的等於是臺積電去扶植第二家先進的代工廠那你如果Intel有在臺積電的扶助下或是在美國的扶助下崛起那美國境內就出現了一個先進製程的一個複製者就會動搖臺積電的獨佔優勢所以這部分感覺上是你扶住你的對手然後還跟自己抗衡這",
+      "chunk_id": "6813748c-3850-4eb8-830c-f1f133113ba2",
+      "chunk_index": 15,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136,
+      "enhanced_tags": [
+        "感覺",
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.063629"
+    },
+    {
+      "chunk_text": "這部分相信是投資人比較不樂見的但是這部分其實也會有另外的問題我說的問題就是說因為臺積電他的公司的理念就是說他不跟其他廠商競爭所有的公司都是他的朋友所以臺積電你去入股Intel就會有一個很奇怪的事情就是譬如說像AMD然後NVIDIA高通",
+      "chunk_id": "6539e348-adde-411f-a551-e07db4f4fcbd",
+      "chunk_index": 16,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 117,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.064793"
+    },
+    {
+      "chunk_text": "你覺得很奇怪就是說你我們去就是說他們當初選臺積電因為臺積電就是所有代工廠的好朋友那現在臺積電去技術入股Intel就覺得好像跟客戶競爭所以臺積電當初他的核心的一個公司的理念就是說他不跟公司競爭那你現在做技術入股Intel就其實還覺得我是覺得違反臺積電他當初的公司的理念不過這部分",
+      "chunk_id": "9d32c2c7-64c4-4074-b171-468b61d0ce50",
+      "chunk_index": 17,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 138,
+      "enhanced_tags": [
+        "科技",
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.066033"
+    },
+    {
+      "chunk_text": "就看美國政府他是不是要拯救Intel然後也減低對臺灣的依賴不過我是覺得美國政府他不一定要救Intel他只是想說先進的製程要在美國製造所以就看要怎麼怎麼去完成這個先進晶片在美國製造的這件事情所以如果如果是這個方案二臺積電就會變成純粹代工",
+      "chunk_id": "d714479c-aa62-4c85-b271-417773ada686",
+      "chunk_index": 18,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 117,
+      "enhanced_tags": [
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.067181"
+    },
+    {
+      "chunk_text": "服務商變成部分競爭者的合夥人這對商業模式是一個很重大的轉變所以變成說你在長期競爭優勢上臺積電說我們專注做製造然後不管設計這個策略被打破所以我覺得你這件事情跟一個公司的長期的目標因為我們長期的服務模式被打破其實我覺得這方案二我就覺得影響會比較大那這個方案的優缺點",
+      "chunk_id": "e0bfe147-9d96-43e3-a884-3dc6920d79cc",
+      "chunk_index": 19,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 130,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.068366"
+    },
+    {
+      "chunk_text": "就是他的優點就是說你如果這個廠成功了他其實臺積電也不用丟太多的資源那也會當川普的好朋友然後也會獲得美國政府的支持也強化跟美國的連結那因為Intel他的製程的製造能力也沒有說特別好然後比如說他的產能如果只是",
+      "chunk_id": "0bf1cb09-2455-4ebd-9897-4a6f0431cb3c",
+      "chunk_index": 20,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 102,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.069515"
+    },
+    {
+      "chunk_text": "說他的先進製程的產能只做Intel自己的部分又可能還好但是就怕說臺積電的重要客戶他會覺得說你去你去扶植就是你去幫忙其他的公司他們就會覺得你這個公司是不是違反了你原本的承諾所以這個部分我是覺得第二個選項是風險最大的一個選項但是",
+      "chunk_id": "f1195155-cae0-4119-91e1-f611b94d0404",
+      "chunk_index": 21,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 112,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.070656"
+    },
+    {
+      "chunk_text": "美國他不見得要扶植Intel對因為因為說我們不知道美國他真的想要的是什麼他想要的是晶片在美國製造或是說他想扶植Intel對這就看一下對好那我覺得裡面最大的影響是方案三就是叫Intel把現有的3奈米跟2奈米的",
+      "chunk_id": "cf1d282e-eefd-43e0-a2cf-df52eea0eb26",
+      "chunk_index": 22,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 103,
+      "enhanced_tags": [
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.071761"
+    },
+    {
+      "chunk_text": "那個就是把他的製程交出來然後還有臺積電他就成立一個美積電的這個公司這個方案其實在美國跟歐洲跟日本其實就有歐洲有歐積電日本有日積電那跟傳統的這個方案跟歐積電跟日積電不一樣的原因是因為因為歐洲跟",
+      "chunk_id": "ce08b4e4-909b-4af9-a897-417af2c9e481",
+      "chunk_index": 23,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 95,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.072872"
+    },
+    {
+      "chunk_text": "日本他做的是特殊製程就是比較成熟製程的特殊製程的公司他不是先進製程對但是你如果在如果以川普政府他們想要的是要先進的製造都在美國所以我在想會不會朝這個方案三的方式去前進就是說讓臺積電他的亞歷莎拉廠跟Intel的廠然後來做",
+      "chunk_id": "23512cf0-7882-41e8-9002-a02d5c3b28c1",
+      "chunk_index": 24,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 109,
+      "enhanced_tags": [
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.074006"
+    },
+    {
+      "chunk_text": "合併起來一個變成一個美積電好所以就變成說臺積電就要成立一個新公司對這公司就是美積電說不定有可能在臺有可能在美國獨立上市對好所以這就是說這個新公司有可能是由臺積電來來主導好來成立一個新的公司",
+      "chunk_id": "ee24a681-db59-4c43-a58c-2cb814faaaa4",
+      "chunk_index": 25,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 94,
+      "enhanced_tags": [
+        "合併",
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.075089"
+    },
+    {
+      "chunk_text": "而且美國政府可能會提供一些資金或是一些補助然後臺積電就等於是要整個聊下去來做美積電對那如果這件事情成功的話如果成功因為短期的部分臺積電一定要付出很多的資本支付然後來做就是把Intel的廠喫下來然後也要把他也要在美國做擴廠",
+      "chunk_id": "1596047d-d6d4-4513-9f0a-680ca27285e2",
+      "chunk_index": 26,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 110,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.076270"
+    },
+    {
+      "chunk_text": "成功的話我是覺得對長遠的財務效益是很可觀的因為等於是臺積電他擴展的整個產能版圖等於是他變成美國一個盟友你知道嗎而且美國原則上會做一些補貼所以原則上盈利的部分可以保障也不會侵襲臺積電的整體毛利所以這部分就看美國跟臺積電怎麼談",
+      "chunk_id": "1905002d-7541-4523-bf06-3ecc47a57fe6",
+      "chunk_index": 27,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111,
+      "enhanced_tags": [
+        "補貼"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.077416"
+    },
+    {
+      "chunk_text": "就是說其實這個跟方案二有一樣的問題就是你成立一個美積電然後所有的技術可能就會跑到美國但是這部分其實也是最符合美國戰略目標的選項美國就等於是臺積電到美國成立一個新的公司等於是把整個臺灣的競爭力搬到美國去這部分對美國而言是國安跟產業雙贏但是對臺灣而言就不一定是這麼好",
+      "chunk_id": "a8dbdbaa-0285-437a-8686-bf72d227a4da",
+      "chunk_index": 28,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 131,
+      "enhanced_tags": [
+        "科技",
+        "職涯",
+        "權利保障"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.078590"
+    },
+    {
+      "chunk_text": "因為對臺灣而言等於是臺灣長久以來引以為傲的間斷技術就被移植到美國去這就削弱我們矽盾的獨震性讓臺灣的半導體優勢變少對臺灣不好但是對臺積電是好的所以在美國而言就是說你讓臺積電在美國有了兩奈米的產能",
+      "chunk_id": "f408cc0b-7035-4102-b3c3-d023e0084138",
+      "chunk_index": 29,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 96,
+      "enhanced_tags": [
+        "半導體",
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.079758"
+    },
+    {
+      "chunk_text": "就是最先進的產能表示就算臺海有狀況在美國他還是可以做出最好的先進晶片某種程度上也保障了他們講的民主陣營的科技優勢臺灣就是會擔心說以前我們就是覺得有矽盾所有的技術都在臺灣美國因為要保護臺灣",
+      "chunk_id": "2ddeef35-e494-47dc-86ab-6c385c234eea",
+      "chunk_index": 30,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 93,
+      "enhanced_tags": [
+        "科技",
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.080990"
+    },
+    {
+      "chunk_text": "所以一定要保護臺灣但是我覺得你以美國的立場來看你把臺積電抓過去是一個比較好的一個選項所以這個部分就看大家怎麼想其實我覺得第三個方案對臺灣應該說對臺積電而言不一定是壞事因為他可能就變成一個美國的乾兒子因為美國就是會希望",
+      "chunk_id": "8efc232d-d0d1-41b3-9b6e-d21ee44c6355",
+      "chunk_index": 31,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 108,
+      "enhanced_tags": [
+        "希望"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.082325"
+    },
+    {
+      "chunk_text": "臺灣的晶片生產鎖定在美國的本土等於是以後就會有兩個製造廠一個在臺灣一個在美國這部分我覺得就是你可以在美國建立起跟臺積電一樣水準的製造但是你的成本比較高的部分也許美國政府跟美國企業可能會願意把它吸收但是缺點就是",
+      "chunk_id": "c583401f-0817-4c03-96b4-8aa7fec7eda1",
+      "chunk_index": 32,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 104,
+      "enhanced_tags": [
+        "職涯",
+        "晶片"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.083581"
+    },
+    {
+      "chunk_text": "就是臺灣的部分可能會被影響但是優點就是臺積電的產能分到臺灣跟美國就降低了很多地緣風險也會增強很多美國投資人的一些投資意願所以這部分也算保障了臺積電的國際地位跟安全所以這部分",
+      "chunk_id": "9df1a788-0ecf-4f20-b11b-afa8ede77b92",
+      "chunk_index": 33,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 86,
+      "enhanced_tags": [
+        "時事",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.084776"
+    },
+    {
+      "chunk_text": "就是一個風險很大但是未來報酬也很大的一個選項綜合起來是這樣我是覺得有反正有三個方案就是第一個就是臺積電就去把那個先進風向到美國那我覺得這是最溫和的方案我也覺得這是臺積電會跟美國談判的第一個方案但是我猜川普政府一定不要因為川普就是",
+      "chunk_id": "92f6b91b-006a-4e87-ab4d-bdf3a765a492",
+      "chunk_index": 34,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114,
+      "enhanced_tags": [
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.086005"
+    },
+    {
+      "chunk_text": "就是一個很浩大喜功的人好 方案二的部分就是有一個複雜的股權合作複雜的股權跟合作架構那以這個部分以商業本質來看其實臺積電沒有主動誘因去做這件事情但是美國如果強力施壓也是有可能做這件事情但是這部分對臺積電就是很麻煩就是說你要去扶植你的對手然後來",
+      "chunk_id": "8a3a2d65-47e6-4d66-92b7-964fac50e137",
+      "chunk_index": 35,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 120,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.087244"
+    },
+    {
+      "chunk_text": "來搶你的產能然後讓你的獨佔性變低我是覺得這部分我是覺得只有臺積電就是說在美國很強勢推動而且沒有其他選項的時候他才會接手我是覺得方案三是一個最激進而且也可以解決最基本問題的選項但是這部分就是美國要覺得說英特爾纔是不行",
+      "chunk_id": "c5a0c2a7-b38f-448d-83e6-1bd91e0203ed",
+      "chunk_index": 36,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 107,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.088459"
+    },
+    {
+      "chunk_text": "所以他希望臺積電去美國做一個美積電那這部分是也完全符合美國利益但是可能不符合應該說符合美國利益也符合臺積電股東的利益但是對臺灣的利益可能就沒有那麼友善所以就看臺積電最後怎麼去怎麼去做決定我是覺得臺積電會",
+      "chunk_id": "ede2508c-a332-4f29-bd68-34810eb3f454",
+      "chunk_index": 37,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 101,
+      "enhanced_tags": [
+        "希望"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.089637"
+    },
+    {
+      "chunk_text": "實際上他會想要保留他的技術領先的優勢而且也會希望美國做充分的保障就是希望不要跟中國一樣說希望把我們的技術都偷過去所以我覺得其實方案三的可能性是蠻高的但是我覺得現在市場大家會應該說市場也覺得方案二跟三比較有可能所以你看現在英特爾大漲大漲的原因是他覺得他有可能把他",
+      "chunk_id": "d34482a8-d857-47c1-b6cc-8200d8b891d0",
+      "chunk_index": 38,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 130,
+      "enhanced_tags": [
+        "希望",
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.090889"
+    },
+    {
+      "chunk_text": "製造部份分拆出去對那對臺積電而言短期上就有可能說我們的要投入大量的資本支出然後來做這個美積電而且臺灣的競爭力可能會減低所以就看之後怎麼去達成最後的協議應該這幾天就會公佈了所以我是覺得大家最擔心的一點就是方案二的部分說臺積電去然後",
+      "chunk_id": "47d3009c-87dd-4ed0-8e73-abd05fe724e6",
+      "chunk_index": 39,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114,
+      "enhanced_tags": [
+        "資本支出"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.092111"
+    },
+    {
+      "chunk_text": "就是去技術入股英特爾然後去扶植英特爾我是覺得這個可能性不會很大因為第一個說臺積電自己一定也不要那另外英特爾跟臺積電的技術其實也不一樣因為其實現在英特爾他自己就有他的18A的製程那臺積電也有他的兩奈米製程所以其實大家各自研發各自的那也是有各自的專利你說臺積電去協助英特爾的",
+      "chunk_id": "58afd485-bd91-4920-9da0-f3bb80073b2a",
+      "chunk_index": 40,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 135,
+      "enhanced_tags": [
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.093403"
+    },
+    {
+      "chunk_text": "18A然後會讓他很快的變好然後英特爾把臺積電的技術偷走我是覺得如果有這麼好偷的話就不會如果有這麼好偷那臺積電的技術早就被偷走了所以我是覺得技術相對的沒這麼好偷因為美國畢竟不是中國美國畢竟還是一個自由貿易的一個國家",
+      "chunk_id": "7495a601-3824-4ade-9ffe-10fad2a0e8b7",
+      "chunk_index": 41,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 106,
+      "enhanced_tags": [
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.094577"
+    },
+    {
+      "chunk_text": "他不會像中國一樣做強迫的技術移轉所以他要的就是說你要怎麼樣符合美國的利益然後以及對臺積電就是說他們要的就是要符合美國利益所以就看之後怎麼談我們可能最快就會有影響好那好本集節目就到這邊好那我是覺得",
+      "chunk_id": "5e0afa8a-ec7e-4cfc-a825-ccadb9952a82",
+      "chunk_index": 42,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 97,
+      "enhanced_tags": [
+        "科技"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.095691"
+    },
+    {
+      "chunk_text": "也不用太擔心因為其實我們大家我覺得反而現在在很多不確定性然後看起來對臺積電很不利的時候大家就會就是一個在市場一個短期大家進入一個比較保守的狀態你如果是臺積電的投資人你就會覺得事實上你等過一陣子方案出來了那隻要我是覺得不要不要是方案二我覺得一跟三我是覺得都是還蠻好的一個選項",
+      "chunk_id": "4e5b76c6-03c8-4a11-a7ee-68340a150b66",
+      "chunk_index": 43,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136,
+      "enhanced_tags": [
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.097161"
+    },
+    {
+      "chunk_text": "好所以我們就經過理性分析之後大家就可以思考一下到底哪一你可以思考一下說你要不要繼續投資臺積電你如果覺得技術會被偷走的話那你就去把它賣掉或是去做空或是你覺得說其實影響不大那你就可以繼續持有所以我們去做這些研究並不是說我們要去做什麼",
+      "chunk_id": "95ffead8-4e43-40d3-8626-d1849fe79175",
+      "chunk_index": 44,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114,
+      "enhanced_tags": [
+        "科技",
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.098401"
+    },
+    {
+      "chunk_text": "做空還是做多並沒有說我看了我做這些研究之後我就會做一些其他的投資我們做研究就是你做研究之後你就會有一個想法你就看這個想法然後你對你的想法去做壓住對好那本集節目就到這邊好那我原則上這是一個新的",
+      "chunk_id": "e5cd05d1-fbe2-4051-95ee-21d82453e138",
+      "chunk_index": 45,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 95,
+      "enhanced_tags": [
+        "投資"
+      ],
+      "tagged_at": "2025-07-10T14:12:36.099538"
+    },
+    {
+      "chunk_text": "做法就說如果市面上市場上有什麼新的東西那我做研究那我就用PARKS講給大家聽那如果大家喜歡這個做法的話可以留言跟我分享我之後如果有做這種自己做功課的部分我就用唸的部分給大家聽好今天節目就到這邊我們的抽出活動好那我就是我會在",
+      "chunk_id": "a429f19c-1134-4c76-a168-e3e974a63351",
+      "chunk_index": 46,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.100811"
+    },
+    {
+      "chunk_text": "AppleParks跟Spotify來做留言我們在會抽那個孤拍老牛的書一本還有切老滾水滾雪球的書三本總共有四本來那個抽給在AppleParks跟Spotify來留言的聽眾們好那還是再重複一下如果你是AppleParks的朋友因為他留言之後可能要70個小時之後才會出現所以所以你如果要",
+      "chunk_id": "176d954a-d11c-4303-92a3-706aa1121fa1",
+      "chunk_index": 47,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 141,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.102155"
+    },
+    {
+      "chunk_text": "想要聽聽說想要參加抽出AppleParks的朋友們可能要趕快留言這樣子禮拜二早上我在錄的時候纔看得到好那這集節目就到這邊謝謝大家我們下星期二見",
+      "chunk_id": "004ce950-14ea-4b82-9a4c-9f9ee09e7d64",
+      "chunk_index": 48,
+      "episode_id": "6863806f13e684d30303f6c0",
+      "original_filename": "RSS_1776077547_podcast_1321_EP16美國與台積電談判三種方案研究.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 71,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:12:36.103441"
+    }
+  ],
+  "original_text_length": 5657,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:12:36.103446",
+    "total_chunks": 49,
+    "total_tags": 70
+  }
+}

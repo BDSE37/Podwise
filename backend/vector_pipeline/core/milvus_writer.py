@@ -40,7 +40,7 @@ class MilvusWriter:
     
     def create_collection(self, collection_name: str, embedding_dim: int = 1024) -> str:
         """
-        創建 Milvus 集合
+        創建 Milvus 集合 - 使用統一的 schema 定義
         
         Args:
             collection_name: 集合名稱
@@ -58,47 +58,94 @@ class MilvusWriter:
                 logger.info(f"集合 {collection_name} 已存在")
                 return collection_name
             
-            # 定義字段 - 符合新的 Milvus schema
+            # 使用統一的字段定義 - 符合完整的 podcast schema
             fields = [
-                FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=1024, is_primary=True),
+                # 主鍵和索引欄位
+                FieldSchema(name="chunk_id", dtype=DataType.VARCHAR, max_length=256, is_primary=True),
                 FieldSchema(name="chunk_index", dtype=DataType.INT64),
                 FieldSchema(name="episode_id", dtype=DataType.INT64),
                 FieldSchema(name="podcast_id", dtype=DataType.INT64),
-                FieldSchema(name="episode_title", dtype=DataType.VARCHAR, max_length=1024),
+                
+                # 節目資訊欄位
+                FieldSchema(name="podcast_name", dtype=DataType.VARCHAR, max_length=255),
+                FieldSchema(name="author", dtype=DataType.VARCHAR, max_length=255),
+                FieldSchema(name="category", dtype=DataType.VARCHAR, max_length=64),
+                FieldSchema(name="episode_title", dtype=DataType.VARCHAR, max_length=255),
+                
+                # 時間和評分欄位
+                FieldSchema(name="duration", dtype=DataType.VARCHAR, max_length=255),
+                FieldSchema(name="published_date", dtype=DataType.VARCHAR, max_length=64),
+                FieldSchema(name="apple_rating", dtype=DataType.INT32),
+                
+                # 內容欄位
                 FieldSchema(name="chunk_text", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=768),
-                FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="source_model", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="podcast_name", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="author", dtype=DataType.VARCHAR, max_length=1024),
-                FieldSchema(name="category", dtype=DataType.VARCHAR, max_length=1024),
-                # 🔁 合併後的 tag 欄位，存為 JSON 格式字串
-                FieldSchema(name="tags", dtype=DataType.VARCHAR, max_length=1024),
+                FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=embedding_dim),
+                FieldSchema(name="language", dtype=DataType.VARCHAR, max_length=16),
+                
+                # 元資料欄位
+                FieldSchema(name="created_at", dtype=DataType.VARCHAR, max_length=64),
+                FieldSchema(name="source_model", dtype=DataType.VARCHAR, max_length=64),
+                FieldSchema(name="tags", dtype=DataType.VARCHAR, max_length=1024),  # JSON 格式的標籤
             ]
             
             # 創建集合
             schema = CollectionSchema(
                 fields=fields,
-                description=f"Podcast Chunks Collection with Vector Tags (dim: {embedding_dim})"
+                description=f"Podcast Chunks Collection with Vector Embeddings (dim: {embedding_dim})"
             )
             collection = Collection(name=collection_name, schema=schema)
             
             # 創建索引
-            index_params = {
-                "metric_type": self.milvus_config.get("metric_type", "COSINE"),
-                "index_type": self.milvus_config.get("index_type", "IVF_FLAT"),
-                "params": {"nlist": self.milvus_config.get("nlist", 1024)}
-            }
-            
-            # 為嵌入向量欄位創建索引
-            collection.create_index(field_name="embedding", index_params=index_params)
+            self._create_indexes(collection, embedding_dim)
             
             logger.info(f"成功創建集合 {collection_name}")
+            logger.info(f"欄位數量: {len(fields)}")
+            logger.info(f"嵌入向量維度: {embedding_dim}")
+            
             return collection_name
             
         except Exception as e:
             logger.error(f"創建集合失敗: {e}")
+            raise
+    
+    def _create_indexes(self, collection: Collection, embedding_dim: int) -> None:
+        """
+        為集合建立索引
+        
+        Args:
+            collection: Milvus 集合物件
+            embedding_dim: 嵌入向量維度
+        """
+        try:
+            # 為嵌入向量欄位建立索引
+            index_params = {
+                "metric_type": self.milvus_config.get("metric_type", "COSINE"),
+                "index_type": self.milvus_config.get("index_type", "IVF_FLAT"),
+                "params": {
+                    "nlist": min(1024, embedding_dim // 4)  # 根據維度調整 nlist
+                }
+            }
+            
+            collection.create_index(field_name="embedding", index_params=index_params)
+            logger.info("成功建立嵌入向量索引")
+            
+            # 為其他重要欄位建立索引
+            scalar_indexes = [
+                "podcast_id",
+                "episode_id", 
+                "category",
+                "language"
+            ]
+            
+            for field_name in scalar_indexes:
+                try:
+                    collection.create_index(field_name=field_name)
+                    logger.info(f"成功為 {field_name} 建立索引")
+                except Exception as e:
+                    logger.warning(f"為 {field_name} 建立索引失敗: {e}")
+            
+        except Exception as e:
+            logger.error(f"建立索引失敗: {e}")
             raise
     
     def drop_collection(self, collection_name: str) -> None:

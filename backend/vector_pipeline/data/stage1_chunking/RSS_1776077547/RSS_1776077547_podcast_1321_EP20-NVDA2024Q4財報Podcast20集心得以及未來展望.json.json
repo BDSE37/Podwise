@@ -1,0 +1,531 @@
+{
+  "filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+  "episode_id": "6863806f13e684d30303f6c5",
+  "collection_name": "RSS_1776077547",
+  "total_chunks": 58,
+  "chunks": [
+    {
+      "chunk_text": "嗨大家好歡迎來到Fireman的Fire人生我是Chris那終於來到我說的目標EP20給自己鼓勵一下好就是我之前給自己一個目標就是做到第20集那這是做到第20集了所以我今天的話題就來講說我做了Podcast的20集的心得跟未來的展望不過我剛剛想要重新整理一下我的帳戶我發現",
+      "chunk_id": "045263a4-f532-4fb7-b153-6303df5671b7",
+      "chunk_index": 0,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "Spotify的那個留言全部都消失了然後又有抽書活動所以我現在頭有點痛如果有聽到的朋友你可能在這一集留言好了那就是我在看看之後的狀況是怎麼樣好不過我們先開始今天的內容好那在開始今天的內容之前我們先講那個NVIDIA的財報以及黃仁勳他怎麼講好那我們先講NVIDIA的財報",
+      "chunk_id": "74e3c1c5-0b67-403b-9995-3b17c499f307",
+      "chunk_index": 1,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "這個是他的財務數據他的收入是393億元比上一季增長12%年增78%那EPS是0.89美元那都是雙雙擊敗預期那全年的收入是1305億美元那年增是114%那全年的EPS是2.94美元那年增147%這個數據非常的漂亮但是現在看起來",
+      "chunk_id": "c7666c5a-a756-4e7e-84dd-ab998560fa7f",
+      "chunk_index": 2,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 112
+    },
+    {
+      "chunk_text": "他的意思是說就是分析是說其實他的增長有放緩大家可以看一下他的第四季的收入其實是增長12%那他現在給了guidance是在2025年第一季的展望是預計收入是430億美元增長也是大概10%左右雖然大家都說看起來就符合買方的預期",
+      "chunk_id": "f600a8c3-ad78-400f-b8cd-e5cc42aac9ff",
+      "chunk_index": 3,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "我之前在看說買方預期其實也大概393億左右但是我看到好的也有到400億美元的那個差異所以你說這份財報雖然說是有擊敗賣方的預期是382億美元那其實這個數據他的382億美元是他上一次財報給的那個財報的高標所以我就說其實你去看那個賣方分析師的那個數據根本就沒什麼參考性",
+      "chunk_id": "2dd36156-8176-45e4-b0b1-ff6080e64d61",
+      "chunk_index": 4,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 131
+    },
+    {
+      "chunk_text": "那因為賣方分析師他們給的數據就是他們用的很簡約的算法簡單講就是他們的給上一季的guidance然後看因為他突然會說他會給一個數字然後加減2%對所以他們可能就抓上緣就是說覺得會好一點就抓上緣那爛一點就抓下緣所以這就是分析師他們賣方分析師的數字但是其實我前幾天就看到說",
+      "chunk_id": "3e35b917-dcc4-41d4-abfc-0d323c5dc475",
+      "chunk_index": 5,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "其實買方分析師是大概估393億左右其實他們估的非常的準所以我說這個財報雖然看起來很亮麗但是就是符合買方分析師的一個預期但是我會覺得其實財報的數據我之前就有提過說數據其實不是重點是要看他在會議上說了什麼東西其實數據只是一個外衣只是外表其實我們要投資是要去看",
+      "chunk_id": "c0c22576-3050-49c2-be28-ae22afa8c650",
+      "chunk_index": 6,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "他的裡面就是去看他的內在好那我就從幾個角度來看來整理黃瑞勳這次的電話會議的重點好我從AI的發展還有GPU平台的優勢然後還有ASIC的威脅還有數據中心的需求還有他產品升級的部分從這幾個部分然後來彙整他到底說了什麼東西好我們先講AI的發展他說AI",
+      "chunk_id": "f813132e-b128-4e05-847e-fd13def2c35a",
+      "chunk_index": 7,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 121
+    },
+    {
+      "chunk_text": "然後現在已經成為一個現在的軟體已經成為一個主流那現在所有的幾乎所有人都在用AI好那黃瑞勳有說不管在物流配送還是什麼反正就是所有東西現在都有AI好所以之後每個人或是金融科技還是你是任何的公司都會用AI他表示說AI已經全面滲透人的日常生活跟企業服務",
+      "chunk_id": "84021734-af88-4840-86fa-972ba7c9290d",
+      "chunk_index": 8,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "那我昨天有看到一個數據他說中國現在大量解僱人類的能力那只留下大概10%到20%就是會用AI的人好所以這件事情就已經證明了說我們之前講第一個劇本已經發生了說AI會不會取代人類他不會取代應該說他在取代人類之前會有一個過渡期他是他會取代不會用AI的人類所以現在大陸已經發生這件事情大陸好像裁掉80%",
+      "chunk_id": "25016669-da51-4e28-9266-da3d0953c316",
+      "chunk_index": 9,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 146
+    },
+    {
+      "chunk_text": "的客服人力現在全部都用AI好那黃瑞勳也在講說AI的下一波發展是什麼好那他這個論述就跟他當初在在什麼就是他上次發布那個那個50系列顯示卡的一樣他說現在的發展就是生成式AI就是生成式AI的就是內容生成跟搜尋他說他接下來就會看到第二階段就是代理人AI就是agent AI",
+      "chunk_id": "f027b525-2c08-4163-a4a2-1917426e3316",
+      "chunk_index": 10,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "好那再下一個就是機器人與自動化領域的AI就是他講的實體AI譬如說機器人或是自動駕駛的崛起他說以及各國基於自身發展系統自身生態系所發展的主權AI所以之後的AI不會只有文字出向生成就是我們現在看到的之後會深入融入企業決策自動駕駛機器人還有真正的機器人的應用所以那這些新形式的AI會開始",
+      "chunk_id": "5cea4ef6-d8dc-4971-a0ea-66f6bc359e59",
+      "chunk_index": 11,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 140
+    },
+    {
+      "chunk_text": "開啟下一階段的技術浪潮會對各大產業造成革命好那以我的觀察來看大家不知道有沒有看到最近特斯拉在中國的那個就是他中駕的到中國大家都知道美國很厲害就是美國的FSD很厲害那其實我們都在看一樣的技術他能不能到中國好那我們看得到中國大家的感覺就是說感覺上就像是個外星人",
+      "chunk_id": "b05511c0-413c-47e9-8165-def0a7a8f9bf",
+      "chunk_index": 12,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 128
+    },
+    {
+      "chunk_text": "外國人去中國人去中國開車那原則上可以開那你去看中國人他們真的是給那個FSD非常困難的很多很困難的情景譬如說跑到什麼夜市小巷子然後還有什麼有人在那邊走來走去其實他們表現的還不錯他說基本上跟美國差不多的那個路況他們都可以解決那剩下就是很多中國特色的交通規則他沒有辦法解決",
+      "chunk_id": "b7bbe597-72e5-4c22-9f94-7c48e4d46b31",
+      "chunk_index": 13,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "我覺得這種東西隨著他的技術到中國開始上路之後我們就會知道說他這一個FSD他的AI他在美國OK他到中國能不能很快的學習好那我對這件事情是抱一個樂觀的態度好第二個是GPU平台的優勢他說NVIDIA的GPU平台他最大優勢是他很通用",
+      "chunk_id": "91ce1746-b74f-4ad8-a623-4d1fcde303aa",
+      "chunk_index": 14,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 112
+    },
+    {
+      "chunk_text": "可以升任各種類型的AI一個工作那他也說不管是回歸模型擴散模型電腦視覺還是文本升級等等好不管是任何的模型NVIDIA的平台都可以提供很好的效能支持好那他就說這是他的靈活的架構設計還有完整的那個軟體生態的系統所以他講到一個重點他說NVIDIA的平台是多數開創新AI演算法的首創的實驗環境",
+      "chunk_id": "8e412a59-c045-4a96-a6f4-bc833aba4aea",
+      "chunk_index": 15,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 141
+    },
+    {
+      "chunk_text": "好就等於是你是新創公司你都會用AI你都會用NVIDIA來做你的AI所以他說NVIDIA他提供很厲害的解決能力他說從資料的處理模型的訓練還有調教到最終的推理NVIDIA都有相對應的軟體工具來支援所以變成說他的生態器其實很完整所以他除了在各大公有雲平台也可以在自己的家裡弄",
+      "chunk_id": "d61f655c-92bf-410c-b04c-923f55270993",
+      "chunk_index": 16,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "所以甚至也可以驗到機器人所以黃仁鈞在電話會議他說我們無所不在他說很多新創團隊在打造AI的解決方案時NVIDIA是最好的決定所以他說在硬體的訓練方面他說每一代的GPU他打算使出很快速的迭代節奏來驚人的性能提升",
+      "chunk_id": "bdc828b1-3c53-44ed-bd8e-4dbb938dc25e",
+      "chunk_index": 17,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 103
+    },
+    {
+      "chunk_text": "他說因為資料中心他不是說我想放多少GPU就放多少GPU他會有既定的空間跟功耗的預算如果新的GPU可以在相同的功耗下提升兩倍四倍甚至八倍的提升那這就是一個非常好的一個提升的方法好那這部分我覺得蠻重要的可以再講一下這是他的發展策略他說",
+      "chunk_id": "30de81c9-3d73-41e5-9ae3-944d1ac0e6ce",
+      "chunk_index": 18,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 115
+    },
+    {
+      "chunk_text": "NVIDIA的每一代GPU他打算用很快速的迭代節奏然後來帶來驚人的性能提升因為資料中心他會受限於既定的空間跟功耗他講的功耗就是供電大家都知道現在可能缺電大家都在弄電如果新一代的處理器可以在相同的功耗下跟一定的空間裡面提供兩倍四倍甚至八倍的性能提升那這是他對抗ASIC的威脅",
+      "chunk_id": "9e029405-2146-4ac1-b8d4-394b537ca76c",
+      "chunk_index": 19,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 136
+    },
+    {
+      "chunk_text": "我覺得NVIDIA他現在最大的就是大家普遍的會覺得他最大的威脅就是ASIC那ASIC是什麼他就是譬如說像三大公有雲他們的各大CSP他們因為用量很大所以他們就覺得啊我與其用你NVIDIA的系統我還不如自己弄對那這就講ASIC就是他們自己設計晶片那NVIDIA他的提供的生態系啊就是是一個很厲害的互承",
+      "chunk_id": "40aacc1e-bdbe-4b4b-a366-bc23c50d278d",
+      "chunk_index": 20,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 148
+    },
+    {
+      "chunk_text": "他說軟體的構建是很困難的他說因為現在的AI系統真的很複雜你要在各種晶片不同的晶片系統上要打造這種環境其實很難他說其實開發出一個AI專用晶片也不代表他就可以輕易的使用那相反的像NVIDIA硬體他有龐大的軟體跟開發者社群這就形成深厚的互承這代表說客戶他可以用最快的速度把技術付諸",
+      "chunk_id": "f0c2b71b-2673-4384-b1dd-213279514b9c",
+      "chunk_index": 21,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 137
+    },
+    {
+      "chunk_text": "實際好綜合以上他對ASIC的威脅他說他要用很快的迭代用在既定的空間跟功耗他就要提供兩倍四倍甚至八倍的性能提升那他也認為說因為他的軟體生態跟開發者的那個這個的生態系所以呢他認為ASIC",
+      "chunk_id": "97ad131d-b8e2-4fc0-8a15-3dc987d23c98",
+      "chunk_index": 22,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 91
+    },
+    {
+      "chunk_text": "他沒辦法像NVIDIA的GPU一樣有通用而且強大的架構還有完完整的軟硬體的生態好這就是他鞏固這個NVIDIA在AI計算領域的領導地位好從這一點我們就來講到前陣子我看到Google他是ASIC最好的一間公司就是ASIC他有他的TPU但是呢他在一二月的時候",
+      "chunk_id": "e1da255a-2e9d-4bbd-aee1-3127794a6c06",
+      "chunk_index": 23,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "發布了NVIDIA他的NV72反正就是這個GPU讓他的GCP的使用者可以使用那就看起來大家本來以為Google他全部都要用他自己的ASIC就發現他其實也用了很多NVIDIA的晶片好那最領先的ASIC廠商",
+      "chunk_id": "2f92caac-1f33-4626-a9cb-2d4d10062415",
+      "chunk_index": 24,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 101
+    },
+    {
+      "chunk_text": "Google他都用了很大量的NVIDIA晶片那其他的根本就還沒有部署好的ASIC就會讓人覺得他到底不知道他們的功能不知道他們的未來性在哪裡所以黃仲勳他認為他覺得ASIC可能不是他的對手因為他覺得說因為他們有很快的迭代的速度那可能因為ASIC他要做出來他從開發到他部署可能要兩三年",
+      "chunk_id": "fcda6f91-0918-4a10-b6fa-955c2d2529ed",
+      "chunk_index": 25,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 139
+    },
+    {
+      "chunk_text": "部署之後呢可能又會不一定可以使用現在的那個軟體但是同樣的兩三年他NVIDIA他做出來的晶片可能比當初他們追趕的兩三年前的晶片的速度可能已經快四倍八倍但是呢他們兩三年前就是他們在設計的晶片往往只有他大概二到三年前的那個速度的水準",
+      "chunk_id": "9f77eaf7-ead9-4740-b5cf-a1e90e877f22",
+      "chunk_index": 26,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 113
+    },
+    {
+      "chunk_text": "所以這就是他用來就是對抗ASIC的威脅就是他用很快速的迭代接受然後來帶來很快的功能的提升好那接下來他講數據中心的需求他說NVIDIA對超大規模客戶的資本支出有相當清晰的掌握他可以預見他們在未來幾年還是會大舉投入建構AI的基礎設施所以現在有一批人在講說接下來大家會很快地",
+      "chunk_id": "395bbb05-c202-45de-bf53-58b9ba93dc0a",
+      "chunk_index": 27,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "很快的把那個AI的預算把它撤退那目前看起來NVIDIA的說法是沒有他說現在很多大規模的資料中心的客戶他還是會大舉的投入AI的基礎設施他說未來啊絕大多數的軟體都會有AI作為基礎所以不管是生成式AI還是推理型AI都會是資料中心不可或缺的工作負載架構這表示各CSP他們",
+      "chunk_id": "cab4e8df-d2af-4bc1-8f86-e95395e37a6e",
+      "chunk_index": 28,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 131
+    },
+    {
+      "chunk_text": "沒有得選擇他只能繼續投入這個GPU來跟上軟體演進的方向所以他說其實現在創新領域還在百花齊放大量新創公司持續湧入並投入AI的研發所以每一個新創都需要很大規模的GPU所以他講除了CSP新創企業的需求也是AI算力的重要支出所以他說短期",
+      "chunk_id": "c13bedfa-450f-4413-9ccf-d55a2773b077",
+      "chunk_index": 29,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 114
+    },
+    {
+      "chunk_text": "短縱長期都沒有問題他講到中國他說中國像DIBSC的出現他說會削弱NVIDIA的基本需求嗎他認為是不會他說就算AI算力因為假設生成式AI的需求有降那其實還有其他的動能會把它支撐起來所以他說基本的趨勢絕對不會改變",
+      "chunk_id": "6c738d0c-b5a6-448c-8c1a-df21d1909f65",
+      "chunk_index": 30,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 104
+    },
+    {
+      "chunk_text": "他說AI算力有堅實的多重動能的支撐不會因為一個事件而動搖他講到中國他說美國對他們祭出高階的晶片管制讓他在中國的業務萎縮他說原則上現在中國的營收跟潛力機差不多美國那邊的增長填補了他之前在中國萎縮的部分他說較之前大概萎縮掉一半",
+      "chunk_id": "ef7e382a-f95f-476f-bed8-956ed799231e",
+      "chunk_index": 31,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "所以他說現在AI的投資還在持續加速他說就算是有地緣政治的風險整體AI的高速成長也是沒有變那最後他講到產品升級他說下一代的GPU架構叫做Breakable Ultra他說預計在今年下半年推出他繼續延續每年一個新架構的節奏那我們本來以為今年會是他講的Ruby結果看起來不是",
+      "chunk_id": "fd974d04-a5f9-4847-bfd2-dbf46d644341",
+      "chunk_index": 32,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 134
+    },
+    {
+      "chunk_text": "今年的架構是Atra他說雖然他的那個B系列的GPU在量產的初期遇到意外的延誤但是他們已經克服困難了現在生產回到正軌並滿足當前的巨大巨雄其實他這一代我覺得蠻掉漆的那因為他們用了很多很複雜的架構而且他們要把所有的東西",
+      "chunk_id": "85f946eb-9eac-4210-a31d-39d664bff5f7",
+      "chunk_index": 33,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 106
+    },
+    {
+      "chunk_text": "MVR他們都要吃就是什麼機櫃怎麼設計他們都要吃就後來發現說這種東西還是要還是要繳學費的其實他們就是弄了非常多的困擾所以就知道他們那個B300系列就回到之前的設計就是他們只做晶片其他東西就讓其他的供應商去處理我在想他之後應該與其在做這麼複雜的東西",
+      "chunk_id": "2181ff08-d8b6-430f-9db8-1859ec53428e",
+      "chunk_index": 34,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 122
+    },
+    {
+      "chunk_text": "然後自己全部都要轉你還不如專注於做晶片的部分這部分我們還要再看他們之後怎麼發布他們的產品他說新的Atra系統會升級網路連接就是NVLink還有記憶體跟處理器的部分會進一步提升性能所以他說新的Atra系統跟現在的系統是一樣的所以新舊交替的話沒有問題所以他說持續的創造",
+      "chunk_id": "3150e54c-286f-4134-9624-011bfaeb475e",
+      "chunk_index": 35,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 132
+    },
+    {
+      "chunk_text": "所以他也特別提醒分析師說你要去關注我們新的GPU技術大會就是GTC他會在3月18會發表大量新消息的主題演講那我就覺得大家可以可以持續關注因為我覺得",
+      "chunk_id": "15ae9acf-45ab-4660-a34f-a1dc7e75447d",
+      "chunk_index": 36,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 73
+    },
+    {
+      "chunk_text": "NVIDIA現在以他現在的狀況就等於是大家都拿著放大鏡去看的變成說你要在NVIDIA上面要拿到很多想要在他這邊做夢其實越來越困難因為是大家都拿著放大鏡在看他們那儘管如此我覺得新的技術可能還是會有新的夢想來推升他的股價所以我們可以其實現在離3月18還蠻近的",
+      "chunk_id": "47b5db8b-2595-47f8-9b6a-76df8f93abe1",
+      "chunk_index": 37,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "那其實現在的股價也沒有到非常高我還是會對NVIDIA的股價會對他有一個好的期待好那本季唯一的財報唯一一個缺點就是他的毛利率下降那其實他有講他說大規模的需求讓NVIDIA願意在短期內承擔較高的生產成本以換取產品快速交付市場他說隨著那個現在的",
+      "chunk_id": "ae9e9226-9d58-4f37-84ed-4d7118061b4a",
+      "chunk_index": 38,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "B系列的產能啊逐漸爬坡完成他說應該之後在毛利率的部分那會有改善好那這就是NVIDIA的財報跟黃仁勳的他說的內容好整體而言來看我覺得他這個財務數據是非常漂亮而且看起來未來的發展也沒有減弱的趨勢那我覺得他最近股價比較弱",
+      "chunk_id": "b440cea0-1a12-4635-a5b6-fb2899b6c8bc",
+      "chunk_index": 39,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 107
+    },
+    {
+      "chunk_text": "很多原因就是大盤比較弱啊而且我覺得大家AI做夢也做了很久了雖然有很大的實際需求進來但是就少了一點讓人家覺得有夢想的部分那這部分我們可以期待之後的AI應用還有他之後的若是硬體的部分我們可能要看他GTC看會不會有很多新的資訊可以讓我們知道好整體來看我覺得這個財報",
+      "chunk_id": "76bff599-8de8-4a77-a275-4e873947835f",
+      "chunk_index": 40,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 129
+    },
+    {
+      "chunk_text": "85分但是買方的預期也是85分所以你看現在的財報雖然擊敗預期可能有10億美元以上但是其實股價並沒有就是基本上在平盤小跌一點點所以但是你在盤前小跌也不代表之後就不會漲所以我們再觀察一下好這是第一個",
+      "chunk_id": "eaa21b01-7b89-4701-a1f7-29137c28ede8",
+      "chunk_index": 41,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 97
+    },
+    {
+      "chunk_text": "這個話題就是對火熱的Invidia的財報的部分好我們再講第二個部分好就是我自己的閒聊啦就是我的Podcast也做了20集了跟大家講一下我的心得我的Podcast從去年的10月25開始到現在大概2月我花了4個月錄完了20集好那其實這段時間其實也改變很多因為我一開始是用",
+      "chunk_id": "2727e228-b2a1-47c4-a31c-cfe603840ebc",
+      "chunk_index": 42,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 133
+    },
+    {
+      "chunk_text": "打稿一個一個字打那有時候打了那個七八千字結果自己念念不到十幾分鐘就念完了那你知道打七八千字要用非常多的時間去打對所以其實我一開始在做Podcast我的那個阻力很大但是但是後來覺得這樣子很累所以我就大概打了一些東西就是打了一些鋼藥然後就丟給AI叫AI去產出一些東西然後後面我再做修改",
+      "chunk_id": "2e1e3e71-3894-4d72-ab49-37dd0773d9fc",
+      "chunk_index": 43,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 140
+    },
+    {
+      "chunk_text": "對所以現在的阻力沒有像以前那麼大就是我大概半天就可以搞定一集對所以我覺得從第0集到現在第20集對最大的收穫就是我的做這件事情的阻力變低了好那其實我知道我的一直以來的短板就是我的口才不好對就是我沒辦法像很多人口若鮮河然後講的非常的有說服力",
+      "chunk_id": "4878a54c-c529-4260-abb0-b6f046922571",
+      "chunk_index": 44,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 118
+    },
+    {
+      "chunk_text": "那我覺得我覺得我們哀人就是這樣因為其實我是個非常矮的人就是其實我平常都不用跟人家講話就是我只要有台電腦就可以了對其實我是個宅男的好其實我覺得哀人的口才就是這樣就是說我們講話就是比較實在然後比較實事求是我們不會說口若鮮河講很多就是口才很好的就是沒辦法像很多口才很好的人啊他們講出很厲害的話反應很快那我",
+      "chunk_id": "28c168ad-ecbc-488a-91c6-dc76abf12efb",
+      "chunk_index": 45,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 149
+    },
+    {
+      "chunk_text": "我們就是講我們講話就是比較實事求是然後就會就是有時候講話的時候想到有些東西腦子會卡住就是說我們的頭腦跟那個嘴巴的那個覺得好像那個神經沒有連起來的感覺好那反正我覺得我的Podcast就是我可能在練習把我的腦中的東西練習在嘴巴講出來對所以我覺得對我而言是一個",
+      "chunk_id": "84ea49f8-36c0-4f9c-a36c-98a831e2c0d7",
+      "chunk_index": 46,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 127
+    },
+    {
+      "chunk_text": "最好的訓練的機會所以現在既然既然那個我的阻力變低了所以我在想以後我們我在想可以的話我可以我的目標是每週再錄一集就是每週希望可以錄兩集好那其實為什麼要做Podcast其實說Podcast完全沒有賺錢你說有沒有更多收入也沒有你說對自己的觸及率",
+      "chunk_id": "bd5ded36-f695-4448-ae3b-45399af2bdda",
+      "chunk_index": 47,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 119
+    },
+    {
+      "chunk_text": "高嗎其實也沒有對所以但是其實我覺得給我也是蠻多收穫第一個就是我在練習我的腦子跟我的嘴巴的神經的連結然後第二個就是其實我後來發現看了很多資料讀了很多東西那輸出就是一個最好的學習所以我覺得化輸入為輸出的學習的方法是對自己是最有利的所以",
+      "chunk_id": "66f00ce7-f071-4fc7-be44-85d8ea57f2c3",
+      "chunk_index": 48,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 115
+    },
+    {
+      "chunk_text": "我自己覺得我的Podcast的鐵粉除了廣大的大家以外因為其實我發現大家很多集都重複聽兩三遍好那其實可能聽最多次的可能可能是我自己吧因為我自己因為現在送完小孩之後大概有8個小時都是自己個人那自己個人的時候我就很常戴上耳機然後可能在做家事健身還是去幫老婆去弄一下其他事情對那在飛躍",
+      "chunk_id": "d3dc3d45-b43a-48a1-b708-1928e03e1ad8",
+      "chunk_index": 49,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 138
+    },
+    {
+      "chunk_text": "讀啊飛學習的時段然後其實我都會耳機帶著那這個時候呢我最常聽的就是自己的Podcast所以想說還是有其實我固定聽的Podcast就只有古矮Mula跟古勢影者還有大人學還有那個就是健身的時候會聽怪獸訓練電台其實就這五個那其實這五個他們更新的節奏也沒有說每天一集就大概一個禮拜兩集那我就很常聽我自己的Podcast",
+      "chunk_id": "259f648d-15ab-49d1-b0bd-a921803bb46e",
+      "chunk_index": 50,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 154
+    },
+    {
+      "chunk_text": "其實我每一集偶爾都會重聽個一兩遍好那我從第0集我最近又從第0集開始稍微重聽了一下發現跟現在最大的差別就是因為我以前發現我在念稿的時候啊我只要速度一塊我的那個嘴巴就開始打結所以我一開始我的做法就是說把我的念稿的速度變慢一點點",
+      "chunk_id": "bf4b8ec0-c958-4b4f-835a-3397448bdaed",
+      "chunk_index": 51,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 111
+    },
+    {
+      "chunk_text": "這樣就可以很順的講完但是我現在後來發現在之後那個講話速度越來越快其實這跟古矮也蠻像就是古矮一開始講話也比較慢然後講話比較低沉跟我現在慢慢的講話越來越快講話的音調看起來也稍微高一點點所以這也代表說自己其實在這四個月的至少在面對麥克風的口才是有進步的好所以",
+      "chunk_id": "e523e24c-88d7-433e-be08-894fa3ff6a0f",
+      "chunk_index": 52,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "跟大家講之後的方向就是我會原則上每週錄兩集如果有空的話就錄兩集然後我想要開那個片頭的廣告就是好像那個我託管的上網的平台他有一個託管的廣告那這主要是我看那個好序列好歌他的那個Podcast每一集前面都有掛那個就是平台的廣告那其實也不是要賺錢那這就感覺上是",
+      "chunk_id": "9dbe4bb5-9e23-47fd-bd76-40afe143c6bf",
+      "chunk_index": 53,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 126
+    },
+    {
+      "chunk_text": "就是說有一點點收入是給自己的一點肯定所以如果大家覺得這個廣告很煩就把它按過跳過因為其實我看古矮他們都會有口部的廣告因為我們現在還很菜根本就沒有廠商要來找我們其實找我也有點懶得跟他們去去Touch所以我就先開這個上網的廣告大家就忍耐一下我是覺得有一點點",
+      "chunk_id": "db6b57df-a9a3-4012-b630-3c9ca6b22de4",
+      "chunk_index": 54,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 125
+    },
+    {
+      "chunk_text": "收益啊還有大家的留言啊跟大家回覆留言就是給給自己一個前進的動力啦好那本集節目就到這邊好那我們還是有一個抽出活動他原則上下禮拜二抽那因為Apple Podcast他留言之後會有大概72小時的那個時間所以請大家如果你想參加我們的那個隱性財富的抽出活動就麻煩可能要在禮拜五之前要留言不然我禮拜二這週會念不到那Spotify的留言",
+      "chunk_id": "282921a0-e74d-4a6e-829a-ce8b1f0f5ac5",
+      "chunk_index": 55,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 161
+    },
+    {
+      "chunk_text": "我後我現在發現之前留我知道有七個人留言只是天啊那七個留言我現在找不到因為我剛剛因為就跟他講說我想要開那個上岸的片頭廣告結果我重新設定完之後發現Spotify的留言全部消失了而且我也找不到那個留言在哪裡所以我發現Spotify的系統感覺上沒有很穩定對但是我就盡量",
+      "chunk_id": "a7e9dbdb-fff8-4e89-bfc4-602a2c3f9bbd",
+      "chunk_index": 56,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 130
+    },
+    {
+      "chunk_text": "反正如果之前留言的鐵粉們抱歉可以麻煩你們在這一集再留一次嗎那就跟之前有留言過的七位鐵粉跟大家跟你們說聲抱歉然後就是可以如果你們要參加抽出活動麻煩你們在Spotify再留一次我可能才看得到好那好本集節目就到這邊就歡迎大家來參加我們的抽出活動我們下禮拜二見拜拜",
+      "chunk_id": "bf818469-92a9-4f84-a974-296e500bd913",
+      "chunk_index": 57,
+      "episode_id": "6863806f13e684d30303f6c5",
+      "original_filename": "RSS_1776077547_podcast_1321_EP20-NVDA2024Q4財報Podcast20集心得以及未來展望.json",
+      "collection_name": "RSS_1776077547",
+      "chunk_length": 128
+    }
+  ],
+  "original_text_length": 7298
+}

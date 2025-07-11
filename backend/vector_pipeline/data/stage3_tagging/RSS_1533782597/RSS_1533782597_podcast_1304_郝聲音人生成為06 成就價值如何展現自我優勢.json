@@ -1,0 +1,39 @@
+{
+  "filename": "RSS_1533782597_podcast_1304_郝聲音人生成為06 成就價值如何展現自我優勢.json",
+  "episode_id": "6867815854dac0f7fe975c02",
+  "collection_name": "RSS_1533782597",
+  "total_chunks": 2,
+  "chunks": [
+    {
+      "chunk_text": "我先騎白馬走三關親愛的金曲歌后徐嘉瑩你知道現在Uber Eats上什麼東西應該都點得到嗎那點得到白馬嗎點不到但點得到白紙那濕若沙粥呢你認真嗎算了那點個螃蟹砂鍋吧在Uber Eats上你想點的都點得到應該啦",
+      "chunk_id": "6b9c1e2c-ce5a-4467-8835-76fd83ace420",
+      "chunk_index": 0,
+      "episode_id": "6867815854dac0f7fe975c02",
+      "original_filename": "RSS_1533782597_podcast_1304_郝聲音人生成為06 成就價值如何展現自我優勢.json",
+      "collection_name": "RSS_1533782597",
+      "chunk_length": 102,
+      "enhanced_tags": [
+        "愛"
+      ],
+      "tagged_at": "2025-07-10T14:45:40.546794"
+    },
+    {
+      "chunk_text": "歡迎來到好聲音",
+      "chunk_id": "520c5e75-3391-4c54-bf4f-ca714fc3ac96",
+      "chunk_index": 1,
+      "episode_id": "6867815854dac0f7fe975c02",
+      "original_filename": "RSS_1533782597_podcast_1304_郝聲音人生成為06 成就價值如何展現自我優勢.json",
+      "collection_name": "RSS_1533782597",
+      "chunk_length": 7,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:40.548932"
+    }
+  ],
+  "original_text_length": 110,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:40.548937",
+    "total_chunks": 2,
+    "total_tags": 1
+  }
+}

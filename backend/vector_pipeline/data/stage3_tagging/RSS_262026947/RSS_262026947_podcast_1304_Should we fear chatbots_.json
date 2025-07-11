@@ -1,0 +1,199 @@
+{
+  "filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+  "episode_id": "6865015b66c1a4e8d11766d3",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 13,
+  "chunks": [
+    {
+      "chunk_text": "Hello, this is 6 Minute English from BBC Learning English. I'm Neil.And I'm Rob.Now I'm sure most of us have interacted with a chatbot. These are bits of computer technology that respond to text with text or respond to your voice. You ask it a question and usually it comes up with an answer.",
+      "chunk_id": "44da39c4-ac3a-4bf1-aa6a-6d3f48f0283c",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 292,
+      "enhanced_tags": [
+        "BI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.558238"
+    },
+    {
+      "chunk_text": "We'll discuss that more in a moment and find out if chatbots really think for themselves. But first I have a question for you, Rob. The first computer program that allowed some kind of plausible conversation between humans and machines was invented in 1966.",
+      "chunk_id": "ce569d8f-1620-4bc1-8601-ca67164309b6",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 257,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.560705"
+    },
+    {
+      "chunk_text": "But what was it called? Was it A. Alexa B. Eliza or C. Parry? Well, it's not Alexa. That's too new. So I'll guess C. Parry. I'll reveal the answer at the end of the program. Now, the old chatbots of the 1960s and 70s were quite basic. But more recently, the technology is able to predict the next word that is likely to be used in a sentence and it learns",
+      "chunk_id": "fad66f64-5901-4891-aa7e-f9d6fa4e12bf",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 355,
+      "enhanced_tags": [
+        "UI",
+        "LED",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.563244"
+    },
+    {
+      "chunk_text": "words and sentence structures. It's clever stuff. I've experienced using them when talking to my bank or when I have problems trying to book a ticket on a website. I no longer phone a human. I speak to a virtual assistant instead. Probably the most well-known chatbot at the moment is ChatGTP. It is. The claim is that it's able to answer anything you ask it. This includes writing students' essays. Now this is something that was discussed on the BBC",
+      "chunk_id": "f41578e3-7f18-452c-a586-294f82124c2b",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 451,
+      "enhanced_tags": [
+        "XP",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.565889"
+    },
+    {
+      "chunk_text": "Radio 4 programme Word of Mouth.Emily M. Bender, Professor of Computational Linguistics at the University of Washington explained why it's dangerous to always trust what a chatbot is telling us.",
+      "chunk_id": "a2120e5a-3fe5-40f8-a252-8e2f0c594c52",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 194,
+      "enhanced_tags": [
+        "RSI",
+        "UI",
+        "XP",
+        "AI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.568192"
+    },
+    {
+      "chunk_text": "Yes, chatbots might appear to write in this way but really they are just predicting one word after another based on what they have learnt. We should therefore be on guard. Be careful and alert about the accuracy of what we are being told.",
+      "chunk_id": "5c70c58f-9167-413a-a8d5-62d569c693c4",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 238,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.570595"
+    },
+    {
+      "chunk_text": "A cognitive psychologist and computer scientist called Geoffrey Hinton",
+      "chunk_id": "48a4e274-e917-402d-98bb-7b840b309f60",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 70,
+      "enhanced_tags": [
+        "CI",
+        "LED"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.572740"
+    },
+    {
+      "chunk_text": "explained why it's dangerous to always trust what a chatbot is telling us.",
+      "chunk_id": "b83b8973-582e-43d4-9a14-8618a7b4d6b5",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 74,
+      "enhanced_tags": [
+        "XP",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.574853"
+    },
+    {
+      "chunk_text": "So although a chatbot might sound human, we really just ask it things to get a reaction. We provoke it and it answers only with words it's learned to use before.",
+      "chunk_id": "352d126e-9ee9-4c49-9140-2751ce963f8a",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 161,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:10.577172"
+    },
+    {
+      "chunk_text": "Not because it has come up with a clever answer. But it does sound like a sentient entity. Sentient describes a living thing that experiences feelings. As Professor Bender says, we imagine that when something speaks there is a mind behind it. But, sorry Neil, they are not your friend. They're just machines. Yes, it's strange then that we sometimes give chatbots names. Alexa, Siri. And earlier I asked you what the name was for the first ever chatbot.",
+      "chunk_id": "35be6108-34f9-401f-9ad6-0bb6c4b66a4e",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 453,
+      "enhanced_tags": [
+        "XP",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.579817"
+    },
+    {
+      "chunk_text": "And I guessed it was Parry, was I right? You guessed wrong, I'm afraid. Parry was an early form of chatbot from 1972. But the correct answer was Eliza. It was considered to be the first chatterbot as it was called then and was developed by Joseph Weissenbaum at Massachusetts Institute of Technology. Fascinating stuff. OK, now let's recap some of the vocabulary we highlighted in this programme. Starting with sophisticated, which can describe",
+      "chunk_id": "5b589959-ba52-405b-8489-8c7725836df6",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 444,
+      "enhanced_tags": [
+        "CI",
+        "LED",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.582447"
+    },
+    {
+      "chunk_text": "technology that is advanced and complex. Authoritative means respected, accurate and important sounding. To provoke means to do something that causes a reaction from someone.",
+      "chunk_id": "59cf76c9-78c2-4533-a043-34f9620f5ecc",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 174,
+      "enhanced_tags": [
+        "RTA",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.584687"
+    },
+    {
+      "chunk_text": "Once again, our six minutes are up. Goodbye. Bye for now.",
+      "chunk_id": "8058f095-4b10-462f-aa8f-81d7faebdb8d",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d11766d3",
+      "original_filename": "RSS_262026947_podcast_1304_Should we fear chatbots_.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 57,
+      "enhanced_tags": [
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:10.586796"
+    }
+  ],
+  "original_text_length": 3232,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:10.586800",
+    "total_chunks": 13,
+    "total_tags": 29
+  }
+}

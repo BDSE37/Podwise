@@ -1,0 +1,205 @@
+{
+  "filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+  "episode_id": "6865015b66c1a4e8d11766fc",
+  "collection_name": "RSS_262026947",
+  "total_chunks": 13,
+  "chunks": [
+    {
+      "chunk_text": "This is a download from BBC Learning English.To find out more, visit our website.",
+      "chunk_id": "c85500a3-0fb2-4e6b-af52-5bed919fd8fc",
+      "chunk_index": 0,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 81,
+      "enhanced_tags": [],
+      "tagged_at": "2025-07-10T14:45:06.458301"
+    },
+    {
+      "chunk_text": "That doesn't sound very tasty, does it?",
+      "chunk_id": "de83d9b3-b977-48bc-ac64-ea333b196dc7",
+      "chunk_index": 1,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 39,
+      "enhanced_tags": [
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.460361"
+    },
+    {
+      "chunk_text": "The popular food in Britain comes from other countries and includes the recipes, flavours and tastes of those faraway places.But how do recipes and cooking ideas from all over the world make their way onto the British dining table?In this programme, we'll be finding out.",
+      "chunk_id": "b25063a6-8473-4491-8c65-03cb4ab7e67a",
+      "chunk_index": 2,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 271,
+      "enhanced_tags": [
+        "BRI",
+        "CI",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.462744"
+    },
+    {
+      "chunk_text": "Sounds good, Rob.But first, I have a question for you.It may be true that British cooking is better than it used to be, but there's still some pretty bad food out there.So according to a 2019 YouGov survey, which UK food was voted the worst?",
+      "chunk_id": "494cb8bb-5f5e-4d0f-8c5b-91540a4992fd",
+      "chunk_index": 3,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 241,
+      "enhanced_tags": [
+        "BRI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.465099"
+    },
+    {
+      "chunk_text": "OK, Rob, I will reveal the answer later in the programme.Now, as anyone who speaks more than one language knows, translating involves more than getting the dictionary out.Recipe translators need to know the vocabulary for different ingredients and cooking techniques, while also preserving the heart of the recipe.Listen as BBC World Service programme The Food Chain talks with recipe translator Rosa Jopis.",
+      "chunk_id": "c9f62dff-73cc-4e53-9803-1384012cf223",
+      "chunk_index": 4,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 407,
+      "enhanced_tags": [
+        "CI",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.467682"
+    },
+    {
+      "chunk_text": "Recipe translation is closely connected to gastronomy, the art and knowledge involved in preparing and eating good food.This is contained in a country's traditional recipes, written in its own language",
+      "chunk_id": "db843c49-166a-43a0-ad66-4b0c8c4bcd8f",
+      "chunk_index": 5,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 201,
+      "enhanced_tags": [
+        "CI",
+        "LED",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.470054"
+    },
+    {
+      "chunk_text": "not English, hence Rosa's decision to specialise in recipe translation.If you specialise in a subject, you focus on studying and learning all about it.When Rosa is asked how she became a recipe translator, she begins by saying to cut a long story short.This phrase can be used when you're explaining what happened in a few words, without giving all the details.Like most recipe translators,Rosa's goal is to produce a cookbook in English,",
+      "chunk_id": "f4debe64-2537-44ac-8e30-9ffb0e1e791e",
+      "chunk_index": 6,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 438,
+      "enhanced_tags": [
+        "CI",
+        "XP",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.472661"
+    },
+    {
+      "chunk_text": "containing the best recipes from her own country, Spain.But doing this is not so easy, as she explained to BBC World Service programme The Food Chain.",
+      "chunk_id": "8adfb79f-02d2-47be-a37f-6ad594905fc2",
+      "chunk_index": 7,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 150,
+      "enhanced_tags": [
+        "SPA",
+        "CI",
+        "XP",
+        "AI",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.474890"
+    },
+    {
+      "chunk_text": "Rosa's cookbook allows readers to replicate her dishes, to make them again in exactly the same way.But this isn't easy when the recipe includes ingredients which are difficult to find, something like lemongrass, which is used in some Spanish cooking, but can be hard to find in the shops.",
+      "chunk_id": "d25978b8-6dc1-40f7-b7f7-76fc29eef210",
+      "chunk_index": 8,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 288,
+      "enhanced_tags": [
+        "CI",
+        "SPA",
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.477338"
+    },
+    {
+      "chunk_text": "It's not easy work, but thanks to recipe translators like Rosa, people here in the UK can cook something a little tastier than meat and boiled vegetables.Speaking of which, it's time to reveal the answer to my question, Rob.",
+      "chunk_id": "8a7a803b-798b-40bd-aafb-59fd92f62f4d",
+      "chunk_index": 9,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 224,
+      "enhanced_tags": [
+        "CI",
+        "LED",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.479698"
+    },
+    {
+      "chunk_text": "Well, in fact, the correct answer was C, haggis, which doesn't sound much nicer because the Scottish dish haggis is made using a sheep's stomach.Yuck! OK, let's quickly move on to recap the vocabulary we've learnt from this programme, starting with ingredient, an item of food that is",
+      "chunk_id": "90b1c81d-bee7-4883-8584-9027e6cd176b",
+      "chunk_index": 10,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 284,
+      "enhanced_tags": [
+        "UI",
+        "OTT",
+        "ES"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.482128"
+    },
+    {
+      "chunk_text": "combined with other food to prepare a particular dish",
+      "chunk_id": "f6548c56-ab74-487a-8968-d42986fda160",
+      "chunk_index": 11,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 53,
+      "enhanced_tags": [
+        "BI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.484219"
+    },
+    {
+      "chunk_text": "in the same way.And finally, to mimic, something means to copy the way in which it is done, sometimes in a funny way.Well, once again, our six minutes are up. Bye for now.Bye bye.",
+      "chunk_id": "7fa729be-c3d4-4325-a5c1-0aae3f2fc580",
+      "chunk_index": 12,
+      "episode_id": "6865015b66c1a4e8d11766fc",
+      "original_filename": "RSS_262026947_podcast_1304_Translating recipes.json",
+      "collection_name": "RSS_262026947",
+      "chunk_length": 179,
+      "enhanced_tags": [
+        "ES",
+        "AI"
+      ],
+      "tagged_at": "2025-07-10T14:45:06.486474"
+    }
+  ],
+  "original_text_length": 2868,
+  "enhanced_tagging_info": {
+    "processor": "EnhancedTagProcessor",
+    "tagged_at": "2025-07-10T14:45:06.486478",
+    "total_chunks": 13,
+    "total_tags": 35
+  }
+}

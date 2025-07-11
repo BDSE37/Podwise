@@ -1,0 +1,47 @@
+{
+  "filename": "RSS_1693352123_podcast_1304_高詩佳故事學堂讓我們來說故事.json",
+  "episode_id": "6860dd2dbb826d6ebef9daee",
+  "collection_name": "RSS_1693352123",
+  "total_chunks": 2,
+  "chunks": [
+    {
+      "chunk_id": "22595de1-7b73-40b9-8bdb-b6aff7fd1fe5",
+      "chunk_index": 0,
+      "episode_id": "6860dd2dbb826d6ebef9daee",
+      "podcast_id": "1304",
+      "podcast_name": "",
+      "author": "",
+      "category": "",
+      "episode_title": "高詩佳故事學堂讓我們來說故事",
+      "duration": "",
+      "published_date": "",
+      "apple_rating": 0,
+      "chunk_text": "用心聆聽 在每個故事尋找智慧",
+      "embedding": [],
+      "language": "zh",
+      "created_at": "2025-07-10T14:46:35.558039",
+      "source_model": "text-embedding-ada-002",
+      "tags": "[]"
+    },
+    {
+      "chunk_id": "b571c9b6-6335-4b13-962a-6e02a3f76ce6",
+      "chunk_index": 1,
+      "episode_id": "6860dd2dbb826d6ebef9daee",
+      "podcast_id": "1304",
+      "podcast_name": "",
+      "author": "",
+      "category": "",
+      "episode_title": "高詩佳故事學堂讓我們來說故事",
+      "duration": "",
+      "published_date": "",
+      "apple_rating": 0,
+      "chunk_text": "所以我會用生動有趣的方式將不同主題的故事呈現給你並且透過深度解讀讓你能夠更深入的瞭解故事背後的意義不論你是喜歡聽故事的小朋友還是熱愛思考的大朋友這裏都有適合你的故事哦讓我們一起聽經典故事啓發智慧提升閱讀素養",
+      "embedding": [],
+      "language": "zh",
+      "created_at": "2025-07-10T14:46:35.560892",
+      "source_model": "text-embedding-ada-002",
+      "tags": "[\"教育\", \"愛\"]"
+    }
+  ],
+  "standardized_at": "2025-07-10T17:26:58.876090"
+}

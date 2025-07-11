@@ -15,19 +15,24 @@
 ```
 tts/
 ├── main.py                 # FastAPI 主程式
-├── tts_service.py          # TTS 服務核心類別
-├── test_edge_tts.py        # 測試腳本
 ├── requirements.txt        # 依賴套件
 ├── Dockerfile             # Docker 配置
 ├── README.md              # 說明文件
+├── core/
+│   ├── __init__.py        # 核心模組初始化
+│   └── tts_service.py     # TTS 服務核心類別
 ├── config/
 │   └── voice_config.py    # 語音配置管理
 ├── providers/
 │   └── edge_tts_provider.py # Podri TTS 提供者
 ├── constants/
 │   └── constants.py       # 系統常數
-└── utils/
-    └── logging_config.py  # 日誌配置
+├── utils/
+│   └── logging_config.py  # 日誌配置
+└── tests/
+    ├── __init__.py        # 測試模組初始化
+    ├── test_edge_tts_connection.py # Edge TTS 連接測試
+    └── test_tts_integration.py    # 整合測試
 ```
 
 ## 🎵 支援語音
