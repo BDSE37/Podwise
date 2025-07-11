@@ -10,15 +10,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import yt_dlp
 
 # === 配置區 ===
-ROOT_DIR = r"C:\Users\student\Desktop\0612_2pocast"
-FFMPEG_LOCATION = r"C:\ffmpeg-master-latest-win64-gpl\ffmpeg-master-latest-win64-gpl\bin"
+ROOT_DIR = "/data"  # 容器內掛載的資料夾
+FFMPEG_LOCATION = None  # 容器已安裝 ffmpeg, 讓 yt-dlp 自動找
 DOWNLOAD_ARCHIVE = os.path.join(ROOT_DIR, "downloaded_test.txt")
 NUM_THREADS = 4
 MIN_DELAY = 0.5
 MAX_DELAY = 2.0
 STOP_FILE = "STOP"
-DOWNLOAD_COUNT = 20  # ✅ 可改為 "ALL" 或整數
-EPISODES_COUNT = 10  # ✅ 可改為 "ALL" 或整數
+DOWNLOAD_COUNT = "ALL"  # ✅ 可改為 "ALL" 或整數
+EPISODES_COUNT = "ALL"  # ✅ 可改為 "ALL" 或整數
 # ===================
 
 
@@ -72,7 +72,6 @@ def gather_download_tasks():
                         tasks.append((url, mp3_dir, filename))
     if isinstance(DOWNLOAD_COUNT, int):
         tasks = tasks[:DOWNLOAD_COUNT]
-    # 若為 "ALL"，不做切片
     return tasks
 
 
