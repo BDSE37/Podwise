@@ -62,7 +62,7 @@ __all__ = [
     "HierarchicalRAGPipeline",
     "RAGResponse",
     "LeaderAgent",
-    "BusinessExpertAgent", 
+    "BusinessExpertAgent",
     "EducationExpertAgent",
     "UserManagerAgent",
     "UserQuery",

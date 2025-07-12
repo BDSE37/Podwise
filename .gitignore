@@ -1,236 +1,63 @@
-# 模型檔案 (太大，不應該上傳到 Git)
-backend/llm/models/*/
-backend/llm/models/*.gguf
-backend/llm/models/*.bin
-backend/llm/models/*.safetensors
+# 系統檔案
+.DS_Store
+._*
+Thumbs.db
 
-# 大型二進制檔案 (超過 100MB)
-*.onnx
-*.ckpt
-*.pkl
-backend/tts/GPT-SoVITS/GPT_SoVITS/text/G2PWModel_1.1/g2pW.onnx
-backend/tts/GPT-SoVITS/pretrained_models/*.ckpt
-backend/tts/GPT-SoVITS/pretrained_models/*.pkl
-
-# GitLab 資料庫和監控檔案 (本地開發用，不上傳)
-gitlab/data/
-gitlab/logs/
-
-# 快取目錄
-cache/
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.py[cod]
+*$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # 虛擬環境
 venv/
 env/
 ENV/
 .venv/
-.env/
 
-# IDE 檔案
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # 日誌檔案
 *.log
 logs/
-log/
 
-# 資料庫檔案
-*.db
-*.sqlite
-*.sqlite3
+# 敏感資料 - 不要上傳到 GitHub
+backend/vaderSentiment/Podcast_info/
+backend/vaderSentiment/comment_data/
+backend/vaderSentiment/podcast_rating_report.csv
 
-# 環境變數檔案
-.env
-.env.local
-.env.production
-.env.staging
-
-# 系統檔案
-.DS_Store
-Thumbs.db
-
-# Docker 相關
-.dockerignore
-
-# Kubernetes 相關
-*.kubeconfig
+# 其他資料檔案
+*.csv
+*.json
+*.xlsx
+*.xls
 
 # 備份檔案
+backup_old/
 *.bak
 *.backup
-*.tmp
-
-# 大型資料檔案
-data/raw/
-data/processed/
-*.csv
-*.xml
-*.zip
-*.tar.gz
-*.rar
-
-# 敏感資料檔案（不上傳到 GitHub）
-backend/vaderSentiment/comment_data/*.json
-backend/data_cleaning/batch_input/*.json
-backend/data_cleaning/batch_output/*.json
-data/cleaned_data/*.json
-
-# n8n ETL 原始資料（不上傳到 GitHub）
-backend/n8n_pipline/raw/
-
-# 圖片檔案（不上傳到 GitHub）
-backend/vaderSentiment/*.png
-backend/vaderSentiment/*.jpg
-backend/vaderSentiment/*.jpeg
-backend/vaderSentiment/*.gif
-backend/vaderSentiment/*.bmp
-backend/vaderSentiment/*.tiff
-backend/vaderSentiment/*.svg
-backend/vaderSentiment/*.ico
-backend/vaderSentiment/*.webp
-
-# HTML 檔案（不上傳到 GitHub）
-backend/vaderSentiment/*.html
-backend/vaderSentiment/interactive_*.html
-
-# 音訊檔案
-*.wav
-*.mp3
-*.flac
-*.aac
-
-# 影片檔案
-*.mp4
-*.avi
-*.mov
-*.mkv
-
-# 圖片檔案 (如果不需要)
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tiff
 
 # 暫存檔案
-temp/
-tmp/
-.tmp/
-
-# 編譯檔案
-*.o
-*.a
-*.lib
-
-# 測試覆蓋率
-.coverage
-htmlcov/
-
-# 本地配置檔案
-config/local.py
-config/local.yaml
-config/local.json
-
-# 敏感資訊
-secrets/
-*.key
-*.pem
-*.p12
-*.pfx
-
-# 大型二進制檔案
-*.bin
-*.dat
-*.model
-
-# 快取目錄
-.cache/
-.pytest_cache/
-
-# 其他
-*.pid
-*.seed
-*.pid.lock 
-
-# =============================================================================
-# Shell 腳本 (本地開發用，不上傳到 Git)
-# =============================================================================
-*.sh
-deploy-podman.sh
-start-podman.sh
-backend/*.sh
-deploy/k8s/*/*.sh
-deploy/k8s/*/*/*.sh
-
-# =============================================================================
-# 測試和臨時檔案
-# =============================================================================
-# 測試音訊檔案
-frontend/chat/test_*.wav
-frontend/chat/test_*.mp3
-frontend/chat/test_*.flac
-
-# 測試圖片檔案
-frontend/**/test_*.jpg
-frontend/**/test_*.png
-frontend/**/test_*.gif
-
-# 測試 HTML 檔案
-frontend/**/test_*.html
-frontend/**/*_test.html
-
-# 測試 Python 檔案
-frontend/**/test_*.py
-frontend/**/*_test.py
-
-# =============================================================================
-# 開發工具配置
-# =============================================================================
-# VSCode 配置
-frontend/**/.vscode/
-**/.vscode/settings.json
-**/.vscode/launch.json
-**/.vscode/tasks.json
-
-# IDE 配置
-frontend/**/.idea/
-**/.idea/workspace.xml
-**/.idea/modules.xml
-
-# =============================================================================
-# 本地開發檔案
-# =============================================================================
-# 本地 Flask/Streamlit 應用
-frontend/**/flask_app.py
-frontend/**/streamlit_app.py
-frontend/**/app.py
-
-# 本地測試腳本
-frontend/**/test_*.py
-frontend/**/debug_*.py
-frontend/**/local_*.py
-
-# =============================================================================
-# 部署相關檔案
-# =============================================================================
-# 本地部署腳本
-deploy-local.sh
-start-local.sh
-test-local.sh
-build-local.sh
-
-# 環境特定配置
-.env.local
-.env.development
-.env.test 
+*.tmp
+*.temp 

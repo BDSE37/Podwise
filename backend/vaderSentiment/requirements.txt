@@ -1,0 +1,29 @@
+# Podcast 情感分析與綜合評分系統依賴套件
+
+# 核心情感分析
+vaderSentiment==3.3.2
+
+# 資料處理與分析
+pandas>=1.5.0
+numpy>=1.21.0
+
+# 中文文本處理
+jieba>=0.42.1
+snownlp>=0.12.3
+
+# 資料視覺化
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# 報告生成
+openpyxl>=3.0.0
+xlsxwriter>=3.0.0
+
+# 日誌與工具
+python-dateutil>=2.8.0
+tqdm>=4.64.0
+
+# 開發工具
+pytest>=7.0.0
+black>=22.0.0
+flake8>=5.0.0 

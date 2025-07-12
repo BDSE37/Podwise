@@ -139,7 +139,7 @@ mcp:
       get_apple_podcast_ranking:
         enabled: true
         include_metadata: true
-      vector_search:
+vector_search:
         enabled: true
         default_top_k: 5
         default_similarity_threshold: 0.7
@@ -204,7 +204,7 @@ mcp_weights = {
 # 系統健康檢查
 health = await processor.health_check()
 mcp_health = await mcp.health_check()
-```
+   ```
 
 ## 版本歷史
 

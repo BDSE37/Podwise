@@ -366,7 +366,7 @@ class UnifiedQueryProcessor:
         self.config = config
         # 初始化 Apple Podcast 排名系統
         self.apple_ranking = get_apple_podcast_ranking()
-    
+        
     @langfuse_trace("query")
     async def process_query(self, user_query: UserQuery) -> RAGResponse:
         """

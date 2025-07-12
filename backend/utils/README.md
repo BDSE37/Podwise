@@ -199,4 +199,4 @@ python -c "from utils import create_text_processor; print('Text processing OK')"
 
 # 測試向量搜尋
 python -c "from utils import create_vector_search; print('Vector search OK')"
-``` 
+```

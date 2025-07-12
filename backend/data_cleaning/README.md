@@ -86,6 +86,6 @@ python backend/data_cleaning/batch_clean_folder.py --input-folder backend/data_c
 
 - 請將所有要清理的資料放入 batch_input 或自訂資料夾
 - 執行批次清理腳本即可自動遞迴處理所有檔案
-- 清理結果會自動輸出到指定資料夾
+- 清理結果會自動輸出到指定資料夾 
 - 請刪除所有 .DS_Store、__pycache__、._*、暫存檔案等與主程式無關之檔案
 - 保留 batch_clean_folder.py、batch_input/ 及所有核心清理模組 
