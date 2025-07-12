@@ -163,7 +163,7 @@ class AgentRolesManager:
             "learning_assessor",       # 分析節目學習價值
             "skill_mapper",            # 配對用戶成長領域
             "recommendation_engine",   # 個人化排序
-                "validation_chain"         # 鏈式驗證
+            "validation_chain"         # 鏈式驗證
             ],
             max_execution_time=30,   # 秒
             temperature=0.8,
