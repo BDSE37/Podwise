@@ -19,12 +19,10 @@
         <div class="container-fluid py-5 h-100">
             <div class="row d-flex justify-content-center align-items-start h-100">
                 <!-- Sidebar（固定在左側） -->
-                <button id="sidebar-expand" style="display:none; position:fixed; top:30px; left:30px; z-index:1100;"
-                    class="btn btn-outline-secondary">&#9776;</button>
+                <button id="sidebar-expand" style="display:none; position:fixed; top:30px; left:30px; z-index:1100;" class="btn btn-outline-secondary">&#9776;</button>
                 <div id="sidebar">
                     <!-- 漢堡按鈕 -->
-                    <button class="btn btn-outline-secondary sidebar-hamburger" id="sidebar-toggle"
-                        style="position:absolute; top:10px; left:10px;">
+                    <button class="btn btn-outline-secondary sidebar-hamburger" id="sidebar-toggle" style="position:absolute; top:10px; left:10px;">
                         &#9776;
                     </button>
                     <!-- 用戶頭像與名稱 -->
@@ -32,7 +30,7 @@
                         <img src="images/user.png" class="rounded-circle user-avatar" alt="User">
                         <p class="mt-2 mb-0 user-name">User</p>
                     </div>
-
+                    
                     <!-- 聲音模型 -->
                     <div class="voice-model-section">
                         <div class="section-title-row">
@@ -98,13 +96,13 @@
                             style="border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 1rem;">
                             <p class="mb-0 fw-bold" style="margin: 0;">Podri 為你精準調頻，打造你的個人聲音空間！</p>
                             <a href="index.html" style="position: absolute; top: 10px; right: 15px;">
-                                <img src="images/home.png" alt="關閉" style="width: 30px; height: 30px; cursor: pointer;">
+                                <img src="images/home.png" alt="關閉"
+                                    style="width: 30px; height: 30px; cursor: pointer;">
                             </a>
                         </div>
                         <div class="card-body">
                             <div class="d-flex flex-row justify-content-start mb-4">
-                                <img src="images/logo_black.png" class="rounded-circle"
-                                    style="width: 55px; height: 100%;">
+                                <img src="images/logo_black.png" class="rounded-circle" style="width: 55px; height: 100%;">
                                 <div class="p-3 ms-3" style="border-radius: 15px; background-color: #efeeef;">
                                     <p class="small mb-0">Hi 我是Podri<br>今天想聽什麼主題？</p>
                                 </div>
@@ -119,12 +117,11 @@
                         <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
                             <input type="text" class="form-control form-control-lg" id="exampleFormControlInput1"
                                 placeholder="開始跟 Podri 對話...">
-                            <a class="ms-3" href="javascript:void(0);" id="show-action-wrap"><img
-                                    src="images/podcasts_green.png" alt="發送"
+                            <a class="ms-3" href="javascript:void(0);" id="show-action-wrap"><img src="images/podcasts_green.png" alt="發送"
                                     style="width: 55px; height: 55px; cursor: pointer;"></a>
                         </div>
                     </div>
-
+                    
                 </div>
             </div>
         </div>
@@ -134,20 +131,17 @@
     <div id="action-wrap" style="display: none;">
         <div class="action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
         <div class="action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
         <div class="action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
         </div>
         <div class="backdrop"></div>
@@ -155,10 +149,10 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <script>
         // 頁面載入時檢查 URL 參數並填入對話框
-        window.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('DOMContentLoaded', function() {
             // URL 參數填入對話框
             const urlParams = new URLSearchParams(window.location.search);
             const searchText = urlParams.get('search');
@@ -169,50 +163,34 @@
                     chatInput.focus();
                 }
             }
-
-            // 動態載入語音選項
-            loadVoiceOptions();
-
             // sidebar 收起/展開功能
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
             const toggleBtn = document.getElementById('sidebar-toggle');
             const expandBtn = document.getElementById('sidebar-expand');
-            if (toggleBtn && sidebar && mainContent && expandBtn) {
-                toggleBtn.onclick = function () {
+            if(toggleBtn && sidebar && mainContent && expandBtn) {
+                toggleBtn.onclick = function() {
                     sidebar.classList.add('collapsed');
                     mainContent.classList.add('expanded');
                     expandBtn.style.display = 'block';
                 };
-                expandBtn.onclick = function () {
+                expandBtn.onclick = function() {
                     sidebar.classList.remove('collapsed');
                     mainContent.classList.remove('expanded');
                     expandBtn.style.display = 'none';
                 };
             }
-            // 發送按鈕點擊事件
-            document.getElementById('show-action-wrap').onclick = function () {
-                const input = document.getElementById('exampleFormControlInput1');
-                const text = input.value.trim();
-
-                if (text) {
-                    // 執行語音合成
-                    synthesizeSpeech(text);
-
-                    // 清空輸入框
-                    input.value = '';
-                } else {
-                    // 如果沒有文字，顯示 action-wrap 彈窗
-                    document.getElementById('action-wrap').style.display = 'flex';
-                }
+            // action-wrap 彈窗顯示/隱藏
+            document.getElementById('show-action-wrap').onclick = function() {
+              document.getElementById('action-wrap').style.display = 'flex';
             };
-            document.querySelector('#action-wrap .backdrop').onclick = function () {
-                document.getElementById('action-wrap').style.display = 'none';
+            document.querySelector('#action-wrap .backdrop').onclick = function() {
+              document.getElementById('action-wrap').style.display = 'none';
             };
             // 語音模型單選高亮
-            document.querySelectorAll('.voice-model-card').forEach(function (card) {
-                card.onclick = function () {
-                    document.querySelectorAll('.voice-model-card').forEach(function (c) {
+            document.querySelectorAll('.voice-model-card').forEach(function(card) {
+                card.onclick = function() {
+                    document.querySelectorAll('.voice-model-card').forEach(function(c) {
                         c.classList.remove('selected');
                     });
                     this.classList.add('selected');
@@ -221,193 +199,12 @@
             });
 
             // HTML 技能進度條選單變化時更新寬度
-            document.getElementById('html-select').addEventListener('change', function () {
+            document.getElementById('html-select').addEventListener('change', function() {
                 let val = parseFloat(this.value);
                 let percent = Math.min(val, 1) * 100; // 超過100%時只顯示滿格
                 document.getElementById('html-bar').style.width = percent + '%';
             });
-
-            // Enter 鍵支援
-            document.getElementById('exampleFormControlInput1').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    const text = this.value.trim();
-                    if (text) {
-                        synthesizeSpeech(text);
-                        this.value = '';
-                    }
-                }
-            });
         });
-
-        // 動態載入語音選項函數
-        async function loadVoiceOptions() {
-            try {
-                // 嘗試從 TTS 服務獲取語音配置
-                const response = await fetch('http://localhost:8003/voice-config');
-                if (response.ok) {
-                    const data = await response.json();
-                    updateVoiceOptions(data.voices);
-                } else {
-                    console.log('無法從 TTS 服務獲取語音配置，使用預設配置');
-                    // 如果無法獲取，使用預設配置
-                    useDefaultVoiceOptions();
-                }
-            } catch (error) {
-                console.log('TTS 服務不可用，使用預設語音配置');
-                // 如果 TTS 服務不可用，使用預設配置
-                useDefaultVoiceOptions();
-            }
-        }
-
-        // 更新語音選項
-        function updateVoiceOptions(voices) {
-            const voiceList = document.querySelector('.voice-model-list');
-            if (!voiceList) return;
-
-            // 清空現有選項
-            voiceList.innerHTML = '';
-
-            // 添加新的語音選項
-            voices.forEach((voice, index) => {
-                const voiceCard = document.createElement('div');
-                voiceCard.className = 'voice-model-card';
-                voiceCard.setAttribute('data-model', voice.id);
-                voiceCard.setAttribute('data-voice-id', voice.id);
-
-                // 根據語音類型選擇圖標
-                let iconSrc = 'images/podcasts_purple.png'; // 預設圖標
-                if (voice.gender === 'female') {
-                    if (voice.style === 'friendly') {
-                        iconSrc = 'images/podcasts_purple.png';
-                    } else if (voice.style === 'cheerful') {
-                        iconSrc = 'images/podcasts_pink.png';
-                    }
-                } else if (voice.gender === 'male') {
-                    if (voice.style === 'serious') {
-                        iconSrc = 'images/podcasts_golden.png';
-                    }
-                }
-
-                voiceCard.innerHTML = `
-                    <img src="${iconSrc}" class="voice-icon" alt="${voice.name}">
-                    <span class="voice-name">${voice.name.split(' ')[0]}</span>
-                    <span class="voice-desc">（${voice.description.split('，')[1] || voice.description}）</span>
-                `;
-
-                // 第一個選項設為預設選中
-                if (index === 0) {
-                    voiceCard.classList.add('selected');
-                }
-
-                // 添加點擊事件
-                voiceCard.onclick = function () {
-                    document.querySelectorAll('.voice-model-card').forEach(function (c) {
-                        c.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-
-                    // 保存選擇的語音到 localStorage
-                    const selectedVoiceId = this.getAttribute('data-voice-id');
-                    localStorage.setItem('selectedVoiceId', selectedVoiceId);
-
-                    console.log('選擇語音:', selectedVoiceId);
-                };
-
-                voiceList.appendChild(voiceCard);
-            });
-
-            // 恢復之前選擇的語音
-            const savedVoiceId = localStorage.getItem('selectedVoiceId');
-            if (savedVoiceId) {
-                const savedCard = document.querySelector(`[data-voice-id="${savedVoiceId}"]`);
-                if (savedCard) {
-                    document.querySelectorAll('.voice-model-card').forEach(function (c) {
-                        c.classList.remove('selected');
-                    });
-                    savedCard.classList.add('selected');
-                }
-            }
-        }
-
-        // 使用預設語音選項
-        function useDefaultVoiceOptions() {
-            const defaultVoices = [
-                {
-                    id: 'podrina',
-                    name: 'Podrina',
-                    description: '溫柔親切的女聲，適合日常對話和情感表達',
-                    gender: 'female',
-                    style: 'friendly'
-                },
-                {
-                    id: 'podrisa',
-                    name: 'Podrisa',
-                    description: '活潑開朗的女聲，適合娛樂內容和輕鬆話題',
-                    gender: 'female',
-                    style: 'cheerful'
-                },
-                {
-                    id: 'podrino',
-                    name: 'Podrino',
-                    description: '穩重可靠的男聲，適合正式場合和專業內容',
-                    gender: 'male',
-                    style: 'serious'
-                }
-            ];
-            updateVoiceOptions(defaultVoices);
-        }
-
-        // 獲取當前選擇的語音 ID
-        function getSelectedVoiceId() {
-            const selectedCard = document.querySelector('.voice-model-card.selected');
-            return selectedCard ? selectedCard.getAttribute('data-voice-id') : 'podrina';
-        }
-
-        // 語音合成函數
-        async function synthesizeSpeech(text) {
-            const selectedVoiceId = getSelectedVoiceId();
-            const speed = document.getElementById('html-select').value;
-
-            try {
-                const response = await fetch('http://localhost:8003/synthesize', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        文字: text,
-                        語音: selectedVoiceId,
-                        語速: speed === '1' ? '+0%' : `+${(speed - 1) * 100}%`
-                    })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.成功 && result.音訊檔案) {
-                        // 播放音頻
-                        playAudio(result.音訊檔案);
-                        return true;
-                    } else {
-                        console.error('語音合成失敗:', result.錯誤訊息);
-                        return false;
-                    }
-                } else {
-                    console.error('語音合成請求失敗');
-                    return false;
-                }
-            } catch (error) {
-                console.error('語音合成錯誤:', error);
-                return false;
-            }
-        }
-
-        // 播放音頻函數
-        function playAudio(base64Audio) {
-            const audio = new Audio(`data:audio/wav;base64,${base64Audio}`);
-            audio.play().catch(error => {
-                console.error('播放音頻失敗:', error);
-            });
-        }
     </script>
     <style>
         #sidebar {
@@ -418,7 +215,7 @@
             height: 100vh;
             background: #fff;
             border-radius: 20px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.10);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.10);
             padding: 2rem 1.2rem 1.2rem 1.2rem;
             min-width: 270px;
             max-width: 320px;
@@ -426,26 +223,20 @@
             z-index: 1050;
             transition: all 0.3s;
         }
-
         #sidebar.collapsed {
             display: none;
         }
-
         #main-content {
-            margin-left: 320px;
-            /* sidebar寬度+間距 */
+            margin-left: 320px; /* sidebar寬度+間距 */
             transition: margin-left 0.3s;
         }
-
         #main-content.expanded {
             margin-left: 0;
         }
-
         .sidebar-hamburger {
             font-size: 1.5rem;
             padding: 0.25rem 0.75rem;
         }
-
         #sidebar-expand {
             position: fixed;
             top: 30px;
@@ -456,101 +247,82 @@
             padding: 0.25rem 0.75rem;
             border-radius: 12px;
             background: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: none;
             align-items: center;
             justify-content: center;
         }
-
         @media (max-width: 991px) {
             #sidebar {
                 width: 220px;
                 padding-top: 1rem;
             }
-
             #main-content {
                 margin-left: 0;
             }
         }
-
         .action-wrap {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            background: #fff;
-            border-radius: 1em;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-            padding: 2em 2.5em 1.5em 2.5em;
-            display: flex;
-            flex-direction: row;
-            gap: 1.5em;
-            align-items: center;
+          position: fixed;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 2000;
+          background: #fff;
+          border-radius: 1em;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+          padding: 2em 2.5em 1.5em 2.5em;
+          display: flex;
+          flex-direction: row;
+          gap: 1.5em;
+          align-items: center;
         }
-
         .action-wrap .action {
-            background: #f6f6fa;
-            border: none;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            cursor: pointer;
-            transition: background 0.2s;
+          background: #f6f6fa;
+          border: none;
+          border-radius: 50%;
+          width: 56px; height: 56px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          cursor: pointer;
+          transition: background 0.2s;
         }
-
         .action-wrap .action:hover {
-            background: #e0e0f7;
+          background: #e0e0f7;
         }
-
         .action-wrap .action-icon {
-            width: 32px;
-            height: 32px;
-            color: #7c4dff;
+          width: 32px; height: 32px;
+          color: #7c4dff;
         }
-
         .action-wrap .action-content {
-            display: none;
+          display: none;
         }
-
         .action-wrap .backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.25);
-            z-index: -1;
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.25);
+          z-index: -1;
         }
-
         .user-avatar {
             width: 80px;
             height: 80px;
             margin-bottom: 0.5rem;
         }
-
         .user-name {
             font-size: 1.1rem;
             font-weight: 500;
             color: #444;
         }
-
         .section-title {
             font-size: 1rem;
             font-weight: 600;
             color: #222;
         }
-
         .voice-model-list {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-
         .voice-model-card {
             display: flex;
             align-items: center;
@@ -560,45 +332,23 @@
             padding: 0.5rem 0.8rem;
             gap: 0.5rem;
             font-size: 0.98rem;
-            box-shadow: 0 1px 4px rgba(127, 85, 255, 0.06);
+            box-shadow: 0 1px 4px rgba(127,85,255,0.06);
             cursor: pointer;
             transition: border 0.2s, box-shadow 0.2s, background 0.2s;
         }
-
         .voice-model-card.selected {
             border: 2px solid #7c4dff;
             background: #f3e8ff;
-            box-shadow: 0 2px 8px rgba(127, 85, 255, 0.12);
+            box-shadow: 0 2px 8px rgba(127,85,255,0.12);
         }
-
         .voice-icon {
-            width: 28px;
-            height: 28px;
-            display: inline-block;
-            background-size: contain;
-            background-repeat: no-repeat;
+            width: 28px; height: 28px; display: inline-block;
+            background-size: contain; background-repeat: no-repeat;
         }
-
-        .voice-name {
-            font-weight: 600;
-            margin-right: 2px;
-        }
-
-        .voice-desc {
-            color: #888;
-            font-size: 0.95em;
-        }
-
-        .history-section {
-            margin-top: 0.5rem;
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
+        .voice-name { font-weight: 600; margin-right: 2px; }
+        .voice-desc { color: #888; font-size: 0.95em; }
+        .history-section { margin-top: 0.5rem; }
+        .history-list { display: flex; flex-direction: column; gap: 0.5rem; }
         .history-card {
             background: #fafaff;
             border: 1.5px solid #ececec;
@@ -606,9 +356,8 @@
             padding: 0.5rem 0.8rem;
             font-size: 0.98rem;
             color: #444;
-            box-shadow: 0 1px 4px rgba(127, 85, 255, 0.06);
+            box-shadow: 0 1px 4px rgba(127,85,255,0.06);
         }
-
         .section-title-row {
             display: flex;
             align-items: center;
@@ -618,16 +367,13 @@
             width: 100%;
             gap: 1rem;
         }
-
         .section-title {
             font-size: 1rem;
             font-weight: 600;
             color: #222;
-            white-space: nowrap;
-            /* 不換行 */
+            white-space: nowrap;   /* 不換行 */
             flex-shrink: 0;
         }
-
         .toggle-button-cover {
             min-width: 80px;
             max-width: 110px;
@@ -637,8 +383,7 @@
             align-items: center;
             justify-content: flex-end;
         }
-
-        /* From Uiverse.io by JaydipPrajapati1910 */
+        /* From Uiverse.io by JaydipPrajapati1910 */ 
         .toggle-button-cover {
             display: table-cell;
             position: relative;
@@ -732,58 +477,50 @@
             padding: 0;
         }
 
-        #button-3 .checkbox:active+.knobs:before {
+        #button-3 .checkbox:active + .knobs:before {
             width: 46px;
             border-radius: 100px;
         }
 
-        #button-3 .checkbox:checked:active+.knobs:before {
+        #button-3 .checkbox:checked:active + .knobs:before {
             margin-left: -26px;
         }
 
-        #button-3 .checkbox:checked+.knobs:before {
+        #button-3 .checkbox:checked + .knobs:before {
             content: "NO";
-            left: 40px;
-            /* 根據 .button 寬度微調 */
+            left: 40px; /* 根據 .button 寬度微調 */
             background-color: #f44336;
         }
 
-        #button-3 .checkbox:checked~.layer {
+        #button-3 .checkbox:checked ~ .layer {
             background-color: #fcebeb;
         }
-
         .skill-container {
             margin: 1.2rem 0 1.2rem 0;
         }
-
         .skill-box {
             width: 100%;
         }
-
         .skill-box .title {
             font-size: 0.95rem;
             font-weight: 600;
             color: #222;
         }
-
         .skill-bar {
             height: 8px;
             background: #e0e0e0;
             border-radius: 8px;
-            margin-top: 2px;
-            /* 讓bar更靠近按鈕 */
+            margin-top: 2px;       /* 讓bar更靠近按鈕 */
             position: relative;
         }
-
         .skill-per {
             display: block;
             height: 100%;
             border-radius: 8px;
             position: relative;
-            background: #4e7cff;
+            background: #7c4dff;
             transition: width 0.3s;
         }
-
         .bar-select {
             position: absolute;
             top: -32px;
@@ -791,7 +528,7 @@
             font-size: 0.9rem;
             border-radius: 4px;
             padding: 2px 8px;
-            background: #4e7cff;
+            background: #7c4dff;
             color: #fff;
             border: none;
             outline: none;
@@ -800,18 +537,12 @@
             -moz-appearance: none;
             cursor: pointer;
         }
-
         .speed-btn-group {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 0;
-            /* 讓按鈕組緊貼bar */
+            margin-bottom: 0;      /* 讓按鈕組緊貼bar */
         }
-
         .section-title-hot {
             margin-top: 2rem;
         }
     </style>
-</body>
-
-</html>

@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-service
+  namespace: podwise
+  labels:
+    app: recommendation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation-service
+  template:
+    metadata:
+      labels:
+        app: recommendation-service
+    spec:
+      containers:
+        - name: recommendation-service
+          image: python:3.9-slim
+          workingDir: /app
+          command: ["python", "-m", "uvicorn", "recommendation_service:app", "--host", "0.0.0.0", "--port", "8005"]
+          ports:
+            - containerPort: 8005
+          env:
+            - name: POSTGRES_HOST
+              value: "postgres.podwise.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "podcast"
+            - name: POSTGRES_USER
+              value: "bdse37"
+            - name: POSTGRES_PASSWORD
+              value: "111111"
+            - name: MINIO_ENDPOINT
+              value: "minio.podwise.svc.cluster.local:9000"
+            - name: MINIO_ACCESS_KEY
+              value: "minioadmin"
+            - name: MINIO_SECRET_KEY
+              value: "minioadmin"
+          volumeMounts:
+            - name: app-code
+              mountPath: /app
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: app-code
+          configMap:
+            name: recommendation-service-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendation-service
+  namespace: podwise
+  labels:
+    app: recommendation-service
+spec:
+  selector:
+    app: recommendation-service
+  ports:
+    - protocol: TCP
+      port: 8005
+      targetPort: 8005
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recommendation-service-code
+  namespace: podwise
+data:
+  recommendation_service.py: |
+    # 這裡會包含完整的 recommendation_service.py 代碼
+    # 由於代碼較長，建議使用 initContainer 或 volume 掛載
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: recommendation-service-ingress
+  namespace: podwise
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+spec:
+  rules:
+    - host: recommendation.podwise.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: recommendation-service
+                port:
+                  number: 8005 

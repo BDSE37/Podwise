@@ -643,7 +643,7 @@ class EmbeddingProcessor:
         try:
             # 實際編碼邏輯
             return np.random.rand(len(texts), 768)  # 模擬
-        except Exception as e:
+    except Exception as e:
             logging.error(f"文本編碼失敗: {e}")
             return None
     

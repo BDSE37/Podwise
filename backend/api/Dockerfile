@@ -1,39 +1,23 @@
-# API 服務 Dockerfile
-# 主要 API 閘道，整合所有後端服務
-FROM docker.io/library/python:3.10-slim
+FROM python:3.9-slim
 
-# 設定工作目錄
 WORKDIR /app
 
-# 安裝必要系統依賴（編譯器、curl、API 服務優化）
+# 安裝系統依賴
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    git \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# 複製 requirements.txt 並安裝 Python 依賴
+# 複製 requirements
 COPY requirements.txt .
+
+# 安裝 Python 依賴
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製應用程式碼
-COPY . .
+# 複製應用代碼
+COPY recommendation_service.py .
 
-# 創建 API 相關目錄
-RUN mkdir -p /app/logs \
-    /app/cache \
-    /app/config \
-    /app/templates
+# 暴露端口
+EXPOSE 8005
 
-# 設定環境變數
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-ENV LOGS_DIR=/app/logs
-ENV CACHE_DIR=/app/cache
-ENV CONFIG_DIR=/app/config
-
-# 暴露 API 服務埠（8000）
-EXPOSE 8000
-
-# 啟動指令
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+# 啟動命令
+CMD ["python", "-m", "uvicorn", "recommendation_service:app", "--host", "0.0.0.0", "--port", "8005"] 

@@ -62,7 +62,7 @@
 			margin-top: 2em;
 		}
 		.music-card {
-			background: #f6ece3;
+			background: #ebebeb;
 			border-radius: 1em;
 			box-shadow: 0 4px 16px rgba(88,62,61,0.08);
 			width: 220px;
@@ -135,6 +135,34 @@
 header.major .dash {
   color: #fff;
 }
+
+.searchbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px; /* 控制間距，可調整 */
+  width: 100%;
+  margin-top: 1em;
+}
+
+.InputContainer {
+  display: flex;
+  align-items: center;
+  /* 其他原有樣式不變 */
+}
+
+.input-logo {
+  height: 38px;
+  width: 38px;
+  cursor: pointer;
+  transition: filter 0.2s;
+  vertical-align: middle;
+}
+.input-logo:hover {
+  filter: brightness(0.8);
+}
+
+/* 新增 TAG 按鈕樣式：這裡只保留純 CSS，不要有 JS */
 	</style>
 </head>
 
@@ -148,22 +176,26 @@ header.major .dash {
 			<div class="inner">
 
 				<!-- Header -->
-				<header id="header">
-					<a href="index.html" class="logo"><img src="images/logo_black.png" alt="PodWise Logo"
-							style="height: 60px; vertical-align: middle; margin-right: 5px;"><strong>PodWise</strong>
-						Podcast自動摘要與個人化推薦系統</a>
-					<!-- 登入 user.png 按鈕 -->
-					<div style="position: absolute; top: 20px; right: 30px;">
-						<img src="images/user.png" id="user-login-btn" alt="登入" style="width:40px; height:40px; cursor:pointer; border-radius:50%; border:2px solid #e0e0e0; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+				<header id="header" style="display: flex; justify-content: space-between; align-items: center; 
+				padding: 10px 30px; width: 100%; box-sizing: border-box; margin-top: 40px;margin-bottom: 60px;">
+				<!-- 左側：logo + 文字 -->
+				<a href="podri.html" class="logo" style="display: flex; align-items: center; text-decoration: none;">
+				  <img src="images/logo_black.png" alt="PodWise Logo" style="height: 60px; margin-right: 10px;">
+				  <strong>PodWise</strong> Podcast自動摘要與個人化推薦系統
+				</a>
+				<!-- 右側：使用者頭像 -->
+				<div>
+				  <img src="images/user.png" id="user-login-btn" alt="登入"
+					style="width:40px; height:40px; cursor:pointer; border-radius:50%; border:2px solid #1dd195; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+				</div>
+				<!-- 登入彈窗 -->
+				<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:9999;">
+					<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.18); padding:2em 2.5em; min-width:260px;">
+						<div style="text-align:center; margin-bottom:1em; font-weight:bold; font-size:1.1em;">請輸入使用者ID</div>
+						<input type="text" id="user-id-input" placeholder="TYPE YOUR ID" style="width:100%; padding:0.7em; border-radius:8px; border:1px solid #1dd195; margin-bottom:1em; text-align:center; font-size:1em;">
+						<div id="login-close-btn" style="position:absolute; top:10px; right:14px; font-size:1.3em; color:#aaa; cursor:pointer;">&times;</div>
 					</div>
-					<!-- 登入彈窗 -->
-					<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:9999;">
-						<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.18); padding:2em 2.5em; min-width:260px;">
-							<div style="text-align:center; margin-bottom:1em; font-weight:bold; font-size:1.1em;">請輸入使用者ID</div>
-							<input type="text" id="user-id-input" placeholder="TYPE YOUR ID" style="width:100%; padding:0.7em; border-radius:8px; border:1px solid #1dd195; margin-bottom:1em; text-align:center; font-size:1em;">
-							<div id="login-close-btn" style="position:absolute; top:10px; right:14px; font-size:1.3em; color:#aaa; cursor:pointer;">&times;</div>
-						</div>
-					</div>
+				</div>
 					<!-- <ul class="icons">
 						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
 						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
@@ -185,7 +217,7 @@ header.major .dash {
 							</p>
 						</header>
 <!-- 搜尋欄置中外層 -->
-<div class="searchbar-outer">
+<div class="searchbar-row">
   <div class="InputContainer">
     <input placeholder="Ask Podri.." id="input" class="input" name="text" type="text">
   </div>
@@ -248,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<!-- Section -->
 				<section>
 					<header class="major">
-						<h2 style="margin-top:em; text-align:center;">
+						<h2 style="margin-top:6em; text-align:center;">
 						  <span class="dash">--</span>熱門推薦
 						</h2>
 					  </header>
@@ -602,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	<div id="popup-overlay"
 		style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center;">
 		<div id="popup-container"
-			style="background:#f6ece3; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
+			style="background:#ebebeb; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
 			<!-- 關閉按鈕 -->
 			<img src="images/delete.png" alt="關閉" class="close-button"
 				style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; cursor:pointer; z-index:10;"
@@ -611,11 +643,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			<div class="popup-step" id="popup-step-1">
 				<h2>Taste of PodWise !</h2>
 				<div class="quiz-option-container">
-					<div class="quiz-option" onclick="goToStep(2)">
+					<div class="quiz-option" onclick="selectMainCategory('business')">
 						<img src="images/financial-profit_golden.png" alt="商業">
 						<div>商業</div>
 					</div>
-					<div class="quiz-option" onclick="goToStep(2)">
+					<div class="quiz-option" onclick="selectMainCategory('education')">
 						<img src="images/school_golden.png" alt="教育">
 						<div>教育</div>
 					</div>
@@ -625,13 +657,62 @@ document.addEventListener('DOMContentLoaded', function() {
 			<!-- Step 2 -->
 			<div class="popup-step" id="popup-step-2" style="display:none;">
 				<h2>Which type?</h2>
+				<div id="category-tags" style="display: flex; gap: 1em; margin-bottom: 1.5em;"></div>
 				<div class="quiz-type-container">
-					<button class="quiz-type-btn" onclick="goToStep(3)">財經</button>
-					<button class="quiz-type-btn" onclick="goToStep(3)">職業</button>
-					<button class="quiz-type-btn" onclick="goToStep(3)">房地產</button>
-					<button class="quiz-type-btn" onclick="goToStep(3)">行銷</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '財經')">財經</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '職業')">職業</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '房地產')">房地產</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '行銷')">行銷</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '教育')">教育</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '學習')">學習</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '知識')">知識</button>
+					<button class="quiz-type-btn" onclick="selectCategory(this, '技能')">技能</button>
 				</div>
+				<button class="button primary" style="margin-top:2em;" onclick="goToStep(3)">下一步</button>
 			</div>
+			
+			<script>
+				let mainCategory = '';
+				
+				function selectMainCategory(category) {
+					mainCategory = category;
+					goToStep(2);
+				}
+				
+				function selectCategory(button, category) {
+					// 移除所有按鈕的選中狀態
+					document.querySelectorAll('.quiz-type-btn').forEach(btn => {
+						btn.classList.remove('selected');
+					});
+					
+					// 添加選中狀態到當前按鈕
+					button.classList.add('selected');
+					
+					// 儲存選中的類別
+					window.selectedCategory = category;
+					window.selectedTag = null; // 切換主類別時清空已選 TAG
+					renderCategoryTags(); // 重新渲染 TAGs
+				}
+				
+				// 在 goToStep 函數中添加顯示對應選項的邏輯
+				function goToStep(step) {
+					// 隱藏所有步驟
+					document.querySelectorAll('.popup-step').forEach(s => s.style.display = 'none');
+					
+					// 顯示指定步驟
+					document.getElementById(`popup-step-${step}`).style.display = 'block';
+					
+					// 如果是 Step 2，渲染 TAGs
+					if (step === 2) {
+						renderCategoryTags();
+					}
+					
+					// 如果是 Step 3，載入推薦
+					if (step === 3) {
+						loadRecommendations();
+					}
+				}
+			</script>
 
 <!-- Step 3 -->
 <div class="popup-step" id="popup-step-3" style="display:none;">
@@ -639,134 +720,185 @@ document.addEventListener('DOMContentLoaded', function() {
 	<h3 style="text-align:left; margin-left:0; padding-left:0;">
 	  試聽你有興趣的節目 並按下喜歡
 	</h3>
-	<div class="quiz-recommendations" style="display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: center; align-items: center;">
-	  <!-- 推薦 1 -->
-	  <div class="w-full max-w-[320px] mx-auto bg-white shadow-md rounded-lg overflow-hidden dark:bg-zinc-900">
-		<div class="flex justify-between items-center px-6 py-4">
-		  <div class="flex items-center">
-			<svg
-			  class="h-6 w-6"
-			  style="color: rgb(131,25,163)"
-			  fill="none"
-			  height="24"
-			  stroke="currentColor"
-			  stroke-linecap="round"
-			  stroke-linejoin="round"
-			  stroke-width="2"
-			  viewBox="0 0 24 24"
-			  width="24"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-			  <path d="M9 18V5l12-2v13"></path>
-			  <circle cx="6" cy="18" r="3"></circle>
-			  <circle cx="18" cy="16" r="3"></circle>
-			</svg>
-			<div class="mx-3">
-			  <h3 class="text-lg font-medium text-gray-700 dark:text-gray-200">
-				Timro Mann
-			  </h3>
-			  <p class="text-gray-500 dark:text-gray-400">Dibbya Subba</p>
-			</div>
-		  </div>
-		  <div class="flex items-center">
-			<svg
-			  class="h-6 w-6 text-red-500"
-			  fill="none"
-			  height="24"
-			  stroke="currentColor"
-			  stroke-linecap="round"
-			  stroke-linejoin="round"
-			  stroke-width="2"
-			  viewBox="0 0 24 24"
-			  width="24"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-			  <path
-				d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-			  ></path>
-			</svg>
-			<svg
-			  class="h-6 w-6 text-gray-500 dark:text-gray-400 ml-4"
-			  fill="none"
-			  height="24"
-			  stroke="currentColor"
-			  stroke-linecap="round"
-			  stroke-linejoin="round"
-			  stroke-width="2"
-			  viewBox="0 0 24 24"
-			  width="24"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-			  <polygon
-				points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-			  ></polygon>
-			</svg>
-		  </div>
-		</div>
-		<div class="relative">
-		  <div class="absolute inset-0 flex items-center justify-center"></div>
-		</div>
-		<div class="px-6 py-4">
-		  <div class="flex items-center">
-			<svg
-			  class="h-5 w-5 text-gray-500 dark:text-gray-400"
-			  fill="none"
-			  height="24"
-			  stroke="currentColor"
-			  stroke-linecap="round"
-			  stroke-linejoin="round"
-			  stroke-width="2"
-			  viewBox="0 0 24 24"
-			  width="24"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-			  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-			</svg>
-			<div class="w-full mx-3">
-			  <div
-				class="relative mt-1 h-1 bg-gray-200 rounded overflow-hidden dark:bg-gray-800"
-			  >
-				<div
-				  class="absolute left-0 top-0 h-full w-1/2"
-				  style="background-color: rgb(131,25,163)"
-				></div>
-			  </div>
-			</div>
-			<p class="text-sm text-gray-500 dark:text-gray-400">50%</p>
-		  </div>
-		  <div
-			class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-3"
-		  >
-			<span> 00:03 </span><span> 3:35 </span>
-		  </div>
-		</div>
+	<div class="quiz-recommendations" id="recommendations-container" style="display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: center; align-items: center;">
+	  <!-- 推薦節目將在這裡動態載入 -->
 	  </div>
   
-	  <!-- 推薦 2 -->
-	  
+	<button class="button secondary" onclick="refreshRecommendations()">重新整理</button>
+	<button class="button primary" onclick="goToStep(4)">下一步</button>
   
-	  <!-- 推薦 3 -->
-	  <div class="recommend-item">
-		<img src="images/天下學習.png" alt="天下學習">
-		<img src="images/play_gray.png" alt="播放" class="play-button"
-		  onclick="playAudio('audio/sample3.mp3')">
+	<script>
+	  // 全域變數
+	  let currentCategory = '';
+	  let selectedEpisodes = [];
+	  let currentRecommendations = [];
+	  
+	  // 主類別對應 TAG pool（與後端一致）
+	  const CATEGORY_TAGS = {
+		business: ["投資理財", "股票分析", "房地產", "創業"],
+		education: ["學習方法", "教育理念", "知識分享", "個人成長"]
+	  };
+	  
+	  window.selectedTag = null;
+	  
+	  // 渲染 Step 2 的 TAG 按鈕
+	  function renderCategoryTags() {
+		const tagDiv = document.getElementById('category-tags');
+		tagDiv.innerHTML = '';
+		const apiCategory = mapCategoryToAPI(getCategoryFromStep2());
+		const tags = CATEGORY_TAGS[apiCategory] || [];
+		tags.forEach(tag => {
+		  const btn = document.createElement('button');
+		  btn.className = 'tag-btn' + (window.selectedTag === tag ? ' selected' : '');
+		  btn.textContent = tag;
+		  btn.onclick = function() {
+			window.selectedTag = tag;
+			renderCategoryTags(); // 重新渲染高亮
+		  };
+		  tagDiv.appendChild(btn);
+		});
+	  }
+	  
+	  // 從 Step 2 獲取類別
+	  function getCategoryFromStep2() {
+		// 首先檢查全域變數
+		if (window.selectedCategory) {
+		  console.log('使用全域變數 selectedCategory:', window.selectedCategory);
+		  return window.selectedCategory;
+		}
+		
+		// 如果全域變數沒有，則檢查 DOM
+		const categoryButtons = document.querySelectorAll('.quiz-type-btn');
+		for (let btn of categoryButtons) {
+		  if (btn.classList.contains('selected')) {
+			const category = btn.textContent.trim();
+			console.log('從 DOM 獲取類別:', category);
+			return category;
+		  }
+		}
+		console.log('沒有找到選中的類別，使用預設值: business');
+		return 'business'; // 預設值
+	  }
+	  
+	  // 映射類別到 API 類別
+	  function mapCategoryToAPI(category) {
+		const categoryMap = {
+		  '財經': 'business',
+		  '職業': 'business', 
+		  '房地產': 'business',
+		  '行銷': 'business',
+		  '投資': 'business',
+		  '理財': 'business',
+		  '教育': 'education',
+		  '學習': 'education',
+		  '知識': 'education',
+		  '技能': 'education'
+		};
+		return categoryMap[category] || 'business';
+	  }
+	  
+	  // 載入推薦節目
+	  async function loadRecommendations() {
+		try {
+		  currentCategory = getCategoryFromStep2();
+		  const apiCategory = mapCategoryToAPI(currentCategory);
+		  const tag = window.selectedTag;
+		  const response = await fetch('http://localhost:8006/api/category/recommendations', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ category: apiCategory, tag: tag })
+		  });
+		  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		  const data = await response.json();
+		  currentRecommendations = data.recommendations || [];
+		  renderRecommendations();
+		} catch (error) {
+		  console.error('載入推薦失敗:', error);
+		  loadDefaultRecommendations();
+		}
+	  }
+	  
+	  // 載入預設推薦（當 API 不可用時）
+	  function loadDefaultRecommendations() {
+		const defaultRecommendations = [
+		  {
+			podcast_name: '股癌 Gooaye',
+			episode_title: '投資理財精選',
+			episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
+			podcast_image: 'images/股癌.png',
+			audio_url: 'audio/sample1.mp3',
+			episode_id: 1,
+			rss_id: '123',
+			tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
+		  },
+		  {
+			podcast_name: '矽谷輕鬆談',
+			episode_title: 'AI 技術趨勢',
+			episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
+			podcast_image: 'images/矽谷輕鬆談.png',
+			audio_url: 'audio/sample2.mp3',
+			episode_id: 2,
+			rss_id: '456',
+			tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
+		  },
+		  {
+			podcast_name: '天下學習',
+			episode_title: '管理思維分享',
+			episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
+			podcast_image: 'images/天下學習.png',
+			audio_url: 'audio/sample3.mp3',
+			episode_id: 3,
+			rss_id: '789',
+			tags: ['企業管理', '領導力', '學習方法', '個人成長']
+		  }
+		];
+  
+		currentRecommendations = defaultRecommendations;
+		renderRecommendations();
+	  }
+	  
+	  // 渲染推薦節目
+	  function renderRecommendations() {
+		const container = document.getElementById('recommendations-container');
+		container.innerHTML = '';
+  
+		currentRecommendations.forEach((rec, index) => {
+		  const rssId = rec.rss_id;
+		  const playBtnId = `play-btn-${index}`;
+		  const imgId = `podcast-img-${index}`;
+		  
+		  // 調試：檢查每個推薦的 tags
+		  console.log(`渲染推薦 ${index + 1}:`, {
+			rec_tags: rec.tags,
+			rec_tags_type: typeof rec.tags,
+			rec_tags_length: rec.tags ? rec.tags.length : 0,
+			tags_condition: rec.tags ? '有 tags' : '無 tags',
+			tags_is_array: Array.isArray(rec.tags),
+			tags_map_result: rec.tags ? rec.tags.map(tag => tag).join(', ') : '無 tags'
+		  });
+		  // 圖片佔位
+		  const imgHtml = `<img id="${imgId}" alt="${rec.podcast_name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">`;
+		  
+		  const item = document.createElement('div');
+		  item.className = 'recommend-item';
+		  item.innerHTML = `
+			${imgHtml}
+			<img src="images/play_gray.png" alt="播放" class="play-button" id="${playBtnId}" style="cursor:pointer; width:44px; height:44px;" onclick="playOrPauseAudio(this, '${rec.rss_id}', '${rec.episode_title}', '${rec.category || ''}')">
 		<div class="text">
-		  <div class="title">天下學習</div>
-		  <p class="description">訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。</p>
+			  <div class="title">${rec.podcast_name}</div>
+			  <p class="description">${rec.episode_title}</p>
+			  <div class="tags-container" style="margin-top: 8px; border: 1px solid red; padding: 4px;">
+				${rec.tags ? rec.tags.map(tag => `<span class="tag" style="display: inline-block; background: #f0f0f0; color: #666; padding: 2px 6px; margin: 2px; border-radius: 12px; font-size: 11px;">${tag}</span>`).join('') : '<span style="color: red;">無 tags 可顯示</span>'}
 		</div>
-		<!-- like button -->
-		<div class="heart-container" title="Like">
-		  <input type="checkbox" class="checkbox">
+			</div>
+			<div class="heart-container" title="Like" onclick="toggleLike(${index}, ${rec.episode_id}, '${rec.podcast_name}', '${rec.episode_title}', '${rec.rss_id}')">
+			  <input type="checkbox" class="checkbox" id="like-${index}">
 		  <div class="svg-container">
 			<svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
-			  <path
-				d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z">
-			  </path>
+				  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
 			</svg>
 			<svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
-			  <path
-				d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z">
-			  </path>
+				  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
 			</svg>
 			<svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
 			  <polygon points="10,10 20,20"></polygon>
@@ -778,155 +910,652 @@ document.addEventListener('DOMContentLoaded', function() {
 			</svg>
 		  </div>
 		</div>
-	  </div>
-	</div>
-  
-	<button class="button secondary" onclick="refreshChannels()">Refresh</button>
-	<button class="button primary" onclick="goToStep(4)">Next</button>
-  
-	<script>
-	  // 1. 準備一份所有可推薦的頻道清單
-	  const allChannels = [
-		{
-		  img: 'images/股癌.png',
-		  alt: '股癌',
-		  audio: 'audio/sample1.mp3',
-		  title: '股癌 Gooaye',
-		  desc: '晦澀金融投資知識直白講，重要海內外時事輕鬆談；散戶也能找到樂趣。'
-		},
-		{
-		  img: 'images/矽谷輕鬆談.png',
-		  alt: '矽谷輕鬆談',
-		  audio: 'audio/sample2.mp3',
-		  title: '矽谷輕鬆談',
-		  desc: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂，專為中文使用者打造。'
-		},
-		{
-		  img: 'images/天下學習.png',
-		  alt: '天下學習',
-		  audio: 'audio/sample3.mp3',
-		  title: '天下學習',
-		  desc: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。'
-		},
-		{
-		  img: 'images/新節目A.png',
-		  alt: '新節目A',
-		  audio: 'audio/sample4.mp3',
-		  title: '新節目 A',
-		  desc: '這是一個新的推薦節目 A。'
-		},
-		{
-		  img: 'images/新節目B.png',
-		  alt: '新節目B',
-		  audio: 'audio/sample5.mp3',
-		  title: '新節目 B',
-		  desc: '這是一個新的推薦節目 B。'
-		},
-		// …還可以更多
-	  ];
-  
-	  // 2. 隨機打散陣列
-	  function shuffle(arr) {
-		for (let i = arr.length - 1; i > 0; i--) {
-		  const j = Math.floor(Math.random() * (i + 1));
-		  [arr[i], arr[j]] = [arr[j], arr[i]];
+		  `;
+		  container.appendChild(item);
+		  
+		  // 強制設置 checkbox 為未選中狀態
+		  const checkbox = document.getElementById(`like-${index}`);
+		  if (checkbox) {
+			checkbox.checked = false;
+			checkbox.removeAttribute('checked');
+		  }
+		  
+		  // 動態載入圖片
+		  setPodcastImage(document.getElementById(imgId), rssId);
+		});
+	  }
+	  
+	  // 設定節目圖片（從 MinIO 載入）
+	  function setPodcastImage(imgElement, rssId) {
+		if (!imgElement || !rssId) {
+		  console.error('setPodcastImage: 缺少必要參數', { imgElement, rssId });
+		  return;
+		}
+		
+		console.log('開始載入圖片，RSS ID:', rssId);
+		
+		// 嘗試從 MinIO 載入圖片
+		const sizes = ['300', '640', '64'];
+		let currentSizeIndex = 0;
+		
+		function tryNextSize() {
+		  if (currentSizeIndex >= sizes.length) {
+			// 所有尺寸都失敗，使用預設圖片
+			console.log('所有圖片尺寸都失敗，使用預設圖片');
+			imgElement.src = 'images/default_podcast.png';
+			return;
+		  }
+		  
+		  const size = sizes[currentSizeIndex];
+		  // 使用 MinIO 預簽名 URL 格式
+		  const imageUrl = `http://localhost:9000/podcast-images/RSS_${rssId}_${size}.jpg`;
+		  
+		  console.log(`嘗試載入圖片: ${imageUrl}`);
+		  
+		  // 測試圖片是否可載入
+		  const testImg = new Image();
+		  testImg.onload = function() {
+			console.log(`成功載入圖片: ${imageUrl}`);
+			imgElement.src = imageUrl;
+		  };
+		  testImg.onerror = function() {
+			console.log(`圖片載入失敗: ${imageUrl}`);
+			currentSizeIndex++;
+			tryNextSize();
+		  };
+		  testImg.src = imageUrl;
+		}
+		
+		tryNextSize();
+	  }
+	  
+	  let globalAudio = null;
+	  let currentPlayButton = null;
+	  let lastAudioUrl = '';
+	  let lastAudioTime = 0;
+
+	  // 修正 1: playOrPauseAudio 暫停/播放切換
+	  async function playOrPauseAudio(button, rssId, episodeTitle, category) {
+		try {
+		  console.log('playOrPauseAudio 被呼叫:', { rssId, episodeTitle, category });
+		  console.log('當前按鈕狀態:', button.src);
+		  console.log('globalAudio 狀態:', globalAudio ? (globalAudio.paused ? 'paused' : 'playing') : 'null');
+
+		  // 檢查是否為同一首歌曲的暫停/播放切換
+		  const apiCategory = mapCategoryToAPI(currentCategory);
+		  const response = await fetch('http://localhost:8006/api/audio/stream', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ rss_id: rssId, episode_title: episodeTitle, category: apiCategory })
+		  });
+		  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		  const data = await response.json();
+		  const audioUrl = data.audio_url;
+		  if (!audioUrl) throw new Error('無法獲取音檔 URL');
+
+		  // 如果已經有 audio 物件且是同一首歌曲
+		  if (globalAudio && lastAudioUrl === audioUrl) {
+			if (!globalAudio.paused) {
+			  // 正在播放，執行暫停
+			  console.log('執行暫停');
+			  globalAudio.pause();
+			  lastAudioTime = globalAudio.currentTime;
+			  button.src = 'images/play_gray.png';
+			  return;
+			} else {
+			  // 已暫停，執行播放
+			  console.log('執行播放');
+			  globalAudio.currentTime = lastAudioTime;
+			  globalAudio.play();
+			  button.src = 'images/stop_gray.png';
+			  return;
+			}
+		  }
+
+		  // 如果是新歌曲或沒有 audio 物件，先停止當前播放
+		  if (globalAudio) {
+			console.log('停止當前播放，切換到新歌曲');
+			globalAudio.pause();
+			if (currentPlayButton && currentPlayButton !== button) {
+			  currentPlayButton.src = 'images/play_gray.png';
+			}
+		  }
+
+		  // 建立新的 audio 物件
+		  console.log('建立新音檔物件');
+		  globalAudio = new Audio(audioUrl);
+		  lastAudioUrl = audioUrl;
+		  lastAudioTime = 0;
+		  currentPlayButton = button;
+
+		  // 設定事件監聽器
+		  globalAudio.addEventListener('ended', () => {
+			console.log('播放結束');
+			button.src = 'images/play_gray.png';
+			lastAudioTime = 0;
+		  });
+		  
+		  globalAudio.addEventListener('pause', () => {
+			console.log('暫停事件觸發');
+			button.src = 'images/play_gray.png';
+		  });
+		  
+		  globalAudio.addEventListener('play', () => {
+			console.log('播放事件觸發');
+			button.src = 'images/stop_gray.png';
+		  });
+		  
+		  globalAudio.addEventListener('error', (e) => {
+			console.log('播放錯誤:', e);
+			button.src = 'images/play_gray.png';
+			alert('音檔播放失敗');
+		  });
+
+		  // 開始播放
+		  console.log('開始播放新歌曲');
+		  await globalAudio.play();
+		  button.src = 'images/stop_gray.png';
+
+		} catch (error) {
+		  console.error('播放失敗:', error);
+		  button.src = 'images/play_gray.png';
+		  alert('播放失敗: ' + error.message);
 		}
 	  }
-  
-	  // 3. 重新渲染前三名
-	  function refreshChannels() {
-		const copy = [...allChannels];
-		shuffle(copy);
-		const picks = copy.slice(0, 3);
-  
-		const container = document.querySelector('.quiz-recommendations');
-		container.innerHTML = '';  // 清空舊項目
-  
-		picks.forEach(ch => {
-		  const item = document.createElement('div');
-		  item.className = 'recommend-item';
-		  item.innerHTML = `
-	<img src="${ch.img}" alt="${ch.alt}">
-	<img src="images/play_gray.png" class="play-button" onclick="playAudio('${ch.audio}')">
-	<div class="text">
-	  <div class="title">${ch.title}</div>
-	  <p class="description">${ch.desc}</p>
-	</div>
-	<div class="heart-container" title="Like">
-	  <input type="checkbox" class="checkbox">
-	  <div class="svg-container">
-		<!-- outline -->
-		<svg viewBox="0 0 24 24" class="svg-outline">
-		  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3…"></path>
-		</svg>
-		<!-- filled -->
-		<svg viewBox="0 0 24 24" class="svg-filled">
-		  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3…"></path>
-		</svg>
-		<!-- celebrate -->
-		<svg class="svg-celebrate" width="100" height="100">
-		  <polygon points="10,10 20,20"></polygon>
-		  <!-- 其他 confetti -->
-		</svg>
+	  
+	  // 播放音檔
+	  async function playAudio(audioUrl, episodeId, podcastName, episodeTitle, rssId) {
+		try {
+		  console.log('開始播放音檔:', audioUrl);
+		  
+		  // 檢查是否為 MinIO 音檔 URL
+		  let finalAudioUrl = audioUrl;
+		  
+		  // 如果 URL 不包含 localhost:9000（MinIO 預簽名 URL），則嘗試獲取
+		  if (!audioUrl.includes('localhost:9000') && !audioUrl.includes('audio/sample')) {
+			try {
+			  const response = await fetch('http://localhost:8006/api/audio/stream', {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+				  rss_id: rssId,
+				  episode_title: episodeTitle,
+				  category: mapCategoryToAPI(currentCategory)
+				})
+			  });
+			  
+			  if (response.ok) {
+				const data = await response.json();
+				if (data.audio_url) {
+				  finalAudioUrl = data.audio_url;
+				  console.log('從 MinIO 獲取音檔:', finalAudioUrl);
+				}
+			  }
+			} catch (error) {
+			  console.log('無法從 MinIO 獲取音檔，使用預設音檔');
+			}
+		  }
+		  
+		  // 停止當前播放的音檔
+		  const existingAudio = document.getElementById('audio-player');
+		  if (existingAudio) {
+			existingAudio.pause();
+			existingAudio.currentTime = 0;
+		  }
+		  
+		  // 創建新的音檔元素
+		  const audio = new Audio();
+		  audio.id = 'audio-player';
+		  audio.src = finalAudioUrl;
+		  
+		  // 添加播放事件監聽器
+		  audio.addEventListener('loadstart', () => {
+			console.log('開始載入音檔...');
+		  });
+		  
+		  audio.addEventListener('canplay', () => {
+			console.log('音檔可以播放');
+		  });
+		  
+		  audio.addEventListener('play', () => {
+			console.log('開始播放:', podcastName, '-', episodeTitle);
+			// 顯示播放狀態
+			showPlayStatus(podcastName, episodeTitle, true);
+		  });
+		  
+		  audio.addEventListener('ended', () => {
+			console.log('播放結束');
+			showPlayStatus(podcastName, episodeTitle, false);
+		  });
+		  
+		  audio.addEventListener('error', (e) => {
+			console.error('播放錯誤:', e);
+			alert('音檔播放失敗，請檢查音檔是否存在');
+			showPlayStatus(podcastName, episodeTitle, false);
+		  });
+		  
+		  // 開始播放
+		  const playPromise = audio.play();
+		  if (playPromise !== undefined) {
+			playPromise.then(() => {
+			  // 播放成功
+			  console.log('播放成功啟動');
+			}).catch(error => {
+			  console.error('播放失敗:', error);
+			  alert('播放失敗，可能是瀏覽器阻止了自動播放');
+			});
+		  }
+		  
+		  // 記錄播放行為
+		  recordFeedback('play', episodeId, podcastName, episodeTitle, rssId);
+		  
+		} catch (error) {
+		  console.error('播放失敗:', error);
+		  alert('播放失敗: ' + error.message);
+		}
+	  }
+	  
+	  // 顯示播放狀態
+	  function showPlayStatus(podcastName, episodeTitle, isPlaying) {
+		// 創建或更新播放狀態提示
+		let statusDiv = document.getElementById('play-status');
+		if (!statusDiv) {
+		  statusDiv = document.createElement('div');
+		  statusDiv.id = 'play-status';
+		  statusDiv.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: ${isPlaying ? '#4CAF50' : '#f44336'};
+			color: white;
+			padding: 10px 15px;
+			border-radius: 5px;
+			z-index: 10000;
+			font-size: 14px;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+		  `;
+		  document.body.appendChild(statusDiv);
+		}
+		
+		statusDiv.textContent = isPlaying ? 
+		  `🎵 正在播放: ${podcastName} - ${episodeTitle}` : 
+		  `⏹️ 播放結束: ${podcastName} - ${episodeTitle}`;
+		
+		// 3秒後自動隱藏
+		setTimeout(() => {
+		  if (statusDiv && !isPlaying) {
+			statusDiv.remove();
+		  }
+		}, 3000);
+	  }
+	  
+	  // 切換喜歡狀態
+	  function toggleLike(index, episodeId, podcastName, episodeTitle, rssId) {
+		const checkbox = document.getElementById(`like-${index}`);
+		const heartContainer = checkbox.closest('.heart-container');
+		const isLiked = checkbox.checked;
+		
+		console.log('toggleLike 被呼叫:', { index, episodeId, isLiked });
+		
+		// 切換 checkbox 狀態
+		checkbox.checked = !isLiked;
+		
+		// 添加愛心動畫效果
+		if (!isLiked) {
+		  // 喜歡動畫
+		  heartContainer.style.transform = 'scale(1.2)';
+		  setTimeout(() => {
+			heartContainer.style.transform = 'scale(1)';
+		  }, 200);
+		  
+		  // 顯示慶祝動畫
+		  const celebrateSvg = heartContainer.querySelector('.svg-celebrate');
+		  if (celebrateSvg) {
+			celebrateSvg.style.display = 'block';
+			celebrateSvg.style.animation = 'keyframes-svg-celebrate 0.6s ease-out';
+			setTimeout(() => {
+			  celebrateSvg.style.display = 'none';
+			}, 600);
+		  }
+		}
+		
+		// 更新選中的節目列表
+		const episodeData = {
+		  episode_id: episodeId,
+		  podcast_name: podcastName,
+		  episode_title: episodeTitle,
+		  rss_id: rssId
+		};
+		
+		if (!isLiked) {
+		  // 添加到選中列表
+		  selectedEpisodes.push(episodeData);
+		  recordFeedback('like', episodeId, podcastName, episodeTitle, rssId);
+		  console.log(`❤️ 喜歡節目: ${podcastName} - ${episodeTitle}`);
+		} else {
+		  // 從選中列表移除
+		  selectedEpisodes = selectedEpisodes.filter(ep => ep.episode_id !== episodeId);
+		  recordFeedback('unlike', episodeId, podcastName, episodeTitle, rssId);
+		  console.log(`💔 取消喜歡: ${podcastName} - ${episodeTitle}`);
+		}
+		
+		console.log('選中的節目數量:', selectedEpisodes.length);
+		console.log('選中的節目:', selectedEpisodes);
+		
+		// 顯示用戶偏好提示
+		showPreferenceNotification(podcastName, episodeTitle, !isLiked);
+	  }
+	  
+	  // 顯示用戶偏好提示
+	  function showPreferenceNotification(podcastName, episodeTitle, isLiked) {
+		// 創建或更新偏好提示
+		let notificationDiv = document.getElementById('preference-notification');
+		if (!notificationDiv) {
+		  notificationDiv = document.createElement('div');
+		  notificationDiv.id = 'preference-notification';
+		  notificationDiv.style.cssText = `
+			position: fixed;
+			top: 80px;
+			right: 20px;
+			background: ${isLiked ? '#4CAF50' : '#f44336'};
+			color: white;
+			padding: 12px 18px;
+			border-radius: 8px;
+			z-index: 10000;
+			font-size: 14px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+			max-width: 300px;
+			word-wrap: break-word;
+			transform: translateX(100%);
+			transition: transform 0.3s ease;
+		  `;
+		  document.body.appendChild(notificationDiv);
+		}
+		
+		const emoji = isLiked ? '❤️' : '💔';
+		const action = isLiked ? '已加入喜好' : '已移除喜好';
+		
+		notificationDiv.innerHTML = `
+		  <div style="display: flex; align-items: center; gap: 8px;">
+			<span style="font-size: 18px;">${emoji}</span>
+			<div>
+			  <div style="font-weight: bold;">${action}</div>
+			  <div style="font-size: 12px; opacity: 0.9;">${podcastName}</div>
+			  <div style="font-size: 11px; opacity: 0.8;">${episodeTitle}</div>
 	  </div>
 	</div>
   `;
-		  container.appendChild(item);
-		});
+		
+		// 顯示動畫
+		setTimeout(() => {
+		  notificationDiv.style.transform = 'translateX(0)';
+		}, 100);
+		
+		// 3秒後自動隱藏
+		setTimeout(() => {
+		  notificationDiv.style.transform = 'translateX(100%)';
+		  setTimeout(() => {
+			if (notificationDiv) {
+			  notificationDiv.remove();
+			}
+		  }, 300);
+		}, 3000);
 	  }
-  
-	  // 頁面載入時先呼叫一次
-	  document.addEventListener('DOMContentLoaded', refreshChannels);
+	  
+	  // 記錄用戶反饋
+	  async function recordFeedback(action, episodeId, podcastName, episodeTitle, rssId) {
+		try {
+		  const response = await fetch('http://localhost:8007/api/feedback', {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+			  user_id: 'temp_user', // 暫時用戶 ID
+			  episode_id: episodeId,
+			  podcast_name: podcastName,
+			  episode_title: episodeTitle,
+			  rss_id: rssId,
+			  action: action,
+			  category: mapCategoryToAPI(currentCategory)
+			})
+		  });
+		  
+		  if (response.ok) {
+			console.log(`${action} 操作記錄成功`);
+		  }
+		  
+		} catch (error) {
+		  console.error('記錄反饋失敗:', error);
+		}
+	  }
+	  
+	  // 重新整理推薦
+	  function refreshRecommendations() {
+		loadRecommendations();
+	  }
+	  
+	  // 頁面載入時載入推薦
+	  document.addEventListener('DOMContentLoaded', () => {
+		// 延遲載入，確保 Step 2 已完成
+		setTimeout(loadRecommendations, 100);
+	  });
+	  
+	  // 頁面離開時停止音檔播放
+	  window.addEventListener('beforeunload', () => {
+		if (globalAudio) {
+		  globalAudio.pause();
+		  globalAudio = null;
+		}
+	  });
+	  
+	  // 修正 goToStep 函數，在跳轉時停止音檔
+	  function goToStep(step) {
+		// 停止當前播放的音檔
+		if (globalAudio) {
+		  globalAudio.pause();
+		  globalAudio = null;
+		  if (currentPlayButton) {
+			currentPlayButton.src = 'images/play_gray.png';
+		  }
+		}
+		
+		// 隱藏所有步驟
+		for (let i = 1; i <= 4; i++) {
+		  const el = document.getElementById(`popup-step-${i}`);
+		  if (el) el.style.display = 'none';
+		}
+		
+		// 顯示指定步驟
+		const targetEl = document.getElementById(`popup-step-${step}`);
+		if (targetEl) targetEl.style.display = 'block';
+		
+		// 如果是步驟 4，執行額外邏輯
+		if (step === 4) {
+		  // 這裡可以添加步驟 4 的特殊邏輯
+		}
+	  }
 	</script>
   </div>
   
 			<!-- Step 4 -->
-			<div class="popup-step" id="popup-step-4">
-				<h2>Signin Your Podwise</h2>
-				<div class="row">
-					<div class="col-6 col-12-small">
+<div class="popup-step" id="popup-step-4" style="display: none;">
+  <h2 style="color: #7c4dff;">Sign in Your Podwise</h2>
+  <!-- 這裡開始： -->
+  <div class="form-center">
+    <!-- Podwise ID 輸入 -->
+    <input
+      type="text"
+      name="demo-name"
+      id="demo-name"
+      placeholder="輸入你的Podwise ID"
+    />
 
-						<!-- Form -->
-						<div class="row gtr-uniform" style="text-align: center;">
-							<h3>輸入我的Podwise ID</h3>
-							<form method="post" action="#">
-								<div class="row gtr-uniform">
-									<div class="col-6 col-12-xsmall">
-										<input type="text" name="demo-name" id="demo-name" value=""
-											placeholder="Podwise ID" />
-									</div>
+    <!-- or 分隔 -->
+    <span style="color:#666;">— or —</span>
 
-									<!--  or  -->
-									<div class="col-12" style="text-align: center; margin: 1rem 0;">
-										<h3 style="margin: 0; font-weight: normal; color: #666;">or</h3>
-									</div>
-									<!-- Break -->
-									<div class="col-12">
-										<ul class="actions">
+    <!-- 產生 ID 按鈕 -->
+    <input
+      type="button"
+      value="產生Podwise ID"
+      id="generateIdBtn"
+      class="secondary"
+      onclick="generatePodwiseID()"
+    />
 
-											<li>
-												<input type="button" value="產生Podwise ID" id="generateIdBtn"
-													class="secondary" onclick="generatePodwiseID()" />
-											</li>
-										</ul>
+    <!-- 顯示產生後的 ID -->
+    <input
+      type="text"
+      id="podwiseIdField"
+      readonly
+      placeholder="Generating..."
+    />
 
-										<!-- 下面這個欄位用來顯示產生的 ID -->
-										<div>
-											<input type="text" id="podwiseIdField" readonly placeholder="尚未產生"
-												style="width: 200px;" />
-										</div>
-									</div>
+    <!-- 進入 Podwise 按鈕 -->
+    <button
+      type="button"
+      class="button primary"
+      onclick="enterPodwise()"
+    >
+      進入Podwise
+    </button>
+  </div>
+  <!-- 這裡結束 -->
+</div>
 
 									<script>
-										function generatePodwiseID() {
-											// 這裡放你的 ID 產生邏輯
-											const newId = 'PW-' + Date.now();
-											// 把新 ID 塞到下方欄位
-											document.getElementById('podwiseIdField').value = newId;
+										async function generatePodwiseID() {
+											try {
+												// 顯示載入狀態
+												const idField = document.getElementById('podwiseIdField');
+												const generateBtn = document.getElementById('generateIdBtn');
+												
+												idField.value = '正在生成...';
+												generateBtn.disabled = true;
+												generateBtn.value = '生成中...';
+												
+												// 調用後端 API 生成 Podwise ID
+												const response = await fetch('/api/generate-podwise-id', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json',
+													}
+												});
+												
+												if (response.ok) {
+													const data = await response.json();
+													if (data.success) {
+														// 顯示生成的 Podwise ID
+														idField.value = data.podwise_id;
+														console.log('Podwise ID 生成成功:', data.podwise_id);
+													} else {
+														throw new Error(data.message || '生成失敗');
+													}
+												} else {
+													throw new Error('API 請求失敗');
+												}
+												
+											} catch (error) {
+												console.error('生成 Podwise ID 失敗:', error);
+												document.getElementById('podwiseIdField').value = '生成失敗，請重試';
+												alert('生成 Podwise ID 失敗，請重試');
+											} finally {
+												// 恢復按鈕狀態
+												const generateBtn = document.getElementById('generateIdBtn');
+												generateBtn.disabled = false;
+												generateBtn.value = '產生Podwise ID';
+											}
+										}
+										
+										// 收集所有 Like 的節目資訊
+										function collectLikedEpisodes() {
+										  const likedEpisodes = [];
+										  if (window.currentRecommendations) {
+										    window.currentRecommendations.forEach((rec, idx) => {
+										      const checkbox = document.getElementById(`like-${idx}`);
+										      if (checkbox && checkbox.checked) {
+										        likedEpisodes.push({
+										          podcast_name: rec.podcast_name,
+										          episode_title: rec.episode_title,
+										          rss_id: rec.rss_id,
+										          episode_id: rec.episode_id
+										        });
+										      }
+										    });
+										  }
+										  window.selectedEpisodes = likedEpisodes;
+										}
+										
+										// 進入 Podwise 按鈕觸發
+										async function enterPodwise() {
+										  collectLikedEpisodes(); // 先收集 Like 節目
+										
+										  const userIdInput = document.getElementById('demo-name');
+										  const generatedIdInput = document.getElementById('podwiseIdField');
+										  let userId = userIdInput.value.trim();
+										  const isNewUser = generatedIdInput.value.trim() !== '';
+										  if (isNewUser) {
+										    userId = generatedIdInput.value.trim();
+										  }
+										  if (!userId) {
+										    alert('請輸入或產生 Podwise ID');
+										    return;
+										  }
+										  try {
+										    if (isNewUser) {
+										      await registerNewUser(userId);
+										    } else {
+										      const exists = await checkUserExists(userId);
+										      if (!exists) {
+										        await registerNewUser(userId);
+										      }
+										    }
+										    window.location.href = 'index.html';
+										  } catch (error) {
+										    alert('登入失敗，請重試');
+										  }
+										}
+										
+										async function checkUserExists(userId) {
+											try {
+												const response = await fetch(`/api/user/check/${userId}`);
+												const data = await response.json();
+												return data.exists;
+											} catch (error) {
+												console.error('檢查用戶失敗:', error);
+												return false;
+											}
+										}
+										
+										async function registerNewUser(userId) {
+											try {
+												const response = await fetch('/api/user/register', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json',
+													},
+													body: JSON.stringify({
+														user_id: userId,
+														category: window.selectedCategory || 'business',
+														selected_episodes: window.selectedEpisodes || []
+													})
+												});
+												
+												if (response.ok) {
+													console.log('用戶註冊成功');
+												} else {
+													throw new Error('註冊失敗');
+												}
+												
+											} catch (error) {
+												console.error('註冊用戶失敗:', error);
+												throw error;
+											}
 										}
 									</script>
-
-									<button class="button" onclick="closePopup()">進入Podwise</button>
+						<!-- <button type="button" class="button" onclick="closePopup()">進入Podwise</button> -->
 								</div>
 
 						</div>
@@ -944,14 +1573,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							document.getElementById('popup-overlay').style.display = 'flex';
 						});
 
-						// 切換步驟
-						function goToStep(step) {
-							for (let i = 1; i <= 4; i++) {
-								const el = document.getElementById(`popup-step-${i}`);
-								if (el) el.style.display = (i === step) ? 'block' : 'none';
-							}
-							if (step === 4) fetchGeneratedCode();
-						}
+						// 切換步驟（已在上方定義，這裡移除重複定義）
 
 						// 向後端取得 ID 並顯示
 						function fetchGeneratedCode() {
@@ -966,19 +1588,33 @@ document.addEventListener('DOMContentLoaded', function() {
 						}
 
 						// 複製按鈕
-						document.addEventListener('DOMContentLoaded', () => {
-							document.getElementById('copy-code-btn').addEventListener('click', () => {
-								const code = document.getElementById('generated-code').textContent;
-								navigator.clipboard.writeText(code)
-									.then(() => alert('已複製到剪貼簿！'))
-									.catch(() => alert('複製失敗'));
-							});
-						});
+						// document.addEventListener('DOMContentLoaded', () => {
+						// 	document.getElementById('copy-code-btn').addEventListener('click', () => {
+						// 		const code = document.getElementById('generated-code').textContent;
+						// 		navigator.clipboard.writeText(code)
+						// 			.then(() => alert('已複製到剪貼簿！'))
+						// 			.catch(() => alert('複製失敗'));
+						// 	});
+						// });
 
 						// 關閉
 						function closePopup() {
 							document.getElementById('popup-overlay').style.display = 'none';
 						}
 					</script>
+        <!-- Step 4 結束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer 應該在這裡，獨立於 popup 之外 -->
+<footer id="footer" style="background:#dddada; padding:2em 0; text-align:center; margin-top:3em;">
+  <div class="inner">
+    <p style="margin:0; color:#3d4449;">&copy; 2025 PodWise. All rights reserved.</p>
+    <p style="margin:0; font-size:0.9em; color:#3d4449;">Designed by PodWise Team</p>
+</footer>
+
 </body>
 </html>
