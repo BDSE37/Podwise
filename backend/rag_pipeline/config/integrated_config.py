@@ -84,7 +84,7 @@ class DatabaseConfig:
     # Milvus
     milvus_host: str = "worker3"
     milvus_port: int = 19530
-    milvus_collection: str = "podwise_vectors"
+    milvus_collection: str = "podwise_chunks"
 
 
 @dataclass
@@ -550,11 +550,23 @@ class PodwiseIntegratedConfig(BaseSettings):
 
 
 # 全域配置實例
-podwise_config = PodwiseIntegratedConfig()
+podwise_config = None
 
 
 def get_config() -> PodwiseIntegratedConfig:
     """獲取配置實例"""
+    global podwise_config
+    if podwise_config is None:
+        # 確保載入環境變數
+        from dotenv import load_dotenv
+        import os
+        load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '.env'))
+        
+        # 初始化配置
+        podwise_config = PodwiseIntegratedConfig()
+        podwise_config._load_from_env()
+        podwise_config._load_from_yaml()
+    
     return podwise_config
 
 

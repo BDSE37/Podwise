@@ -21,7 +21,7 @@ from collections import defaultdict
 from pathlib import Path
 
 # 導入工具
-from tools.enhanced_vector_search import SmartTagExtractor
+from ..core.enhanced_vector_search import SmartTagExtractor
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)

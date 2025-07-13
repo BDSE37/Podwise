@@ -7,6 +7,32 @@ version: '3.8'
 
 services:
   # =============================================================================
+  # 資料庫服務層
+  # =============================================================================
+
+  # PostgreSQL 資料庫
+  postgresql:
+    image: postgres:15
+    container_name: podwise_postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-podcast}
+      - POSTGRES_USER=${POSTGRES_USER:-bdse37}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-111111}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - podwise
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bdse37} -d ${POSTGRES_DB:-podcast}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # =============================================================================
   # 核心 AI 服務層
   # =============================================================================
 
@@ -198,6 +224,37 @@ services:
       # Podwise MCP 整合配置
       - PODWISE_MCP_INTEGRATION_ENABLED=true
       - PODWISE_MCP_TOOL_CALLS_ENABLED=true
+      # Web Search 整合配置
+      - WEB_SEARCH_HOST=http://web_search:8006
+      - WEB_SEARCH_ENABLED=true
+      - WEB_SEARCH_FALLBACK_THRESHOLD=0.7
+
+  # Web Search 服務 - 網路搜尋
+  web_search:
+    build:
+      context: ./backend/web_search_service
+      dockerfile: Dockerfile
+    container_name: podwise_web_search
+    ports:
+      - "8006:8006"
+    env_file:
+      - ./backend/.env
+    environment:
+      - DEBUG=${DEBUG_MODE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
+      - WEB_SEARCH_MODEL=${WEB_SEARCH_MODEL:-gpt-3.5-turbo}
+      - WEB_SEARCH_HOST=0.0.0.0
+      - WEB_SEARCH_PORT=8006
+      - WEB_SEARCH_RELOAD=false
+    networks:
+      - podwise
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8006/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
       - PODWISE_MCP_FALLBACK_TO_LOCAL=true
       - PODWISE_MCP_VECTOR_SEARCH_ENHANCEMENT=true
       - PODWISE_MCP_SENTIMENT_ANALYSIS_ENABLED=true
@@ -227,7 +284,7 @@ services:
       dockerfile: Dockerfile
     container_name: podwise_frontend
     ports:
-      - "80:80"
+      - "8080:80"
     env_file:
       - ./backend/.env
     environment:
@@ -285,9 +342,10 @@ services:
 
   # 自動化爬蟲服務 - 資料收集
   crawler:
-    build:
-      context: ./data/ingestion
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./data/ingestion
+    #   dockerfile: Dockerfile
+    image: python:3.10-slim # 改用 python image 以避免 python not found
     container_name: podwise_crawler
     env_file:
       - ./backend/.env
@@ -316,9 +374,10 @@ services:
 
   # 資料處理服務 - 資料清理和轉換
   data_processor:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    image: python:3.10-slim # 改用 python image 以避免 python not found
     container_name: podwise_data_processor
     command: [ "python", "data_processor.py" ]
     env_file:

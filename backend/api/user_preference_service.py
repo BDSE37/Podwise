@@ -42,9 +42,9 @@ MINIO_CONFIG = {
     "secure": False
 }
 
-# 類別映射
+# 類別映射（與 MinIO business-one-min-audio 一致）
 CATEGORY_MAPPING = {
-    "business": ["business", "財經", "職業", "房地產", "行銷", "投資", "理財"],
+    "business": ["business", "投資理財", "股票分析", "經濟分析", "財務規劃", "投資", "理財"],
     "education": ["education", "教育", "學習", "科技", "知識", "技能"]
 }
 
@@ -480,12 +480,12 @@ class UserPreferenceService:
                 result = cursor.fetchone()
                 if result:
                     return result[0]
-                # 如果不存在，創建新用戶，只設置 username，讓 user_code 自動生成
+                # 如果不存在，創建新用戶
                 cursor.execute("""
-                    INSERT INTO users (username, created_at, updated_at)
-                    VALUES (%s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    INSERT INTO users (user_code, username, created_at, updated_at)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     RETURNING user_id
-                """, (user_code,))
+                """, (user_code, user_code))
                 new_user_id = cursor.fetchone()[0]
                 conn.commit()
                 logger.info(f"創建新用戶: {user_code} -> ID: {new_user_id}")
@@ -641,8 +641,8 @@ async def generate_podwise_id():
             # 查詢現有的最大 Podwise ID 編號
             cursor.execute("""
                 SELECT user_code FROM users 
-                WHERE user_code LIKE 'Podwise_%' 
-                ORDER BY CAST(SUBSTRING(user_code FROM 9) AS INTEGER) DESC 
+                WHERE user_code LIKE 'Podwise%' 
+                ORDER BY CAST(SUBSTRING(user_code FROM 8) AS INTEGER) DESC 
                 LIMIT 1
             """)
             result = cursor.fetchone()
@@ -651,7 +651,7 @@ async def generate_podwise_id():
                 # 提取現有最大編號
                 last_id = result[0]
                 try:
-                    last_number = int(last_id.split('_')[1])
+                    last_number = int(last_id[7:])  # 從第8個字符開始提取數字
                     next_number = last_number + 1
                 except (IndexError, ValueError):
                     # 如果解析失敗，從 1 開始
@@ -661,7 +661,7 @@ async def generate_podwise_id():
                 next_number = 1
             
             # 生成新的 Podwise ID
-            podwise_id = f"Podwise_{next_number:04d}"  # 格式：Podwise_0001, Podwise_0002, ...
+            podwise_id = f"Podwise{next_number:04d}"  # 格式：Podwise0001, Podwise0002, ...
             
             # 在資料庫中創建用戶
             user_numeric_id = preference_service._get_or_create_user(podwise_id)

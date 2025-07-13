@@ -66,6 +66,7 @@ class ServiceType(Enum):
     TTS = "tts"
     RAG_PIPELINE = "rag_pipeline"
     ML_PIPELINE = "ml_pipeline"
+    WEB_SEARCH = "web_search"
     FRONTEND = "frontend"
     PODRI_CHAT = "podri_chat"
     CRAWLER = "crawler"
@@ -346,6 +347,107 @@ class MLPipelineService(BaseService):
         super().__init__(config)
 
 
+class WebSearchService(BaseService):
+    """Web Search 服務類別"""
+    
+    def __init__(self):
+        config = ServiceConfig(
+            name="Web Search Service",
+            service_type=ServiceType.WEB_SEARCH,
+            host="localhost",
+            port=8006,
+            health_check_url="http://localhost:8006/health",
+            environment_vars={
+                "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY") or "",
+                "OPENAI_API_BASE": os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"),
+                "WEB_SEARCH_MODEL": os.getenv("WEB_SEARCH_MODEL", "gpt-3.5-turbo")
+            }
+        )
+        super().__init__(config)
+        
+        # 初始化 WebSearchExpert
+        try:
+            from rag_pipeline.tools.web_search_tool import WebSearchExpert
+            self.expert = WebSearchExpert(
+                api_key=config.environment_vars["OPENAI_API_KEY"],
+                api_base=config.environment_vars["OPENAI_API_BASE"],
+                model=config.environment_vars["WEB_SEARCH_MODEL"]
+            )
+            self._expert_initialized = False
+        except ImportError:
+            self.expert = None
+            logger.warning("WebSearchExpert 無法載入")
+    
+    async def initialize(self) -> bool:
+        """初始化 Web Search 服務"""
+        try:
+            if self.expert:
+                self._expert_initialized = await self.expert.initialize()
+                return self._expert_initialized
+            return False
+        except Exception as e:
+            logger.error(f"Web Search 服務初始化失敗: {e}")
+            return False
+    
+    async def search(self, query: str, max_results: int = 3, language: str = "zh-TW"):
+        """執行網路搜尋"""
+        if not self._expert_initialized or not self.expert:
+            raise RuntimeError("Web Search 服務未初始化")
+        
+        from rag_pipeline.tools.web_search_tool import SearchRequest
+        request = SearchRequest(
+            query=query,
+            max_results=max_results,
+            language=language
+        )
+        return await self.expert.search(request)
+    
+    async def health_check(self) -> ServiceHealth:
+        """執行健康檢查"""
+        try:
+            if not self.expert:
+                return ServiceHealth(
+                    service_name=self.config.name,
+                    status=ServiceStatus.ERROR,
+                    error_message="WebSearchExpert 未載入"
+                )
+            
+            health_info = await self.expert.health_check()
+            
+            if health_info["status"] == "healthy":
+                return ServiceHealth(
+                    service_name=self.config.name,
+                    status=ServiceStatus.HEALTHY,
+                    last_check=datetime.now(),
+                    details=health_info
+                )
+            else:
+                return ServiceHealth(
+                    service_name=self.config.name,
+                    status=ServiceStatus.UNHEALTHY,
+                    last_check=datetime.now(),
+                    error_message=health_info.get("error", "未知錯誤")
+                )
+                
+        except Exception as e:
+            return ServiceHealth(
+                service_name=self.config.name,
+                status=ServiceStatus.ERROR,
+                last_check=datetime.now(),
+                error_message=str(e)
+            )
+    
+    async def cleanup(self) -> bool:
+        """清理資源"""
+        try:
+            if self.expert:
+                return await self.expert.cleanup()
+            return True
+        except Exception as e:
+            logger.error(f"Web Search 服務清理失敗: {e}")
+            return False
+
+
 class ServiceManager:
     """服務管理器主類別"""
     
@@ -542,6 +644,7 @@ def get_service_manager() -> ServiceManager:
         _service_manager.register_service(TTSService())
         _service_manager.register_service(RAGPipelineService())
         _service_manager.register_service(MLPipelineService())
+        _service_manager.register_service(WebSearchService())
     
     return _service_manager
 

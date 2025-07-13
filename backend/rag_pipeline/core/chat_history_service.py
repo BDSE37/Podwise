@@ -26,7 +26,7 @@ class ChatHistoryService:
             mongo_uri: MongoDB 連接字串
             database_name: 資料庫名稱
         """
-        self.mongo_uri = mongo_uri or os.getenv("MONGO_URI", "mongodb://localhost:27017")
+        self.mongo_uri = mongo_uri or os.getenv("MONGODB_URI", "mongodb://localhost:27017")
         self.database_name = database_name
         self.client: Optional[MongoClient] = None
         self.db: Optional[Database] = None

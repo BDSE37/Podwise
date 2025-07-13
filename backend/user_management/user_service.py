@@ -50,7 +50,7 @@ class UserService:
                     # 獲取最大的用戶 ID
                     cursor.execute("SELECT MAX(user_id) FROM users")
                     result = cursor.fetchone()
-                    max_id = result[0] if result[0] else 0
+                    max_id = result[0] if result and result[0] else 0
                     
                     # 生成下一個用戶名稱
                     next_id = max_id + 1
@@ -62,7 +62,7 @@ class UserService:
             timestamp = int(datetime.now().timestamp())
             return f"Podwise{timestamp % 10000:04d}"
     
-    def create_user(self, username: str = None, email: str = None) -> Optional[Dict[str, Any]]:
+    def create_user(self, username: Optional[str] = None, email: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         建立新用戶
         
@@ -78,13 +78,16 @@ class UserService:
             if not username:
                 username = self._generate_podwise_username()
             
+            # 生成唯一的 user_identifier
+            user_identifier = f"user_{uuid.uuid4().hex[:8]}"
+            
             with self._get_connection() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                     cursor.execute("""
-                        INSERT INTO users (username, email, created_at, updated_at, is_active)
-                        VALUES (%s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, TRUE)
+                        INSERT INTO users (user_identifier, username, email, user_type, is_active, created_at, updated_at)
+                        VALUES (%s, %s, %s, 'registered', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING *
-                    """, (username, email))
+                    """, (user_identifier, username, email))
                     
                     user = cursor.fetchone()
                     conn.commit()
@@ -138,6 +141,30 @@ class UserService:
                     cursor.execute("""
                         SELECT * FROM users WHERE username = %s
                     """, (username,))
+                    
+                    user = cursor.fetchone()
+                    return dict(user) if user else None
+                    
+        except Exception as e:
+            logger.error(f"獲取用戶失敗: {e}")
+            return None
+    
+    def get_user_by_identifier(self, user_identifier: str) -> Optional[Dict[str, Any]]:
+        """
+        根據用戶識別碼獲取用戶資訊
+        
+        Args:
+            user_identifier: 用戶識別碼
+            
+        Returns:
+            用戶資訊字典或 None
+        """
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM users WHERE user_identifier = %s
+                    """, (user_identifier,))
                     
                     user = cursor.fetchone()
                     return dict(user) if user else None
@@ -243,26 +270,27 @@ class UserService:
             logger.error(f"獲取用戶列表失敗: {e}")
             return []
     
-    def record_activity(self, user_id: int, activity_type: str, activity_data: Dict[str, Any] = None):
+    def record_activity(self, user_id: int, activity_type: str, activity_data: Optional[Dict[str, Any]] = None):
         """
-        記錄用戶活動
+        記錄用戶活動，將 activity_data 寫入 metadata 欄位
         
         Args:
             user_id: 用戶 ID (整數)
             activity_type: 活動類型
             activity_data: 活動資料
         """
+        import json
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
-                        INSERT INTO user_feedback (user_id, feedback_type, feedback_content, created_at)
-                        VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
-                    """, (user_id, activity_type, str(activity_data or {})))
+                        INSERT INTO user_feedback (user_id, feedback_type, feedback_content, metadata, created_at)
+                        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
+                    """, (user_id, activity_type, str(activity_data or {}), json.dumps(activity_data or {})))
                     
                     conn.commit()
                     logger.info(f"活動記錄成功: {user_id} - {activity_type}")
-                    
+        
         except Exception as e:
             logger.error(f"記錄活動失敗: {e}")
     

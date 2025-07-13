@@ -64,6 +64,10 @@ class UserQueryRequest(BaseModel):
     user_id: str = Field(..., description="用戶 ID", min_length=1)
     query: str = Field(..., description="查詢內容", min_length=1)
     session_id: Optional[str] = Field(default=None, description="會話 ID")
+    enable_tts: bool = Field(default=True, description="是否啟用 TTS 語音回覆")
+    voice: str = Field(default="podrina", description="語音 ID")
+    speed: float = Field(default=1.0, description="語速倍數", ge=0.5, le=2.0)
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="額外元數據")
     
     @validator('user_id')
     def validate_user_id(cls, v: str) -> str:
@@ -91,6 +95,10 @@ class UserQueryResponse(BaseModel):
     reasoning: str
     processing_time: float
     timestamp: str
+    audio_data: Optional[str] = Field(default=None, description="TTS 音頻數據 (Base64)")
+    voice_used: Optional[str] = Field(default=None, description="使用的語音 ID")
+    speed_used: Optional[float] = Field(default=None, description="使用的語速")
+    tts_enabled: bool = Field(default=True, description="是否啟用了 TTS")
 
 
 # ==================== 用戶管理模型 ====================
@@ -193,6 +201,33 @@ class ContentProcessResponse(BaseModel):
     keywords: List[str] = Field(default_factory=list, description="關鍵詞")
     summary: str = Field(description="摘要")
     tags: List[str] = Field(default_factory=list, description="標籤")
+
+
+# ==================== TTS 模型 ====================
+
+class TTSRequest(BaseModel):
+    """TTS 語音合成請求模型"""
+    text: str = Field(..., description="要合成的文字", min_length=1, max_length=1000)
+    voice: str = Field(default="podrina", description="語音 ID")
+    speed: float = Field(default=1.0, description="語速倍數", ge=0.5, le=2.0)
+    
+    @validator('text')
+    def validate_text(cls, v: str) -> str:
+        """驗證文字內容"""
+        if not v.strip():
+            raise ValueError("文字內容不能為空")
+        return v.strip()
+
+
+class TTSResponse(BaseModel):
+    """TTS 語音合成回應模型"""
+    success: bool = Field(description="是否成功")
+    audio_data: Optional[str] = Field(default=None, description="音頻數據 (Base64)")
+    text: str = Field(description="原始文字")
+    voice: str = Field(description="使用的語音")
+    speed: float = Field(description="使用的語速")
+    processing_time: Optional[float] = Field(default=None, description="處理時間")
+    error_message: Optional[str] = Field(default=None, description="錯誤訊息")
 
 
 # ==================== 系統資訊模型 ====================

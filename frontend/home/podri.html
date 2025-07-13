@@ -35,27 +35,27 @@
                     <div class="voice-model-section">
                         <div class="section-title-row">
                             <div class="section-title">聲音模型</div>
-                            <!-- From Uiverse.io by JaydipPrajapati1910 -->
+                            <!-- TTS 開關 -->
                             <div class="toggle-button-cover">
                                 <div id="button-3" class="button r">
-                                    <input class="checkbox" type="checkbox">
+                                    <input class="checkbox" type="checkbox" id="tts-toggle" checked>
                                     <div class="knobs"></div>
                                     <div class="layer"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="voice-model-list">
-                            <div class="voice-model-card selected" data-model="Podrina">
+                            <div class="voice-model-card selected" data-model="podrina">
                                 <img src="images/podcasts_purple.png" class="voice-icon" alt="Podrina">
                                 <span class="voice-name">Podrina</span>
                                 <span class="voice-desc">（溫柔女聲）</span>
                             </div>
-                            <div class="voice-model-card" data-model="Podrisa">
+                            <div class="voice-model-card" data-model="podrisa">
                                 <img src="images/podcasts_pink.png" class="voice-icon" alt="Podrisa">
                                 <span class="voice-name">Podrisa</span>
                                 <span class="voice-desc">（活潑女聲）</span>
                             </div>
-                            <div class="voice-model-card" data-model="Podrino">
+                            <div class="voice-model-card" data-model="podrino">
                                 <img src="images/podcasts_golden.png" class="voice-icon" alt="Podrino">
                                 <span class="voice-name">Podrino</span>
                                 <span class="voice-desc">（穩重男聲）</span>
@@ -100,18 +100,12 @@
                                     style="width: 30px; height: 30px; cursor: pointer;">
                             </a>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="chat-messages">
                             <div class="d-flex flex-row justify-content-start mb-4">
                                 <img src="images/logo_black.png" class="rounded-circle" style="width: 55px; height: 100%;">
                                 <div class="p-3 ms-3" style="border-radius: 15px; background-color: #efeeef;">
                                     <p class="small mb-0">Hi 我是Podri<br>今天想聽什麼主題？</p>
                                 </div>
-                            </div>
-                            <div class="d-flex flex-row justify-content-end mb-4">
-                                <div class="p-3 me-3 border" style="border-radius: 15px; background-color: #fbfbfb;">
-                                    <p class="small mb-0">我想聽財經</p>
-                                </div>
-                                <img src="images/user.png" class="rounded-circle" style="width: 55px; height: 55px;">
                             </div>
                         </div>
                         <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
@@ -129,19 +123,20 @@
 
     <!-- action-wrap 彈窗 -->
     <div id="action-wrap" style="display: none;">
-        <div class="action">
+        <div class="action" id="stt-action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
             </svg>
         </div>
-        <div class="action">
+        <div class="action" id="send-action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
             </svg>
         </div>
-        <div class="action">
+        <div class="action" id="voice-action">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
             </svg>
         </div>
         <div class="backdrop"></div>
@@ -151,18 +146,64 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // 全域變數
+        let currentUserMessage = '';
+        let currentPodriResponse = '';
+        let isProcessing = false;
+        let currentAudio = null;
+        
+        // STT 相關變數
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+
         // 頁面載入時檢查 URL 參數並填入對話框
         window.addEventListener('DOMContentLoaded', function() {
-            // URL 參數填入對話框
+            // 檢查用戶認證 - 確保只有通過首頁認證的用戶才能訪問
             const urlParams = new URLSearchParams(window.location.search);
+            let userCode = urlParams.get('user_code');
+            
+            // 如果 URL 中沒有 user_code，嘗試從 localStorage 獲取
+            if (!userCode) {
+                userCode = localStorage.getItem('currentUserCode');
+            }
+            
+            if (!userCode) {
+                // 如果沒有 user_code，重定向回首頁
+                alert('請先從首頁登入 Podwise');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // 設置當前用戶代碼
+            window.currentUserId = userCode;
+            
+            // 確保 TTS 開關預設為開啟
+            const ttsToggle = document.getElementById('tts-toggle');
+            if (ttsToggle) {
+                ttsToggle.checked = true;
+                // 觸發 change 事件以更新視覺狀態
+                ttsToggle.dispatchEvent(new Event('change'));
+                // 強制更新 CSS 樣式
+                setTimeout(() => {
+                    ttsToggle.dispatchEvent(new Event('change'));
+                }, 100);
+            }
+            
+            // URL 參數填入對話框
             const searchText = urlParams.get('search');
             if (searchText) {
                 const chatInput = document.getElementById('exampleFormControlInput1');
                 if (chatInput) {
                     chatInput.value = decodeURIComponent(searchText);
                     chatInput.focus();
+                    // 自動發送查詢
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 500);
                 }
             }
+
             // sidebar 收起/展開功能
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
@@ -180,13 +221,17 @@
                     expandBtn.style.display = 'none';
                 };
             }
+
             // action-wrap 彈窗顯示/隱藏
-            document.getElementById('show-action-wrap').onclick = function() {
+            document.getElementById('show-action-wrap').onclick = function(e) {
+              e.preventDefault();
+              e.stopPropagation();
               document.getElementById('action-wrap').style.display = 'flex';
             };
             document.querySelector('#action-wrap .backdrop').onclick = function() {
               document.getElementById('action-wrap').style.display = 'none';
             };
+
             // 語音模型單選高亮
             document.querySelectorAll('.voice-model-card').forEach(function(card) {
                 card.onclick = function() {
@@ -194,7 +239,6 @@
                         c.classList.remove('selected');
                     });
                     this.classList.add('selected');
-                    // 這裡可加上你要的互動行為（如切換語音模型）
                 };
             });
 
@@ -204,7 +248,405 @@
                 let percent = Math.min(val, 1) * 100; // 超過100%時只顯示滿格
                 document.getElementById('html-bar').style.width = percent + '%';
             });
+
+            // 輸入框 Enter 鍵發送
+            document.getElementById('exampleFormControlInput1').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !isProcessing) {
+                    sendMessage();
+                }
+            });
+
+            // 發送按鈕點擊 - 移除重複的事件監聽器
+            // document.getElementById('show-action-wrap').addEventListener('click', function() {
+            //     if (!isProcessing) {
+            //         sendMessage();
+            //     }
+            // });
+
+            // action-wrap 按鈕事件
+            document.getElementById('stt-action').addEventListener('click', function() {
+                if (!isRecording) {
+                    startSTTRecording();
+                } else {
+                    stopSTTRecording();
+                }
+                document.getElementById('action-wrap').style.display = 'none';
+            });
+
+            document.getElementById('send-action').addEventListener('click', function() {
+                if (!isProcessing) {
+                    sendMessage();
+                }
+                document.getElementById('action-wrap').style.display = 'none';
+            });
+
+            document.getElementById('voice-action').addEventListener('click', function() {
+                // 語音設定功能（可以擴展）
+                alert('語音設定功能開發中...');
+                document.getElementById('action-wrap').style.display = 'none';
+            });
         });
+
+        // 發送訊息到 RAG Pipeline
+        async function sendMessage() {
+            const input = document.getElementById('exampleFormControlInput1');
+            const message = input.value.trim();
+            
+            if (!message || isProcessing) {
+                return;
+            }
+
+            isProcessing = true;
+            currentUserMessage = message;
+
+            // 添加用戶訊息到聊天界面
+            addUserMessage(message);
+            input.value = '';
+
+            // 顯示載入狀態
+            addLoadingMessage();
+
+            try {
+                // 獲取 TTS 設定
+                const ttsEnabled = document.getElementById('tts-toggle').checked;
+                const selectedVoiceCard = document.querySelector('.voice-model-card.selected');
+                const selectedVoice = selectedVoiceCard ? selectedVoiceCard.dataset.model : 'podrina';
+                const speed = document.getElementById('html-select').value;
+
+                // 發送到 RAG Pipeline
+                const response = await fetch('http://localhost:8005/api/v1/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: message,
+                        user_id: window.currentUserId || 'default_user',
+                        session_id: generateSessionId(),
+                        enable_tts: ttsEnabled, // 根據使用者設定啟用 TTS
+                        voice: selectedVoice,
+                        speed: parseFloat(speed),
+                        metadata: {
+                            source: 'podri_chat',
+                            timestamp: new Date().toISOString()
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // 移除載入訊息並添加 Podri 回覆
+                removeLoadingMessage();
+                
+                if (data.response) {
+                    currentPodriResponse = data.response;
+                    addPodriMessage(data.response);
+
+                    // 如果 TTS 開啟且有音頻數據，自動播放語音
+                    if (data.tts_enabled && data.audio_data) {
+                        playTTSAudio(data.audio_data);
+                    } else if (ttsEnabled && !data.audio_data) {
+                        // 如果 TTS 開啟但沒有音頻數據，單獨呼叫 TTS 服務
+                        await generateTTS(data.response, selectedVoice, speed);
+                    }
+                } else {
+                    throw new Error(data.error || '查詢失敗');
+                }
+
+            } catch (error) {
+                console.error('發送訊息失敗:', error);
+                removeLoadingMessage();
+                addPodriMessage('抱歉，我遇到了一些問題，請稍後再試。', true);
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        // 生成 TTS 語音
+        async function generateTTS(text, voice, speed) {
+            try {
+                // 計算語速調整
+                const rateAdjustment = calculateRateAdjustment(speed);
+                
+                const response = await fetch('http://localhost:8003/synthesize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        文字: text,
+                        語音: voice,
+                        語速: rateAdjustment,
+                        音量: "+0%",
+                        音調: "+0%"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`TTS HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.成功 && data.音訊檔案) {
+                    // 播放語音
+                    playTTSAudio(data.音訊檔案);
+                } else {
+                    console.warn('TTS 生成失敗:', data.錯誤訊息);
+                }
+
+            } catch (error) {
+                console.error('TTS 生成失敗:', error);
+            }
+        }
+
+        // 計算語速調整
+        function calculateRateAdjustment(speed) {
+            const speedValue = parseFloat(speed);
+            if (speedValue === 1) return "+0%";
+            if (speedValue < 1) {
+                const reduction = Math.round((1 - speedValue) * 100);
+                return `-${reduction}%`;
+            } else {
+                const increase = Math.round((speedValue - 1) * 100);
+                return `+${increase}%`;
+            }
+        }
+
+
+
+        // 播放 TTS 語音
+        function playTTSAudio(base64Audio) {
+            try {
+                // 停止當前播放的音頻
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+
+                // 創建新的音頻元素
+                currentAudio = new Audio();
+                currentAudio.src = `data:audio/wav;base64,${base64Audio}`;
+                
+                currentAudio.addEventListener('loadstart', () => {
+                    console.log('開始載入 TTS 音頻...');
+                });
+                
+                currentAudio.addEventListener('canplay', () => {
+                    console.log('TTS 音頻可以播放');
+                });
+                
+                currentAudio.addEventListener('play', () => {
+                    console.log('開始播放 TTS 音頻');
+                });
+                
+                currentAudio.addEventListener('ended', () => {
+                    console.log('TTS 音頻播放結束');
+                    currentAudio = null;
+                });
+                
+                currentAudio.addEventListener('error', (e) => {
+                    console.error('TTS 音頻播放錯誤:', e);
+                    currentAudio = null;
+                });
+
+                // 開始播放
+                currentAudio.play().catch(error => {
+                    console.error('TTS 音頻播放失敗:', error);
+                });
+
+            } catch (error) {
+                console.error('播放 TTS 音頻失敗:', error);
+            }
+        }
+
+        // 添加用戶訊息
+        function addUserMessage(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex flex-row justify-content-end mb-4';
+            messageDiv.innerHTML = `
+                <div class="p-3 me-3 border" style="border-radius: 15px; background-color: #fbfbfb;">
+                    <p class="small mb-0">${escapeHtml(message)}</p>
+                </div>
+                <img src="images/user.png" class="rounded-circle" style="width: 55px; height: 55px;">
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // 添加 Podri 訊息
+        function addPodriMessage(message, isError = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex flex-row justify-content-start mb-4';
+            
+            const bgColor = isError ? '#ffe6e6' : '#efeeef';
+            const textColor = isError ? '#d32f2f' : '#000';
+            
+            messageDiv.innerHTML = `
+                <img src="images/logo_black.png" class="rounded-circle" style="width: 55px; height: 100%;">
+                <div class="p-3 ms-3" style="border-radius: 15px; background-color: ${bgColor};">
+                    <p class="small mb-0" style="color: ${textColor};">${escapeHtml(message)}</p>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // 添加載入訊息
+        function addLoadingMessage() {
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading-message';
+            loadingDiv.className = 'd-flex flex-row justify-content-start mb-4';
+            loadingDiv.innerHTML = `
+                <img src="images/logo_black.png" class="rounded-circle" style="width: 55px; height: 100%;">
+                <div class="p-3 ms-3" style="border-radius: 15px; background-color: #efeeef;">
+                    <p class="small mb-0">
+                        <span class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </p>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            scrollToBottom();
+        }
+
+        // 移除載入訊息
+        function removeLoadingMessage() {
+            const loadingMessage = document.getElementById('loading-message');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+        }
+
+        // 滾動到底部
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 生成會話 ID
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // HTML 轉義
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== STT 語音識別功能 ====================
+
+        // 開始錄音
+        async function startSTTRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = function(event) {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = function() {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    processSTTAudio(audioBlob);
+                    
+                    // 停止麥克風
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // 更新 UI
+                document.getElementById('stt-action').classList.add('recording');
+                document.getElementById('stt-action').innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" fill="currentColor" style="color: white;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                
+                console.log('開始錄音...');
+                
+            } catch (error) {
+                console.error('無法啟動麥克風:', error);
+                alert('無法啟動麥克風，請檢查權限設定。');
+            }
+        }
+
+        // 停止錄音
+        function stopSTTRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                // 更新 UI
+                document.getElementById('stt-action').classList.remove('recording');
+                document.getElementById('stt-action').innerHTML = '<svg class="action-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+                
+                console.log('停止錄音...');
+            }
+        }
+
+        // 處理 STT 音頻
+        async function processSTTAudio(audioBlob) {
+            try {
+                // 顯示載入狀態
+                const input = document.getElementById('exampleFormControlInput1');
+                input.value = '正在識別語音...';
+                input.disabled = true;
+                
+                // 準備 FormData
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'audio.wav');
+                formData.append('language', 'zh');
+                
+                // 發送到 STT 服務
+                const response = await fetch('http://localhost:8001/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`STT 服務錯誤: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.text && result.text.trim()) {
+                    // 將識別結果填入輸入框
+                    input.value = result.text.trim();
+                    input.disabled = false;
+                    
+                    console.log('語音識別成功:', result.text);
+                    
+                    // 自動發送訊息
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 500);
+                    
+                } else {
+                    input.value = '';
+                    input.disabled = false;
+                    alert('無法識別語音內容，請重試。');
+                }
+                
+            } catch (error) {
+                console.error('STT 處理失敗:', error);
+                const input = document.getElementById('exampleFormControlInput1');
+                input.value = '';
+                input.disabled = false;
+                alert('語音識別失敗，請重試。');
+            }
+        }
     </script>
     <style>
         #sidebar {
@@ -261,7 +703,7 @@
                 margin-left: 0;
             }
         }
-        .action-wrap {
+        #action-wrap {
           position: fixed;
           top: 50%; left: 50%;
           transform: translate(-50%, -50%);
@@ -275,7 +717,7 @@
           gap: 1.5em;
           align-items: center;
         }
-        .action-wrap .action {
+        #action-wrap .action {
           background: #f6f6fa;
           border: none;
           border-radius: 50%;
@@ -287,17 +729,17 @@
           cursor: pointer;
           transition: background 0.2s;
         }
-        .action-wrap .action:hover {
+        #action-wrap .action:hover {
           background: #e0e0f7;
         }
-        .action-wrap .action-icon {
+        #action-wrap .action-icon {
           width: 32px; height: 32px;
           color: #7c4dff;
         }
-        .action-wrap .action-content {
+        #action-wrap .action-content {
           display: none;
         }
-        .action-wrap .backdrop {
+        #action-wrap .backdrop {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
           background: rgba(0,0,0,0.25);
@@ -495,6 +937,17 @@
         #button-3 .checkbox:checked ~ .layer {
             background-color: #fcebeb;
         }
+
+        /* 確保 TTS 開關預設為開啟狀態 */
+        #tts-toggle:not(:checked) + .knobs:before {
+            content: "YES";
+            left: 2px;
+            background-color: #03a9f4;
+        }
+
+        #tts-toggle:not(:checked) ~ .layer {
+            background-color: #ebf7fc;
+        }
         .skill-container {
             margin: 1.2rem 0 1.2rem 0;
         }
@@ -545,4 +998,82 @@
         .section-title-hot {
             margin-top: 2rem;
         }
+
+        /* 打字指示器樣式 */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #999;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 聊天區域滾動樣式 */
+        #chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* action-wrap 按鈕樣式 */
+        #stt-action.recording {
+            background-color: #dc3545 !important;
+            animation: pulse 1s infinite;
+        }
+
+        #stt-action.recording .action-icon {
+            color: white !important;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</body>
+</html>
     </style>

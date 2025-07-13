@@ -261,6 +261,9 @@ class BaseAgent(ABC):
             "last_used": None
         }
         
+        # 可用性狀態
+        self.is_available = True
+        
         logger.info(f"初始化代理人: {agent_name} ({role})")
     
     @abstractmethod

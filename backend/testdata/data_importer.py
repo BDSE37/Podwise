@@ -98,33 +98,36 @@ class DatabaseImporter:
             self.connection.rollback()
             logger.warning("🔄 交易已回滾")
     
-    def get_or_create_user(self, user_identifier: str) -> Optional[int]:
+    def get_or_create_user(self, user_code: str) -> Optional[int]:
         """
         取得或創建使用者
         
         Args:
-            user_identifier: 使用者識別碼
+            user_code: 使用者代碼
             
         Returns:
             Optional[int]: 使用者 ID
         """
+        # 標準化使用者代碼格式 (移除底線)
+        normalized_user_code = user_code.replace('_', '')
+        
         # 檢查使用者是否存在
-        query = "SELECT user_id FROM users WHERE user_identifier = %s"
-        if self.execute_query(query, (user_identifier,)):
+        query = "SELECT user_id FROM users WHERE user_code = %s"
+        if self.execute_query(query, (normalized_user_code,)):
             result = self.cursor.fetchone()
             if result:
                 return result['user_id']
         
         # 創建新使用者
         insert_query = """
-        INSERT INTO users (user_identifier, user_type, is_active, locale)
-        VALUES (%s, 'guest', true, 'zh-TW')
+        INSERT INTO users (email, username, given_name, family_name, is_active, locale)
+        VALUES (%s, %s, 'Guest', 'User', true, 'zh-TW')
         RETURNING user_id
         """
-        if self.execute_query(insert_query, (user_identifier,)):
+        if self.execute_query(insert_query, (f"{normalized_user_code}@podwise.test", normalized_user_code)):
             result = self.cursor.fetchone()
             if result:
-                logger.info(f"👤 創建新使用者: {user_identifier} (ID: {result['user_id']})")
+                logger.info(f"👤 創建新使用者: {normalized_user_code} (ID: {result['user_id']})")
                 return result['user_id']
         
         return None
@@ -139,9 +142,12 @@ class DatabaseImporter:
         Returns:
             Optional[int]: 節目集數 ID
         """
+        # 處理股癌節目的格式轉換
+        normalized_title = self._normalize_episode_title(episode_title)
+        
         # 檢查節目集數是否存在
         query = "SELECT episode_id FROM episodes WHERE episode_title = %s"
-        if self.execute_query(query, (episode_title,)):
+        if self.execute_query(query, (normalized_title,)):
             result = self.cursor.fetchone()
             if result:
                 return result['episode_id']
@@ -153,13 +159,49 @@ class DatabaseImporter:
         VALUES (1, %s, CURRENT_DATE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING episode_id
         """
-        if self.execute_query(insert_query, (episode_title,)):
+        if self.execute_query(insert_query, (normalized_title,)):
             result = self.cursor.fetchone()
             if result:
-                logger.info(f"📺 創建新節目集數: {episode_title[:50]}... (ID: {result['episode_id']})")
+                logger.info(f"📺 創建新節目集數: {normalized_title[:50]}... (ID: {result['episode_id']})")
                 return result['episode_id']
         
         return None
+    
+    def _normalize_episode_title(self, episode_title: str) -> str:
+        """
+        標準化節目集數標題格式
+        
+        Args:
+            episode_title: 原始節目集數標題
+            
+        Returns:
+            str: 標準化後的標題
+        """
+        # 處理股癌節目的格式轉換
+        if episode_title.startswith('Spotify_RSS_1500839292_EP') and episode_title.endswith('_股癌.mp3'):
+            # 從 Spotify_RSS_1500839292_EP569_股癌.mp3 轉換為 EP569_股癌
+            episode_number = episode_title.replace('Spotify_RSS_1500839292_EP', '').replace('_股癌.mp3', '')
+            return f'EP{episode_number}_股癌'
+        
+        # 處理其他可能的格式轉換
+        if episode_title.startswith('RSS_1500839292_EP') and episode_title.endswith('_股癌.mp3'):
+            # 從 RSS_1500839292_EP5702_股癌.mp3 轉換為 EP5702_股癌
+            episode_number = episode_title.replace('RSS_1500839292_EP', '').replace('_股癌.mp3', '')
+            return f'EP{episode_number}_股癌'
+        
+        # 處理其他節目的格式轉換
+        if episode_title.startswith('Spotify_RSS_'):
+            # 移除 Spotify_RSS_ 前綴和 .mp3 後綴
+            normalized = episode_title.replace('Spotify_RSS_', '')
+            if normalized.endswith('.mp3'):
+                normalized = normalized[:-4]
+            return normalized
+        
+        # 移除 .mp3 副檔名
+        if episode_title.endswith('.mp3'):
+            episode_title = episode_title[:-4]
+        
+        return episode_title
     
     def import_user_feedback(self, csv_path: str) -> bool:
         """

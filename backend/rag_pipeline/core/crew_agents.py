@@ -81,7 +81,7 @@ class WebSearchAgent(BaseAgent):
         self.role_config = get_agent_roles_manager().get_role("web_search_expert")
         
         # 初始化 Web Search 工具
-        from tools.web_search_tool import WebSearchTool
+        from core.web_search_tool import WebSearchTool
         self.web_search_tool = WebSearchTool()
         
         # 設定信心度閾值（使用配置系統）
@@ -211,7 +211,7 @@ class RAGExpertAgent(BaseAgent):
     RAG 檢索專家代理人
     
     此代理人負責語意檢索和向量搜尋，提供最相關的
-    內容檢索功能。
+    內容檢索功能。使用 intelligent_retrieval_expert 實作。
     """
     
     def __init__(self, config: Dict[str, Any]) -> None:
@@ -221,6 +221,10 @@ class RAGExpertAgent(BaseAgent):
         # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager
         self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
+        
+        # 初始化智能檢索專家
+        from core.intelligent_retrieval_expert import get_intelligent_retrieval_expert
+        self.intelligent_retrieval = get_intelligent_retrieval_expert()
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -243,91 +247,63 @@ class RAGExpertAgent(BaseAgent):
             )
         
         try:
-            # 導入 Podcast 格式化工具
-            from tools.podcast_formatter import PodcastFormatter
-            formatter = PodcastFormatter()
+            # 使用智能檢索專家處理查詢
+            retrieval_response = await self.intelligent_retrieval.process_query(input_data.query)
             
-            # 執行語意檢索
-            search_results = await self._semantic_search(input_data.query)
+            # 格式化回應
+            if retrieval_response.status == "SUCCESS":
+                formatted_response = self.intelligent_retrieval.format_response(retrieval_response)
+                
+                return AgentResponse(
+                    content=formatted_response,
+                    confidence=retrieval_response.avg_confidence,
+                    reasoning=f"使用智能檢索專家，找到 {retrieval_response.total_matches} 個相關結果",
+                    processing_time=retrieval_response.processing_time,
+                    metadata={
+                        "status": "SUCCESS",
+                        "total_matches": retrieval_response.total_matches,
+                        "avg_confidence": retrieval_response.avg_confidence,
+                        "results": [
+                            {
+                                "content": result.content,
+                                "confidence": result.confidence,
+                                "matched_tags": result.matched_tags
+                            }
+                            for result in retrieval_response.results
+                        ]
+                    }
+                )
             
-            # 執行向量搜尋
-            vector_results = await self._vector_search(input_data.query)
+            elif retrieval_response.status == "NO_MATCH":
+                return AgentResponse(
+                    content="NO_MATCH",
+                    confidence=0.0,
+                    reasoning="信心分數低於閾值，未找到相關結果",
+                    processing_time=retrieval_response.processing_time,
+                    metadata={
+                        "status": "NO_MATCH",
+                        "avg_confidence": retrieval_response.avg_confidence
+                    }
+                )
             
-            # 合併結果
-            combined_results = self._merge_results(search_results, vector_results)
-            
-            # 格式化 Podcast 推薦結果
-            formatted_result = formatter.format_podcast_recommendations(
-                combined_results, 
-                input_data.query, 
-                max_recommendations=3
-            )
-            
-            # 檢查是否需要 Web 搜尋
-            web_search_used = False
-            final_response = formatter.generate_recommendation_text(formatted_result)
-            
-            # 如果信心度不足且沒有足夠結果，嘗試 Web 搜尋
-            if formatter.should_use_web_search(formatted_result.confidence, len(formatted_result.recommendations)):
-                try:
-                    # 導入 Web Search 工具
-                    from tools.web_search_tool import WebSearchTool
-                    web_search = WebSearchTool()
-                    
-                    if web_search.is_configured():
-                        logger.info(f"信心度不足 ({formatted_result.confidence:.2f})，執行 Web 搜尋")
-                        
-                        # 根據類別選擇搜尋方法
-                        if input_data.category == "商業":
-                            web_result = await web_search.search_business_topic(input_data.query)
-                        elif input_data.category == "教育":
-                            web_result = await web_search.search_education_topic(input_data.query)
-                        else:
-                            web_result = await web_search.search_with_openai(input_data.query)
-                        
-                        if web_result["success"]:
-                            # 將 Web 搜尋結果轉換為 Podcast 格式
-                            web_podcasts = self._convert_web_result_to_podcasts(web_result["response"])
-                            web_formatted_result = formatter.format_podcast_recommendations(
-                                web_podcasts, 
-                                input_data.query, 
-                                max_recommendations=3
-                            )
-                            
-                            final_response = formatter.generate_recommendation_text(web_formatted_result)
-                            formatted_result = web_formatted_result
-                            web_search_used = True
-                            logger.info("Web 搜尋成功，使用 OpenAI 回應")
-                        else:
-                            logger.warning(f"Web 搜尋失敗: {web_result.get('error', 'Unknown error')}")
-                    else:
-                        logger.warning("Web Search 工具未配置，無法執行備援搜尋")
-                        
-                except Exception as e:
-                    logger.error(f"Web 搜尋執行失敗: {str(e)}")
-            
-            processing_time = time.time() - start_time
-            
-            return AgentResponse(
-                content=final_response,
-                confidence=formatted_result.confidence,
-                reasoning=formatted_result.reasoning,
-                metadata={
-                    "formatted_result": formatted_result,
-                    "search_method": "hybrid_with_web" if web_search_used else "hybrid",
-                    "web_search_used": web_search_used,
-                    "tags_used": formatted_result.tags_used,
-                    "total_found": formatted_result.total_found
-                },
-                processing_time=processing_time
-            )
+            else:  # ERROR
+                return AgentResponse(
+                    content="檢索過程中發生錯誤",
+                    confidence=0.0,
+                    reasoning="智能檢索專家處理失敗",
+                    processing_time=retrieval_response.processing_time,
+                    metadata={
+                        "status": "ERROR",
+                        "avg_confidence": retrieval_response.avg_confidence
+                    }
+                )
                 
         except Exception as e:
-            logger.error(f"RAG 專家處理失敗: {str(e)}")
+            logger.error(f"RAG 專家處理失敗: {e}")
             return AgentResponse(
-                content="檢索過程中發生錯誤",
-                confidence=0.3,
-                reasoning=f"處理失敗: {str(e)}",
+                content="處理過程中發生異常",
+                confidence=0.0,
+                reasoning=f"異常：{str(e)}",
                 processing_time=time.time() - start_time
             )
     
@@ -750,7 +726,7 @@ class UserManagerAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化用戶管理專家代理人"""
-        super().__init__("User Manager", "用戶 ID 管理和記錄追蹤專家", config)
+        super().__init__("User Manager", "用戶管理專家", config)
         
         # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager
@@ -823,7 +799,7 @@ class BusinessExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化商業專家代理人"""
-        super().__init__("Business Expert", "商業類別專家", config)
+        super().__init__("Business Expert", "商業專家", config)
         
         # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager
@@ -926,7 +902,7 @@ class EducationExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化教育專家代理人"""
-        super().__init__("Education Expert", "教育類別專家", config)
+        super().__init__("Education Expert", "教育專家", config)
         
         # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager
@@ -1031,7 +1007,7 @@ class LeaderAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化領導者代理人"""
-        super().__init__("Leader", "三層架構協調者", config)
+        super().__init__("Leader", "領導者", config)
         
         # 載入角色配置
         from config.agent_roles_config import get_agent_roles_manager

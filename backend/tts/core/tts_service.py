@@ -23,8 +23,10 @@ import wave
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from ..providers.edge_tts_provider import EdgeTTSManager
-from ..config.voice_config import VoiceConfig
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from providers.edge_tts_provider import EdgeTTSManager
+from tts.config.voice_config import VoiceConfig
 
 # 使用相對路徑引用共用工具
 import sys

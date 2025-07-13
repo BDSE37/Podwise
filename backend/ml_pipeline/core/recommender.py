@@ -73,23 +73,31 @@ class RecommenderEngine:
     def _prepare_data(self):
         """準備和預處理資料"""
         try:
+            # 檢查資料是否為空
+            if self.user_history.empty or self.podcast_data.empty:
+                logger.warning("資料為空，跳過預處理")
+                return
+            
             # 編碼使用者 ID
             unique_users = self.user_history['user_id'].unique()
             self.user_encoder.fit(unique_users)
             
-            # 編碼 Podcast ID
-            unique_podcasts = self.podcast_data['id'].unique()
-            self.podcast_encoder.fit(unique_podcasts)
+            # 編碼 Episode ID（而不是 podcast_id）
+            unique_episodes = self.podcast_data['episode_id'].unique()
+            self.podcast_encoder.fit(unique_episodes)
             
-            # 編碼類別
-            unique_categories = self.podcast_data['category'].unique()
-            self.category_encoder.fit(unique_categories)
+            # 編碼類別（如果存在）
+            if 'category' in self.podcast_data.columns:
+                unique_categories = self.podcast_data['category'].unique()
+                self.category_encoder.fit(unique_categories)
             
             # 轉換編碼
             self.user_history['user_idx'] = self.user_encoder.transform(self.user_history['user_id'])
-            self.user_history['podcast_idx'] = self.podcast_encoder.transform(self.user_history['podcast_id'])
-            self.podcast_data['podcast_idx'] = self.podcast_encoder.transform(self.podcast_data['id'])
-            self.podcast_data['category_idx'] = self.category_encoder.transform(self.podcast_data['category'])
+            self.user_history['episode_idx'] = self.podcast_encoder.transform(self.user_history['episode_id'])
+            self.podcast_data['episode_idx'] = self.podcast_encoder.transform(self.podcast_data['episode_id'])
+            
+            if 'category' in self.podcast_data.columns:
+                self.podcast_data['category_idx'] = self.category_encoder.transform(self.podcast_data['category'])
             
             logger.info("資料預處理完成")
             
@@ -120,10 +128,10 @@ class RecommenderEngine:
     def _init_knn_model(self):
         """初始化 KNN 模型"""
         try:
-            # 建立使用者-Podcast 評分矩陣
+            # 建立使用者-Episode 評分矩陣
             self.user_podcast_matrix = self.user_history.pivot_table(
                 index='user_id',
-                columns='podcast_id',
+                columns='episode_id',
                 values='rating',
                 fill_value=0
             )
@@ -167,13 +175,13 @@ class RecommenderEngine:
             for user_idx, user_id in enumerate(self.user_podcast_matrix.index):
                 user_ratings = self.user_podcast_matrix.iloc[user_idx]
                 
-                for podcast_id in self.user_podcast_matrix.columns:
-                    rating = user_ratings[podcast_id]
+                for episode_id in self.user_podcast_matrix.columns:
+                    rating = user_ratings[episode_id]
                     if rating > 0:  # 只使用有評分的數據
-                        # 使用者特徵（排除當前 podcast 的評分）
+                        # 使用者特徵（排除當前 episode 的評分）
                         user_feature = self.user_features[user_idx].copy()
-                        podcast_idx = list(self.user_podcast_matrix.columns).index(podcast_id)
-                        user_feature[podcast_idx] = 0  # 排除當前 podcast
+                        episode_idx = list(self.user_podcast_matrix.columns).index(episode_id)
+                        user_feature[episode_idx] = 0  # 排除當前 episode
                         
                         X.append(user_feature)
                         y.append(rating)
@@ -209,15 +217,14 @@ class RecommenderEngine:
     def _extract_content_features(self) -> np.ndarray:
         """提取內容特徵"""
         try:
-            # 合併標題、描述和標籤
+            # 合併標題和描述（使用實際資料庫欄位）
             content_text = (
-                self.podcast_data['title'].fillna('') + ' ' +
-                self.podcast_data['description'].fillna('') + ' ' +
-                self.podcast_data['tags'].fillna('')
+                self.podcast_data['episode_title'].fillna('') + ' ' +
+                self.podcast_data['description'].fillna('')
             )
             
             # TF-IDF 向量化
-            if self.tfidf_vectorizer is not None:
+            if self.tfidf_vectorizer is not None and len(content_text) > 0:
                 tfidf_matrix = self.tfidf_vectorizer.fit_transform(content_text)
                 return tfidf_matrix.toarray()
             else:
@@ -230,19 +237,15 @@ class RecommenderEngine:
     def _extract_user_features(self) -> np.ndarray:
         """提取使用者特徵"""
         try:
-            # 建立使用者-Podcast 評分矩陣
-            user_podcast_matrix = self.user_history.pivot_table(
+            # 建立使用者-Episode 評分矩陣
+            user_episode_matrix = self.user_history.pivot_table(
                 index='user_id',
-                columns='podcast_id',
+                columns='episode_id',
                 values='rating',
                 fill_value=0
             )
             
-            # 標準化
-            scaler = StandardScaler()
-            user_features = scaler.fit_transform(user_podcast_matrix)
-            
-            return user_features
+            return user_episode_matrix.values
             
         except Exception as e:
             logger.error(f"使用者特徵提取失敗: {str(e)}")
@@ -325,33 +328,33 @@ class RecommenderEngine:
             # 預測所有 Podcast 的評分
             predicted_ratings = {}
             
-            for podcast_id in self.user_podcast_matrix.columns:
+            for episode_id in self.user_podcast_matrix.columns:
                 # 檢查類別篩選
                 if category_filter:
-                    podcast_matches = self.podcast_data[self.podcast_data['id'] == podcast_id]
-                    if len(podcast_matches) > 0:
-                        podcast_category = podcast_matches.iloc[0]['category']
-                        if podcast_category != category_filter:
+                    episode_matches = self.podcast_data[self.podcast_data['episode_id'] == episode_id]
+                    if len(episode_matches) > 0:
+                        episode_category = episode_matches.iloc[0]['category']
+                        if episode_category != category_filter:
                             continue
                 
                 # 檢查使用者是否已經評分過
-                current_rating = self.user_podcast_matrix.loc[user_id, podcast_id]
+                current_rating = self.user_podcast_matrix.loc[user_id, episode_id]
                 if current_rating > 0:
                     continue  # 跳過已評分的 Podcast
                 
                 # 使用 KNN 預測評分
                 try:
-                    # 創建預測特徵（將當前 podcast 的評分設為 0）
+                    # 創建預測特徵（將當前 episode 的評分設為 0）
                     predict_feature = user_feature.copy()
-                    podcast_idx = list(self.user_podcast_matrix.columns).index(podcast_id)
-                    predict_feature[podcast_idx] = 0
+                    episode_idx = list(self.user_podcast_matrix.columns).index(episode_id)
+                    predict_feature[episode_idx] = 0
                     
                     # 預測評分
                     predicted_rating = self.knn_model.predict([predict_feature])[0]
-                    predicted_ratings[podcast_id] = max(0, predicted_rating)  # 確保評分非負
+                    predicted_ratings[episode_id] = max(0, predicted_rating)  # 確保評分非負
                     
                 except Exception as e:
-                    logger.warning(f"預測 {podcast_id} 評分失敗: {str(e)}")
+                    logger.warning(f"預測 {episode_id} 評分失敗: {str(e)}")
                     continue
             
             # 排序並返回前 top_k 個
@@ -360,9 +363,9 @@ class RecommenderEngine:
             
             # 轉換為標準格式
             recommendations = []
-            for podcast_id, score in sorted_predictions[:top_k]:
+            for episode_id, score in sorted_predictions[:top_k]:
                 recommendations.append({
-                    'podcast_id': podcast_id,
+                    'podcast_id': episode_id, # KNN 推薦的是 episode_id
                     'score': score,
                     'model_type': 'KNN_Collaborative'
                 })
@@ -407,27 +410,27 @@ class RecommenderEngine:
                 ]
                 
                 for _, row in similar_user_podcasts.iterrows():
-                    podcast_id = row['podcast_id']
+                    episode_id = row['episode_id'] # 使用 episode_id
                     
                     # 檢查類別篩選
                     if category_filter:
-                        podcast_matches = self.podcast_data[self.podcast_data['id'] == podcast_id]
-                        if len(podcast_matches) > 0:
-                            podcast_category = podcast_matches['category'].iloc[0]
-                            if podcast_category != category_filter:
+                        episode_matches = self.podcast_data[self.podcast_data['episode_id'] == episode_id]
+                        if len(episode_matches) > 0:
+                            episode_category = episode_matches['category'].iloc[0]
+                            if episode_category != category_filter:
                                 continue
                     
                     # 計算推薦分數
                     score = similarity * row['rating']
-                    candidate_scores[podcast_id] = candidate_scores.get(podcast_id, 0) + score
+                    candidate_scores[episode_id] = candidate_scores.get(episode_id, 0) + score
             
             # 排序並返回
             sorted_candidates = sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True)
             
             recommendations = []
-            for podcast_id, score in sorted_candidates[:top_k]:
+            for episode_id, score in sorted_candidates[:top_k]:
                 recommendations.append({
-                    'podcast_id': podcast_id,
+                    'podcast_id': episode_id, # 使用 episode_id
                     'score': score,
                     'model_type': 'Traditional_Collaborative'
                 })
@@ -451,7 +454,7 @@ class RecommenderEngine:
             if len(user_liked_podcasts_df) == 0:
                 return []
                 
-            user_liked_podcasts = user_liked_podcasts_df['podcast_id'].tolist()
+            user_liked_podcasts = user_liked_podcasts_df['episode_id'].tolist() # 使用 episode_id
             
             # 計算使用者偏好向量
             if self.content_similarity is None:
@@ -459,39 +462,39 @@ class RecommenderEngine:
                 
             user_preference = np.zeros(len(self.podcast_data))
             
-            for podcast_id in user_liked_podcasts:
-                podcast_matches = self.podcast_data[self.podcast_data['id'] == podcast_id]
-                if len(podcast_matches) > 0:
-                    podcast_idx = podcast_matches.index[0]
-                    user_preference += self.content_similarity[podcast_idx]
+            for episode_id in user_liked_podcasts:
+                episode_matches = self.podcast_data[self.podcast_data['episode_id'] == episode_id]
+                if len(episode_matches) > 0:
+                    episode_idx = episode_matches.index[0]
+                    user_preference += self.content_similarity[episode_idx]
             
             user_preference /= len(user_liked_podcasts)
             
             # 找出最相似的 Podcast
             candidate_scores = []
             
-            for idx, podcast in self.podcast_data.iterrows():
-                podcast_id = podcast['id']
+            for idx, episode in self.podcast_data.iterrows():
+                episode_id = episode['episode_id'] # 使用 episode_id
                 
                 # 跳過已聽過的 Podcast
-                if podcast_id in user_liked_podcasts:
+                if episode_id in user_liked_podcasts:
                     continue
                 
                 # 檢查類別篩選
-                if category_filter and podcast['category'] != category_filter:
+                if category_filter and episode['category'] != category_filter:
                     continue
                 
                 # 計算相似度分數
                 similarity_score = user_preference[idx]
-                candidate_scores.append((podcast_id, similarity_score))
+                candidate_scores.append((episode_id, similarity_score))
             
             # 排序並返回
             candidate_scores.sort(key=lambda x: x[1], reverse=True)
             
             recommendations = []
-            for podcast_id, score in candidate_scores[:top_k]:
+            for episode_id, score in candidate_scores[:top_k]:
                 recommendations.append({
-                    'podcast_id': podcast_id,
+                    'podcast_id': episode_id, # 使用 episode_id
                     'score': score,
                     'model_type': 'Content_Based'
                 })
@@ -515,23 +518,23 @@ class RecommenderEngine:
             
             # 協同過濾推薦評分
             for i, rec in enumerate(cf_recs):
-                podcast_id = rec['podcast_id']
+                episode_id = rec['podcast_id'] # 使用 episode_id
                 score = 0.6 * (1.0 - i / max(len(cf_recs), 1))  # 協同過濾權重較高
-                scores[podcast_id] = scores.get(podcast_id, 0) + score
+                scores[episode_id] = scores.get(episode_id, 0) + score
             
             # 內容式推薦評分
             for i, rec in enumerate(cb_recs):
-                podcast_id = rec['podcast_id']
+                episode_id = rec['podcast_id'] # 使用 episode_id
                 score = 0.4 * (1.0 - i / max(len(cb_recs), 1))  # 內容式權重較低
-                scores[podcast_id] = scores.get(podcast_id, 0) + score
+                scores[episode_id] = scores.get(episode_id, 0) + score
             
             # 排序並取前 top_k 個
             sorted_podcasts = sorted(scores.items(), key=lambda x: x[1], reverse=True)
             
             recommendations = []
-            for podcast_id, score in sorted_podcasts[:top_k]:
+            for episode_id, score in sorted_podcasts[:top_k]:
                 recommendations.append({
-                    'podcast_id': podcast_id,
+                    'podcast_id': episode_id, # 使用 episode_id
                     'score': score,
                     'model_type': 'Hybrid'
                 })
@@ -547,7 +550,7 @@ class RecommenderEngine:
         """取得熱門推薦"""
         try:
             # 計算 Podcast 受歡迎程度
-            popularity = self.user_history.groupby('podcast_id').agg({
+            popularity = self.user_history.groupby('episode_id').agg({
                 'rating': 'mean',
                 'listen_time': 'sum',
                 'user_id': 'count'
@@ -564,8 +567,8 @@ class RecommenderEngine:
                 category_podcasts_df = self.podcast_data[
                     self.podcast_data['category'] == category_filter
                 ]
-                category_podcasts = category_podcasts_df['id'].tolist()
-                popularity = popularity[popularity['podcast_id'].isin(category_podcasts)]
+                category_podcasts = category_podcasts_df['episode_id'].tolist() # 使用 episode_id
+                popularity = popularity[popularity['episode_id'].isin(category_podcasts)]
             
             # 排序並取前 top_k 個
             top_popular = popularity.nlargest(top_k, 'popularity_score')
@@ -573,7 +576,7 @@ class RecommenderEngine:
             recommendations = []
             for _, row in top_popular.iterrows():
                 recommendations.append({
-                    'podcast_id': row['podcast_id'],
+                    'podcast_id': row['episode_id'], # 使用 episode_id
                     'score': row['popularity_score'],
                     'model_type': 'Popularity'
                 })
@@ -589,30 +592,30 @@ class RecommenderEngine:
         try:
             recommendations = []
             
-            for podcast_id in podcast_ids:
-                podcast_matches = self.podcast_data[self.podcast_data['id'] == podcast_id]
-                if len(podcast_matches) == 0:
+            for episode_id in podcast_ids:
+                episode_matches = self.podcast_data[self.podcast_data['episode_id'] == episode_id]
+                if len(episode_matches) == 0:
                     continue
                     
-                podcast_info = podcast_matches.iloc[0]
+                episode_info = episode_matches.iloc[0]
                 
                 # 計算統計資訊
-                podcast_history = self.user_history[
-                    self.user_history['podcast_id'] == podcast_id
+                episode_history = self.user_history[
+                    self.user_history['episode_id'] == episode_id
                 ]
                 
-                average_rating = podcast_history['rating'].mean() if len(podcast_history) > 0 else 0
-                listen_count = len(podcast_history)
+                average_rating = episode_history['rating'].mean() if len(episode_history) > 0 else 0
+                listen_count = len(episode_history)
                 
                 # 計算推薦理由
-                reason = self._get_recommendation_reason(podcast_info['category'], strategy)
+                reason = self._get_recommendation_reason(episode_info['category'], strategy)
                 
                 recommendation = {
-                    'podcast_id': podcast_id,
-                    'title': podcast_info['title'],
-                    'category': podcast_info['category'],
-                    'description': podcast_info['description'],
-                    'tags': podcast_info['tags'],
+                    'podcast_id': episode_id, # 使用 episode_id
+                    'title': episode_info['episode_title'],
+                    'category': episode_info['category'],
+                    'description': episode_info['description'],
+                    'tags': episode_info['tags'],
                     'average_rating': round(average_rating, 2),
                     'listen_count': listen_count,
                     'recommendation_reason': reason,
