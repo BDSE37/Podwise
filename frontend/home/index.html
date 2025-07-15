@@ -652,11 +652,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			<div class="popup-step" id="popup-step-1">
 				<h2>Taste of PodWise !</h2>
 				<div class="quiz-option-container">
-					<div class="quiz-option" onclick="selectMainCategory('business')">
+					<div class="quiz-option" data-category="business" onclick="selectMainCategory('business')">
 						<img src="images/financial-profit_golden.png" alt="商業">
 						<div>商業</div>
 					</div>
-					<div class="quiz-option" onclick="selectMainCategory('education')">
+					<div class="quiz-option" data-category="education" onclick="selectMainCategory('education')">
 						<img src="images/school_golden.png" alt="教育">
 						<div>教育</div>
 					</div>
@@ -725,8 +725,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		  const apiTag = window.selectedTag || '';
 		  console.log('Step3 載入推薦，類別:', apiCategory, 'tag:', apiTag);
 
-		  // 呼叫後端API取得三個節目
-		  const response = await fetch(`http://localhost:8007/api/one-minutes-episodes?category=${encodeURIComponent(apiCategory)}&tag=${encodeURIComponent(apiTag)}`, {
+		  // 呼叫後端API取得推薦節目
+		  const response = await fetch(`http://localhost:8008/api/one-minutes-episodes?category=${encodeURIComponent(apiCategory)}&tag=${encodeURIComponent(apiTag)}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		  });
@@ -747,38 +747,76 @@ document.addEventListener('DOMContentLoaded', function() {
 	  
 	  // 載入預設推薦（當 API 不可用時）
 	  window.loadDefaultRecommendations = function() {
-		const defaultRecommendations = [
-		  {
-			podcast_name: '股癌 Gooaye',
-			episode_title: '投資理財精選',
-			episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
-			podcast_image: 'images/股癌.png',
-			audio_url: 'audio/sample1.mp3',
-			episode_id: 1,
-			rss_id: '123',
-			tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
-		  },
-		  {
-			podcast_name: '矽谷輕鬆談',
-			episode_title: 'AI 技術趨勢',
-			episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
-			podcast_image: 'images/矽谷輕鬆談.png',
-			audio_url: 'audio/sample2.mp3',
-			episode_id: 2,
-			rss_id: '456',
-			tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
-		  },
-		  {
-			podcast_name: '天下學習',
-			episode_title: '管理思維分享',
-			episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
-			podcast_image: 'images/天下學習.png',
-			audio_url: 'audio/sample3.mp3',
-			episode_id: 3,
-			rss_id: '789',
-			tags: ['企業管理', '領導力', '學習方法', '個人成長']
-		  }
-		];
+		const category = window.mainCategory || 'business';
+		let defaultRecommendations = [];
+		
+		if (category === 'business') {
+		  defaultRecommendations = [
+			{
+			  podcast_name: '股癌 Gooaye',
+			  episode_title: '投資理財精選',
+			  episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
+			  podcast_image: 'images/股癌.png',
+			  audio_url: 'audio/sample1.mp3',
+			  episode_id: 1,
+			  rss_id: '123',
+			  tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
+			},
+			{
+			  podcast_name: '矽谷輕鬆談',
+			  episode_title: 'AI 技術趨勢',
+			  episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
+			  podcast_image: 'images/矽谷輕鬆談.png',
+			  audio_url: 'audio/sample2.mp3',
+			  episode_id: 2,
+			  rss_id: '456',
+			  tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
+			},
+			{
+			  podcast_name: '天下學習',
+			  episode_title: '管理思維分享',
+			  episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
+			  podcast_image: 'images/天下學習.png',
+			  audio_url: 'audio/sample3.mp3',
+			  episode_id: 3,
+			  rss_id: '789',
+			  tags: ['企業管理', '領導力', '學習方法', '個人成長']
+			}
+		  ];
+		} else if (category === 'education') {
+		  defaultRecommendations = [
+			{
+			  podcast_name: '知識就是力量',
+			  episode_title: '學習方法論',
+			  episode_description: '探討有效的學習方法和知識獲取技巧。',
+			  podcast_image: 'images/知識就是力量.png',
+			  audio_url: 'audio/sample4.mp3',
+			  episode_id: 4,
+			  rss_id: '101',
+			  tags: ['學習方法', '教育理念', '知識分享', '個人成長']
+			},
+			{
+			  podcast_name: '科技新知',
+			  episode_title: '未來教育趨勢',
+			  episode_description: '探討科技如何改變教育方式和學習體驗。',
+			  podcast_image: 'images/科技新知.png',
+			  audio_url: 'audio/sample5.mp3',
+			  episode_id: 5,
+			  rss_id: '102',
+			  tags: ['教育科技', '未來趨勢', '創新教育', '數位學習']
+			},
+			{
+			  podcast_name: '心靈成長',
+			  episode_title: '自我提升指南',
+			  episode_description: '幫助你建立積極心態，實現個人成長目標。',
+			  podcast_image: 'images/心靈成長.png',
+			  audio_url: 'audio/sample6.mp3',
+			  episode_id: 6,
+			  rss_id: '103',
+			  tags: ['個人成長', '心理學', '自我提升', '心靈成長']
+			}
+		  ];
+		}
   
 		currentRecommendations = defaultRecommendations;
 		renderRecommendations();
@@ -795,8 +833,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const usedPodcastNames = new Set();
 		
 		for (const rec of currentRecommendations) {
-			const episodeId = rec.episode_id;
-			const podcastName = rec.podcast_name;
+			const episodeId = rec.episode_id || rec.rss_id + '_' + rec.episode_title;
+			const podcastName = rec.podcast_name || rec.rss_id;
 			
 			if (episodeId && !usedEpisodeIds.has(episodeId) && 
 				podcastName && !usedPodcastNames.has(podcastName)) {
@@ -807,30 +845,36 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
   
 		uniqueRecommendations.forEach((rec, index) => {
-		  // 取得RSS_id與標題
-		  const rssId = rec.rss_id;
+		  // 取得podcast_id與標題
+		  const rssId = rec.rss_id || rec.podcast_id;
 		  const episodeTitle = rec.episode_title;
-		  const podcastName = rec.podcast_name;
+		  const podcastName = rec.podcast_name || rssId;
 		  const playBtnId = `play-btn-${index}`;
 		  const imgId = `podcast-img-${index}`;
-		  // 動態產生圖片URL（MinIO）
-		  const imgHtml = `<img id="${imgId}" alt="${podcastName}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">`;
-		  // 動態產生音檔URL（MinIO）
-		  // 注意：實際播放時由 playOrPauseAudio 處理
+		  
+		  // 根據類別和 RSS ID 構建圖片 URL
+		  const category = window.mainCategory || 'business';
+		  const imageUrl = rec.image_url || `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
+		  
+		  // 圖片HTML
+		  const imgHtml = `<img id="${imgId}" alt="${podcastName}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" src="${imageUrl}" onerror="this.src='images/default_podcast.png'">`;
+		  
+		  // 音檔URL直接用API回傳
 		  const item = document.createElement('div');
 		  item.className = 'recommend-item';
 		  item.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin: 10px; min-width: 300px; background: white;';
 		  item.innerHTML = `
 			${imgHtml}
-			<img src="images/play_gray.png" alt="播放" class="play-button" id="${playBtnId}" style="cursor:pointer; width:44px; height:44px;" onclick="playOrPauseAudio(this, '${rssId}', '${episodeTitle}', '${window.mainCategory || 'business'}')">
+			<img src="images/play_gray.png" alt="播放" class="play-button" id="${playBtnId}" style="cursor:pointer; width:44px; height:44px;" onclick="playOrPauseAudio(this, '${rssId}', '${episodeTitle}', '${category}')">
 		<div class="text" style="flex: 1; min-width: 0;">
 			  <div class="title" style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">${podcastName}</div>
 			  <p class="description" style="font-size: 14px; color: #666; margin: 0; line-height: 1.4;">${episodeTitle}</p>
 			  <div class="tags-container" style="margin-top: 8px; padding: 4px;">
 				${rec.tags ? rec.tags.map(tag => `<span class="tag" style="display: inline-block; background: #f0f0f0; color: #666; padding: 2px 6px; margin: 2px; border-radius: 12px; font-size: 11px;">${tag}</span>`).join('') : '<span style="color: red;">無 tags 可顯示</span>'}
 		</div>
+			<div style="font-size: 12px; color: #888; margin-top: 4px;">RSS_ID: ${rssId}</div>
 			</div>
-			<div class="heart-container" title="Like" onclick="toggleLike(${index}, ${rec.episode_id}, '${podcastName}', '${episodeTitle}', '${rssId}')">
+			<div class="heart-container" title="Like" onclick="toggleLike(${index}, '${rssId}', '${podcastName}', '${episodeTitle}', '${rssId}')">
 			  <input type="checkbox" class="checkbox" id="like-${index}">
 		  <div class="svg-container">
 			<svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
@@ -860,9 +904,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 添加 data 屬性來追蹤狀態
 			checkbox.setAttribute('data-initial-state', 'false');
 		  }
-		  
-		  // 動態載入圖片（MinIO）
-		  setPodcastImage(document.getElementById(imgId), rssId);
 		});
 	  }
 	  
@@ -935,14 +976,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		  // 從當前推薦列表中獲取音檔 URL
 		  const currentEpisode = currentRecommendations.find(ep => 
-			ep.rss_id === rssId && ep.episode_title === episodeTitle
+			(ep.rss_id === rssId || ep.podcast_id === rssId) && ep.episode_title === episodeTitle
 		  );
 		  
-		  if (!currentEpisode || !currentEpisode.audio_url) {
+		  let audioUrl = '';
+		  if (currentEpisode && currentEpisode.audio_url) {
+			audioUrl = currentEpisode.audio_url;
+		  } else {
+			// 如果沒有找到音檔 URL，嘗試從 MinIO 獲取
+			try {
+			  const response = await fetch('http://localhost:8008/api/audio/presigned-url', {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+				  rss_id: rssId,
+				  episode_title: episodeTitle,
+				  category: category
+				})
+			  });
+			  
+			  if (response.ok) {
+				const data = await response.json();
+				if (data.success && data.audio_url) {
+				  audioUrl = data.audio_url;
+				  console.log('從 MinIO 獲取音檔:', audioUrl);
+				}
+			  }
+			} catch (error) {
+			  console.log('無法從 MinIO 獲取音檔:', error);
+			}
+		  }
+		  
+		  if (!audioUrl) {
 			throw new Error('無法找到對應的音檔 URL');
 		  }
 		  
-		  const audioUrl = currentEpisode.audio_url;
 		  console.log('使用音檔 URL:', audioUrl);
 
 		  // 如果已經有 audio 物件且是同一首歌曲
@@ -1200,18 +1270,18 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		if (!isLiked) {
 		  // 添加到選中列表（點擊時加入喜好）
-		  selectedEpisodes.push(episodeData);
+		  window.selectedEpisodes.push(episodeData);
 		  recordFeedback('like', episodeId, podcastName, episodeTitle, rssId);
 		  console.log(`❤️ 加入喜好: ${podcastName} - ${episodeTitle}`);
 		} else {
 		  // 從選中列表移除（再次點擊時移除喜好）
-		  selectedEpisodes = selectedEpisodes.filter(ep => ep.episode_id !== episodeId);
+		  window.selectedEpisodes = window.selectedEpisodes.filter(ep => ep.episode_id !== episodeId);
 		  recordFeedback('unlike', episodeId, podcastName, episodeTitle, rssId);
 		  console.log(`💔 移除喜好: ${podcastName} - ${episodeTitle}`);
 		}
 		
-		console.log('選中的節目數量:', selectedEpisodes.length);
-		console.log('選中的節目:', selectedEpisodes);
+		console.log('選中的節目數量:', window.selectedEpisodes.length);
+		console.log('選中的節目:', window.selectedEpisodes);
 		
 		// 顯示用戶偏好提示 - 傳入切換後的新狀態（checkbox.checked）
 		showPreferenceNotification(podcastName, episodeTitle, checkbox.checked);
@@ -1276,19 +1346,22 @@ document.addEventListener('DOMContentLoaded', function() {
 	  // 記錄用戶反饋
 	  async function recordFeedback(action, episodeId, podcastName, episodeTitle, rssId) {
 		try {
-		  const response = await fetch('http://localhost:8007/api/feedback', {
+		  // 使用臨時用戶代碼，在 Step 4 時會更新為真實的用戶代碼
+		  const tempUserCode = window.generatedUserCode || localStorage.getItem('currentUserCode') || 'temp_user';
+		  
+		  const response = await fetch('http://localhost:8008/api/feedback', {
 			method: 'POST',
 			headers: {
 			  'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-			  user_code: window.generatedUserCode || 'temp_user', // 使用生成的 user_code 或預設值
+			  user_code: tempUserCode,
 			  episode_id: episodeId,
 			  podcast_name: podcastName,
 			  episode_title: episodeTitle,
 			  rss_id: rssId,
 			  action: action,
-			  category: mapCategoryToAPI(window.mainCategory || 'business')
+			  category: window.mainCategory || 'business'
 			})
 		  });
 		  
@@ -1381,7 +1454,7 @@ document.addEventListener('DOMContentLoaded', function() {
 												generateBtn.value = '生成中...';
 												
 												// 調用後端 API 生成 Podwise ID
-												const response = await fetch('http://localhost:8007/api/generate-podwise-id', {
+												const response = await fetch('http://localhost:8008/api/generate-podwise-id', {
 													method: 'POST',
 													headers: {
 														'Content-Type': 'application/json',
@@ -1417,6 +1490,12 @@ document.addEventListener('DOMContentLoaded', function() {
 										
 										// 收集所有 Like 的節目資訊
 										function collectLikedEpisodes() {
+										  // 使用全域變數中已收集的節目，如果沒有則從 checkbox 重新收集
+										  if (window.selectedEpisodes && window.selectedEpisodes.length > 0) {
+										    console.log('使用已收集的節目:', window.selectedEpisodes);
+										    return;
+										  }
+										  
 										  const likedEpisodes = [];
 										  if (window.currentRecommendations) {
 										    window.currentRecommendations.forEach((rec, idx) => {
@@ -1425,13 +1504,14 @@ document.addEventListener('DOMContentLoaded', function() {
 										        likedEpisodes.push({
 										          podcast_name: rec.podcast_name,
 										          episode_title: rec.episode_title,
-										          rss_id: rec.rss_id,
-										          episode_id: rec.episode_id
+										          rss_id: rec.rss_id || rec.podcast_id,
+										          episode_id: rec.episode_id || idx + 1
 										        });
 										      }
 										    });
 										  }
 										  window.selectedEpisodes = likedEpisodes;
+										  console.log('重新收集節目:', window.selectedEpisodes);
 										}
 										
 																				// 進入 Podwise 按鈕觸發
@@ -1452,6 +1532,27 @@ document.addEventListener('DOMContentLoaded', function() {
 										      alert('請輸入有效的 Podwise ID 格式（例如：Podwise0001）');
 										      return;
 										    }
+										    
+										    // 檢查現有用戶是否存在於資料庫
+										    try {
+										      const checkResponse = await fetch(`http://localhost:8008/api/user/check/${userId}`, {
+										        method: 'GET',
+										        headers: { 'Content-Type': 'application/json' }
+										      });
+										      
+										      if (checkResponse.ok) {
+										        const checkData = await checkResponse.json();
+										        if (!checkData.exists) {
+										          alert('此 Podwise ID 不存在，請重新輸入或創建新的 ID');
+										          return;
+										        }
+										      } else {
+										        console.warn('無法檢查用戶存在性，繼續執行');
+										      }
+										    } catch (error) {
+										      console.warn('檢查用戶存在性失敗:', error);
+										    }
+										    
 										    // 對於現有用戶，直接使用輸入的 ID
 										    console.log('使用現有用戶 ID:', userId);
 										  }
@@ -1461,10 +1562,16 @@ document.addEventListener('DOMContentLoaded', function() {
 										    return;
 										  }
 										  
+										  // 檢查是否至少選擇了一個節目
+										  if (window.selectedEpisodes.length === 0) {
+										    alert('請至少選擇一個您喜歡的節目');
+										    return;
+										  }
+										  
 										  try {
 										    // 儲存完整的用戶偏好資料
 										    await saveUserPreferences(userId);
-										    console.log('用戶偏好儲存成功，準備跳轉到 http://localhost:8080/');
+										    console.log('用戶偏好儲存成功，準備跳轉到沒有彈出視窗的 index.html');
 										    localStorage.setItem('podwiseOnboarded', 'true'); // 新增：進入 Podwise 後設 flag
 										    localStorage.setItem('currentUserCode', userId); // 儲存用戶代碼供搜尋功能使用
 										    window.location.href = 'http://localhost:8080/';
@@ -1484,7 +1591,8 @@ document.addEventListener('DOMContentLoaded', function() {
 										      liked_episodes: window.selectedEpisodes || [], // Step 3 喜歡的節目
 										    };
 										
-										    const response = await fetch('http://localhost:8007/api/user/preferences', {
+										    // 先儲存用戶偏好
+										    const response = await fetch('http://localhost:8008/api/user/preferences', {
 										      method: 'POST',
 										      headers: {
 										        'Content-Type': 'application/json',
@@ -1495,6 +1603,38 @@ document.addEventListener('DOMContentLoaded', function() {
 										    if (response.ok) {
 										      const data = await response.json();
 										      console.log('用戶偏好儲存成功:', data);
+										      
+										      // 儲存每個喜歡的節目的反饋到 user_feedback 表
+										      for (const episode of window.selectedEpisodes) {
+										        try {
+										          const feedbackData = {
+										            user_code: userId,
+										            episode_id: episode.episode_id || 1,
+										            podcast_name: episode.podcast_name,
+										            episode_title: episode.episode_title,
+										            rss_id: episode.rss_id,
+										            action: 'like',
+										            category: window.mainCategory || 'business'
+										          };
+										          
+										          const feedbackResponse = await fetch('http://localhost:8008/api/feedback', {
+										            method: 'POST',
+										            headers: {
+										              'Content-Type': 'application/json',
+										            },
+										            body: JSON.stringify(feedbackData)
+										          });
+										          
+										          if (feedbackResponse.ok) {
+										            console.log(`節目反饋儲存成功: ${episode.podcast_name} - ${episode.episode_title}`);
+										          } else {
+										            console.warn(`節目反饋儲存失敗: ${episode.podcast_name}`);
+										          }
+										        } catch (error) {
+										          console.warn(`儲存節目反饋時發生錯誤: ${error}`);
+										        }
+										      }
+										      
 										      return data;
 										    } else {
 										      const errorData = await response.json();
@@ -1509,7 +1649,7 @@ document.addEventListener('DOMContentLoaded', function() {
 										async function registerNewUser(userId) {
 											try {
 												// 使用 generate-podwise-id API 來創建新用戶
-												const response = await fetch('http://localhost:8007/api/generate-podwise-id', {
+												const response = await fetch('http://localhost:8000/api/generate-podwise-id', {
 													method: 'POST',
 													headers: {
 														'Content-Type': 'application/json',
@@ -1589,7 +1729,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 						// 向後端取得 ID 並顯示
 						function fetchGeneratedCode() {
-							fetch('http://localhost:8007/api/generate-podwise-id', {
+							fetch('http://localhost:8008/api/generate-podwise-id', {
 								method: 'POST',
 								headers: {
 									'Content-Type': 'application/json',
@@ -1622,6 +1762,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							
 							// 全域變數和函數定義
 							window.mainCategory = 'business'; // 預設值
+							window.selectedEpisodes = []; // 儲存選中的節目
 
 							// 主類別對應的標籤（將從後端動態獲取）
 							window.CATEGORY_TAGS = {
@@ -1634,7 +1775,6 @@ document.addEventListener('DOMContentLoaded', function() {
 								window.mainCategory = category;
 								window.selectedMainCategory = category;
 								window.selectedTag = null;
-								console.log('設置 mainCategory 為:', window.mainCategory);
 								window.goToStep(2);
 							};
 
@@ -1653,14 +1793,17 @@ document.addEventListener('DOMContentLoaded', function() {
 								tagDiv.innerHTML = '';
 								
 								// 從後端動態獲取類別標籤
-								fetch(`http://localhost:8007/api/category-tags?category=${window.mainCategory}`)
+								fetch(`http://localhost:8008/api/category-tags?category=${window.mainCategory}`)
 									.then(response => response.json())
 									.then(data => {
 										if (data.success) {
 											const tags = data.tags;
 											console.log('從後端獲取的標籤:', tags);
 											
-											tags.forEach(tag => {
+											// 確保只顯示4個標籤，以2行2列顯示
+											const displayTags = tags.slice(0, 4);
+											
+											displayTags.forEach(tag => {
 												const btn = document.createElement('button');
 												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 												btn.textContent = tag;
@@ -1676,13 +1819,15 @@ document.addEventListener('DOMContentLoaded', function() {
 											console.error('獲取標籤失敗:', data.message);
 											// 使用預設標籤
 											const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
-											defaultTags.forEach(tag => {
+											const displayTags = defaultTags.slice(0, 4);
+											displayTags.forEach(tag => {
 												const btn = document.createElement('button');
 												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 												btn.textContent = tag;
 												btn.onclick = function() {
 													window.selectedTag = tag;
 													window.renderCategoryTags();
+													setTimeout(() => { window.goToStep(3); }, 200);
 												};
 												tagDiv.appendChild(btn);
 											});
@@ -1692,13 +1837,15 @@ document.addEventListener('DOMContentLoaded', function() {
 										console.error('獲取標籤異常:', error);
 										// 使用預設標籤
 										const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
-										defaultTags.forEach(tag => {
+										const displayTags = defaultTags.slice(0, 4);
+										displayTags.forEach(tag => {
 											const btn = document.createElement('button');
 											btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 											btn.textContent = tag;
 											btn.onclick = function() {
 												window.selectedTag = tag;
 												window.renderCategoryTags();
+												setTimeout(() => { window.goToStep(3); }, 200);
 											};
 											tagDiv.appendChild(btn);
 										});
