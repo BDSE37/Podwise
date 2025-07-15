@@ -9,8 +9,8 @@ import asyncio
 import logging
 import pandas as pd
 
-from ..core import RecommenderEngine
-from ..config.recommender_config import get_recommender_config
+from core import RecommenderEngine
+from config.recommender_config import get_recommender_config
 
 logger = logging.getLogger(__name__)
 

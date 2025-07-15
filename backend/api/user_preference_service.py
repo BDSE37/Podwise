@@ -315,27 +315,19 @@ class UserPreferenceService:
                 return "http://localhost:8080/images/default_podcast.png"
             
             # 直接使用公開 URL，因為已設置 bucket 為公開讀取
-            # 圖片命名格式：RSS_{rss_id}_{size}.jpg
-            sizes = ['300', '640', '64']
+            # 根據實際圖片命名格式：RSS_id.jpg
+            object_name = f"RSS_{rss_id}.jpg"
+            # 使用公開 URL
+            public_url = f"http://localhost:9000/podcast-images/{object_name}"
             
-            for size in sizes:
-                try:
-                    object_name = f"RSS_{rss_id}_{size}.jpg"
-                    # 使用公開 URL
-                    public_url = f"http://localhost:9000/podcast-images/{object_name}"
-                    
-                    # 測試 URL 是否有效
-                    response = requests.head(public_url, timeout=5)
-                    if response.status_code == 200:
-                        logger.info(f"找到節目圖片: {object_name}")
-                        return public_url
-                        
-                except Exception as e:
-                    logger.debug(f"圖片 {object_name} 不存在或無法存取: {e}")
-                    continue
-            
-            logger.warning(f"找不到 RSS ID {rss_id} 的節目圖片，使用預設圖片")
-            return "http://localhost:8080/images/default_podcast.png"
+            # 測試 URL 是否有效
+            response = requests.head(public_url, timeout=5)
+            if response.status_code == 200:
+                logger.info(f"找到節目圖片: {object_name}")
+                return public_url
+            else:
+                logger.warning(f"圖片 {object_name} 不存在或無法存取")
+                return "http://localhost:8080/images/default_podcast.png"
                 
         except Exception as e:
             logger.error(f"獲取節目圖片失敗: {e}")

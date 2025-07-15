@@ -1,8 +1,3 @@
-# 系統檔案
-.DS_Store
-._*
-Thumbs.db
-
 # Python
 __pycache__/
 *.py[cod]
@@ -26,38 +21,45 @@ wheels/
 *.egg
 MANIFEST
 
-# 虛擬環境
-venv/
+# Virtual environments
+.env
+.venv
 env/
+venv/
 ENV/
-.venv/
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# 日誌檔案
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
 *.log
 logs/
 
-# 敏感資料 - 不要上傳到 GitHub
-backend/vaderSentiment/Podcast_info/
-backend/vaderSentiment/comment_data/
-backend/vaderSentiment/podcast_rating_report.csv
-
-# 其他資料檔案
-*.csv
-*.json
-*.xlsx
-*.xls
-
-# 備份檔案
-backup_old/
-*.bak
-*.backup
-
-# 暫存檔案
+# Temporary files
 *.tmp
-*.temp 
+*.temp
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/ 

@@ -1,24 +1,35 @@
 """
-Podwise RAG Pipeline - 工具模組
+RAG Pipeline Tools Module
 
-提供各種實用工具：
-- 向量搜尋工具
-- Podcast 格式化工具
-- 詞向量模型訓練工具
-
-作者: Podwise Team
-版本: 2.0.0
+提供 RAG Pipeline 所需的各種工具和服務
 """
 
-from .enhanced_vector_search import RAGVectorSearch, RAGSearchConfig, create_rag_vector_search
-from .podcast_formatter import PodcastFormatter, FormattedPodcast
+from .web_search_tool import (
+    WebSearchExpert,
+    SearchRequest,
+    SearchResponse,
+    SearchResult,
+    get_web_search_expert,
+    search_web,
+    test_web_search
+)
+
+from .podcast_formatter import PodcastFormatter
 from .train_word2vec_model import Word2VecTrainer
 
 __all__ = [
-    "RAGVectorSearch",
-    "RAGSearchConfig", 
-    "create_rag_vector_search",
-    "PodcastFormatter",
-    "FormattedPodcast",
-    "Word2VecTrainer"
+    # Web Search Tools
+    'WebSearchExpert',
+    'SearchRequest', 
+    'SearchResponse',
+    'SearchResult',
+    'get_web_search_expert',
+    'search_web',
+    'test_web_search',
+    
+    # Podcast Tools
+    'PodcastFormatter',
+    
+    # ML Tools
+    'Word2VecTrainer'
 ] 

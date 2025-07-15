@@ -17,9 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 複製應用程式程式碼
 COPY web_search_service.py .
-COPY rag_pipeline/ ./rag_pipeline/
-COPY core/ ./core/
-COPY utils/ ./utils/
+COPY ../rag_pipeline/ ./rag_pipeline/
+COPY ../core/ ./core/
+COPY ../utils/ ./utils/
 
 # 建立非 root 使用者
 RUN useradd --create-home --shell /bin/bash app \

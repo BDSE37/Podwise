@@ -2,7 +2,9 @@
 Podwise API 主應用程式
 整合所有後端服務的統一 API 介面
 """
-
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,6 +14,13 @@ from typing import Dict, Any, Optional
 import asyncio
 import httpx
 import os
+from fastapi import FastAPI
+from backend.utils.minio_milvus_utils import get_minio_client, get_tags_for_audio, MINIO_URL
+import random
+import psycopg2
+
+# 導入新的用戶偏好服務
+from backend.user_management.main import get_user_manager, UserServiceConfig
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +72,17 @@ SERVICE_CONFIGS = {
     }
 }
 
+# 初始化用戶偏好管理器
+user_manager = None
+
+def get_user_preference_manager():
+    """獲取用戶偏好管理器實例"""
+    global user_manager
+    if user_manager is None:
+        config = UserServiceConfig()
+        user_manager = get_user_manager(config)
+    return user_manager
+
 async def check_service_health(service_name: str, service_url: str) -> Dict[str, Any]:
     """檢查服務健康狀態"""
     try:
@@ -86,6 +106,29 @@ async def check_service_health(service_name: str, service_url: str) -> Dict[str,
             "url": service_url,
             "error": str(e)
         }
+
+# PostgreSQL 連線設定
+PG_HOST = "postgres.podwise.svc.cluster.local"
+PG_PORT = 5432
+PG_DB = "podcast"
+PG_USER = "bdse37"
+PG_PASSWORD = "111111"
+
+def get_podcast_name_from_db(podcast_id):
+    try:
+        conn = psycopg2.connect(
+            dbname=PG_DB, user=PG_USER, password=PG_PASSWORD, host=PG_HOST, port=PG_PORT
+        )
+        with conn.cursor() as cur:
+            cur.execute("SELECT name FROM podcasts WHERE podcast_id = %s", (int(podcast_id),))
+            row = cur.fetchone()
+            return row[0] if row else str(podcast_id)
+    except Exception as e:
+        print(f"PostgreSQL 查詢失敗: {e}")
+        return str(podcast_id)
+    finally:
+        if 'conn' in locals():
+            conn.close()
 
 @app.get("/")
 async def root():
@@ -242,62 +285,6 @@ async def init_database():
         logger.error(f"資料庫初始化失敗: {str(e)}")
         raise HTTPException(status_code=500, detail=f"資料庫初始化失敗: {str(e)}")
 
-@app.post("/api/create_user")
-async def create_user():
-    """創建新用戶並返回 user_code"""
-    try:
-        import psycopg2
-        import os
-        
-        # 從環境變數獲取資料庫配置，使用 K8s PostgreSQL IP 地址
-        db_config = {
-            "host": os.getenv("POSTGRES_HOST", "10.233.50.117"),  # 使用 K8s PostgreSQL IP
-            "port": int(os.getenv("POSTGRES_PORT", "5432")),
-            "database": os.getenv("POSTGRES_DB", "podcast"),
-            "user": os.getenv("POSTGRES_USER", "bdse37"),
-            "password": os.getenv("POSTGRES_PASSWORD", "111111")
-        }
-        
-        # 連接到 PostgreSQL
-        conn = psycopg2.connect(
-            host=db_config["host"],
-            port=db_config["port"],
-            database=db_config["database"],
-            user=db_config["user"],
-            password=db_config["password"]
-        )
-        
-        cursor = conn.cursor()
-        
-        # 插入新用戶記錄，user_code 會自動生成
-        insert_query = """
-            INSERT INTO users (is_active) 
-            VALUES (true)
-            RETURNING user_code
-        """
-        
-        cursor.execute(insert_query)
-        conn.commit()
-        
-        # 獲取生成的 user_code
-        result = cursor.fetchone()
-        if not result:
-            raise HTTPException(status_code=500, detail="無法獲取生成的用戶代碼")
-        
-        user_code = result[0]
-        
-        cursor.close()
-        conn.close()
-        
-        return {"user_code": user_code}
-            
-    except ImportError as e:
-        logger.error(f"導入 psycopg2 失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail="資料庫驅動不可用")
-    except Exception as e:
-        logger.error(f"創建用戶失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"創建用戶失敗: {str(e)}")
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """全域異常處理器"""
@@ -307,11 +294,82 @@ async def global_exception_handler(request, exc):
         content={"error": "內部伺服器錯誤", "detail": str(exc)}
     )
 
+@app.get("/api/category-tags")
+def get_category_tags(category: str):
+    """根據類別獲取標籤"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.get_category_tags(category)
+    except Exception as e:
+        logger.error(f"獲取類別標籤失敗: {e}")
+        return {"success": False, "detail": f"獲取標籤失敗: {e}"}
+
+@app.get("/api/one-minutes-episodes")
+def get_one_minutes_episodes(category: str, tag: str):
+    """獲取一分鐘節目推薦"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.get_one_minute_episodes(category, tag)
+    except Exception as e:
+        logger.error(f"獲取節目失敗: {e}")
+        return {"success": False, "detail": f"獲取節目失敗: {e}"}
+
+@app.get("/api/user/check/{user_code}")
+def check_user_exists(user_code: str):
+    """檢查用戶是否存在於資料庫中"""
+    try:
+        manager = get_user_preference_manager()
+        result = manager.check_user_exists(user_code)
+        return {"success": True, "exists": result}
+    except Exception as e:
+        logger.error(f"檢查用戶失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/user/preferences")
+def save_user_preferences(preferences_data: Dict[str, Any]):
+    """儲存用戶偏好"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.save_user_preferences(preferences_data)
+    except Exception as e:
+        logger.error(f"儲存用戶偏好失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/feedback")
+def record_feedback(feedback_data: Dict[str, Any]):
+    """記錄用戶反饋"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.record_feedback(feedback_data)
+    except Exception as e:
+        logger.error(f"記錄反饋失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/generate-podwise-id")
+def generate_podwise_id():
+    """生成新的 Podwise ID"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.generate_podwise_id()
+    except Exception as e:
+        logger.error(f"生成 Podwise ID 失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/audio/presigned-url")
+def get_audio_presigned_url(request_data: Dict[str, Any]):
+    """獲取音檔的預簽名 URL"""
+    try:
+        manager = get_user_preference_manager()
+        return manager.get_audio_presigned_url(request_data)
+    except Exception as e:
+        logger.error(f"獲取音檔 URL 失敗: {e}")
+        return {"success": False, "error": str(e)}
+
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
-        port=8006,
+        port=8008,
         reload=True,
         log_level="info"
     ) 

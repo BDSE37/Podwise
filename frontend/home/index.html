@@ -162,7 +162,94 @@ header.major .dash {
   filter: brightness(0.8);
 }
 
-/* 新增 TAG 按鈕樣式：這裡只保留純 CSS，不要有 JS */
+		/* 新增 TAG 按鈕樣式：這裡只保留純 CSS，不要有 JS */
+		
+		/* From Uiverse.io by catraco */ 
+		.heart-container {
+		  --heart-color: rgb(255, 91, 137);
+		  position: relative;
+		  width: 32px;
+		  height: 32px;
+		  transition: .3s;
+		}
+
+		.heart-container .checkbox {
+		  position: absolute;
+		  width: 100%;
+		  height: 100%;
+		  opacity: 0;
+		  z-index: 20;
+		  cursor: pointer;
+		}
+
+		.heart-container .svg-container {
+		  width: 100%;
+		  height: 100%;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		}
+
+		.heart-container .svg-outline,
+				.heart-container .svg-filled {
+		  fill: var(--heart-color);
+		  position: absolute;
+		}
+
+		.heart-container .svg-filled {
+		  animation: keyframes-svg-filled 1s;
+		  display: none;
+		}
+
+		.heart-container .svg-celebrate {
+		  position: absolute;
+		  animation: keyframes-svg-celebrate .5s;
+		  animation-fill-mode: forwards;
+		  display: none;
+		  stroke: var(--heart-color);
+		  fill: var(--heart-color);
+		  stroke-width: 2px;
+		}
+
+		.heart-container .checkbox:checked~.svg-container .svg-filled {
+		  display: block
+		}
+
+		.heart-container .checkbox:checked~.svg-container .svg-celebrate {
+		  display: block
+		}
+
+		@keyframes keyframes-svg-filled {
+		  0% {
+			transform: scale(0);
+		  }
+
+		  25% {
+			transform: scale(1.2);
+		  }
+
+		  50% {
+			transform: scale(1);
+			filter: brightness(1.5);
+		  }
+		}
+
+		@keyframes keyframes-svg-celebrate {
+		  0% {
+			transform: scale(0);
+		  }
+
+		  50% {
+			opacity: 1;
+			filter: brightness(1.5);
+		  }
+
+		  100% {
+			transform: scale(1.4);
+			opacity: 0;
+			display: none;
+		  }
+		}
 	</style>
 </head>
 
@@ -752,37 +839,37 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		if (category === 'business') {
 		  defaultRecommendations = [
-			{
-			  podcast_name: '股癌 Gooaye',
-			  episode_title: '投資理財精選',
-			  episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
-			  podcast_image: 'images/股癌.png',
-			  audio_url: 'audio/sample1.mp3',
-			  episode_id: 1,
-			  rss_id: '123',
-			  tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
-			},
-			{
-			  podcast_name: '矽谷輕鬆談',
-			  episode_title: 'AI 技術趨勢',
-			  episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
-			  podcast_image: 'images/矽谷輕鬆談.png',
-			  audio_url: 'audio/sample2.mp3',
-			  episode_id: 2,
-			  rss_id: '456',
-			  tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
-			},
-			{
-			  podcast_name: '天下學習',
-			  episode_title: '管理思維分享',
-			  episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
-			  podcast_image: 'images/天下學習.png',
-			  audio_url: 'audio/sample3.mp3',
-			  episode_id: 3,
-			  rss_id: '789',
-			  tags: ['企業管理', '領導力', '學習方法', '個人成長']
-			}
-		  ];
+		  {
+			podcast_name: '股癌 Gooaye',
+			episode_title: '投資理財精選',
+			episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
+			podcast_image: 'images/股癌.png',
+			audio_url: 'audio/sample1.mp3',
+			episode_id: 1,
+			rss_id: '123',
+			tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
+		  },
+		  {
+			podcast_name: '矽谷輕鬆談',
+			episode_title: 'AI 技術趨勢',
+			episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
+			podcast_image: 'images/矽谷輕鬆談.png',
+			audio_url: 'audio/sample2.mp3',
+			episode_id: 2,
+			rss_id: '456',
+			tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
+		  },
+		  {
+			podcast_name: '天下學習',
+			episode_title: '管理思維分享',
+			episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
+			podcast_image: 'images/天下學習.png',
+			audio_url: 'audio/sample3.mp3',
+			episode_id: 3,
+			rss_id: '789',
+			tags: ['企業管理', '領導力', '學習方法', '個人成長']
+		  }
+		];
 		} else if (category === 'education') {
 		  defaultRecommendations = [
 			{
@@ -852,9 +939,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		  const playBtnId = `play-btn-${index}`;
 		  const imgId = `podcast-img-${index}`;
 		  
-		  // 根據類別和 RSS ID 構建圖片 URL
-		  const category = window.mainCategory || 'business';
-		  const imageUrl = rec.image_url || `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
+		            // 根據類別和 RSS ID 構建圖片 URL
+          const category = window.mainCategory || 'business';
+          // 使用後端提供的 image_url，如果沒有則使用預設格式
+          const imageUrl = rec.image_url || `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
 		  
 		  // 圖片HTML
 		  const imgHtml = `<img id="${imgId}" alt="${podcastName}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" src="${imageUrl}" onerror="this.src='images/default_podcast.png'">`;
@@ -868,14 +956,14 @@ document.addEventListener('DOMContentLoaded', function() {
 			<img src="images/play_gray.png" alt="播放" class="play-button" id="${playBtnId}" style="cursor:pointer; width:44px; height:44px;" onclick="playOrPauseAudio(this, '${rssId}', '${episodeTitle}', '${category}')">
 		<div class="text" style="flex: 1; min-width: 0;">
 			  <div class="title" style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">${podcastName}</div>
-			  <p class="description" style="font-size: 14px; color: #666; margin: 0; line-height: 1.4;">${episodeTitle}</p>
+			  <p class="description" style="font-size: 14px; color: #666; margin: 0; line-height: 1.4;">${episodeTitle || '無標題'}</p>
 			  <div class="tags-container" style="margin-top: 8px; padding: 4px;">
 				${rec.tags ? rec.tags.map(tag => `<span class="tag" style="display: inline-block; background: #f0f0f0; color: #666; padding: 2px 6px; margin: 2px; border-radius: 12px; font-size: 11px;">${tag}</span>`).join('') : '<span style="color: red;">無 tags 可顯示</span>'}
 		</div>
 			<div style="font-size: 12px; color: #888; margin-top: 4px;">RSS_ID: ${rssId}</div>
 			</div>
-			<div class="heart-container" title="Like" onclick="toggleLike(${index}, '${rssId}', '${podcastName}', '${episodeTitle}', '${rssId}')">
-			  <input type="checkbox" class="checkbox" id="like-${index}">
+			<div class="heart-container" title="Like">
+			  <input type="checkbox" class="checkbox" id="like-${index}" onchange="toggleLike(${index}, '${rssId}', '${podcastName}', '${episodeTitle}', '${rssId}')">
 		  <div class="svg-container">
 			<svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
 				  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
@@ -916,50 +1004,23 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		console.log('開始載入圖片，RSS ID:', rssId);
 		
-		// 嘗試從 MinIO 載入圖片
-		const sizes = ['300', '640', '64'];
-		let currentSizeIndex = 0;
+		// 根據實際圖片命名格式：RSS_id_300.jpg
+		const imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
 		
-		function tryNextSize() {
-		  if (currentSizeIndex >= sizes.length) {
-			// 所有尺寸都失敗，使用預設圖片
-			console.log('所有圖片尺寸都失敗，使用預設圖片');
-			imgElement.src = 'images/default_podcast.png';
-			return;
-		  }
-		  
-		  const size = sizes[currentSizeIndex];
-		  // 使用 MinIO 預簽名 URL 格式
-		  const imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_${size}.jpg`;
-		  
-		  console.log(`嘗試載入圖片: ${imageUrl}`);
-		  
-		  // 測試圖片是否可載入
-		  const testImg = new Image();
-		  testImg.onload = function() {
-			console.log(`成功載入圖片: ${imageUrl}`);
-			imgElement.src = imageUrl;
-		  };
-		  testImg.onerror = function() {
-			console.log(`圖片載入失敗: ${imageUrl}`);
-			currentSizeIndex++;
-			tryNextSize();
-		  };
-		  
-		  testImg.onload = function() {
-			console.log(`成功載入圖片: ${imageUrl}`);
-			imgElement.src = imageUrl;
-		  };
-		  testImg.onerror = function() {
-			console.log(`圖片載入失敗: ${imageUrl}`);
-			currentSizeIndex++;
-			tryNextSize();
-		  };
-		  
-		  testImg.src = imageUrl;
-		}
+		console.log(`嘗試載入圖片: ${imageUrl}`);
 		
-		tryNextSize();
+		// 測試圖片是否可載入
+		const testImg = new Image();
+		testImg.onload = function() {
+		  console.log(`成功載入圖片: ${imageUrl}`);
+		  imgElement.src = imageUrl;
+		};
+		testImg.onerror = function() {
+		  console.log(`圖片載入失敗: ${imageUrl}，使用預設圖片`);
+		  imgElement.src = 'images/default_podcast.png';
+		};
+		
+		testImg.src = imageUrl;
 	  }
 	  
 	  let globalAudio = null;
@@ -976,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		  // 從當前推薦列表中獲取音檔 URL
 		  const currentEpisode = currentRecommendations.find(ep => 
-			(ep.rss_id === rssId || ep.podcast_id === rssId) && ep.episode_title === episodeTitle
+			(ep.rss_id === rssId || ep.podcast_id === rssId) && (ep.episode_title === episodeTitle || !episodeTitle)
 		  );
 		  
 		  let audioUrl = '';
@@ -1113,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		  // 如果 URL 不包含 MinIO 預簽名 URL，則嘗試獲取
 		  if (!audioUrl.includes('localhost:9000') && !audioUrl.includes('192.168.32.66:30090') && !audioUrl.includes('audio/sample')) {
 			try {
-			  const response = await fetch('http://localhost:8006/api/audio/presigned-url', {
+			  		const response = await fetch('http://localhost:8008/api/audio/presigned-url', {
 				method: 'POST',
 				headers: {
 				  'Content-Type': 'application/json',
@@ -1233,32 +1294,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	  // 切換喜歡狀態
 	  function toggleLike(index, episodeId, podcastName, episodeTitle, rssId) {
 		const checkbox = document.getElementById(`like-${index}`);
-		const heartContainer = checkbox.closest('.heart-container');
 		const isLiked = checkbox.checked;
 		
 		console.log('toggleLike 被呼叫:', { index, episodeId, isLiked });
-		
-		// 切換 checkbox 狀態
-		checkbox.checked = !isLiked;
-		
-		// 添加愛心動畫效果
-		if (!isLiked) {
-		  // 喜歡動畫
-		  heartContainer.style.transform = 'scale(1.2)';
-		  setTimeout(() => {
-			heartContainer.style.transform = 'scale(1)';
-		  }, 200);
-		  
-		  // 顯示慶祝動畫
-		  const celebrateSvg = heartContainer.querySelector('.svg-celebrate');
-		  if (celebrateSvg) {
-			celebrateSvg.style.display = 'block';
-			celebrateSvg.style.animation = 'keyframes-svg-celebrate 0.6s ease-out';
-			setTimeout(() => {
-			  celebrateSvg.style.display = 'none';
-			}, 600);
-		  }
-		}
 		
 		// 更新選中的節目列表
 		const episodeData = {
@@ -1268,13 +1306,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		  rss_id: rssId
 		};
 		
-		if (!isLiked) {
-		  // 添加到選中列表（點擊時加入喜好）
+		if (isLiked) {
+		  // 添加到選中列表（checkbox 被勾選時加入喜好）
 		  window.selectedEpisodes.push(episodeData);
 		  recordFeedback('like', episodeId, podcastName, episodeTitle, rssId);
 		  console.log(`❤️ 加入喜好: ${podcastName} - ${episodeTitle}`);
 		} else {
-		  // 從選中列表移除（再次點擊時移除喜好）
+		  // 從選中列表移除（checkbox 取消勾選時移除喜好）
 		  window.selectedEpisodes = window.selectedEpisodes.filter(ep => ep.episode_id !== episodeId);
 		  recordFeedback('unlike', episodeId, podcastName, episodeTitle, rssId);
 		  console.log(`💔 移除喜好: ${podcastName} - ${episodeTitle}`);
@@ -1283,8 +1321,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		console.log('選中的節目數量:', window.selectedEpisodes.length);
 		console.log('選中的節目:', window.selectedEpisodes);
 		
-		// 顯示用戶偏好提示 - 傳入切換後的新狀態（checkbox.checked）
-		showPreferenceNotification(podcastName, episodeTitle, checkbox.checked);
+		// 顯示用戶偏好提示 - 傳入當前狀態（checkbox.checked）
+		showPreferenceNotification(podcastName, episodeTitle, isLiked);
 	  }
 	  
 	  // 顯示用戶偏好提示
@@ -1649,7 +1687,7 @@ document.addEventListener('DOMContentLoaded', function() {
 										async function registerNewUser(userId) {
 											try {
 												// 使用 generate-podwise-id API 來創建新用戶
-												const response = await fetch('http://localhost:8000/api/generate-podwise-id', {
+												const response = await fetch('http://localhost:8008/api/generate-podwise-id', {
 													method: 'POST',
 													headers: {
 														'Content-Type': 'application/json',
@@ -1793,7 +1831,7 @@ document.addEventListener('DOMContentLoaded', function() {
 								tagDiv.innerHTML = '';
 								
 								// 從後端動態獲取類別標籤
-								fetch(`http://localhost:8008/api/category-tags?category=${window.mainCategory}`)
+										  fetch(`http://localhost:8008/api/category-tags/${window.mainCategory}`)
 									.then(response => response.json())
 									.then(data => {
 										if (data.success) {

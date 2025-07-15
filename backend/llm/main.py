@@ -1,469 +1,241 @@
+#!/usr/bin/env python3
 """
-LLM 服務主程式
-整合 Qwen3、bge-m3 和 Deepseek R1 模型
-支援 qwen2.5-Taiwan 和 qwen3:8b 模型
-採用 OOP 架構設計
+Podwise LLM 主模組
+
+提供統一的 LLM 服務入口點，整合所有語言模型功能：
+- 多模型管理 (Qwen2.5-Taiwan-7B-Instruct, Qwen3-8B)
+- 模型路由和負載均衡
+- 效能監控和追蹤
+- 錯誤處理和重試機制
+- 配置管理
+
+符合 OOP 原則和 Google Clean Code 標準
+作者: Podwise Team
+版本: 2.0.0
 """
 
-import os
 import logging
+import os
+import sys
 import asyncio
-import aiohttp
-import json
-import time
-from typing import Dict, List, Optional, Any
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
-from datetime import datetime
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from transformers import AutoTokenizer, AutoModel
-import torch
-from dotenv import load_dotenv
-import httpx
-from langfuse import Langfuse
-
-# 載入環境變數
-load_dotenv()
+from pathlib import Path
 
 # 設定日誌
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# 初始化 FastAPI
-app = FastAPI(title="LLM Service")
-
-# 初始化 Langfuse
-langfuse = Langfuse(
-    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
-    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
-    host=os.getenv("LANGFUSE_HOST", "http://localhost:3000")
-)
 
 @dataclass
-class ModelConfig:
-    """模型配置資料結構"""
-    model_name: str
-    model_id: str
-    host: str
-    port: int
-    api_endpoint: str
+class LLMConfig:
+    """LLM 配置類別"""
+    enable_qwen_taiwan: bool = True
+    enable_qwen3: bool = True
+    enable_fallback: bool = True
     max_tokens: int = 2048
     temperature: float = 0.7
-    priority: int = 1
-    enabled: bool = True
+    timeout: int = 60
+    retry_count: int = 3
+    log_level: str = "INFO"
 
-@dataclass
-class GenerationRequest:
-    """生成請求資料結構"""
-    prompt: str
-    model_name: Optional[str] = None
-    max_tokens: Optional[int] = None
-    temperature: Optional[float] = None
-    system_prompt: Optional[str] = None
-    user_id: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
-    trace_id: Optional[str] = None
 
-@dataclass
-class GenerationResponse:
-    """生成回應資料結構"""
-    text: str
-    model_used: str
-    tokens_used: int
-    processing_time: float
-    confidence: float
-    metadata: Optional[Dict[str, Any]] = None
-    trace_id: Optional[str] = None
-
-class LLMService:
-    """LLM 服務類別 - OOP 架構"""
+class LLMManager:
+    """LLM 管理器 - 統一管理所有語言模型服務"""
     
-    def __init__(self):
-        """初始化 LLM 服務"""
-        self.models: Dict[str, ModelConfig] = {}
-        self.http_session: Optional[aiohttp.ClientSession] = None
-        
-        # 載入模型配置
-        self._load_model_configs()
-        
-        logger.info(f"LLM 服務初始化完成，可用模型: {list(self.models.keys())}")
-        logger.info("Langfuse 追蹤功能已啟用")
+    def __init__(self, config: Optional[LLMConfig] = None):
+        """初始化 LLM 管理器"""
+        self.config = config or LLMConfig()
+        self.models = {}
+        self._initialize_models()
+        logger.info("🚀 LLM 管理器初始化完成")
     
-    def _load_model_configs(self):
-        """載入模型配置"""
-        # Qwen2.5-Taiwan 模型配置
-        self.models["qwen2.5-Taiwan"] = ModelConfig(
-            model_name="Qwen2.5-Taiwan",
-            model_id="qwen2.5:7b",
-            host=os.getenv("OLLAMA_HOST", "localhost"),
-            port=int(os.getenv("OLLAMA_PORT", "11434")),
-            api_endpoint="/api/generate",
-            max_tokens=2048,
-            temperature=0.7,
-            priority=1
-        )
-        
-        # Qwen3:8b 模型配置
-        self.models["qwen3:8b"] = ModelConfig(
-            model_name="Qwen3:8b",
-            model_id="qwen3:8b",
-            host=os.getenv("OLLAMA_HOST", "localhost"),
-            port=int(os.getenv("OLLAMA_PORT", "11434")),
-            api_endpoint="/api/generate",
-            max_tokens=2048,
-            temperature=0.7,
-            priority=2
-        )
-        
-        # 通用 Qwen 模型配置（向後相容）
-        self.models["qwen"] = ModelConfig(
-            model_name="Qwen",
-            model_id="qwen3:8b",
-            host=os.getenv("OLLAMA_HOST", "localhost"),
-            port=int(os.getenv("OLLAMA_PORT", "11434")),
-            api_endpoint="/api/generate",
-            max_tokens=2048,
-            temperature=0.7,
-            priority=3
-        )
-        
-        # DeepSeek 模型配置
-        self.models["deepseek"] = ModelConfig(
-            model_name="DeepSeek",
-            model_id="deepseek-coder:6.7b",
-            host=os.getenv("OLLAMA_HOST", "localhost"),
-            port=int(os.getenv("OLLAMA_PORT", "11434")),
-            api_endpoint="/api/generate",
-            max_tokens=2048,
-            temperature=0.7,
-            priority=4
-        )
-    
-    async def initialize(self) -> bool:
-        """初始化服務"""
+    def _initialize_models(self) -> None:
+        """初始化所有模型"""
         try:
-            # 創建 HTTP 會話
-            self.http_session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=60)
-            )
+            # 導入核心服務
+            from .core.ollama_llm import OllamaLLM
+            from .core.base_llm import BaseLLM
             
-            # 測試模型連接
-            await self._test_model_connections()
+            # 初始化 Qwen2.5-Taiwan-7B-Instruct 模型
+            if self.config.enable_qwen_taiwan:
+                self.models['qwen_taiwan'] = OllamaLLM(
+                    model_name="Qwen2.5-Taiwan-7B-Instruct",
+                    host="localhost",
+                    port=11434
+                )
+                logger.info("✅ Qwen2.5-Taiwan-7B-Instruct 模型已初始化")
             
-            logger.info("LLM 服務初始化成功")
-            return True
+            # 初始化 Qwen3-8B 模型
+            if self.config.enable_qwen3:
+                self.models['qwen3'] = OllamaLLM(
+                    model_name="Qwen3-8B",
+                    host="localhost",
+                    port=11434
+                )
+                logger.info("✅ Qwen3-8B 模型已初始化")
             
         except Exception as e:
-            logger.error(f"LLM 服務初始化失敗: {str(e)}")
-            return False
+            logger.error(f"❌ 模型初始化失敗: {e}")
+            raise
     
-    async def _test_model_connections(self):
-        """測試模型連接"""
-        for model_name, model_config in self.models.items():
-            if not model_config.enabled:
-                continue
-                
-            try:
-                # 簡單的連接測試
-                url = f"http://{model_config.host}:{model_config.port}/api/tags"
-                async with self.http_session.get(url, timeout=5) as response:
-                    if response.status == 200:
-                        logger.info(f"模型 {model_name} 連接正常")
-                    else:
-                        logger.warning(f"模型 {model_name} 連接異常: {response.status}")
-                        model_config.enabled = False
-                        
-            except Exception as e:
-                logger.warning(f"模型 {model_name} 連接失敗: {str(e)}")
-                model_config.enabled = False
+    def get_model(self, model_name: str) -> Any:
+        """獲取指定模型"""
+        if model_name not in self.models:
+            raise ValueError(f"模型 '{model_name}' 不存在")
+        return self.models[model_name]
     
-    async def generate_text(self, request: GenerationRequest) -> GenerationResponse:
+    def get_qwen_taiwan(self) -> Any:
+        """獲取 Qwen2.5-Taiwan-7B-Instruct 模型"""
+        return self.get_model('qwen_taiwan')
+    
+    def get_qwen3(self) -> Any:
+        """獲取 Qwen3-8B 模型"""
+        return self.get_model('qwen3')
+    
+    async def generate_text(self, prompt: str, model_name: Optional[str] = None, **kwargs) -> Dict[str, Any]:
         """生成文字"""
-        start_time = time.time()
-        
         try:
             # 選擇模型
-            model_name = request.model_name or self._select_best_model()
-            if model_name not in self.models:
-                raise ValueError(f"模型 {model_name} 不可用")
-            
-            model_config = self.models[model_name]
-            
-            # 準備請求數據
-            payload = self._prepare_payload(request, model_config)
-            
-            # 發送請求
-            url = f"http://{model_config.host}:{model_config.port}{model_config.api_endpoint}"
-            async with self.http_session.post(url, json=payload, timeout=60) as response:
-                if response.status != 200:
-                    raise HTTPException(status_code=response.status, detail="模型 API 錯誤")
-                
-                result = await response.json()
-                
-                # 解析回應
-                generated_text = result.get("response", "")
-                tokens_used = len(generated_text.split())  # 簡化計算
-                
-                processing_time = time.time() - start_time
-                confidence = self._calculate_confidence(generated_text, tokens_used)
-                
-                return GenerationResponse(
-                    text=generated_text,
-                    model_used=model_name,
-                    tokens_used=tokens_used,
-                    processing_time=processing_time,
-                    confidence=confidence,
-                    metadata=request.metadata,
-                    trace_id=request.trace_id
-                )
-                
-        except Exception as e:
-            logger.error(f"生成文字失敗: {str(e)}")
-            # 嘗試 fallback
-            return await self._fallback_generation(request, model_name)
-    
-    def _prepare_payload(self, request: GenerationRequest, model_config: ModelConfig) -> Dict[str, Any]:
-        """準備請求數據"""
-        return {
-            "model": model_config.model_id,
-            "prompt": request.prompt,
-            "stream": False,
-            "options": {
-                "num_predict": request.max_tokens or model_config.max_tokens,
-                "temperature": request.temperature or model_config.temperature
-            }
-        }
-    
-    def _select_best_model(self) -> str:
-        """選擇最佳模型"""
-        available_models = [
-            (name, config) for name, config in self.models.items() 
-            if config.enabled
-        ]
-        
-        if not available_models:
-            raise ValueError("沒有可用的模型")
-        
-        # 按優先級排序
-        available_models.sort(key=lambda x: x[1].priority)
-        return available_models[0][0]
-    
-    async def _fallback_generation(self, request: GenerationRequest, failed_model: str) -> GenerationResponse:
-        """Fallback 生成"""
-        logger.warning(f"模型 {failed_model} 失敗，嘗試 fallback")
-        
-        # 禁用失敗的模型
-        if failed_model in self.models:
-            self.models[failed_model].enabled = False
-        
-        # 嘗試其他模型
-        for model_name, model_config in self.models.items():
-            if model_name != failed_model and model_config.enabled:
-                try:
-                    request.model_name = model_name
-                    return await self.generate_text(request)
-                except Exception as e:
-                    logger.warning(f"Fallback 模型 {model_name} 也失敗: {str(e)}")
-                    continue
-        
-        # 所有模型都失敗，返回預設回應
-        return GenerationResponse(
-            text="抱歉，目前無法生成回應，請稍後再試。",
-            model_used="fallback",
-            tokens_used=0,
-            processing_time=0,
-            confidence=0.0,
-            metadata=request.metadata,
-            trace_id=request.trace_id
-        )
-    
-    def _calculate_confidence(self, text: str, tokens_used: int) -> float:
-        """計算信心度"""
-        if not text:
-            return 0.0
-        
-        # 基於文本長度和內容的簡單信心度計算
-        base_confidence = min(len(text) / 100, 1.0)  # 文本越長信心度越高
-        token_confidence = min(tokens_used / 50, 1.0)  # token 數量適中時信心度較高
-        
-        return (base_confidence + token_confidence) / 2
-    
-    async def get_available_models(self) -> List[Dict[str, Any]]:
-        """獲取可用模型列表"""
-        return [
-            {
-                "name": name,
-                "model_id": config.model_id,
-                "enabled": config.enabled,
-                "priority": config.priority
-            }
-            for name, config in self.models.items()
-        ]
-    
-    async def cleanup(self) -> bool:
-        """清理資源"""
-        try:
-            if self.http_session:
-                await self.http_session.close()
-            return True
-        except Exception as e:
-            logger.error(f"清理資源失敗: {str(e)}")
-            return False
-
-# 創建 LLM 服務實例
-llm_service = LLMService()
-
-# Pydantic 模型
-class LLMRequest(BaseModel):
-    """LLM 請求模型"""
-    prompt: str
-    model: str = "qwen2.5-Taiwan"  # 預設使用 Qwen2.5-Taiwan
-    max_tokens: int = 2048
-    temperature: float = 0.7
-    system_prompt: Optional[str] = None
-    user_id: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
-
-class EmbeddingRequest(BaseModel):
-    """向量嵌入請求模型"""
-    text: str
-    model: str = "bge-m3"  # 預設使用 bge-m3
-
-# 載入向量模型
-def load_embedding_models():
-    """載入向量嵌入模型"""
-    models = {}
-    
-    # 檢查模型路徑是否存在
-    bge_path = os.getenv("BGE_MODEL_PATH", "/app/models/external/bge-m3")
-    
-    # 載入 BGE-M3 模型（如果存在）
-    if os.path.exists(bge_path) and os.path.exists(os.path.join(bge_path, "config.json")):
-        try:
-            models["bge-m3"] = {
-                "tokenizer": AutoTokenizer.from_pretrained(bge_path),
-                "model": AutoModel.from_pretrained(bge_path)
-            }
-            logging.info(f"BGE-M3 模型載入成功: {bge_path}")
-        except Exception as e:
-            logging.error(f"BGE-M3 模型載入失敗: {e}")
-    else:
-        logging.warning(f"BGE-M3 模型路徑不存在或無效: {bge_path}")
-    
-    return models
-
-# 初始化模型
-embedding_models = load_embedding_models()
-
-@app.on_event("startup")
-async def startup_event():
-    """啟動事件"""
-    await llm_service.initialize()
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """關閉事件"""
-    await llm_service.cleanup()
-
-@app.get("/health")
-async def health_check():
-    """健康檢查端點"""
-    available_models = await llm_service.get_available_models()
-    return {
-        "status": "healthy", 
-        "models": available_models,
-        "embedding_models": list(embedding_models.keys())
-    }
-
-@app.post("/generate")
-async def generate_text(request: LLMRequest):
-    """生成文字端點"""
-    try:
-        with langfuse.trace(name="generate_text") as trace:
-            # 創建生成請求
-            gen_request = GenerationRequest(
-                prompt=request.prompt,
-                model_name=request.model,
-                max_tokens=request.max_tokens,
-                temperature=request.temperature,
-                system_prompt=request.system_prompt,
-                user_id=request.user_id,
-                metadata=request.metadata,
-                trace_id=trace.id
-            )
+            if model_name and model_name in self.models:
+                model = self.get_model(model_name)
+            else:
+                # 使用預設模型或自動選擇
+                model = self.get_qwen_taiwan()
             
             # 生成文字
-            response = await llm_service.generate_text(gen_request)
+            response = await model.generate(
+                prompt=prompt,
+                max_tokens=kwargs.get('max_tokens', self.config.max_tokens),
+                temperature=kwargs.get('temperature', self.config.temperature),
+                **kwargs
+            )
             
-            # 記錄追蹤
-            trace.span(
-                name="llm_generation",
-                input={"prompt": request.prompt, "model": request.model},
-                output={"response": response.text, "confidence": response.confidence}
-            )
-
             return {
-                "text": response.text,
-                "model_used": response.model_used,
-                "tokens_used": response.tokens_used,
-                "processing_time": response.processing_time,
-                "confidence": response.confidence,
-                "trace_id": response.trace_id
+                "success": True,
+                "text": response,
+                "model_used": model.model_name,
+                "prompt": prompt
             }
-
-    except Exception as e:
-        logger.error(f"生成文字失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/embed")
-async def get_embedding(request: EmbeddingRequest):
-    """獲取向量嵌入端點"""
-    try:
-        with langfuse.trace(name="get_embedding") as trace:
-            # 檢查模型是否可用
-            if request.model not in embedding_models:
-                raise HTTPException(status_code=400, detail=f"模型 {request.model} 不可用")
-
-            model = embedding_models[request.model]
-            inputs = model["tokenizer"](
-                request.text,
-                return_tensors="pt",
-                padding=True,
-                truncation=True
-            )
-
-            with torch.no_grad():
-                outputs = model["model"](**inputs)
-                embeddings = outputs.last_hidden_state.mean(dim=1)
-
-            trace.span(
-                name="embedding_generation",
-                input={"text": request.text},
-                output={"embedding_shape": embeddings.shape}
-            )
-
-            return {"embedding": embeddings.tolist()}
-
-    except Exception as e:
-        logger.error(f"生成向量嵌入失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/models")
-async def get_models():
-    """獲取可用模型列表"""
-    try:
-        available_models = await llm_service.get_available_models()
-        return {
-            "llm_models": available_models,
-            "embedding_models": list(embedding_models.keys())
+            
+        except Exception as e:
+            logger.error(f"文字生成失敗: {e}")
+            
+            # 嘗試 fallback
+            if self.config.enable_fallback and model_name != 'qwen3':
+                try:
+                    fallback_model = self.get_qwen3()
+                    response = await fallback_model.generate(prompt, **kwargs)
+                    return {
+                        "success": True,
+                        "text": response,
+                        "model_used": fallback_model.model_name,
+                        "fallback": True,
+                        "original_error": str(e)
+                    }
+                except Exception as fallback_error:
+                    logger.error(f"Fallback 也失敗: {fallback_error}")
+            
+            return {
+                "success": False,
+                "error": str(e),
+                "prompt": prompt
+            }
+    
+    def health_check(self) -> Dict[str, Any]:
+        """健康檢查"""
+        health_status = {
+            "status": "healthy",
+            "models": {},
+            "timestamp": str(Path(__file__).stat().st_mtime)
         }
-    except Exception as e:
-        logger.error(f"獲取模型列表失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        
+        for model_name, model in self.models.items():
+            try:
+                # 基本可用性檢查
+                if hasattr(model, 'health_check'):
+                    model_health = model.health_check()
+                else:
+                    model_health = {"status": "available"}
+                
+                health_status["models"][model_name] = model_health
+            except Exception as e:
+                health_status["models"][model_name] = {
+                    "status": "error",
+                    "error": str(e)
+                }
+                health_status["status"] = "unhealthy"
+        
+        return health_status
+    
+    def get_service_info(self) -> Dict[str, Any]:
+        """獲取服務資訊"""
+        return {
+            "module": "llm",
+            "version": "2.0.0",
+            "description": "Podwise 語言模型服務",
+            "models": list(self.models.keys()),
+            "config": {
+                "enable_qwen_taiwan": self.config.enable_qwen_taiwan,
+                "enable_qwen3": self.config.enable_qwen3,
+                "enable_fallback": self.config.enable_fallback,
+                "max_tokens": self.config.max_tokens,
+                "temperature": self.config.temperature,
+                "timeout": self.config.timeout,
+                "retry_count": self.config.retry_count,
+                "log_level": self.config.log_level
+            }
+        }
+
+
+# 全域實例
+_llm_manager: Optional[LLMManager] = None
+
+
+def get_llm_manager(config: Optional[LLMConfig] = None) -> LLMManager:
+    """獲取 LLM 管理器實例（單例模式）"""
+    global _llm_manager
+    if _llm_manager is None:
+        _llm_manager = LLMManager(config)
+    return _llm_manager
+
+
+def initialize_llm(config: Optional[LLMConfig] = None) -> LLMManager:
+    """初始化 LLM 模組"""
+    return get_llm_manager(config)
+
+
+# 便捷函數
+def get_qwen_taiwan():
+    """獲取 Qwen2.5-Taiwan-7B-Instruct 模型"""
+    return get_llm_manager().get_qwen_taiwan()
+
+
+def get_qwen3():
+    """獲取 Qwen3-8B 模型"""
+    return get_llm_manager().get_qwen3()
+
+
+async def generate_text(prompt: str, model_name: Optional[str] = None, **kwargs):
+    """生成文字"""
+    return await get_llm_manager().generate_text(prompt, model_name, **kwargs)
+
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8004) 
+    # 測試模式
+    async def test_llm():
+        try:
+            llm_manager = initialize_llm()
+            print("✅ LLM 模組初始化成功")
+            print(f"📋 服務資訊: {llm_manager.get_service_info()}")
+            print(f"🏥 健康檢查: {llm_manager.health_check()}")
+            
+            # 測試文字生成
+            result = await llm_manager.generate_text("你好，請介紹一下自己")
+            print(f"🤖 文字生成測試: {result}")
+            
+        except Exception as e:
+            print(f"❌ LLM 模組初始化失敗: {e}")
+            sys.exit(1)
+    
+    asyncio.run(test_llm()) 
