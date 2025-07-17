@@ -123,6 +123,55 @@ def clean_data(input_file: str, output_file: str):
         logger.error(f"清理資料失敗: {e}")
         return False
 
+def batch_clean_folder(input_folder: str, output_folder: str):
+    """批次清理指定資料夾下所有支援檔案"""
+    try:
+        from data_cleaning import UnifiedCleaner
+        
+        print(f"開始批次清理資料夾: {input_folder}")
+        
+        # 初始化統一清理器
+        cleaner = UnifiedCleaner()
+        
+        # 批次清理檔案
+        cleaned_files = cleaner.batch_clean_files(
+            [str(f) for f in Path(input_folder).glob("*.json")],
+            output_folder
+        )
+        
+        print(f"批次清理完成！共處理 {len(cleaned_files)} 個檔案")
+        print(f"輸出目錄: {output_folder}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"批次清理失敗: {e}")
+        return False
+
+def quick_clean_emoji(source_dir: str, target_dir: str):
+    """快速清理表情符號"""
+    try:
+        from data_cleaning import UnifiedCleaner
+        
+        print(f"開始快速清理表情符號: {source_dir}")
+        
+        # 初始化統一清理器
+        cleaner = UnifiedCleaner()
+        
+        # 快速清理表情符號
+        stats = cleaner.quick_clean_emoji_from_folder(source_dir, target_dir)
+        
+        print(f"表情符號清理完成！")
+        print(f"總計檔案: {stats['total_files']}")
+        print(f"成功處理: {stats['processed_files']}")
+        if stats['errors']:
+            print(f"錯誤數量: {len(stats['errors'])}")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"快速清理表情符號失敗: {e}")
+        return False
+
 def process_stock_cancer(input_file: str, import_postgresql: bool = False):
     """處理股癌資料"""
     try:
@@ -292,6 +341,12 @@ def main():
   python main.py --service-test local --sample-size 50
   python main.py --service-test database --sample-size 50
   python main.py --service-test full --sample-size 50
+  
+  # 批次清理資料夾
+  python main.py --batch-clean --input-folder batch_input --output-folder cleaned_data
+  
+  # 快速清理表情符號
+  python main.py --quick-clean-emoji --source-dir comment_data --target-dir cleaned_comment_data
         """
     )
     
@@ -320,6 +375,22 @@ def main():
                        help='執行服務測試 (local/database/full)')
     parser.add_argument('--sample-size', type=int, default=100,
                        help='測試樣本大小 (預設: 100)')
+    
+    # 批次處理選項
+    parser.add_argument('--batch-clean', action='store_true',
+                       help='批次清理指定資料夾下所有支援檔案')
+    parser.add_argument('--input-folder', type=str,
+                       help='輸入資料夾路徑')
+    parser.add_argument('--output-folder', type=str,
+                       help='輸出資料夾路徑')
+    
+    # 快速清理選項
+    parser.add_argument('--quick-clean-emoji', action='store_true',
+                       help='快速清理表情符號')
+    parser.add_argument('--source-dir', type=str,
+                       help='來源資料夾路徑')
+    parser.add_argument('--target-dir', type=str,
+                       help='目標資料夾路徑')
     
     args = parser.parse_args()
     
@@ -350,6 +421,20 @@ def main():
     
     elif args.service_test:
         return run_service_test(args.service_test, args.sample_size)
+    
+    elif args.batch_clean:
+        if not args.input_folder:
+            print("錯誤: 批次清理需要指定 --input-folder 參數")
+            return False
+        output_folder = args.output_folder or "cleaned_data"
+        return batch_clean_folder(args.input_folder, output_folder)
+    
+    elif args.quick_clean_emoji:
+        if not args.source_dir:
+            print("錯誤: 快速清理表情符號需要指定 --source-dir 參數")
+            return False
+        target_dir = args.target_dir or args.source_dir
+        return quick_clean_emoji(args.source_dir, target_dir)
     
     else:
         parser.print_help()

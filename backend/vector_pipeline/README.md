@@ -1,228 +1,356 @@
 # Vector Pipeline
 
-統一的向量化處理管道，整合所有核心功能，遵循 Google Clean Code 原則和 OOP 架構。
+一個完整的向量處理管道系統，用於處理 podcast 內容的文本分塊、標籤化、向量化和存儲。
 
-## 架構概覽
+## 功能特色
+
+- **文本分塊**: 智能文本分割，支援重疊分塊
+- **向量化**: 使用 BGE-M3 模型生成高品質向量嵌入
+- **智能標籤**: 自動標籤提取和分類
+- **向量存儲**: 與 Milvus 向量資料庫整合
+- **批次處理**: 支援大量資料的批次處理
+- **錯誤處理**: 完整的錯誤記錄和恢復機制
+
+## 架構設計
 
 ```
 vector_pipeline/
-├── main.py                    # 主程式入口
-├── enhanced_tagging.py        # 增強版標籤處理器（主程式）
-├── core/                      # 核心模組
-│   ├── __init__.py
-│   ├── tag_processor.py       # 統一標籤處理器
-│   ├── batch_processor.py     # 批次處理器
-│   ├── text_chunker.py        # 文本分塊器（以換行符分段）
-│   ├── mongo_processor.py     # MongoDB 處理器
-│   ├── milvus_writer.py       # Milvus 寫入器
-│   ├── vector_processor.py    # 向量處理器
-│   ├── pipeline_stages.py     # 管道階段處理器
-│   └── error_logger.py        # 錯誤記錄器
-├── utils/                     # 工具模組
-│   ├── __init__.py
-│   └── data_quality_checker.py # 資料品質檢查器
-└── tests/                     # 測試模組
-    ├── __init__.py
-    └── test_enhanced_integration.py
+├── main.py              # 主要入口點和 API
+├── core/                # 核心業務邏輯
+│   ├── vector_processor.py
+│   ├── text_chunker.py
+│   ├── tag_processor.py
+│   ├── milvus_writer.py
+│   └── ...
+├── services/            # 服務層
+│   ├── embedding_service.py
+│   ├── search_service.py
+│   ├── tagging_service.py
+│   └── ...
+├── config/              # 配置檔案
+├── data/                # 資料目錄
+└── logs/                # 日誌檔案
 ```
 
-## 核心功能
-
-### 1. 統一標籤處理器 (`core/tag_processor.py`)
-- **優先使用 TAG_info.csv**：首先查詢預定義標籤
-- **智能標籤提取**：使用 `tag_processor.py` 的 SmartTagExtractor
-- **增強版處理器**：整合 MoneyDJ 百科和專業術語
-- **支援 1-3 個標籤**：根據內容類型自動調整
-
-### 2. 文本分塊器 (`core/text_chunker.py`)
-- **以換行符分段**：優先按換行符切分長文本
-- **智能分塊**：處理超長段落
-- **重疊設計**：確保上下文連續性
-
-### 3. 批次處理器 (`core/batch_processor.py`)
-- **多 RSS 資料夾處理**：並行處理多個資料夾
-- **進度追蹤**：實時顯示處理進度
-- **錯誤處理**：詳細的錯誤記錄和恢復
-
-### 4. 資料品質檢查器 (`utils/data_quality_checker.py`)
-- **Exclamation 檔案檢查**：識別問題檔案
-- **STT 檔案檢查**：驗證語音轉文字品質
-- **報告生成**：JSON 和 CSV 格式報告
-
-## 使用方式
+## 快速開始
 
 ### 基本使用
 
 ```python
-from vector_pipeline import VectorPipeline
+from vector_pipeline.main import VectorPipeline
 
-# 初始化管道
+# 建立管道實例
 pipeline = VectorPipeline()
 
-# 處理所有 RSS 資料夾
-results = pipeline.process_all_rss_folders()
+# 處理單一文本
+result = pipeline.process_text(
+    "這是一個測試文本",
+    metadata={'source': 'test', 'author': 'user'}
+)
 
-# 處理單一 RSS 資料夾
-stats = pipeline.process_single_rss_folder("RSS_1234567890")
+# 批次處理
+texts = ["文本1", "文本2", "文本3"]
+batch_result = pipeline.batch_process(texts)
 
-# 測試標籤系統
-pipeline.test_tagging_system()
+# 向量搜尋
+search_result = pipeline.search_similar("搜尋查詢", limit=10)
 ```
 
-### 命令列使用
-
-```bash
-# 顯示處理狀態
-python main.py status
-
-# 測試標籤系統
-python main.py test
-
-# 處理單一 RSS 資料夾
-python main.py single RSS_1234567890
-
-# 處理所有 RSS 資料夾
-python main.py all
-```
-
-### 直接使用增強版標籤處理器
+### 便利函數
 
 ```python
-from enhanced_tagging import EnhancedTagProcessor
+from vector_pipeline.main import process_single_text, search_similar_content
 
-# 初始化處理器
-processor = EnhancedTagProcessor("path/to/TAG_info.csv")
+# 快速處理單一文本
+result = process_single_text("測試文本")
 
-# 提取標籤
-text = "AI人工智慧技術正在改變世界"
-tags = processor.extract_enhanced_tags(text)
-print(f"標籤: {tags}")
+# 快速搜尋
+results = search_similar_content("查詢內容")
 ```
 
-### 資料品質檢查
+## API 參考
+
+### VectorPipeline 類別
+
+#### 初始化
+```python
+pipeline = VectorPipeline(config_path="config.json")
+```
+
+#### 主要方法
+
+##### process_text(text, metadata=None)
+處理單一文本通過完整管道。
+
+**參數:**
+- `text` (str): 要處理的文本
+- `metadata` (dict, optional): 文本的元資料
+
+**返回:**
+- `dict`: 包含處理結果的字典
+
+##### batch_process(texts, metadata_list=None)
+批次處理多個文本。
+
+**參數:**
+- `texts` (List[str]): 要處理的文本列表
+- `metadata_list` (List[dict], optional): 每個文本的元資料列表
+
+**返回:**
+- `dict`: 包含批次處理結果的字典
+
+##### search_similar(query, limit=10)
+使用向量相似度搜尋相似內容。
+
+**參數:**
+- `query` (str): 搜尋查詢
+- `limit` (int): 返回結果的最大數量
+
+**返回:**
+- `dict`: 包含搜尋結果的字典
+
+##### store_to_milvus(data)
+將處理後的資料存儲到 Milvus 向量資料庫。
+
+**參數:**
+- `data` (List[dict]): 要存儲的資料列表
+
+**返回:**
+- `dict`: 包含存儲結果的字典
+
+##### sync_stages(source_stage, target_stage)
+同步管道階段之間的資料。
+
+**參數:**
+- `source_stage` (str): 來源階段名稱
+- `target_stage` (str): 目標階段名稱
+
+**返回:**
+- `dict`: 包含同步結果的字典
+
+##### normalize_titles(titles)
+標準化標題以保持一致性。
+
+**參數:**
+- `titles` (List[str]): 要標準化的標題列表
+
+**返回:**
+- `List[str]`: 標準化後的標題列表
+
+##### get_pipeline_status()
+獲取所有管道組件的當前狀態。
+
+**返回:**
+- `dict`: 包含組件狀態的字典
+
+## 配置
+
+### 預設配置
+
+```json
+{
+  "milvus": {
+    "host": "192.168.32.86",
+    "port": "19530",
+    "collection_name": "podcast_chunks"
+  },
+  "embedding": {
+    "model": "bge-m3",
+    "dimension": 1024
+  },
+  "chunking": {
+    "chunk_size": 512,
+    "overlap": 50
+  }
+}
+```
+
+### 自定義配置
+
+建立 `config.json` 檔案：
+
+```json
+{
+  "milvus": {
+    "host": "your-milvus-host",
+    "port": "19530",
+    "collection_name": "your-collection"
+  },
+  "embedding": {
+    "model": "bge-m3",
+    "dimension": 1024
+  },
+  "chunking": {
+    "chunk_size": 256,
+    "overlap": 25
+  }
+}
+```
+
+## 核心組件
+
+### Core 模組
+
+- **VectorProcessor**: 向量處理核心邏輯
+- **TextChunker**: 文本分塊處理
+- **TagProcessor**: 標籤處理和提取
+- **TagManager**: 標籤管理
+- **MilvusWriter**: Milvus 資料庫寫入
+- **PostgreSQLMapper**: PostgreSQL 資料映射
+- **MongoProcessor**: MongoDB 資料處理
+- **PipelineStages**: 管道階段管理
+- **BatchProcessor**: 批次處理
+- **StageSyncManager**: 階段同步管理
+- **TitleNormalizer**: 標題標準化
+- **ErrorLogger**: 錯誤記錄
+
+### Services 模組
+
+- **EmbeddingService**: 向量嵌入服務
+- **SearchService**: 向量搜尋服務
+- **TaggingService**: 標籤服務
+- **ErrorLogger**: 錯誤記錄服務
+
+## 使用範例
+
+### 完整管道處理
 
 ```python
-from utils.data_quality_checker import DataQualityChecker
+from vector_pipeline.main import VectorPipeline
 
-# 初始化檢查器
-checker = DataQualityChecker()
+# 建立管道
+pipeline = VectorPipeline()
 
-# 檢查 exclamation 檔案
-stats = checker.check_exclamation_files()
+# 處理 podcast 內容
+podcast_text = """
+這是一個關於人工智慧的 podcast 內容。
+我們將討論機器學習的最新發展和應用。
+"""
 
-# 生成報告
-report_file = checker.generate_report(stats, "exclamation")
-txt_file = checker.save_exclamation_list_to_txt(stats)
+metadata = {
+    'podcast_name': 'AI Talk',
+    'episode_title': '機器學習入門',
+    'author': '張三',
+    'category': '科技'
+}
 
-# 打印摘要
-checker.print_report_summary(stats)
+# 執行完整處理
+result = pipeline.process_text(podcast_text, metadata)
+
+if result['status'] == 'success':
+    print(f"處理成功: {result['chunks']} 個分塊")
+    print(f"生成 {result['embeddings']} 個向量")
+else:
+    print(f"處理失敗: {result['message']}")
 ```
 
-## 配置要求
+### 向量搜尋
 
-### 環境變數
-```bash
-# MongoDB 配置
-MONGO_HOST=192.168.32.86
-MONGO_PORT=30017
-MONGO_USERNAME=bdse37
-MONGO_PASSWORD=111111
-MONGO_DATABASE=podcast
+```python
+# 搜尋相似內容
+search_query = "人工智慧應用"
+results = pipeline.search_similar(search_query, limit=5)
 
-# PostgreSQL 配置
-POSTGRES_HOST=192.168.32.86
-POSTGRES_PORT=5432
-POSTGRES_USERNAME=bdse37
-POSTGRES_PASSWORD=111111
-POSTGRES_DATABASE=podcast
-
-# Milvus 配置
-MILVUS_HOST=192.168.32.86
-MILVUS_PORT=19530
+if results['status'] == 'success':
+    print(f"找到 {results['results_count']} 個相關結果:")
+    for i, result in enumerate(results['results']):
+        print(f"{i+1}. {result['episode_title']}")
+        print(f"   相似度: {result['score']:.4f}")
+        print(f"   內容: {result['chunk_text'][:100]}...")
 ```
 
-### 依賴套件
-```bash
-pip install pymongo psycopg2-binary pymilvus transformers torch numpy pandas
+### 批次處理
+
+```python
+# 批次處理多個文本
+texts = [
+    "第一個 podcast 內容",
+    "第二個 podcast 內容", 
+    "第三個 podcast 內容"
+]
+
+metadata_list = [
+    {'source': 'podcast1', 'category': '科技'},
+    {'source': 'podcast2', 'category': '商業'},
+    {'source': 'podcast3', 'category': '教育'}
+]
+
+batch_result = pipeline.batch_process(texts, metadata_list)
+
+print(f"總處理: {batch_result['total_processed']}")
+print(f"成功: {batch_result['successful']}")
+print(f"失敗: {batch_result['failed']}")
 ```
-
-## 整合原則
-
-### 1. 功能整合
-- **每個功能只有一份**：避免重複實現
-- **統一介面**：所有模組使用一致的 API
-- **模組化設計**：易於維護和擴展
-
-### 2. 架構一致性
-- **與 backend 其他資料夾一致**：遵循相同的目錄結構
-- **OOP 設計**：所有功能以類別形式實現
-- **Google Clean Code**：遵循最佳實踐
-
-### 3. 標籤處理策略
-- **優先使用 TAG_info.csv**：確保標籤一致性
-- **智能備援**：當 CSV 中沒有匹配時使用智能提取
-- **增強版處理**：整合多個專業術語來源
-
-### 4. 文本分塊策略
-- **換行符優先**：保持語義完整性
-- **長文本處理**：智能處理超長段落
-- **重疊設計**：確保上下文連續性
 
 ## 錯誤處理
 
-### 錯誤記錄
-- **詳細記錄**：記錄所有處理階段的錯誤
-- **分類統計**：按錯誤類型統計
-- **恢復機制**：支援錯誤恢復和重試
+系統提供完整的錯誤處理機制：
 
-### 資料品質
-- **自動檢查**：識別問題檔案
-- **報告生成**：詳細的問題報告
-- **處理建議**：提供解決方案建議
-
-## 測試
-
-### 整合測試
-```bash
-# 執行整合測試
-python tests/test_enhanced_integration.py
+```python
+# 檢查管道狀態
+status = pipeline.get_pipeline_status()
+print(f"Milvus 連接: {status['milvus_connection']}")
+print(f"嵌入服務: {status['embedding_service']}")
+print(f"搜尋服務: {status['search_service']}")
+print(f"錯誤數量: {status['error_count']}")
 ```
 
-### 單元測試
-```bash
-# 測試標籤處理器
-python -m pytest tests/ -v
+## 依賴項目
+
+```
+pymilvus>=2.4.0
+numpy>=1.21.0
+pandas>=1.3.0
+psycopg2-binary>=2.9.0
+pymongo>=4.0.0
+sentence-transformers>=2.2.0
 ```
 
-## 維護說明
+## 安裝
 
-### 新增功能
-1. 在適當的模組中添加功能
-2. 更新 `__init__.py` 文件
-3. 添加對應的測試
-4. 更新 README 文檔
+```bash
+# 安裝依賴
+pip install -r requirements.txt
 
-### 修改現有功能
-1. 確保向後相容性
-2. 更新相關測試
-3. 更新文檔說明
+# 或使用 conda
+conda install --file requirements.txt
+```
 
-### 錯誤修復
-1. 在 `core/error_logger.py` 中記錄錯誤
-2. 添加錯誤處理邏輯
-3. 更新測試案例
+## 開發
 
-## 版本歷史
+### 程式碼風格
 
-### v2.0.0 (整合版本)
-- 整合所有重複功能
-- 統一架構設計
-- 增強標籤處理
-- 改進文本分塊
-- 新增資料品質檢查
+本專案遵循 Google Python Style Guide：
 
-### v1.0.0 (初始版本)
-- 基本向量化功能
-- 標籤處理
-- MongoDB 整合
-- Milvus 寫入 
+- 使用 4 空格縮排
+- 行長度限制在 80 字元
+- 使用類型提示
+- 完整的 docstring 文件
+- 單元測試覆蓋
+
+### 測試
+
+```bash
+# 執行測試
+python -m pytest tests/
+
+# 執行特定測試
+python -m pytest tests/test_vector_processor.py
+```
+
+## 授權
+
+本專案採用 MIT 授權條款。
+
+## 貢獻
+
+歡迎提交 Issue 和 Pull Request！
+
+## 更新日誌
+
+### v1.0.0 (2025-07-16)
+- 初始版本發布
+- 完整的向量處理管道
+- Milvus 整合
+- 智能標籤系統
+- 批次處理支援 

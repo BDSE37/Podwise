@@ -17,7 +17,22 @@ from langchain.schema import BaseMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
-from config.integrated_config import get_config
+try:
+    from config.integrated_config import get_config
+except ImportError:
+    try:
+        from ..config.integrated_config import get_config
+    except ImportError:
+        # 如果都無法導入，使用簡化配置
+        def get_config():
+            class Config:
+                class API:
+                    openai_api_key = ""
+                class Models:
+                    pass
+                api = API()
+                models = Models()
+            return Config()
 
 # 配置日誌
 logging.basicConfig(level=logging.INFO)

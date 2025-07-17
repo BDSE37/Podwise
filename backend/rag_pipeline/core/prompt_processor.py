@@ -14,8 +14,50 @@ import logging
 from typing import Dict, Any, List, Optional, Union
 from dataclasses import dataclass
 
-from config.prompt_templates import get_prompt_template, format_prompt
-from config.integrated_config import get_config
+import sys
+import os
+# 添加 rag_pipeline 根目錄到路徑
+rag_pipeline_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if rag_pipeline_root not in sys.path:
+    sys.path.insert(0, rag_pipeline_root)
+
+# 修復導入路徑問題
+import os
+import sys
+
+# 添加 rag_pipeline 根目錄到 Python 路徑
+rag_pipeline_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if rag_pipeline_root not in sys.path:
+    sys.path.insert(0, rag_pipeline_root)
+
+# 添加 config 目錄到 Python 路徑
+config_path = os.path.join(rag_pipeline_root, 'config')
+if config_path not in sys.path:
+    sys.path.insert(0, config_path)
+
+try:
+    from prompt_templates import get_prompt_template, format_prompt
+    from integrated_config import get_config
+except ImportError as e:
+    print(f"導入錯誤: {e}")
+    print(f"當前路徑: {os.getcwd()}")
+    print(f"Python 路徑: {sys.path}")
+    # 嘗試相對導入
+    try:
+        from ..config.prompt_templates import get_prompt_template, format_prompt
+        from ..config.integrated_config import get_config
+    except ImportError as e2:
+        print(f"相對導入也失敗: {e2}")
+        # 最後嘗試直接導入
+        try:
+            import config.prompt_templates as pt
+            import config.integrated_config as ic
+            get_prompt_template = pt.get_prompt_template
+            format_prompt = pt.format_prompt
+            get_config = ic.get_config
+        except ImportError as e3:
+            print(f"直接導入也失敗: {e3}")
+            raise
 # Langfuse 整合已移除，使用 Langfuse Cloud 服務
 
 logger = logging.getLogger(__name__)

@@ -53,7 +53,6 @@ from .utils.file_format_detector import FileFormatDetector
 
 # 資料庫匯入
 from .database.postgresql_inserter import PostgreSQLInserter
-from .database.batch_inserter import BatchPostgreSQLInserter
 
 __version__ = "2.0.0"
 __author__ = "Podwise Team"

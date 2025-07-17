@@ -1,269 +1,235 @@
 #!/usr/bin/env python3
 """
-Vector Pipeline 主程式 - 重構版本
-統一入口點，整合所有功能
-符合 Google Clean Code 原則
+Vector Pipeline Main Module
+
+This module provides the main interface for the vector pipeline system.
+It orchestrates all components and provides a clean API for external usage.
 """
 
 import logging
-import sys
-import argparse
+from typing import List, Dict, Any, Optional
 from pathlib import Path
-from typing import Dict, Any, Optional
-from datetime import datetime
 
-from config.settings import config
-from services.tagging_service import TaggingService
-from services.embedding_service import EmbeddingService
-from services.search_service import SearchService
-from utils.data_quality_checker import DataQualityChecker
+from core.vector_processor import VectorProcessor
+from core.text_chunker import TextChunker
 
-# 設置日誌
+# Configure logging
 logging.basicConfig(
-    level=getattr(logging, config.log_level),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(config.log_file, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
 
 class VectorPipeline:
-    """Vector Pipeline 主類別 - 重構版本"""
+    """
+    Main Vector Pipeline class that orchestrates all components.
+    
+    This class provides a unified interface for all vector pipeline operations
+    including text processing and embedding generation.
+    """
     
     def __init__(self):
-        """初始化 Vector Pipeline"""
-        self.tagging_service = TaggingService()
-        self.embedding_service = EmbeddingService()
-        self.search_service = SearchService()
-        self.data_quality_checker = DataQualityChecker()
+        """Initialize the Vector Pipeline."""
+        self._initialize_components()
         
-        logger.info("Vector Pipeline 初始化完成")
-    
-    def process_tagging(self, stage1_dir: Optional[str] = None, 
-                       stage3_dir: Optional[str] = None) -> Dict[str, Any]:
-        """
-        執行標籤處理
-        
-        Args:
-            stage1_dir: stage1 目錄路徑
-            stage3_dir: stage3 目錄路徑
-            
-        Returns:
-            處理結果
-        """
-        stage1_path = Path(stage1_dir or config.stage1_dir)
-        stage3_path = Path(stage3_dir or config.stage3_dir)
-        
-        if not stage1_path.exists():
-            return {"error": f"輸入路徑不存在: {stage1_path}"}
-        
-        # 獲取所有 RSS 資料夾
-        rss_folders = [f.name for f in stage1_path.iterdir() 
-                      if f.is_dir() and f.name.startswith('RSS_')]
-        
-        if not rss_folders:
-            return {"error": "沒有找到 RSS 資料夾"}
-        
-        logger.info(f"開始標籤處理，找到 {len(rss_folders)} 個 RSS 資料夾")
-        
-        # 執行標籤處理
-        results = self.tagging_service.process_multiple_rss_folders(
-            rss_folders, str(stage1_path), str(stage3_path)
-        )
-        
-        return results
-    
-    def process_embedding(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
-        """
-        執行嵌入處理
-        
-        Args:
-            stage3_dir: stage3 目錄路徑
-            
-        Returns:
-            嵌入結果
-        """
-        logger.info("開始嵌入處理")
-        
-        results = self.embedding_service.embed_stage3_data(stage3_dir)
-        
-        if "error" not in results:
-            logger.info(f"嵌入完成: {results['successful_files']}/{results['total_files']} 檔案成功")
-        
-        return results
-    
-    def search_content(self, query: str, top_k: int = 5) -> Dict[str, Any]:
-        """
-        搜尋內容
-        
-        Args:
-            query: 查詢文本
-            top_k: 返回結果數量
-            
-        Returns:
-            搜尋結果
-        """
-        logger.info(f"搜尋內容: '{query}'")
-        
-        results = self.search_service.search_similar_content(query, top_k)
-        
-        return {
-            "query": query,
-            "results": results,
-            "count": len(results)
-        }
-    
-    def test_search(self) -> Dict[str, Any]:
-        """
-        測試搜尋功能
-        
-        Returns:
-            測試結果
-        """
-        logger.info("開始搜尋功能測試")
-        
-        return self.search_service.test_search_functionality()
-    
-    def get_collection_stats(self) -> Dict[str, Any]:
-        """
-        獲取集合統計資訊
-        
-        Returns:
-            集合統計資訊
-        """
-        return self.search_service.get_collection_stats()
-    
-    def get_tag_statistics(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
-        """
-        獲取標籤統計資訊
-        
-        Args:
-            stage3_dir: stage3 目錄路徑
-            
-        Returns:
-            標籤統計資訊
-        """
-        return self.tagging_service.get_tag_statistics(stage3_dir)
-    
-    def check_data_quality(self, stage3_dir: Optional[str] = None) -> Dict[str, Any]:
-        """
-        檢查資料品質
-        
-        Args:
-            stage3_dir: stage3 目錄路徑
-            
-        Returns:
-            資料品質報告
-        """
-        stage3_path = Path(stage3_dir or config.stage3_dir)
-        
-        if not stage3_path.exists():
-            return {"error": f"目錄不存在: {stage3_path}"}
-        
-        logger.info("開始資料品質檢查")
-        
-        return self.data_quality_checker.check_stage3_data(str(stage3_path))
-    
-    def run_full_pipeline(self) -> Dict[str, Any]:
-        """
-        執行完整管線
-        
-        Returns:
-            完整管線結果
-        """
-        logger.info("🚀 開始執行完整 Vector Pipeline")
-        
-        results = {
-            "timestamp": datetime.now().isoformat(),
-            "stages": {}
-        }
-        
+    def _initialize_components(self):
+        """Initialize all pipeline components."""
         try:
-            # 階段 1: 標籤處理
-            logger.info("=== 階段 1: 標籤處理 ===")
-            tagging_results = self.process_tagging()
-            results["stages"]["tagging"] = tagging_results
+            # Core components
+            self.vector_processor = VectorProcessor()
+            self.text_chunker = TextChunker()
             
-            # 階段 2: 嵌入處理
-            logger.info("=== 階段 2: 嵌入處理 ===")
-            embedding_results = self.process_embedding()
-            results["stages"]["embedding"] = embedding_results
-            
-            # 階段 3: 搜尋測試
-            logger.info("=== 階段 3: 搜尋測試 ===")
-            search_results = self.test_search()
-            results["stages"]["search_test"] = search_results
-            
-            logger.info("🎉 完整管線執行完成")
+            logger.info("✅ All components initialized successfully")
             
         except Exception as e:
-            logger.error(f"管線執行失敗: {e}")
-            results["error"] = str(e)
+            logger.error(f"❌ Failed to initialize components: {e}")
+            raise
+    
+    def process_text(self, text: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Process a single text through the complete pipeline.
         
-        return results
+        Args:
+            text: Input text to process
+            metadata: Optional metadata for the text
+            
+        Returns:
+            Dictionary containing processed results
+        """
+        try:
+            # Step 1: Text chunking
+            document_id = metadata.get('document_id', 'default') if metadata else 'default'
+            chunks = self.text_chunker.split_text_into_chunks(text, document_id)
+            
+            # Step 2: Generate embeddings
+            chunk_texts = [chunk.chunk_text for chunk in chunks]
+            embeddings = self.vector_processor.generate_embeddings(chunk_texts)
+            
+            # Step 3: Prepare data for storage
+            processed_data = []
+            for i, chunk in enumerate(chunks):
+                processed_data.append({
+                    'chunk_id': chunk.chunk_id,
+                    'chunk_text': chunk.chunk_text,
+                    'embedding': embeddings[i].tolist(),
+                    'metadata': metadata or {}
+                })
+            
+            return {
+                'status': 'success',
+                'chunks': len(chunks),
+                'embeddings': len(embeddings),
+                'processed_data': processed_data
+            }
+            
+        except Exception as e:
+            logger.error(f"Text processing failed: {e}")
+            return {'status': 'error', 'message': str(e)}
+    
+    def batch_process(self, texts: List[str], metadata_list: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+        """
+        Process multiple texts in batch.
+        
+        Args:
+            texts: List of texts to process
+            metadata_list: Optional list of metadata for each text
+            
+        Returns:
+            Dictionary containing batch processing results
+        """
+        try:
+            results = []
+            for i, text in enumerate(texts):
+                metadata = metadata_list[i] if metadata_list and i < len(metadata_list) else None
+                result = self.process_text(text, metadata)
+                results.append(result)
+            
+            return {
+                'status': 'success',
+                'total_processed': len(texts),
+                'successful': len([r for r in results if r['status'] == 'success']),
+                'failed': len([r for r in results if r['status'] == 'error']),
+                'results': results
+            }
+            
+        except Exception as e:
+            logger.error(f"Batch processing failed: {e}")
+            return {'status': 'error', 'message': str(e)}
+    
+    def search_similar(self, query: str, texts: List[str], limit: int = 10) -> Dict[str, Any]:
+        """
+        Search for similar content using vector similarity.
+        
+        Args:
+            query: Search query
+            texts: List of texts to search in
+            limit: Maximum number of results to return
+            
+        Returns:
+            Dictionary containing search results
+        """
+        try:
+            # Generate embedding for query
+            query_embedding = self.vector_processor.generate_single_embedding(query)
+            
+            # Generate embeddings for all texts
+            text_embeddings = self.vector_processor.generate_embeddings(texts)
+            
+            # Calculate similarities
+            similarities = self.vector_processor.calculate_similarities(query, texts)
+            
+            # Sort by similarity and get top results
+            text_similarity_pairs = list(zip(texts, similarities))
+            text_similarity_pairs.sort(key=lambda x: x[1], reverse=True)
+            
+            top_results = text_similarity_pairs[:limit]
+            
+            results = []
+            for text, similarity in top_results:
+                results.append({
+                    'text': text,
+                    'similarity': similarity
+                })
+            
+            return {
+                'status': 'success',
+                'query': query,
+                'results_count': len(results),
+                'results': results
+            }
+            
+        except Exception as e:
+            logger.error(f"Search failed: {e}")
+            return {'status': 'error', 'message': str(e)}
+    
+    def get_model_info(self) -> Dict[str, Any]:
+        """
+        Get information about the embedding model.
+        
+        Returns:
+            Dictionary containing model information
+        """
+        try:
+            return self.vector_processor.get_model_info()
+        except Exception as e:
+            logger.error(f"Failed to get model info: {e}")
+            return {'status': 'error', 'message': str(e)}
+    
+    def get_pipeline_status(self) -> Dict[str, Any]:
+        """
+        Get the current status of all pipeline components.
+        
+        Returns:
+            Dictionary containing component statuses
+        """
+        try:
+            model_info = self.get_model_info()
+            return {
+                'vector_processor': 'available',
+                'text_chunker': 'available',
+                'model_info': model_info
+            }
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
 
 
-def main():
-    """主函數"""
-    parser = argparse.ArgumentParser(description="Vector Pipeline 主程式")
-    parser.add_argument("--action", choices=[
-        "tagging", "embedding", "search", "test_search", 
-        "stats", "tag_stats", "quality", "full_pipeline"
-    ], default="full_pipeline", help="執行動作")
-    
-    parser.add_argument("--query", type=str, help="搜尋查詢")
-    parser.add_argument("--top_k", type=int, default=5, help="搜尋結果數量")
-    parser.add_argument("--stage1_dir", type=str, help="stage1 目錄路徑")
-    parser.add_argument("--stage3_dir", type=str, help="stage3 目錄路徑")
-    
-    args = parser.parse_args()
-    
-    # 初始化 Vector Pipeline
+# Convenience functions for easy usage
+def create_pipeline() -> VectorPipeline:
+    """Create and return a new VectorPipeline instance."""
+    return VectorPipeline()
+
+
+def process_single_text(text: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Process a single text using a default pipeline instance."""
     pipeline = VectorPipeline()
-    
-    try:
-        if args.action == "tagging":
-            results = pipeline.process_tagging(args.stage1_dir, args.stage3_dir)
-            print("標籤處理結果:", results)
-            
-        elif args.action == "embedding":
-            results = pipeline.process_embedding(args.stage3_dir)
-            print("嵌入處理結果:", results)
-            
-        elif args.action == "search":
-            if not args.query:
-                print("錯誤: 搜尋需要提供 --query 參數")
-                return
-            results = pipeline.search_content(args.query, args.top_k)
-            print("搜尋結果:", results)
-            
-        elif args.action == "test_search":
-            results = pipeline.test_search()
-            print("搜尋測試結果:", results)
-            
-        elif args.action == "stats":
-            results = pipeline.get_collection_stats()
-            print("集合統計:", results)
-            
-        elif args.action == "tag_stats":
-            results = pipeline.get_tag_statistics(args.stage3_dir)
-            print("標籤統計:", results)
-            
-        elif args.action == "quality":
-            results = pipeline.check_data_quality(args.stage3_dir)
-            print("資料品質報告:", results)
-            
-        elif args.action == "full_pipeline":
-            results = pipeline.run_full_pipeline()
-            print("完整管線結果:", results)
-            
-    except Exception as e:
-        logger.error(f"執行失敗: {e}")
-        print(f"錯誤: {e}")
+    return pipeline.process_text(text, metadata)
+
+
+def search_similar_content(query: str, texts: List[str], limit: int = 10) -> Dict[str, Any]:
+    """Search for similar content using a default pipeline instance."""
+    pipeline = VectorPipeline()
+    return pipeline.search_similar(query, texts, limit)
 
 
 if __name__ == "__main__":
-    main() 
+    # Example usage
+    pipeline = VectorPipeline()
+    
+    # Process a sample text
+    sample_text = "This is a sample text for testing the vector pipeline."
+    result = pipeline.process_text(sample_text, {'source': 'test'})
+    print(f"Processing result: {result}")
+    
+    # Search for similar content
+    sample_texts = [
+        "This is a sample text for testing.",
+        "Another example text for comparison.",
+        "A completely different topic about technology."
+    ]
+    search_result = pipeline.search_similar("sample text", sample_texts)
+    print(f"Search result: {search_result}")
+    
+    # Get model info
+    model_info = pipeline.get_model_info()
+    print(f"Model info: {model_info}") 

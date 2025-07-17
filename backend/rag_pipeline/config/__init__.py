@@ -5,11 +5,12 @@ RAG Pipeline 配置模組
 
 from .integrated_config import get_config
 from .agent_roles_config import get_agent_roles_manager
-from .prompt_templates import get_prompt_template, format_prompt
+from .prompt_templates import get_prompt_template, format_prompt, PodwisePromptTemplates
 
 __all__ = [
     'get_config',
     'get_agent_roles_manager',
     'get_prompt_template',
-    'format_prompt'
+    'format_prompt',
+    'PodwisePromptTemplates'
 ] 

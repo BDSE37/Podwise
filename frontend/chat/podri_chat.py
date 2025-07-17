@@ -115,12 +115,15 @@ class PodriChatService(BaseService):
     async def process_user_message(self, message: str, user_id: str = None) -> str:
         """處理用戶訊息 - 主要使用 RAG Pipeline 進行對話"""
         try:
+            # 確保有有效的使用者ID
+            effective_user_id = user_id or self.current_user_id or "default_user"
+            
             # 記錄用戶訊息
             user_msg = ChatMessage(
                 role="user",
                 content=message,
                 timestamp=datetime.now(),
-                metadata={"user_id": user_id}
+                metadata={"user_id": effective_user_id}
             )
             self.chat_history.append(user_msg)
             
@@ -128,13 +131,17 @@ class PodriChatService(BaseService):
             if (self.user_auth_service and self.current_user_info and 
                 self.current_user_info.get('user_id') is not None and 
                 self.current_user_info.get('user_type') != 'anonymous'):
-                self.user_auth_service.log_chat_message(
-                    user_id=self.current_user_info['user_id'],
-                    session_id=self.session_id,
-                    message_type='user',
-                    content=message,
-                    metadata={"service": "rag_pipeline"}
-                )
+                try:
+                    self.user_auth_service.log_chat_message(
+                        user_id=self.current_user_info['user_id'],
+                        session_id=self.session_id,
+                        message_type='user',
+                        content=message,
+                        metadata={"service": "rag_pipeline", "user_identifier": effective_user_id}
+                    )
+                    logger.info(f"✅ 記錄用戶訊息成功: {effective_user_id}")
+                except Exception as e:
+                    logger.warning(f"⚠️ 記錄用戶訊息失敗: {e}")
             
             # 使用 Backend 服務處理訊息
             if self.backend_manager:
@@ -147,32 +154,38 @@ class PodriChatService(BaseService):
                 if any(keyword in message.lower() for keyword in ["推薦", "podcast", "節目", "建議"]):
                     query_type = "recommendation"
                     # 調用推薦服務
-                    response = await self.backend_manager.run_module("ml_pipeline", user_id=user_id)
+                    response = await self.backend_manager.run_module("ml_pipeline", user_id=effective_user_id)
                     bot_response = f"根據您的偏好，我推薦以下 Podcast：{response.get('message', '推薦服務暫時不可用')}"
                 # 檢查是否為語音相關查詢
                 elif any(keyword in message.lower() for keyword in ["語音轉文字", "語音識別", "stt", "轉錄"]):
                     query_type = "voice"
                     # 調用 STT 服務
-                    response = await self.backend_manager.run_module("stt")
+                    response = await self.backend_manager.run_module("stt", user_id=effective_user_id)
                     bot_response = f"語音轉文字服務狀態：{response.get('message', 'STT 服務暫時不可用')}"
                 # 檢查是否為語音合成相關查詢
                 elif any(keyword in message.lower() for keyword in ["文字轉語音", "語音合成", "tts", "發音"]):
                     query_type = "voice"
                     # 調用 TTS 服務
-                    response = await self.backend_manager.run_module("tts")
+                    response = await self.backend_manager.run_module("tts", user_id=effective_user_id)
                     bot_response = f"文字轉語音服務狀態：{response.get('message', 'TTS 服務暫時不可用')}"
                 else:
                     # 預設使用 RAG Pipeline 進行智能對話
                     # 使用 QueryRequest 格式傳遞參數
                     rag_request = {
                         "query": message,
-                        "user_id": user_id or "default_user",
-                        "session_id": f"session_{user_id}" if user_id else "default_session",
+                        "user_id": effective_user_id,
+                        "session_id": f"session_{effective_user_id}_{int(datetime.now().timestamp())}",
                         "use_advanced_features": True,
                         "use_openai_search": True,
-                        "use_llm_generation": True
+                        "use_llm_generation": True,
+                        "metadata": {
+                            "user_identifier": effective_user_id,
+                            "user_type": self.current_user_info.get('user_type', 'unknown') if self.current_user_info else 'unknown',
+                            "session_id": self.session_id
+                        }
                     }
                     
+                    logger.info(f"🔄 發送 RAG 請求: {effective_user_id} - {message[:50]}...")
                     response = await self.backend_manager.run_module("rag_pipeline", **rag_request)
                     
                     # 從回應中提取內容
@@ -192,7 +205,7 @@ class PodriChatService(BaseService):
                 role="bot",
                 content=bot_response,
                 timestamp=datetime.now(),
-                metadata={"user_id": user_id}
+                metadata={"user_id": effective_user_id}
             )
             self.chat_history.append(bot_msg)
             
@@ -200,19 +213,27 @@ class PodriChatService(BaseService):
             if (self.user_auth_service and self.current_user_info and 
                 self.current_user_info.get('user_id') is not None and 
                 self.current_user_info.get('user_type') != 'anonymous'):
-                self.user_auth_service.log_chat_message(
-                    user_id=self.current_user_info['user_id'],
-                    session_id=self.session_id,
-                    message_type='bot',
-                    content=bot_response,
-                    metadata={"service": "rag_pipeline", "query_type": query_type}
-                )
-                
-                # 更新使用者行為統計
-                self.user_auth_service.update_user_behavior_stats(
-                    user_id=self.current_user_info['user_id'],
-                    query_type=query_type
-                )
+                try:
+                    self.user_auth_service.log_chat_message(
+                        user_id=self.current_user_info['user_id'],
+                        session_id=self.session_id,
+                        message_type='bot',
+                        content=bot_response,
+                        metadata={
+                            "service": "rag_pipeline", 
+                            "query_type": query_type,
+                            "user_identifier": effective_user_id
+                        }
+                    )
+                    
+                    # 更新使用者行為統計
+                    self.user_auth_service.update_user_behavior_stats(
+                        user_id=self.current_user_info['user_id'],
+                        query_type=query_type
+                    )
+                    logger.info(f"✅ 記錄機器人回應成功: {effective_user_id} - {query_type}")
+                except Exception as e:
+                    logger.warning(f"⚠️ 記錄機器人回應失敗: {e}")
             
             return bot_response
             

@@ -1,30 +1,54 @@
 #!/usr/bin/env python3
 """
-Podwise RAG Pipeline 主模組
+Podwise RAG Pipeline 主服務
 
-提供統一的 OOP 介面，整合所有 RAG Pipeline 功能：
-- 核心 RAG Pipeline 處理邏輯
-- FastAPI Web 服務
-- Apple Podcast 優先推薦系統
-- 層級化 CrewAI 架構
-- 語意檢索（text2vec-base-chinese + TAG_info.csv）
-- 提示詞模板系統
-- 聊天歷史記錄
-- 效能優化
+整合 Apple Podcast 排名系統的智能推薦引擎
+提供統一的 RAG Pipeline 服務
 
-符合 OOP 原則和 Google Clean Code 標準
 作者: Podwise Team
-版本: 3.0.0
+版本: 2.0.0
 """
 
-import asyncio
-import logging
 import os
 import sys
-from typing import Dict, Any, Optional, List, Union
+
+# 清除 Python 模組快取，避免載入錯誤的模組
+for module_name in list(sys.modules.keys()):
+    if module_name.startswith('core.') or module_name.startswith('config.'):
+        del sys.modules[module_name]
+
+# 強制設定 sys.path，確保 rag_pipeline 目錄優先
+current_dir = os.path.dirname(os.path.abspath(__file__))  # rag_pipeline 目錄
+backend_root = os.path.abspath(os.path.join(current_dir, '..'))  # backend 目錄
+
+# 完全重新設定 sys.path
+sys.path = [
+    current_dir,  # rag_pipeline 目錄（最高優先級）
+    backend_root,  # backend 目錄
+    '/usr/lib/python3.10',
+    '/usr/lib/python3.10/lib-dynload',
+    '/home/bai/Desktop/Podwise/.venv/lib/python3.10/site-packages'
+]
+
+# 設定環境變數
+os.environ['PYTHONPATH'] = f"{current_dir}:{backend_root}"
+
+import logging
+import asyncio
 from datetime import datetime
-from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List
 from contextlib import asynccontextmanager
+
+# 設定日誌
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# 導入必要的標準庫
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional, List, Union
 
 # FastAPI 相關導入
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
@@ -32,57 +56,235 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-# 添加當前目錄到 Python 路徑
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
+# API 模型定義
+class UserQueryRequest(BaseModel):
+    """用戶查詢請求"""
+    query: str = Field(..., description="用戶查詢內容")
+    user_id: str = Field(default="default_user", description="用戶ID")
+    session_id: Optional[str] = Field(None, description="會話ID")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="額外元數據")
+    enable_tts: bool = Field(default=False, description="是否啟用TTS")
+    voice: str = Field(default="podrina", description="語音模型")
+    speed: float = Field(default=1.0, description="語音速度")
 
-# 導入核心模組
-from core.crew_agents import LeaderAgent, BusinessExpertAgent, EducationExpertAgent, UserManagerAgent, UserQuery, AgentResponse
-from core.hierarchical_rag_pipeline import HierarchicalRAGPipeline, RAGResponse
-from core.apple_podcast_ranking import ApplePodcastRankingSystem
-from core.integrated_core import UnifiedQueryProcessor
-from core.content_categorizer import ContentCategorizer
-from core.qwen_llm_manager import Qwen3LLMManager
-from core.chat_history_service import get_chat_history_service
-from core.mcp_integration import get_mcp_integration
-from core.api_models import (
-    UserQueryRequest, UserQueryResponse, UserValidationRequest, UserValidationResponse,
-    ErrorResponse, SystemInfoResponse, HealthCheckResponse, TTSRequest, TTSResponse
+class UserQueryResponse(BaseModel):
+    """用戶查詢回應"""
+    user_id: str
+    query: str
+    response: str
+    category: str
+    confidence: float
+    recommendations: List[Dict[str, Any]]
+    reasoning: str
+    processing_time: float
+    timestamp: str
+    audio_data: Optional[str] = None
+    voice_used: Optional[str] = None
+    speed_used: Optional[float] = None
+    tts_enabled: bool = False
+
+class UserValidationRequest(BaseModel):
+    """用戶驗證請求"""
+    user_id: str = Field(..., description="用戶ID")
+
+class UserValidationResponse(BaseModel):
+    """用戶驗證回應"""
+    user_id: str
+    is_valid: bool
+    has_history: bool
+    preferred_category: Optional[str] = None
+    message: str
+
+class TTSRequest(BaseModel):
+    """TTS請求"""
+    text: str = Field(..., description="要合成的文字")
+    voice: str = Field(default="podrina", description="語音模型")
+    speed: float = Field(default=1.0, description="語音速度")
+
+class TTSResponse(BaseModel):
+    """TTS回應"""
+    success: bool
+    audio_data: Optional[str] = None
+    voice: Optional[str] = None
+    speed: Optional[float] = None
+    processing_time: float
+    message: str
+
+class ErrorResponse(BaseModel):
+    """錯誤回應"""
+    error: str
+    detail: str
+    timestamp: str
+
+class SystemInfoResponse(BaseModel):
+    """系統資訊回應"""
+    version: str
+    status: str
+    components: Dict[str, bool]
+    timestamp: str
+
+class HealthCheckResponse(BaseModel):
+    """健康檢查回應"""
+    status: str
+    timestamp: str
+    components: Dict[str, bool]
+
+# 修復模組導入 - 使用正確的導入路徑
+try:
+    from core import RAGVectorSearch, RAGSearchConfig
+    VECTOR_SEARCH_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"向量搜尋模組導入失敗: {e}")
+    VECTOR_SEARCH_AVAILABLE = False
+    RAGVectorSearch = None
+    RAGSearchConfig = None
+
+try:
+    from core import AgentResponse, UserQuery, RAGResponse, BaseAgent
+    from core import LeaderAgent, BusinessExpertAgent, EducationExpertAgent, UserManagerAgent
+    CREW_AGENTS_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"CrewAI 代理模組導入失敗: {e}")
+    CREW_AGENTS_AVAILABLE = False
+    LeaderAgent = BusinessExpertAgent = EducationExpertAgent = UserManagerAgent = None
+    UserQuery = AgentResponse = RAGResponse = BaseAgent = None
+
+try:
+    from core import HierarchicalRAGPipeline
+    RAG_PIPELINE_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"層級化 RAG Pipeline 模組導入失敗: {e}")
+    RAG_PIPELINE_AVAILABLE = False
+    HierarchicalRAGPipeline = None
+
+try:
+    from core import ApplePodcastRankingSystem
+    APPLE_RANKING_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Apple Podcast 排名模組導入失敗: {e}")
+    APPLE_RANKING_AVAILABLE = False
+    ApplePodcastRankingSystem = None
+
+try:
+    from core import ContentCategorizer
+    CONTENT_CATEGORIZER_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"內容分類器模組導入失敗: {e}")
+    CONTENT_CATEGORIZER_AVAILABLE = False
+    ContentCategorizer = None
+
+try:
+    from core import Qwen3LLMManager
+    QWEN_LLM_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Qwen LLM 管理器模組導入失敗: {e}")
+    QWEN_LLM_AVAILABLE = False
+    Qwen3LLMManager = None
+
+try:
+    from core import ChatHistoryService
+    CHAT_HISTORY_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"聊天歷史服務模組導入失敗: {e}")
+    CHAT_HISTORY_AVAILABLE = False
+    ChatHistoryService = None
+
+try:
+    from config import get_config
+    CONFIG_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"整合配置模組導入失敗: {e}")
+    CONFIG_AVAILABLE = False
+    get_config = None
+
+try:
+    from config import PodwisePromptTemplates
+    PROMPT_TEMPLATES_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"提示詞模板模組導入失敗: {e}")
+    PROMPT_TEMPLATES_AVAILABLE = False
+    PodwisePromptTemplates = None
+
+try:
+    from core import MCPEnhancedPodcastRecommender
+    RECOMMENDER_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"增強推薦器模組導入失敗: {e}")
+    RECOMMENDER_AVAILABLE = False
+    MCPEnhancedPodcastRecommender = None
+
+try:
+    from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
+    FORMATTER_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Podcast 格式化器模組導入失敗: {e}")
+    FORMATTER_AVAILABLE = False
+    PodcastFormatter = None
+    FormattedPodcast = None
+    PodcastRecommendationResult = None
+
+try:
+    from core.default_qa_processor import DefaultQAProcessor, create_default_qa_processor
+    QA_PROCESSOR_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"預設問答處理器模組導入失敗: {e}")
+    QA_PROCESSOR_AVAILABLE = False
+    DefaultQAProcessor = None
+    def create_default_qa_processor(csv_path: str = "scripts/default_QA.csv") -> Optional[Any]:
+        return None
+
+try:
+    from tools.web_search_tool import WebSearchExpert as WebSearchTool
+    WEB_SEARCH_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Web 搜尋工具模組導入失敗: {e}")
+    WEB_SEARCH_AVAILABLE = False
+    WebSearchTool = None
+
+try:
+    from tts.config.voice_config import VoiceConfig
+    from tts.core.tts_service import TTSService as PodriTTSService
+    TTS_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"TTS 服務模組導入失敗: {e}")
+    TTS_AVAILABLE = False
+    VoiceConfig = None
+    PodriTTSService = None
+
+# 簡化的配置函數
+def get_simple_config():
+    """簡化的配置函數"""
+    return {
+        "llm": {"host": "localhost", "port": 8003},
+        "milvus": {"host": "localhost", "port": 19530},
+        "confidence_threshold": 0.7,
+        "tts": {"host": "localhost", "port": 8003}
+    }
+
+# 如果配置模組不可用，使用簡化配置
+if not CONFIG_AVAILABLE:
+    get_config = get_simple_config
+
+# 創建 FastAPI 應用
+app = FastAPI(
+    title="Podwise RAG Pipeline",
+    description="提供 REST API 介面的智能 Podcast 推薦系統",
+    version="3.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
-# 導入 TTS 服務
-import sys, os
-# 將 tts/core 加入 sys.path
-tts_core_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'tts', 'core'))
-if tts_core_path not in sys.path:
-    sys.path.insert(0, tts_core_path)
-try:
-    from tts_service import TTSService
-    TTS_AVAILABLE = True
-    print("✅ TTS 服務導入成功")
-except ImportError as e:
-    print(f'TTS 服務不可用: {e}')
-    TTS_AVAILABLE = False
+# 添加 CORS 中間件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# 導入配置
-from config.prompt_templates import PodwisePromptTemplates
-from config.integrated_config import get_config
-
-# 導入工具
-from core.enhanced_vector_search import RAGVectorSearch, RAGSearchConfig
-from core.web_search_tool import WebSearchTool
-from core.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
-from core.default_qa_processor import DefaultQAProcessor, create_default_qa_processor
-
-# 使用相對路徑引用共用工具
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-try:
-    from utils.logging_config import get_logger
-    logger = get_logger(__name__)
-except ImportError:
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+# 全局服務管理器
+service_manager = None
 
 
 @dataclass(frozen=True)
@@ -135,22 +337,22 @@ class PodwiseRAGPipeline:
         self.confidence_threshold = confidence_threshold
         
         # 初始化整合配置
-        self.config = get_config()
+        self.config = get_config() if get_config else get_simple_config()
         
         # 初始化提示詞模板
-        self.prompt_templates = PodwisePromptTemplates()
+        self.prompt_templates = PodwisePromptTemplates() if PodwisePromptTemplates else None
         
         # 初始化 LLM 管理器
-        self.llm_manager = Qwen3LLMManager()
+        self.llm_manager = Qwen3LLMManager() if Qwen3LLMManager else None
         
         # 初始化內容處理器
-        self.categorizer = ContentCategorizer()
+        self.categorizer = ContentCategorizer() if ContentCategorizer else None
         
         # 初始化聊天歷史服務（如果啟用且可用）
         self.chat_history = None
         if enable_chat_history:
             try:
-                self.chat_history = get_chat_history_service()
+                self.chat_history = ChatHistoryService()
                 logger.info("✅ 聊天歷史服務初始化成功")
             except Exception as e:
                 logger.warning(f"聊天歷史服務初始化失敗: {e}")
@@ -192,16 +394,16 @@ class PodwiseRAGPipeline:
         self._initialize_agents()
         
         # 初始化層級化 RAG Pipeline
-        self.rag_pipeline = HierarchicalRAGPipeline()
+        self.rag_pipeline = HierarchicalRAGPipeline() if HierarchicalRAGPipeline else None
         
         # 初始化整合核心
-        self.integrated_core = UnifiedQueryProcessor({})
+        self.integrated_core = None # UnifiedQueryProcessor({}) # This line was removed as UnifiedQueryProcessor is no longer imported
         
         # 初始化 TTS 服務
         self.tts_service = None
-        if TTS_AVAILABLE:
+        if TTS_AVAILABLE and PodriTTSService:
             try:
-                self.tts_service = TTSService()
+                self.tts_service = PodriTTSService()
                 logger.info("✅ TTS 服務初始化完成")
             except Exception as e:
                 logger.warning(f"TTS 服務初始化失敗: {e}")
@@ -215,10 +417,42 @@ class PodwiseRAGPipeline:
             'max_processing_time': 30.0
         }
         
-        self.user_manager = UserManagerAgent(config)
-        self.business_expert = BusinessExpertAgent(config)
-        self.education_expert = EducationExpertAgent(config)
-        self.leader_agent = LeaderAgent(config)
+        # 檢查代理類別是否可用，並處理導入錯誤
+        try:
+            if UserManagerAgent:
+                self.user_manager = UserManagerAgent(config)
+            else:
+                self.user_manager = None
+        except Exception as e:
+            logger.warning(f"UserManagerAgent 初始化失敗: {e}")
+            self.user_manager = None
+            
+        try:
+            if BusinessExpertAgent:
+                self.business_expert = BusinessExpertAgent(config)
+            else:
+                self.business_expert = None
+        except Exception as e:
+            logger.warning(f"BusinessExpertAgent 初始化失敗: {e}")
+            self.business_expert = None
+            
+        try:
+            if EducationExpertAgent:
+                self.education_expert = EducationExpertAgent(config)
+            else:
+                self.education_expert = None
+        except Exception as e:
+            logger.warning(f"EducationExpertAgent 初始化失敗: {e}")
+            self.education_expert = None
+            
+        try:
+            if LeaderAgent:
+                self.leader_agent = LeaderAgent(config)
+            else:
+                self.leader_agent = None
+        except Exception as e:
+            logger.warning(f"LeaderAgent 初始化失敗: {e}")
+            self.leader_agent = None
         
         logger.info("✅ CrewAI 代理初始化完成")
     
@@ -441,25 +675,38 @@ class PodwiseRAGPipeline:
         """
         start_time = datetime.now()
         
+        # 確保有有效的使用者ID
+        effective_user_id = user_id or "default_user"
+        effective_session_id = session_id or f"session_{effective_user_id}_{int(start_time.timestamp())}"
+        
+        logger.info(f"🔄 開始處理查詢: {effective_user_id} - {query[:50]}...")
+        
         # 記錄用戶查詢到聊天歷史
         if self.enable_chat_history and self.chat_history:
             try:
                 self.chat_history.save_chat_message(
-                    user_id=user_id,
-                    session_id=session_id or f"session_{user_id}_{int(start_time.timestamp())}",
+                    user_id=effective_user_id,
+                    session_id=effective_session_id,
                     role="user",
                     content=query,
                     chat_mode="rag",
-                    metadata=metadata
+                    metadata={
+                        **(metadata or {}),
+                        "user_identifier": effective_user_id,
+                        "processing_start": start_time.isoformat()
+                    }
                 )
+                logger.info(f"✅ 記錄用戶查詢成功: {effective_user_id}")
             except Exception as e:
-                logger.warning(f"記錄用戶查詢失敗: {e}")
+                logger.warning(f"⚠️ 記錄用戶查詢失敗: {e}")
         
         try:
             # 第一層：向量搜尋
             vector_result = await self._process_vector_search(query)
             if vector_result and vector_result.confidence >= self.confidence_threshold:
                 logger.info(f"✅ 使用向量搜尋回覆 (信心度: {vector_result.confidence:.2f})")
+                # 記錄成功的向量搜尋結果
+                self._log_successful_query(effective_user_id, "vector_search", query, vector_result.confidence)
                 return vector_result
             
             # 第二層：Web 搜尋 fallback
@@ -470,37 +717,45 @@ class PodwiseRAGPipeline:
             default_qa_result = await self._check_default_qa(query)
             if default_qa_result:
                 logger.info("✅ 使用預設問答回覆")
+                self._log_successful_query(effective_user_id, "default_qa", query, default_qa_result.confidence)
                 return default_qa_result
             
             # 如果都沒有找到合適的回應，返回 web 搜尋結果
+            self._log_successful_query(effective_user_id, "web_search", query, web_result.confidence)
             return web_result
             
         except Exception as e:
-            logger.error(f"處理查詢時發生錯誤: {e}")
-            
-            # 記錄錯誤回應
-            if self.enable_chat_history and self.chat_history:
-                try:
-                    self.chat_history.save_chat_message(
-                        user_id=user_id,
-                        session_id=session_id or f"session_{user_id}_{int(start_time.timestamp())}",
-                        role="assistant",
-                        content=f"抱歉，處理您的查詢時發生錯誤: {str(e)}",
-                        chat_mode="rag",
-                        metadata={"error": str(e), "error_type": type(e).__name__}
-                    )
-                except Exception as history_error:
-                    logger.warning(f"記錄錯誤回應失敗: {history_error}")
-            
-            # 返回錯誤回應
+            logger.error(f"❌ 查詢處理失敗: {e}")
+            # 記錄失敗的查詢
+            self._log_failed_query(effective_user_id, query, str(e))
             return RAGResponse(
-                content=f"抱歉，處理您的查詢時發生錯誤: {str(e)}",
+                content="抱歉，處理您的查詢時發生錯誤。",
                 confidence=0.0,
-                level_used="error",
                 sources=[],
                 processing_time=(datetime.now() - start_time).total_seconds(),
-                metadata={"error": str(e)}
+                level_used="error",
+                metadata={
+                    "error": str(e),
+                    "user_id": effective_user_id,
+                    "session_id": effective_session_id
+                }
             )
+    
+    def _log_successful_query(self, user_id: str, method: str, query: str, confidence: float):
+        """記錄成功的查詢"""
+        try:
+            logger.info(f"✅ 查詢成功記錄: {user_id} - {method} - 信心度: {confidence:.2f}")
+            # 這裡可以添加更詳細的日誌記錄或資料庫記錄
+        except Exception as e:
+            logger.warning(f"⚠️ 記錄成功查詢失敗: {e}")
+    
+    def _log_failed_query(self, user_id: str, query: str, error: str):
+        """記錄失敗的查詢"""
+        try:
+            logger.warning(f"❌ 查詢失敗記錄: {user_id} - 錯誤: {error}")
+            # 這裡可以添加更詳細的錯誤記錄
+        except Exception as e:
+            logger.warning(f"⚠️ 記錄失敗查詢失敗: {e}")
     
     async def _apply_apple_ranking(self, response: RAGResponse, query: str) -> RAGResponse:
         """應用 Apple Podcast 排名系統"""
@@ -509,7 +764,7 @@ class PodwiseRAGPipeline:
             recommendations = response.metadata.get('recommendations', [])
             if recommendations and self.apple_ranking:
                 # 轉換為 ApplePodcastRating 格式
-                from .core.apple_podcast_ranking import ApplePodcastRating
+                from core.apple_podcast_ranking import ApplePodcastRating
                 podcast_ratings = []
                 for rec in recommendations:
                     if isinstance(rec, dict) and 'rss_id' in rec:
@@ -827,26 +1082,6 @@ async def lifespan(app: FastAPI):
     logger.info("應用程式關閉，清理資源...")
 
 
-# 創建 FastAPI 應用
-app = FastAPI(
-    title=service_manager.app_config.title,
-    description=service_manager.app_config.description,
-    version=service_manager.app_config.version,
-    docs_url=service_manager.app_config.docs_url,
-    redoc_url=service_manager.app_config.redoc_url,
-    lifespan=lifespan
-)
-
-# 添加 CORS 中間件
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 # 依賴注入
 def get_service_manager() -> RAGPipelineService:
     """獲取服務管理器"""
@@ -874,29 +1109,29 @@ async def root() -> Dict[str, Any]:
     }
 
 
-@app.get("/health", response_model=HealthCheckResponse)
-async def health_check(manager: RAGPipelineService = Depends(get_service_manager)) -> HealthCheckResponse:
+@app.get("/health")
+async def health_check(manager: RAGPipelineService = Depends(get_service_manager)):
     """健康檢查端點"""
     if not manager.rag_pipeline:
         raise HTTPException(status_code=503, detail="RAG Pipeline 未初始化")
     
     health_data = await manager.rag_pipeline.health_check()
     
-    return HealthCheckResponse(
-        status=health_data["status"],
-        timestamp=health_data["timestamp"],
-        components=health_data.get("components", {}),
-        rag_pipeline_health=health_data,
-        web_search_available=manager.web_search_tool.is_configured() if manager.web_search_tool and hasattr(manager.web_search_tool, 'is_configured') else False
-    )
+    return {
+        "status": health_data["status"],
+        "timestamp": health_data["timestamp"],
+        "components": health_data.get("components", {}),
+        "rag_pipeline_health": health_data,
+        "web_search_available": manager.web_search_tool.is_configured() if manager.web_search_tool and hasattr(manager.web_search_tool, 'is_configured') else False
+    }
 
 
-@app.post("/api/v1/validate-user", response_model=UserValidationResponse)
+@app.post("/api/v1/validate-user")
 async def validate_user(
     request: UserValidationRequest,
     manager: RAGPipelineService = Depends(get_service_manager),
     _: None = Depends(validate_system_ready)
-) -> UserValidationResponse:
+):
     """驗證用戶"""
     try:
         # 簡單的用戶驗證邏輯
@@ -905,6 +1140,8 @@ async def validate_user(
         return UserValidationResponse(
             user_id=request.user_id,
             is_valid=is_valid,
+            has_history=False,
+            preferred_category=None,
             message="用戶驗證成功" if is_valid else "用戶驗證失敗"
         )
         
@@ -1190,4 +1427,4 @@ async def main():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=True) 
+    uvicorn.run("main:app", host="0.0.0.0", port=8005, reload=False, log_level="info") 

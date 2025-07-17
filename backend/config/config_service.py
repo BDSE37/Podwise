@@ -14,9 +14,7 @@ from pathlib import Path
 import subprocess
 
 # 導入現有配置模組
-from mongo_config import MONGO_CONFIG, MONGO_URI, MONGO_INDEXES
-from db_config import POSTGRES_CONFIG, MILVUS_CONFIG, MINIO_CONFIG, DB_CONFIG
-
+from db_config import POSTGRES_CONFIG, MILVUS_CONFIG, MINIO_CONFIG, DB_CONFIG, MONGO_CONFIG
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -73,7 +71,7 @@ async def get_mongo_config():
             "database": MONGO_CONFIG["database"],
             "username": MONGO_CONFIG["username"],
             "collections": MONGO_CONFIG["collections"],
-            "indexes": MONGO_INDEXES
+            "indexes": MONGO_CONFIG["indexes"]
         }
     except Exception as e:
         logger.error(f"獲取 MongoDB 配置失敗: {str(e)}")

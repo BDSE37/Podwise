@@ -354,4 +354,60 @@ class UnifiedCleaner(BaseCleaner):
         if error_files:
             self.logger.warning(f"修正失敗的檔案: {error_files}")
         
-        return fixed_count 
+        return fixed_count
+    
+    def quick_clean_emoji_from_folder(self, source_dir: str, target_dir: Optional[str] = None) -> Dict[str, Any]:
+        """
+        快速清理指定資料夾中所有 JSON 檔案的表情符號
+        
+        Args:
+            source_dir: 來源資料夾路徑
+            target_dir: 目標資料夾路徑（可選）
+            
+        Returns:
+            處理結果統計
+        """
+        import shutil
+        
+        source_path = Path(source_dir)
+        if target_dir:
+            target_path = Path(target_dir)
+        else:
+            target_path = source_path
+        
+        # 確保目標目錄存在
+        target_path.mkdir(parents=True, exist_ok=True)
+        
+        # 統計資訊
+        stats = {
+            'total_files': 0,
+            'processed_files': 0,
+            'cleaned_files': [],
+            'errors': []
+        }
+        
+        # 處理所有 JSON 檔案
+        for json_file in source_path.glob("*.json"):
+            stats['total_files'] += 1
+            
+            try:
+                # 複製檔案到目標目錄
+                target_file = target_path / json_file.name
+                shutil.copy2(json_file, target_file)
+                
+                # 清理檔案內容
+                cleaned_file = self.clean_file(str(target_file))
+                stats['cleaned_files'].append(cleaned_file)
+                stats['processed_files'] += 1
+                
+                self.logger.info(f"已清理: {json_file.name}")
+                
+            except Exception as e:
+                error_msg = f"處理檔案 {json_file.name} 失敗: {e}"
+                stats['errors'].append(error_msg)
+                self.logger.error(error_msg)
+        
+        self.logger.info(f"表情符號清理完成: 總計 {stats['total_files']} 個檔案，"
+                        f"成功處理 {stats['processed_files']} 個檔案")
+        
+        return stats

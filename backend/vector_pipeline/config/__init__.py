@@ -1,12 +1,13 @@
 """
-Vector Pipeline 配置模組
-提供統一的配置管理
+Vector Pipeline Configuration Module
+
+This module contains configuration management for the vector pipeline system.
 """
 
+from .config_manager import ConfigManager
 from .settings import VectorPipelineConfig
-from .milvus_config import MilvusConfig
 
 __all__ = [
-    'VectorPipelineConfig',
-    'MilvusConfig'
+    'ConfigManager',
+    'VectorPipelineConfig'
 ] 

@@ -14,6 +14,11 @@ Podwise RAG Pipeline 模組
 版本: 2.0.0
 """
 
+import logging
+
+# 設定 logger
+logger = logging.getLogger(__name__)
+
 # 主要介面
 from .main import PodwiseRAGPipeline, get_rag_pipeline
 
@@ -35,9 +40,25 @@ from .config.prompt_templates import PodwisePromptTemplates, get_prompt_template
 from .config.agent_roles_config import AgentRolesManager, get_agent_roles_manager
 
 # 工具模組
-from .tools.enhanced_podcast_recommender import EnhancedPodcastRecommender
-from .tools.enhanced_vector_search import RAGVectorSearch, create_rag_vector_search
-from .tools.podcast_formatter import PodcastFormatter, FormattedPodcast
+try:
+    from .tools.enhanced_podcast_recommender import EnhancedPodcastRecommender
+except ImportError:
+    EnhancedPodcastRecommender = None
+    logger.warning("EnhancedPodcastRecommender 導入失敗")
+
+try:
+    from .tools.enhanced_vector_search import RAGVectorSearch, create_rag_vector_search
+except ImportError:
+    RAGVectorSearch = None
+    create_rag_vector_search = None
+    logger.warning("RAGVectorSearch 導入失敗")
+
+try:
+    from .tools.podcast_formatter import PodcastFormatter, FormattedPodcast
+except ImportError:
+    PodcastFormatter = None
+    FormattedPodcast = None
+    logger.warning("PodcastFormatter 導入失敗")
 
 # 腳本模組
 # from .scripts.tag_processor import SmartTagExtractor  # 暫時註解，避免導入錯誤

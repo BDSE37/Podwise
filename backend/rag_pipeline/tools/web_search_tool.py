@@ -3,7 +3,7 @@
 """
 Web Search Expert - 網路搜尋專家
 
-提供基於 OpenAI API 的智能網路搜尋功能，支援多語言查詢和多來源搜尋。
+使用 OpenAI 官方的 Web Search 工具進行智能網路搜尋，支援多語言查詢和多來源搜尋。
 整合到 RAG Pipeline 的 fallback 機制中。
 
 Author: Podwise Team
@@ -15,7 +15,7 @@ import json
 import logging
 import os
 import sys
-from typing import Dict, List, Optional, Any
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from dataclasses import dataclass
 
@@ -70,17 +70,17 @@ class SearchResponse:
     """搜尋回應資料結構"""
     query: str
     results: List[SearchResult]
-    summary: Optional[str] = None
     total_results: int
     processing_time: float
     confidence: float
+    summary: Optional[str] = None
     source: str = "openai_web_search"
 
 
 class WebSearchExpert:
     """網路搜尋專家類別
     
-    提供基於 OpenAI API 的智能網路搜尋功能，支援：
+    使用 OpenAI 官方的 Web Search 工具，支援：
     - 多語言查詢
     - 多來源搜尋
     - 智能摘要生成
@@ -89,7 +89,7 @@ class WebSearchExpert:
     
     def __init__(self, api_key: Optional[str] = None, 
                  api_base: Optional[str] = None,
-                 model: str = "gpt-3.5-turbo",
+                 model: str = "gpt-4o",
                  timeout: int = 30):
         """
         初始化 Web Search Expert
@@ -97,16 +97,25 @@ class WebSearchExpert:
         Args:
             api_key: OpenAI API 金鑰
             api_base: OpenAI API 基礎 URL
-            model: 使用的模型名稱
+            model: 使用的模型名稱（建議使用 gpt-4o 以支援 tools）
             timeout: 請求超時時間
         """
+        # 嘗試載入 backend/.env 檔案
+        backend_env_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+        if os.path.exists(backend_env_path):
+            from dotenv import load_dotenv
+            load_dotenv(backend_env_path)
+            logger.info(f"已載入環境變數檔案: {backend_env_path}")
+        
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.api_base = api_base or os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
         self.model = model
         self.timeout = timeout
         
         if not self.api_key:
-            raise ValueError("OpenAI API 金鑰未設定")
+            logger.warning("OpenAI API 金鑰未設定，WebSearchExpert 將以受限模式運行")
+            self._initialized = False
+            return
         
         self.http_client: Optional[httpx.AsyncClient] = None
         self._initialized = False
@@ -147,13 +156,13 @@ class WebSearchExpert:
         start_time = datetime.now()
         
         try:
-            # 使用 OpenAI API 進行網路搜尋
-            search_results = await self._openai_web_search(request)
+            # 使用 OpenAI 官方 Web Search 工具
+            search_results = await self._openai_web_search_with_tools(request)
             
             # 生成摘要（如果需要）
             summary = None
             if request.include_summary and search_results:
-                summary = await self._generate_summary(request.query, search_results)
+                summary = await self._generate_summary_with_tools(request.query, search_results)
             
             processing_time = (datetime.now() - start_time).total_seconds()
             
@@ -180,22 +189,22 @@ class WebSearchExpert:
                 confidence=0.0
             )
     
-    async def _openai_web_search(self, request: SearchRequest) -> List[SearchResult]:
-        """使用 OpenAI API 進行網路搜尋"""
+    async def _openai_web_search_with_tools(self, request: SearchRequest) -> List[SearchResult]:
+        """使用 OpenAI 官方 Web Search 工具進行搜尋"""
         try:
             # 構建搜尋提示
             search_prompt = self._build_search_prompt(request)
             
-            # 調用 OpenAI API
-            response = await self._call_openai_api(search_prompt)
+            # 調用 OpenAI API 使用 tools
+            response = await self._call_openai_api_with_tools(search_prompt)
             
             # 解析回應
-            results = self._parse_openai_response(response, request)
+            results = self._parse_openai_tools_response(response, request)
             
             return results
             
         except Exception as e:
-            logger.error(f"OpenAI 網路搜尋失敗: {e}")
+            logger.error(f"OpenAI Web Search 失敗: {e}")
             return []
     
     def _build_search_prompt(self, request: SearchRequest) -> str:
@@ -215,11 +224,10 @@ class WebSearchExpert:
 查詢：{request.query}
 語言：{language}
 搜尋類型：{request.search_type}
-最大結果數：{request.max_results}
 
-請提供以下格式的搜尋結果：
+請使用網路搜尋工具獲取最新的相關資訊，並提供以下格式的結果：
 1. 標題
-2. URL（如果可用）
+2. URL
 3. 摘要（100-200字）
 4. 來源
 5. 相關性評分（0-1）
@@ -228,8 +236,8 @@ class WebSearchExpert:
 """
         return prompt
     
-    async def _call_openai_api(self, prompt: str) -> str:
-        """調用 OpenAI API"""
+    async def _call_openai_api_with_tools(self, prompt: str) -> Dict[str, Any]:
+        """調用 OpenAI API 使用 tools"""
         if not self.http_client:
             raise RuntimeError("HTTP 客戶端未初始化")
         
@@ -238,13 +246,24 @@ class WebSearchExpert:
             "messages": [
                 {
                     "role": "system",
-                    "content": "你是一個專業的網路搜尋助手，能夠提供準確、最新的資訊。請基於最新的網路資訊回答問題。"
+                    "content": "你是一個專業的網路搜尋助手，能夠提供準確、最新的資訊。請使用網路搜尋工具獲取最新資訊。"
                 },
                 {
                     "role": "user", 
                     "content": prompt
                 }
             ],
+            "tools": [
+                {
+                    "type": "web_search"
+                }
+            ],
+            "tool_choice": {
+                "type": "function",
+                "function": {
+                    "name": "web_search"
+                }
+            },
             "max_tokens": 2000,
             "temperature": 0.3
         }
@@ -257,7 +276,7 @@ class WebSearchExpert:
             
             if response.status_code == 200:
                 result = response.json()
-                return result["choices"][0]["message"]["content"]
+                return result
             else:
                 raise Exception(f"OpenAI API 錯誤: {response.status_code} - {response.text}")
                 
@@ -265,13 +284,82 @@ class WebSearchExpert:
             logger.error(f"OpenAI API 調用失敗: {e}")
             raise
     
-    def _parse_openai_response(self, response: str, request: SearchRequest) -> List[SearchResult]:
-        """解析 OpenAI 回應"""
+    def _parse_openai_tools_response(self, response: Dict[str, Any], request: SearchRequest) -> List[SearchResult]:
+        """解析 OpenAI tools 回應"""
         results = []
         
         try:
-            # 簡單的解析邏輯，實際使用時可能需要更複雜的解析
-            lines = response.split('\n')
+            # 檢查是否有 tool calls
+            choices = response.get("choices", [])
+            if not choices:
+                return results
+            
+            choice = choices[0]
+            message = choice.get("message", {})
+            tool_calls = message.get("tool_calls", [])
+            
+            # 處理 tool calls
+            for tool_call in tool_calls:
+                if tool_call.get("type") == "function" and tool_call.get("function", {}).get("name") == "web_search":
+                    # 解析 web_search 結果
+                    function_response = tool_call.get("function", {}).get("output", "")
+                    parsed_results = self._parse_web_search_output(function_response, request)
+                    results.extend(parsed_results)
+            
+            # 如果沒有 tool calls，嘗試解析一般回應
+            if not results:
+                content = message.get("content", "")
+                results = self._parse_fallback_response(content, request)
+            
+            return results[:request.max_results]
+            
+        except Exception as e:
+            logger.error(f"解析 OpenAI tools 回應失敗: {e}")
+            return []
+    
+    def _parse_web_search_output(self, output: str, request: SearchRequest) -> List[SearchResult]:
+        """解析 web_search 工具輸出"""
+        results = []
+        
+        try:
+            # 嘗試解析 JSON 格式
+            if output.startswith('{') or output.startswith('['):
+                data = json.loads(output)
+                if isinstance(data, list):
+                    for item in data:
+                        results.append(SearchResult(
+                            title=item.get('title', '未知標題'),
+                            url=item.get('url', ''),
+                            snippet=item.get('snippet', ''),
+                            source=item.get('source', 'Web Search'),
+                            confidence=item.get('confidence', 0.8),
+                            timestamp=datetime.now()
+                        ))
+                elif isinstance(data, dict):
+                    results.append(SearchResult(
+                        title=data.get('title', '未知標題'),
+                        url=data.get('url', ''),
+                        snippet=data.get('snippet', ''),
+                        source=data.get('source', 'Web Search'),
+                        confidence=data.get('confidence', 0.8),
+                        timestamp=datetime.now()
+                    ))
+            else:
+                # 解析文本格式
+                results = self._parse_text_output(output, request)
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"解析 web_search 輸出失敗: {e}")
+            return []
+    
+    def _parse_text_output(self, text: str, request: SearchRequest) -> List[SearchResult]:
+        """解析文本格式的搜尋結果"""
+        results = []
+        
+        try:
+            lines = text.split('\n')
             current_result = {}
             
             for line in lines:
@@ -305,30 +393,22 @@ class WebSearchExpert:
             if current_result:
                 results.append(self._create_search_result(current_result))
             
-            # 如果解析失敗，創建一個簡單的結果
-            if not results:
-                results.append(SearchResult(
-                    title=f"搜尋結果：{request.query}",
-                    url="",
-                    snippet=response[:500] + "..." if len(response) > 500 else response,
-                    source="OpenAI Web Search",
-                    confidence=0.8,
-                    timestamp=datetime.now()
-                ))
-            
-            return results[:request.max_results]
+            return results
             
         except Exception as e:
-            logger.error(f"解析 OpenAI 回應失敗: {e}")
-            # 返回簡單的結果
-            return [SearchResult(
-                title=f"搜尋結果：{request.query}",
-                url="",
-                snippet=response[:500] + "..." if len(response) > 500 else response,
-                source="OpenAI Web Search",
-                confidence=0.7,
-                timestamp=datetime.now()
-            )]
+            logger.error(f"解析文本輸出失敗: {e}")
+            return []
+    
+    def _parse_fallback_response(self, content: str, request: SearchRequest) -> List[SearchResult]:
+        """解析備用回應"""
+        return [SearchResult(
+            title=f"搜尋結果：{request.query}",
+            url="",
+            snippet=content[:500] + "..." if len(content) > 500 else content,
+            source="OpenAI Web Search",
+            confidence=0.7,
+            timestamp=datetime.now()
+        )]
     
     def _create_search_result(self, data: Dict[str, Any]) -> SearchResult:
         """創建搜尋結果"""
@@ -341,8 +421,8 @@ class WebSearchExpert:
             timestamp=datetime.now()
         )
     
-    async def _generate_summary(self, query: str, results: List[SearchResult]) -> str:
-        """生成搜尋摘要"""
+    async def _generate_summary_with_tools(self, query: str, results: List[SearchResult]) -> str:
+        """使用 tools 生成搜尋摘要"""
         try:
             # 構建摘要提示
             summary_prompt = f"""
@@ -360,8 +440,16 @@ class WebSearchExpert:
             summary_prompt += "\n請提供一個客觀、準確的摘要。"
             
             # 調用 OpenAI API 生成摘要
-            response = await self._call_openai_api(summary_prompt)
-            return response.strip()
+            response = await self._call_openai_api_with_tools(summary_prompt)
+            
+            # 解析摘要
+            choices = response.get("choices", [])
+            if choices:
+                message = choices[0].get("message", {})
+                content = message.get("content", "")
+                return content.strip()
+            
+            return "無法生成摘要"
             
         except Exception as e:
             logger.error(f"生成摘要失敗: {e}")
@@ -384,12 +472,13 @@ class WebSearchExpert:
         try:
             # 簡單的 API 測試
             test_prompt = "測試"
-            await self._call_openai_api(test_prompt)
+            await self._call_openai_api_with_tools(test_prompt)
             
             return {
                 "status": "healthy",
                 "api_key_configured": bool(self.api_key),
                 "model": self.model,
+                "tools_enabled": True,
                 "timestamp": datetime.now().isoformat()
             }
         except Exception as e:

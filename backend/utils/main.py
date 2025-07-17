@@ -35,6 +35,10 @@ class UtilsConfig:
     enable_audio_search: bool = True
     enable_user_auth: bool = True
     enable_minio_utils: bool = True
+    enable_audio_stream: bool = True
+    enable_feedback_service: bool = True
+    enable_minio_episode: bool = True
+    enable_unified_recommendation: bool = True
     log_level: str = "INFO"
 
 
@@ -55,14 +59,14 @@ class UtilsManager:
             from .core_services import BaseService, ServiceConfig, ServiceResponse
             from .text_processing import TextProcessor, create_text_processor
             from .vector_search import VectorSearchEngine, create_vector_search
-            from .audio_search import AudioSearchEngine
+            from .intelligent_audio_search import IntelligentAudioSearch
             from .user_auth_service import UserAuthService
             from .minio_milvus_utils import get_minio_client, get_podcast_name_from_db
             from .env_config import PodriConfig
             from .logging_config import setup_logging
             
             # 設定日誌
-            setup_logging(level=self.config.log_level)
+            setup_logging(level=getattr(logging, self.config.log_level.upper(), logging.INFO))
             
             # 初始化服務
             if self.config.enable_text_processing:
@@ -74,16 +78,51 @@ class UtilsManager:
                 logger.info("✅ 向量搜尋服務已初始化")
             
             if self.config.enable_audio_search:
-                self.services['audio_search'] = AudioSearchEngine()
-                logger.info("✅ 音檔搜尋服務已初始化")
+                try:
+                    self.services['audio_search'] = IntelligentAudioSearch()
+                    logger.info("✅ 音檔搜尋服務已初始化")
+                except Exception as e:
+                    logger.warning(f"⚠️ 音檔搜尋服務初始化失敗: {e}")
             
             if self.config.enable_user_auth:
-                self.services['user_auth'] = UserAuthService()
-                logger.info("✅ 用戶認證服務已初始化")
+                try:
+                    # 使用與其他服務相同的資料庫配置
+                    db_config = {
+                        'host': os.getenv('POSTGRES_HOST', 'postgres.podwise.svc.cluster.local'),
+                        'port': int(os.getenv('POSTGRES_PORT', '5432')),
+                        'database': os.getenv('POSTGRES_DB', 'podcast'),
+                        'user': os.getenv('POSTGRES_USER', 'bdse37'),
+                        'password': os.getenv('POSTGRES_PASSWORD', '111111')
+                    }
+                    self.services['user_auth'] = UserAuthService(db_config)
+                    logger.info("✅ 用戶認證服務已初始化")
+                except Exception as e:
+                    logger.warning(f"⚠️ 用戶認證服務初始化失敗: {e}")
             
             if self.config.enable_minio_utils:
                 self.services['minio_client'] = get_minio_client()
                 logger.info("✅ MinIO 客戶端已初始化")
+            
+            # 初始化新服務
+            if self.config.enable_audio_stream:
+                from .audio_stream_service import AudioStreamService
+                self.services['audio_stream'] = AudioStreamService()
+                logger.info("✅ 音檔流服務已初始化")
+            
+            if self.config.enable_feedback_service:
+                from .feedback_service import DatabaseManager
+                self.services['feedback_service'] = DatabaseManager()
+                logger.info("✅ 反饋服務已初始化")
+            
+            if self.config.enable_minio_episode:
+                from .minio_episode_service import MinioEpisodeService
+                self.services['minio_episode'] = MinioEpisodeService()
+                logger.info("✅ MinIO 節目服務已初始化")
+            
+            if self.config.enable_unified_recommendation:
+                from .unified_recommendation_service import UnifiedRecommendationService
+                self.services['unified_recommendation'] = UnifiedRecommendationService()
+                logger.info("✅ 統一推薦服務已初始化")
             
             # 環境配置
             self.services['config'] = PodriConfig()
@@ -122,6 +161,22 @@ class UtilsManager:
     def get_config(self) -> Any:
         """獲取環境配置"""
         return self.get_service('config')
+    
+    def get_audio_stream(self) -> Any:
+        """獲取音檔流服務"""
+        return self.get_service('audio_stream')
+    
+    def get_feedback_service(self) -> Any:
+        """獲取反饋服務"""
+        return self.get_service('feedback_service')
+    
+    def get_minio_episode(self) -> Any:
+        """獲取 MinIO 節目服務"""
+        return self.get_service('minio_episode')
+    
+    def get_unified_recommendation(self) -> Any:
+        """獲取統一推薦服務"""
+        return self.get_service('unified_recommendation')
     
     def health_check(self) -> Dict[str, Any]:
         """健康檢查"""
@@ -162,6 +217,9 @@ class UtilsManager:
                 "enable_audio_search": self.config.enable_audio_search,
                 "enable_user_auth": self.config.enable_user_auth,
                 "enable_minio_utils": self.config.enable_minio_utils,
+                "enable_audio_stream": self.config.enable_audio_stream,
+                "enable_feedback_service": self.config.enable_feedback_service,
+                "enable_minio_episode": self.config.enable_minio_episode,
                 "log_level": self.config.log_level
             }
         }
@@ -213,6 +271,25 @@ def get_minio_client():
 def get_config():
     """獲取環境配置"""
     return get_utils_manager().get_config()
+
+
+def get_audio_stream():
+    """獲取音檔流服務"""
+    return get_utils_manager().get_audio_stream()
+
+
+def get_feedback_service():
+    """獲取反饋服務"""
+    return get_utils_manager().get_feedback_service()
+
+
+def get_minio_episode():
+    """獲取 MinIO 節目服務"""
+    return get_utils_manager().get_minio_episode()
+
+def get_unified_recommendation():
+    """獲取統一推薦服務"""
+    return get_utils_manager().get_unified_recommendation()
 
 
 if __name__ == "__main__":

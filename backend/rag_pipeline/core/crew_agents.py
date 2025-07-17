@@ -21,7 +21,10 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import time
 from datetime import datetime
-from core.prompt_processor import PromptProcessor
+try:
+    from .prompt_processor import PromptProcessor
+except ImportError:
+    from core.prompt_processor import PromptProcessor
 
 logger = logging.getLogger(__name__)
 

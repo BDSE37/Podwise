@@ -20,8 +20,9 @@ from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass, field
 from datetime import datetime
 
-# 導入智能 TAG 提取器
-from .enhanced_vector_search import SmartTagExtractor
+# 智能 TAG 提取器暫時不可用
+SMART_TAG_EXTRACTOR_AVAILABLE = False
+SmartTagExtractor = None
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,10 @@ class PodcastFormatter:
         self.apple_podcast_base_url = "https://podcasts.apple.com/tw/podcast/id"
         
         # 初始化智能 TAG 提取器
-        self.smart_extractor = SmartTagExtractor(existing_tags_file=existing_tags_file)
+        if SMART_TAG_EXTRACTOR_AVAILABLE and SmartTagExtractor is not None:
+            self.smart_extractor = SmartTagExtractor(existing_tags_file=existing_tags_file)
+        else:
+            self.smart_extractor = None
     
     def extract_tags_from_query(self, query: str) -> List[str]:
         """
@@ -75,20 +79,36 @@ class PodcastFormatter:
         Returns:
             List[str]: 提取的 TAG 列表
         """
-        # 使用智能 TAG 提取器
-        smart_result = self.smart_extractor.extract_smart_tags(query)
-        
-        logger.info(f"智能 TAG 提取結果: {smart_result.extracted_tags}")
-        logger.info(f"使用的方法: {smart_result.method_used}")
-        logger.info(f"信心度: {smart_result.confidence:.2f}")
-        
-        # 如果有映射結果，記錄詳細信息
-        if smart_result.mapped_tags:
-            logger.info("TAG 映射詳情:")
-            for mapping in smart_result.mapped_tags:
-                logger.info(f"  {mapping.original_tag} -> {mapping.mapped_tags} (方法: {mapping.method}, 信心度: {mapping.confidence:.2f})")
-        
-        return smart_result.extracted_tags
+        if self.smart_extractor is not None:
+            # 使用智能 TAG 提取器
+            smart_result = self.smart_extractor.extract_smart_tags(query)
+            
+            logger.info(f"智能 TAG 提取結果: {smart_result.extracted_tags}")
+            logger.info(f"使用的方法: {smart_result.method_used}")
+            logger.info(f"信心度: {smart_result.confidence:.2f}")
+            
+            # 如果有映射結果，記錄詳細信息
+            if smart_result.mapped_tags:
+                logger.info("TAG 映射詳情:")
+                for mapping in smart_result.mapped_tags:
+                    logger.info(f"  {mapping.original_tag} -> {mapping.mapped_tags} (方法: {mapping.method}, 信心度: {mapping.confidence:.2f})")
+            
+            return smart_result.extracted_tags
+        else:
+            # 簡單的關鍵字提取作為備用
+            logger.warning("智能 TAG 提取器不可用，使用簡單關鍵字提取")
+            return self._simple_keyword_extraction(query)
+    
+    def _simple_keyword_extraction(self, query: str) -> List[str]:
+        """簡單的關鍵字提取（備用方法）"""
+        # 簡單的關鍵字提取邏輯
+        stop_words = {'的', '是', '在', '有', '和', '與', '或', '但', '而', '如果', '因為', '所以'}
+        keywords = []
+        words = query.lower().split()
+        for word in words:
+            if len(word) > 2 and word not in stop_words:
+                keywords.append(word)
+        return keywords[:5]  # 最多返回 5 個關鍵字
     
     def format_apple_podcast_url(self, rss_id: str) -> str:
         """

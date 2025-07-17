@@ -11,12 +11,12 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 
 try:
     from data_cleaning.core.mongo_cleaner import MongoCleaner
-    from data_cleaning.core.stock_cancer_cleaner import StockCancerCleaner
+    from data_cleaning.stock_cancer.stock_cancer_cleaner import StockCancerCleaner
     from data_cleaning.utils.file_format_detector import FileFormatDetector
 except ImportError:
     # Fallback: 相對導入
     from core.mongo_cleaner import MongoCleaner
-    from core.stock_cancer_cleaner import StockCancerCleaner
+    from stock_cancer.stock_cancer_cleaner import StockCancerCleaner
     from utils.file_format_detector import FileFormatDetector
 
 logger = logging.getLogger(__name__)

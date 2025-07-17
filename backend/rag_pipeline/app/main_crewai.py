@@ -29,12 +29,13 @@ from pydantic import BaseModel, Field, validator
 
 # 導入核心 RAG Pipeline
 import sys
+import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import PodwiseRAGPipeline, get_rag_pipeline
 
 # 導入工具
-from tools.enhanced_vector_search import UnifiedVectorSearch
-from tools.web_search_tool import WebSearchTool
+from core.enhanced_vector_search import RAGVectorSearch as UnifiedVectorSearch
+from tools.web_search_tool import WebSearchExpert as WebSearchTool
 from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
 
 # 導入配置
@@ -100,12 +101,22 @@ class ApplicationManager:
             
             # 初始化統一向量搜尋工具
             vector_config = self.config.get_vector_search_config()
-            self.vector_search_tool = UnifiedVectorSearch(vector_config)
+            from core.enhanced_vector_search import RAGSearchConfig
+            search_config = RAGSearchConfig(
+                top_k=vector_config.get('top_k', 8),
+                confidence_threshold=vector_config.get('confidence_threshold', 0.7),
+                max_execution_time=vector_config.get('max_execution_time', 25),
+                enable_semantic_search=vector_config.get('enable_semantic_search', True),
+                enable_tag_matching=vector_config.get('enable_tag_matching', True),
+                enable_content_cleaning=vector_config.get('enable_content_cleaning', True),
+                enable_recommendation_enhancement=vector_config.get('enable_recommendation_enhancement', True)
+            )
+            self.vector_search_tool = UnifiedVectorSearch(search_config)
             logger.info("✅ 統一向量搜尋工具初始化完成")
             
             # 初始化 Web Search 工具
             self.web_search_tool = WebSearchTool()
-            if self.web_search_tool.is_configured():
+            if hasattr(self.web_search_tool, 'is_configured') and self.web_search_tool.is_configured():
                 logger.info("✅ Web Search 工具初始化完成 (OpenAI 可用)")
             else:
                 logger.warning("⚠️ Web Search 工具初始化完成 (OpenAI 未配置)")
@@ -128,7 +139,7 @@ class ApplicationManager:
             components={
                 "rag_pipeline": self.rag_pipeline is not None,
                 "vector_search_tool": self.vector_search_tool is not None,
-                "web_search_tool": self.web_search_tool is not None and self.web_search_tool.is_configured(),
+                "web_search_tool": self.web_search_tool is not None and hasattr(self.web_search_tool, 'is_configured') and self.web_search_tool.is_configured(),
                 "podcast_formatter": self.podcast_formatter is not None
             },
             timestamp=datetime.now().isoformat(),
@@ -226,7 +237,7 @@ async def health_check(manager: ApplicationManager = Depends(get_app_manager)) -
         timestamp=status.timestamp,
         components=status.components,
         rag_pipeline_health=rag_health,
-        web_search_available=manager.web_search_tool.is_configured() if manager.web_search_tool else False
+        web_search_available=manager.web_search_tool.is_configured() if manager.web_search_tool and hasattr(manager.web_search_tool, 'is_configured') else False
     )
 
 
@@ -293,7 +304,11 @@ async def process_query(
         query = request.query
         session_id = request.session_id
         
-        logger.info(f"處理用戶查詢: {user_id} - {query}")
+        # 確保有有效的使用者ID
+        effective_user_id = user_id or "default_user"
+        effective_session_id = session_id or f"session_{effective_user_id}_{int(start_time.timestamp())}"
+        
+        logger.info(f"🔄 處理用戶查詢: {effective_user_id} - {query[:50]}...")
         
         # 使用核心 RAG Pipeline 處理查詢
         if manager.rag_pipeline is None:
@@ -302,7 +317,14 @@ async def process_query(
         # 使用核心 RAG Pipeline 處理
         rag_response = await manager.rag_pipeline.process_query(
             query=query,
-            user_id=user_id
+            user_id=effective_user_id,
+            session_id=effective_session_id,
+            metadata={
+                **(request.metadata or {}),
+                "api_endpoint": "/api/v1/query",
+                "request_timestamp": start_time.isoformat(),
+                "user_identifier": effective_user_id
+            }
         )
         
         # 獲取推薦項目
@@ -314,12 +336,15 @@ async def process_query(
         # 記錄歷史（背景任務）
         background_tasks.add_task(
             _log_query_history,
-            user_id, session_id, query, rag_response.content, 
+            effective_user_id, effective_session_id, query, rag_response.content, 
             rag_response.confidence
         )
         
+        # 記錄成功的API調用
+        logger.info(f"✅ API查詢成功: {effective_user_id} - 處理時間: {processing_time:.2f}s")
+        
         return UserQueryResponse(
-            user_id=user_id,
+            user_id=effective_user_id,
             query=query,
             response=rag_response.content,
             category=rag_response.metadata.get("category", "其他"),
@@ -333,7 +358,10 @@ async def process_query(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"查詢處理失敗: {str(e)}")
+        logger.error(f"❌ 查詢處理失敗: {str(e)}")
+        # 記錄失敗的API調用
+        if 'effective_user_id' in locals():
+            logger.error(f"❌ API查詢失敗: {effective_user_id} - 錯誤: {str(e)}")
         raise HTTPException(status_code=500, detail=f"查詢處理失敗: {str(e)}")
 
 
@@ -457,10 +485,37 @@ async def _log_query_history(
 ) -> None:
     """記錄查詢歷史"""
     try:
-        # 簡化的歷史記錄（實際應用中應使用資料庫）
-        logger.info(f"記錄查詢歷史: {user_id} - {confidence}")
+        # 確保有有效的使用者ID
+        effective_user_id = user_id or "default_user"
+        effective_session_id = session_id or f"session_{effective_user_id}_{int(datetime.now().timestamp())}"
+        
+        # 記錄到日誌
+        logger.info(f"📝 記錄查詢歷史: {effective_user_id} - 信心度: {confidence:.2f}")
+        
+        # 這裡可以添加資料庫記錄邏輯
+        # 例如：記錄到 user_chat_history 表格
+        try:
+            # 如果有資料庫連接，記錄到資料庫
+            # 這是一個示例，實際實現需要根據資料庫配置調整
+            pass
+        except Exception as db_error:
+            logger.warning(f"⚠️ 資料庫記錄失敗: {db_error}")
+        
+        # 記錄詳細資訊
+        history_entry = {
+            "user_id": effective_user_id,
+            "session_id": effective_session_id,
+            "query": query,
+            "response": response[:200] + "..." if len(response) > 200 else response,  # 截斷長回應
+            "confidence": confidence,
+            "timestamp": datetime.now().isoformat(),
+            "source": "rag_pipeline_api"
+        }
+        
+        logger.info(f"📋 歷史記錄: {history_entry}")
+        
     except Exception as e:
-        logger.error(f"記錄歷史失敗: {str(e)}")
+        logger.error(f"❌ 記錄歷史失敗: {str(e)}")
 
 
 @app.get("/api/v1/system-info", response_model=SystemInfoResponse)

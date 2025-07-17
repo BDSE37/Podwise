@@ -1,14 +1,17 @@
 """
-Vector Pipeline 服務層
-提供高層次的業務邏輯服務
+Vector Pipeline Services Module
+
+This module contains the service layer components for the vector pipeline system.
 """
 
 from .embedding_service import EmbeddingService
-from .tagging_service import TaggingService
 from .search_service import SearchService
+from .tagging_service import TaggingService
+from .error_logger import ErrorLogger
 
 __all__ = [
     'EmbeddingService',
-    'TaggingService', 
-    'SearchService'
+    'SearchService', 
+    'TaggingService',
+    'ErrorLogger'
 ] 

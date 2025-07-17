@@ -2,7 +2,7 @@
 
 ## 系統概述
 
-Podwise RAG Pipeline 是一個整合了多個模組的智能檢索與推薦系統，採用三層式 CrewAI agent 架構，提供完整的 Podcast 內容檢索、推薦和語音合成服務。
+Podwise RAG Pipeline 是一個整合了多個模組的智能檢索與推薦系統，採用三層式 CrewAI agent 架構，提供完整的 Podcast 內容檢索、推薦和語音合成服務。系統遵循 Google Clean Code 原則，確保模組化設計和易於維護。
 
 ## 核心架構
 
@@ -44,24 +44,23 @@ Podwise RAG Pipeline 是一個整合了多個模組的智能檢索與推薦系�
 
 ## 模組整合
 
-### 1. Data Cleaning 整合
+### 1. 資料庫整合
 
 ```python
-# 在 enhanced_vector_search.py 中整合
-from data_cleaning.core.episode_cleaner import EpisodeCleaner
-from data_cleaning.core.base_cleaner import BaseCleaner
-from data_cleaning.utils.data_extractor import DataExtractor
+# 統一的資料庫配置管理
+from config.database_config import get_database_config_manager
 
-# 功能：
-# - 內容清理與標準化
-# - 數據品質檢查
-# - 異常處理與修正
+# 支援的資料庫：
+# - MongoDB: 聊天歷史和會話管理
+# - PostgreSQL: 結構化資料儲存
+# - Redis: 快取和會話狀態
+# - Milvus: 向量資料庫
 ```
 
 ### 2. ML Pipeline 整合
 
 ```python
-# 在 enhanced_vector_search.py 中整合
+# 智能推薦系統整合
 from ml_pipeline.core.recommender import Recommender
 from ml_pipeline.core.data_manager import DataManager
 
@@ -74,13 +73,14 @@ from ml_pipeline.core.data_manager import DataManager
 ### 3. TTS 整合
 
 ```python
-# 在 main.py 中整合
+# 語音合成服務
 from tts.core.tts_service import TTSService
 
-# 功能：
-# - 語音合成 (podrina, podrisa, podrino)
-# - 語速調節 (0.5x - 1.5x)
-# - 情感表達控制
+# 支援的語音模型：
+# - podrina: 女聲
+# - podrisa: 女聲變體
+# - podrino: 男聲
+# - 語速調節: 0.5x - 1.5x
 ```
 
 ### 4. LLM 整合
@@ -91,9 +91,9 @@ from llm.core.ollama_llm import OllamaLLM
 from llm.core.qwen_llm_manager import Qwen3LLMManager
 
 # 支援模型：
-# - qwen2.5-Taiwan
-# - qwen3:8b
-# - Ollama 本地模型
+# - qwen2.5-Taiwan: 繁體中文優化
+# - qwen3:8b: 輕量級模型
+# - Ollama 本地模型: 自定義模型
 ```
 
 ### 5. STT 整合
@@ -120,6 +120,58 @@ from user_management.user_service import UserService
 # - 使用歷史記錄
 ```
 
+## 工具模組
+
+### 1. CrossDBTextFetcher
+跨資料庫文本擷取工具，支援 PostgreSQL 和 MongoDB 的模糊及精確比對。
+
+```python
+from tools import get_cross_db_fetcher
+
+fetcher = get_cross_db_fetcher()
+results = await fetcher.fetch_text("查詢內容", limit=10)
+```
+
+### 2. SummaryGenerator
+長文本摘要生成工具，支援 OpenAI API 和備援方法。
+
+```python
+from tools import get_summary_generator
+
+generator = get_summary_generator()
+summary = await generator.generate_summary("長文本內容", max_length=150)
+```
+
+### 3. SimilarityMatcher
+餘弦相似度計算工具，含向量正規化、批量計算和最佳匹配功能。
+
+```python
+from tools import get_similarity_matcher
+
+matcher = get_similarity_matcher()
+similarity = matcher.calculate_cosine_similarity(vector1, vector2)
+```
+
+### 4. PodcastFormatter
+Podcast 資料格式化工具，統一處理標題、描述和標籤。
+
+```python
+from tools import get_podcast_formatter
+
+formatter = get_podcast_formatter()
+formatted_data = formatter.format_podcast(podcast_data)
+```
+
+### 5. WebSearchExpert
+Web 搜尋專家，提供智能網路搜尋功能。
+
+```python
+from tools import get_web_search
+
+web_search = get_web_search()
+results = await web_search.search("搜尋查詢", max_results=5)
+```
+
 ## 智能檢索 Fallback 機制
 
 ### 三層式回覆機制
@@ -134,6 +186,78 @@ from user_management.user_service import UserService
 - **business_intelligence_expert**: 0.75
 - **educational_growth_strategist**: 0.75
 - **chief_decision_orchestrator**: 0.8
+
+## 快速使用
+
+### 使用 min.py 統一介面
+
+```python
+from min import start_pipeline, query, get_recommendations, synthesize_speech
+
+# 啟動 Pipeline
+await start_pipeline()
+
+# 執行查詢
+response = await query("什麼是機器學習？", "user123")
+print(f"回應: {response.response}")
+print(f"信心度: {response.confidence}")
+
+# 獲取推薦
+recommendations = await get_recommendations("機器學習", "user123", 5)
+
+# 語音合成
+tts_result = await synthesize_speech("這是一個測試", "podrina", 1.0)
+
+# 停止 Pipeline
+await stop_pipeline()
+```
+
+### 使用核心類別
+
+```python
+from core.rag_pipeline_core import RAGPipelineCore
+
+# 初始化核心
+core = RAGPipelineCore(
+    enable_monitoring=True,
+    enable_semantic_retrieval=True,
+    confidence_threshold=0.7
+)
+
+# 啟動
+await core.initialize()
+
+# 處理查詢
+request = QueryRequest(
+    query="查詢內容",
+    user_id="user123",
+    enable_tts=True
+)
+response = await core.process_query(request)
+
+# 清理
+await core.cleanup()
+```
+
+### 使用服務管理器
+
+```python
+from core.unified_service_manager import get_service_manager
+
+# 獲取服務管理器
+manager = get_service_manager()
+
+# 初始化所有服務
+await manager.initialize()
+
+# 使用特定服務
+db_service = manager.get_database_service()
+llm_service = manager.get_llm_service()
+tts_service = manager.get_tts_service()
+
+# 健康檢查
+health = await manager.health_check()
+```
 
 ## API 端點
 
@@ -198,246 +322,242 @@ Content-Type: application/json
 }
 ```
 
-## 前端整合 (podri.html)
+### 健康檢查端點
 
-### 主要功能
-
-1. **智能對話界面**
-   - 實時聊天對話
-   - 載入狀態指示
-   - 錯誤處理與重試
-
-2. **語音控制**
-   - TTS 開關控制
-   - 語音模型選擇 (podrina/podrisa/podrino)
-   - 語速調節 (0.5x - 1.5x)
-
-3. **用戶體驗**
-   - 響應式設計
-   - 側邊欄控制面板
-   - 歷史對話記錄
-
-### 關鍵 JavaScript 函數
-
-```javascript
-// 發送訊息到 RAG Pipeline
-async function sendMessage() {
-    const response = await fetch('http://localhost:8005/api/v1/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            query: message,
-            user_id: window.currentUserId || 'default_user',
-            session_id: generateSessionId(),
-            enable_tts: ttsEnabled,
-            voice: selectedVoice,
-            speed: parseFloat(speed)
-        })
-    });
-}
-
-// 生成 TTS 語音
-async function generateTTS(text, voice, speed) {
-    const response = await fetch('http://localhost:8003/synthesize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            文字: text,
-            語音: voice,
-            語速: rateAdjustment,
-            音量: "+0%",
-            音調: "+0%"
-        })
-    });
-}
+```http
+GET /health
 ```
 
-## 系統流程
+### 系統資訊端點
 
-### 1. 查詢處理流程
-
-```
-用戶查詢 → 語意分析 → 查詢改寫 → 向量化 → Milvus 檢索 → 標籤匹配 → 內容清理 → 推薦增強 → TTS 合成 → 回應
+```http
+GET /api/v1/system-info
 ```
 
-### 2. 智能檢索專家流程
+## 配置管理
 
-```
-1. semantic_analyzer: 萃取意圖與關鍵詞
-2. query_rewriter: 參考 TAG_info 改寫查詢
-3. text2vec_model: 向量化查詢
-4. milvus_db: 檢索 top-k=8
-5. tag_matcher: 依標籤重疊度＋相似度重排
-6. 信心分數 <0.7 時回傳 NO_MATCH
-```
+### 環境變數配置
 
-### 3. TTS 整合流程
-
-```
-文本回應 → TTS 服務 → 語音合成 → Base64 編碼 → 前端播放
-```
-
-## 配置說明
-
-### 環境變數
+系統支援多種環境檔案：
+- `env.local`: 本地開發環境
+- `.env`: 生產環境
+- `.env.example`: 範例配置
 
 ```bash
-# RAG Pipeline 配置
-RAG_PIPELINE_PORT=8005
-RAG_PIPELINE_HOST=0.0.0.0
+# 資料庫配置
+MONGODB_URI=mongodb://localhost:27017/podwise
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=podwise
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
 
-# TTS 服務配置
-TTS_SERVICE_PORT=8003
-TTS_SERVICE_HOST=0.0.0.0
-
-# LLM 服務配置
-LLM_SERVICE_PORT=8004
-LLM_SERVICE_HOST=0.0.0.0
-
-# STT 服務配置
-STT_SERVICE_PORT=8006
-STT_SERVICE_HOST=0.0.0.0
-
-# User Management 配置
-USER_MANAGEMENT_PORT=8007
-USER_MANAGEMENT_HOST=0.0.0.0
+# Redis 配置
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
 
 # Milvus 配置
 MILVUS_HOST=localhost
 MILVUS_PORT=19530
+MILVUS_COLLECTION=podcast_chunks
 
-# 資料庫配置
-DATABASE_URL=postgresql://user:password@localhost:5432/podwise
+# API 配置
+OPENAI_API_KEY=your-openai-api-key
+ANTHROPIC_API_KEY=your-anthropic-api-key
+GOOGLE_API_KEY=your-google-api-key
+
+# 服務配置
+RAG_PIPELINE_HOST=localhost
+RAG_PIPELINE_PORT=8004
+TTS_HOST=localhost
+TTS_PORT=8002
+STT_HOST=localhost
+STT_PORT=8003
+LLM_HOST=localhost
+LLM_PORT=8004
+
+# Ollama 配置
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:8b
 ```
 
-## 啟動指南
+### 配置驗證
 
-### 1. 啟動 RAG Pipeline
+```python
+from config.database_config import get_database_config_manager
+
+config_manager = get_database_config_manager()
+validation = config_manager.validate_config()
+
+for component, is_valid in validation.items():
+    print(f"{component}: {'✅' if is_valid else '❌'}")
+```
+
+## 部署指南
+
+### 本地開發
 
 ```bash
-cd backend/rag_pipeline
-python main.py
+# 1. 安裝依賴
+pip install -r requirements.txt
+
+# 2. 設定環境變數
+cp env.local.example env.local
+# 編輯 env.local 檔案
+
+# 3. 啟動服務
+python min.py
 ```
 
-### 2. 啟動 TTS 服務
+### Docker 部署
 
 ```bash
-cd backend/tts
-python main.py
+# 1. 建構映像
+docker build -t podwise-rag-pipeline .
+
+# 2. 執行容器
+docker run -d \
+  --name rag-pipeline \
+  -p 8004:8004 \
+  --env-file env.local \
+  podwise-rag-pipeline
 ```
 
-### 3. 啟動 LLM 服務
+### Kubernetes 部署
 
 ```bash
-cd backend/llm
-python main.py
+# 1. 套用配置
+kubectl apply -f deploy/k8s/rag-pipeline/
+
+# 2. 檢查部署狀態
+kubectl get pods -l app=rag-pipeline
 ```
 
-### 4. 啟動 STT 服務
+## 監控與日誌
 
-```bash
-cd backend/stt
-python main.py
+### 日誌配置
+
+系統使用結構化日誌，支援不同等級：
+- DEBUG: 詳細除錯資訊
+- INFO: 一般資訊
+- WARNING: 警告訊息
+- ERROR: 錯誤訊息
+
+### 健康檢查
+
+```python
+# 檢查系統健康狀態
+health = await health_check()
+print(f"系統狀態: {health['status']}")
+print(f"服務狀態: {health['services']}")
 ```
 
-### 5. 啟動 User Management 服務
+### 性能監控
 
-```bash
-cd backend/user_management
-python main.py
-```
-
-### 6. 啟動前端
-
-```bash
-# 使用 nginx 或其他 Web 伺服器
-# 或直接在瀏覽器中開啟 podri.html
-```
-
-### 7. 驗證整合
-
-```bash
-# 測試健康檢查
-curl http://localhost:8005/health
-
-# 測試查詢
-curl -X POST http://localhost:8005/api/v1/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "推薦投資理財的 podcast", "enable_tts": true}'
-```
+系統內建性能監控：
+- 查詢處理時間
+- 服務響應時間
+- 資源使用率
+- 錯誤率統計
 
 ## 故障排除
 
 ### 常見問題
 
-1. **TTS 服務無法連接**
-   - 檢查 TTS 服務是否在 8003 端口運行
-   - 確認 TTS 服務健康狀態
+1. **資料庫連接失敗**
+   - 檢查環境變數配置
+   - 確認資料庫服務運行狀態
+   - 驗證網路連接
 
-2. **檢索結果信心度不足**
+2. **LLM 服務無回應**
+   - 檢查 Ollama 服務狀態
+   - 確認模型檔案存在
+   - 驗證 API 金鑰
+
+3. **向量搜尋失敗**
    - 檢查 Milvus 服務狀態
-   - 確認向量資料庫是否已載入資料
+   - 確認集合存在
+   - 驗證向量維度匹配
 
-3. **前端無法播放語音**
-   - 檢查瀏覽器控制台錯誤
-   - 確認音頻格式支援
+### 除錯模式
 
-4. **LLM 服務無法連接**
-   - 檢查 LLM 服務是否在 8004 端口運行
-   - 確認 Ollama 或 Qwen 模型是否已載入
+```python
+# 啟用除錯模式
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
-### 日誌檢查
+# 或設定環境變數
+export DEBUG=true
+export LOG_LEVEL=DEBUG
+```
+
+## 開發指南
+
+### 代碼風格
+
+遵循 Google Clean Code 原則：
+- 清晰的函數和變數命名
+- 適當的註解和文檔
+- 模組化設計
+- 錯誤處理
+- 單元測試
+
+### 新增功能
+
+1. 在適當的模組中新增功能
+2. 更新服務管理器
+3. 添加單元測試
+4. 更新文檔
+5. 提交 Pull Request
+
+### 測試
 
 ```bash
-# RAG Pipeline 日誌
-tail -f backend/rag_pipeline/logs/rag_pipeline.log
+# 執行單元測試
+python -m pytest tests/
 
-# TTS 服務日誌
-tail -f backend/tts/logs/tts_service.log
+# 執行整合測試
+python -m pytest tests/integration/
 
-# LLM 服務日誌
-tail -f backend/llm/logs/llm_service.log
+# 執行性能測試
+python -m pytest tests/performance/
 ```
 
-## 技術架構圖
+## 版本歷史
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   podri.html    │    │  RAG Pipeline   │    │   TTS Service   │
-│   (Frontend)    │◄──►│   (Backend)     │◄──►│   (Backend)     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                              │
-                              ▼
-                       ┌─────────────────┐
-                       │   Milvus DB     │
-                       │  (Vector DB)    │
-                       └─────────────────┘
-                              │
-                              ▼
-                       ┌─────────────────┐
-                       │ Data Cleaning   │
-                       │ ML Pipeline     │
-                       │ LLM Service     │
-                       │ STT Service     │
-                       │ User Management │
-                       └─────────────────┘
-```
+### v3.0.0 (最新)
+- 重構為模組化架構
+- 新增統一服務管理器
+- 整合所有工具模組
+- 改善錯誤處理和日誌
+- 新增健康檢查功能
 
-## 未來規劃
+### v2.0.0
+- 新增 CrewAI 三層架構
+- 整合 Apple Podcast 排名
+- 新增語音合成功能
+- 改善向量搜尋性能
 
-1. **效能優化**
-   - 向量檢索快取機制
-   - 並行處理優化
-   - 記憶體使用優化
+### v1.0.0
+- 初始版本
+- 基本 RAG 功能
+- 向量搜尋
+- Web 搜尋整合
 
-2. **功能增強**
-   - 多語言支援
-   - 更豐富的語音選項
-   - 個人化推薦算法
+## 貢獻指南
 
-3. **監控與分析**
-   - 詳細的效能指標
-   - 用戶行為分析
-   - A/B 測試支援
+1. Fork 專案
+2. 創建功能分支
+3. 提交變更
+4. 發起 Pull Request
 
-這個整合系統確保了所有組件之間的協調運作，為用戶提供完整的智能 Podcast 推薦和語音互動體驗。
+## 授權
+
+本專案採用 MIT 授權條款。
+
+## 聯絡資訊
+
+- 專案維護者: Podwise Team
+- 電子郵件: support@podwise.com
+- 專案網址: https://github.com/podwise/rag-pipeline

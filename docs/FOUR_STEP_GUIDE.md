@@ -126,7 +126,7 @@ POST /api/generate-podwise-id
 ```json
 {
   "success": true,
-  "podwise_id": "Podwise_0001",
+  "podwise_id": "Podwise0001",
   "user_id": 1,
   "message": "Podwise ID 生成成功"
 }
@@ -153,15 +153,15 @@ POST /api/user/preferences
 **請求體：**
 ```json
 {
-  "user_code": "Podwise_0001",
+  "user_code": "Podwise0001",
   "main_category": "business",
   "selected_tag": "投資理財",
   "liked_episodes": [
     {
-      "episode_id": 1,
-      "podcast_name": "股癌 Gooaye",
-      "episode_title": "投資理財精選",
-      "rss_id": "123"
+      "episode_id": 4,
+      "podcast_name": "財經一路發",
+      "episode_title": "財富生活活化大腦與強健身體的體智能鍛練",
+      "rss_id": "RSS_1531106786"
     }
   ]
 }
@@ -175,11 +175,11 @@ POST /api/feedback
 **請求體：**
 ```json
 {
-  "user_code": "Podwise_0001",
-  "episode_id": 1,
-  "podcast_name": "股癌 Gooaye",
-  "episode_title": "投資理財精選",
-  "rss_id": "123",
+  "user_code": "Podwise0001",
+  "episode_id": 4,
+  "podcast_name": "財經一路發",
+  "episode_title": "財富生活活化大腦與強健身體的體智能鍛練",
+  "rss_id": "RSS_1531106786",
   "action": "like",
   "category": "business"
 }
@@ -193,8 +193,8 @@ POST /api/audio/presigned-url
 **請求體：**
 ```json
 {
-  "rss_id": "123",
-  "episode_title": "投資理財精選",
+  "rss_id": "RSS_1531106786",
+  "episode_title": "財富生活活化大腦與強健身體的體智能鍛練",
   "category": "business"
 }
 ```
@@ -203,9 +203,9 @@ POST /api/audio/presigned-url
 ```json
 {
   "success": true,
-  "audio_url": "http://192.168.32.66:30090/business-one-min-audio/Spotify_RSS_123_投資理財精選.mp3",
+  "audio_url": "http://192.168.32.66:30090/business-one-min-audio/Spotify_RSS_1531106786_財富生活活化大腦與強健身體的體智能鍛練.mp3",
   "bucket": "business-one-min-audio",
-  "object_key": "Spotify_RSS_123_投資理財精選.mp3"
+  "object_key": "Spotify_RSS_1531106786_財富生活活化大腦與強健身體的體智能鍛練.mp3"
 }
 ```
 

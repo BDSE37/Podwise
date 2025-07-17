@@ -2,9 +2,15 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 import uvicorn
 from pathlib import Path
+import httpx
+import logging
+
+# 設定日誌
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # 創建 FastAPI 應用
 app = FastAPI(
@@ -25,9 +31,13 @@ app.add_middleware(
 # 設置靜態文件
 app.mount("/assets", StaticFiles(directory=Path(__file__).parent / "assets"), name="assets")
 app.mount("/images", StaticFiles(directory=Path(__file__).parent / "images"), name="images")
+app.mount("/audio", StaticFiles(directory=Path(__file__).parent / "audio"), name="audio")
 
 # 設置模板
 templates = Jinja2Templates(directory=Path(__file__).parent)
+
+# 後端 API 服務 URL - 修正端口為 800
+BACKEND_API_URL = "http://localhost:8000"
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -64,11 +74,98 @@ async def api_status():
     return {
         "frontend": "running",
         "backend_services": {
+            "api_gateway": "http://localhost:8008",
             "recommendation_service": "http://localhost:8006",
             "feedback_service": "http://localhost:8007",
             "minio_service": "http://localhost:9000"
         }
     }
+
+# API 代理中間件
+@app.middleware("http")
+async def proxy_api_requests(request: Request, call_next):
+    """代理 API 請求到後端服務"""
+    if request.url.path.startswith("/api/"):
+        # 構建後端 API URL
+        backend_url = f"{BACKEND_API_URL}{request.url.path}"
+        if request.url.query:
+            backend_url += f"?{request.url.query}"
+        logger.info(f"代理請求: {request.method} {request.url.path} -> {backend_url}")
+        
+        # 轉發請求到後端
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            try:
+                # 準備請求資料
+                headers = dict(request.headers)
+                # 移除一些不需要的 headers
+                headers.pop("host", None)
+                headers.pop("content-length", None)  # 讓 httpx 自動計算
+                
+                # 根據請求方法轉發
+                if request.method == "GET":
+                    response = await client.get(backend_url, headers=headers)
+                elif request.method == "POST":
+                    body = await request.body()
+                    response = await client.post(backend_url, content=body, headers=headers)
+                elif request.method == "PUT":
+                    body = await request.body()
+                    response = await client.put(backend_url, content=body, headers=headers)
+                elif request.method == "DELETE":
+                    response = await client.delete(backend_url, headers=headers)
+                else:
+                    # 其他方法直接轉發
+                    response = await client.request(
+                        request.method, 
+                        backend_url, 
+                        content=await request.body(),
+                        headers=headers
+                    )
+                
+                logger.info(f"後端回應: {response.status_code}")
+                
+                # 返回後端回應
+                from fastapi.responses import Response
+                return Response(
+                    content=response.content,
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    media_type=response.headers.get("content-type")
+                )
+                
+            except httpx.ConnectError as e:
+                logger.error(f"無法連接到後端服務: {e}")
+                return JSONResponse(
+                    status_code=503,
+                    content={
+                        "success": False,
+                        "error": "Backend service unavailable - connection failed"
+                    }
+                )
+            except httpx.TimeoutException as e:
+                logger.error(f"後端服務請求超時: {e}")
+                return JSONResponse(
+                    status_code=504,
+                    content={
+                        "success": False,
+                        "error": "Backend service timeout"
+                    }
+                )
+            except Exception as e:
+                logger.error(f"代理請求失敗: {e}")
+                return JSONResponse(
+                    status_code=500,
+                    content={
+                        "success": False,
+                        "error": f"Backend service error: {str(e)}"
+                    }
+                )
+    
+    # 非 API 請求，正常處理
+    response = await call_next(request)
+    return response
+
+# 最後掛載靜態檔案，避免攔截 API 請求
+app.mount("/", StaticFiles(directory=Path(__file__).parent, html=True), name="static")
 
 if __name__ == "__main__":
     uvicorn.run(

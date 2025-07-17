@@ -84,7 +84,7 @@ class DatabaseConfig:
     # Milvus
     milvus_host: str = "worker3"
     milvus_port: int = 19530
-    milvus_collection: str = "podwise_chunks"
+    milvus_collection: str = "podcast_chunks"
 
 
 @dataclass

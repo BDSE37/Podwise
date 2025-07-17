@@ -49,7 +49,7 @@ class IntegratedRAGConfig:
     # Milvus 配置
     milvus_host: str = "localhost"
     milvus_port: int = 19530
-    collection_name: str = "podwise_chunks"
+            collection_name: str = "podcast_chunks"
     
     # 搜尋配置
     similarity_threshold: float = 0.7

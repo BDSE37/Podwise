@@ -25,6 +25,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 # 導入 data_cleaning 模組
 try:
+    # 添加 data_cleaning 路徑
+    data_cleaning_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data_cleaning')
+    if data_cleaning_path not in sys.path:
+        sys.path.insert(0, data_cleaning_path)
+    
     from data_cleaning.core.episode_cleaner import EpisodeCleaner
     from data_cleaning.core.base_cleaner import BaseCleaner
     from data_cleaning.utils.data_extractor import DataExtractor
@@ -46,9 +51,32 @@ except ImportError as e:
     logger.warning(f"ml_pipeline 模組不可用: {e}")
     ML_PIPELINE_AVAILABLE = False
 
-# 導入 RAG pipeline 相關模組
-from config.agent_roles_config import get_agent_roles_manager
-from config.integrated_config import get_config
+# 延遲導入 RAG pipeline 相關模組以避免循環導入
+def _get_agent_roles_manager():
+    try:
+        import sys
+        import os
+        rag_pipeline_path = os.path.dirname(os.path.dirname(__file__))
+        if rag_pipeline_path not in sys.path:
+            sys.path.insert(0, rag_pipeline_path)
+        from config.agent_roles_config import get_agent_roles_manager
+        return get_agent_roles_manager()
+    except ImportError as e:
+        logger.warning(f"agent_roles_config 模組不可用: {e}")
+        return None
+
+def _get_config():
+    try:
+        import sys
+        import os
+        rag_pipeline_path = os.path.dirname(os.path.dirname(__file__))
+        if rag_pipeline_path not in sys.path:
+            sys.path.insert(0, rag_pipeline_path)
+        from config.integrated_config import get_config
+        return get_config()
+    except ImportError as e:
+        logger.warning(f"integrated_config 模組不可用: {e}")
+        return None
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +112,9 @@ class SmartTagExtractor:
     
     def __init__(self):
         """初始化標籤萃取器"""
-        self.config = get_config()
-        self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
+        self.config = _get_config()
+        agent_manager = _get_agent_roles_manager()
+        self.role_config = agent_manager.get_role("intelligent_retrieval_expert") if agent_manager else None
     
     def extract_tags(self, text: str) -> List[str]:
         """
@@ -146,7 +175,8 @@ class RAGVectorSearch:
             config: 搜尋配置
         """
         self.config = config or RAGSearchConfig()
-        self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
+        agent_manager = _get_agent_roles_manager()
+        self.role_config = agent_manager.get_role("intelligent_retrieval_expert") if agent_manager else None
         
         # 初始化 data_cleaning 組件
         self.episode_cleaner = None
@@ -163,12 +193,12 @@ class RAGVectorSearch:
         if ML_PIPELINE_AVAILABLE:
             try:
                 # 初始化空的 DataFrame 作為預設參數，使用正確的欄位名稱
-                empty_podcast_data = pd.DataFrame(columns=[
+                empty_podcast_data = pd.DataFrame(columns=pd.Index([
                     'episode_id', 'episode_title', 'description', 'category', 'tags'
-                ])
-                empty_user_history = pd.DataFrame(columns=[
+                ]))
+                empty_user_history = pd.DataFrame(columns=pd.Index([
                     'user_id', 'episode_id', 'rating', 'like_count', 'preview_play_count'
-                ])
+                ]))
                 
                 self.recommender = RecommenderEngine(empty_podcast_data, empty_user_history)
                 self.data_manager = RecommenderData("postgresql://podwise_user:podwise_password@192.168.32.86:30017/podwise")

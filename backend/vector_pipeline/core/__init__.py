@@ -1,24 +1,17 @@
 """
-Vector Pipeline Core 模組
-提供完整的資料處理流程核心組件
+Vector Pipeline Core Module
+
+This module contains the core components for the vector pipeline system.
 """
 
-from .mongo_processor import MongoDBProcessor, MongoDocument
-from .postgresql_mapper import PostgreSQLMapper, EpisodeMetadata
-from .text_chunker import TextChunker, TextChunk
 from .vector_processor import VectorProcessor
+from .text_chunker import TextChunker
 from .milvus_writer import MilvusWriter
-from .tag_manager import UnifiedTagManager, TagExtractionResult
+from .error_logger import ErrorLogger
 
 __all__ = [
-    'MongoDBProcessor',
-    'MongoDocument', 
-    'PostgreSQLMapper',
-    'EpisodeMetadata',
-    'TextChunker',
-    'TextChunk',
     'VectorProcessor',
+    'TextChunker', 
     'MilvusWriter',
-    'UnifiedTagManager',
-    'TagExtractionResult'
+    'ErrorLogger'
 ] 

@@ -34,7 +34,7 @@ class EnhancedSearchConfig:
     # Milvus 配置
     milvus_host: str = "worker3"
     milvus_port: int = 19530
-    collection_name: str = "podwise_chunks"
+    collection_name: str = "podcast_chunks"
     similarity_threshold: float = 0.7
     
     # LLM 配置
@@ -215,17 +215,36 @@ class EnhancedMilvusSearch:
             
             # 格式化結果
             formatted_results = []
-            for hits in results:
-                for hit in hits:
-                    if hit.score >= self.config.similarity_threshold:
-                        formatted_results.append({
-                            "chunk_id": hit.entity.get("chunk_id"),
-                            "content": hit.entity.get("chunk_text"),
-                            "similarity_score": hit.score,
-                            "metadata": hit.entity.get("metadata", {}),
-                            "tags": hit.entity.get("tags", []),
-                            "source": "milvus"
-                        })
+            # 處理搜尋結果 - results 可能是 SearchFuture 或直接結果
+            if hasattr(results, '__iter__') and not hasattr(results, 'score'):
+                # 如果是可迭代的結果列表
+                for hits in results:
+                    if hasattr(hits, '__iter__'):
+                        for hit in hits:
+                            if hasattr(hit, 'score') and hit.score >= self.config.similarity_threshold:
+                                formatted_results.append({
+                                    "chunk_id": hit.entity.get("chunk_id"),
+                                    "content": hit.entity.get("chunk_text"),
+                                    "similarity_score": hit.score,
+                                    "metadata": hit.entity.get("metadata", {}),
+                                    "tags": hit.entity.get("tags", []),
+                                    "source": "milvus"
+                                })
+                    else:
+                        # 如果 hits 本身就是 hit 對象
+                        if hasattr(hits, 'score') and hits.score >= self.config.similarity_threshold:
+                            formatted_results.append({
+                                "chunk_id": hits.entity.get("chunk_id"),
+                                "content": hits.entity.get("chunk_text"),
+                                "similarity_score": hits.score,
+                                "metadata": hits.entity.get("metadata", {}),
+                                "tags": hits.entity.get("tags", []),
+                                "source": "milvus"
+                            })
+            else:
+                # 如果 results 是單個結果或不可迭代
+                logger.warning("Milvus 搜尋結果格式異常，使用回退搜尋")
+                return self._fallback_search("")
             
             return formatted_results
             

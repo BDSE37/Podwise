@@ -22,8 +22,8 @@ POSTGRES_CONFIG: Dict = {
 MILVUS_CONFIG: Dict = {
     "host": os.getenv("MILVUS_HOST", "192.168.32.86"),  # worker3 節點 IP
     "port": int(os.getenv("MILVUS_PORT", "19530")),
-    "collection_name": os.getenv("MILVUS_COLLECTION_NAME", "podwise_embeddings"),
-    "dim": int(os.getenv("MILVUS_DIM", "1536")),
+    "collection_name": os.getenv("MILVUS_COLLECTION_NAME", "podcast_chunks"),
+    "dim": int(os.getenv("MILVUS_DIM", "1024")),
     "index_type": os.getenv("MILVUS_INDEX_TYPE", "IVF_FLAT"),
     "metric_type": os.getenv("MILVUS_METRIC_TYPE", "L2"),
     "params": {
@@ -33,16 +33,59 @@ MILVUS_CONFIG: Dict = {
 
 # MinIO 配置
 MINIO_CONFIG: Dict = {
-    "endpoint": os.getenv("MINIO_ENDPOINT", "localhost:9000"),
+    "endpoint": os.getenv("MINIO_ENDPOINT", "192.168.32.66:30090"),
     "access_key": os.getenv("MINIO_ROOT_USER", "bdse37"),
     "secret_key": os.getenv("MINIO_ROOT_PASSWORD", "11111111"),
     "secure": False,
     "bucket_name": os.getenv("MINIO_BUCKET_NAME", "podwise")
 }
 
+# MongoDB 配置
+MONGO_CONFIG: Dict = {
+    "host": os.getenv("MONGO_HOST", "192.168.32.86"),  # worker3 節點 IP
+    "port": int(os.getenv("MONGO_PORT", "30017")),  # NodePort
+    "username": os.getenv("MONGO_USER", "bdse37"),
+    "password": os.getenv("MONGO_PASSWORD", "111111"),
+    "database": os.getenv("MONGO_DB", "podwise"),
+    "collections": {
+        "transcripts": "transcripts",
+        "summaries": "summaries",
+        "topics": "topics"
+    }
+}
+
+# MongoDB 連接字串
+MONGO_URI = f"mongodb://{MONGO_CONFIG['username']}:{MONGO_CONFIG['password']}@{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}"
+
+# MongoDB 索引配置
+MONGO_INDEXES = {
+    "transcripts": [
+        {
+            "keys": [("podcast_id", 1), ("episode_id", 1)],
+            "unique": True
+        },
+        {
+            "keys": [("created_at", -1)]
+        }
+    ],
+    "summaries": [
+        {
+            "keys": [("podcast_id", 1), ("episode_id", 1)],
+            "unique": True
+        }
+    ],
+    "topics": [
+        {
+            "keys": [("podcast_id", 1), ("episode_id", 1), ("topic", 1)],
+            "unique": True
+        }
+    ]
+}
+
 # 合併所有配置
 DB_CONFIG: Dict = {
     "postgres": POSTGRES_CONFIG,
     "milvus": MILVUS_CONFIG,
-    "minio": MINIO_CONFIG
+    "minio": MINIO_CONFIG,
+    "mongo": MONGO_CONFIG
 } 
