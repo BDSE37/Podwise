@@ -17,19 +17,19 @@ NUM_THREADS = 4
 MIN_DELAY = 0.5
 MAX_DELAY = 2.0
 STOP_FILE = "STOP"
-DOWNLOAD_COUNT = "ALL"  # ✅ 可改為 "ALL" 或整數
-EPISODES_COUNT = "ALL"  # ✅ 可改為 "ALL" 或整數
+DOWNLOAD_COUNT = 10  # ✅ 可改為 "ALL" 或整數
+EPISODES_COUNT = 10 # ✅ 可改為 "ALL" 或整數
 # ===================
 
 
 def _handle_abort(sig, frame):
-    print("\n🔴 偵測到中斷訊號，停止提交新任務...")
     raise KeyboardInterrupt
 
 
 signal.signal(signal.SIGINT, _handle_abort)
 if hasattr(signal, "SIGBREAK"):
     signal.signal(signal.SIGBREAK, _handle_abort)
+
 
 
 def safe_filename(title: str) -> str:
@@ -75,6 +75,7 @@ def gather_download_tasks():
     return tasks
 
 
+
 def download_audio(task):
     url, mp3_dir, filename = task
     if os.path.exists(STOP_FILE):
@@ -103,16 +104,18 @@ def download_audio(task):
     try:
         with yt_dlp.YoutubeDL(opts) as ydl:
             ydl.download([url])
-        print(f"✅ 完成: {filename}")
+        # print(f"✅ 完成: {filename}")
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print(f"❌ 失敗: {filename}，{e}")
+        # print(f"❌ 失敗: {filename}，{e}")
+        pass
+
 
 
 def main():
     tasks = gather_download_tasks()
-    print(f"🔹 預計下載 {len(tasks)} 檔案，使用 {NUM_THREADS} 執行緒...")
+    # print(f"🔹 預計下載 {len(tasks)} 檔案，使用 {NUM_THREADS} 執行緒...")
     try:
         with ThreadPoolExecutor(max_workers=NUM_THREADS) as exe:
             futures = []
@@ -125,12 +128,12 @@ def main():
                 try:
                     f.result()
                 except KeyboardInterrupt:
-                    print("🔴 下載中斷")
+                    # print("🔴 下載中斷")
                     break
     except KeyboardInterrupt:
-        print("🔴 已停止所有任務，程式退出。")
+        # print("🔴 已停止所有任務，程式退出。")
         sys.exit(1)
-    print("✅ 全部下載完成。")
+    # print("✅ 全部下載完成。")
 
 
 if __name__ == "__main__":
