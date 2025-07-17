@@ -271,6 +271,7 @@ class PodwiseIntegratedConfig(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "allow"  # 允許額外的輸入參數
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

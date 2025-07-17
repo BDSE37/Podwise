@@ -37,9 +37,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
         python-multipart==0.0.6 \
         aiofiles==23.2.1 \
         python-dotenv==1.0.0 \
-        langchain==0.1.0 \
-        langchain-openai==0.0.5 \
-        crewai==0.28.0
+        langchain>=0.1.10 \
+        langchain-openai>=0.0.5 \
+        crewai>=0.28.0
 
 # 複製應用程式代碼
 COPY backend/rag_pipeline ./backend/rag_pipeline

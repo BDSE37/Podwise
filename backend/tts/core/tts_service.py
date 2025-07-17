@@ -131,6 +131,11 @@ class TTSService:
             # 使用預設語音如果未指定
             actual_voice_id = voice_id or self._default_voice
             
+            # 驗證語音ID是否有效
+            if not self._voice_config.validate_voice_id(actual_voice_id):
+                logger.warning(f"無效的語音ID: {actual_voice_id}，使用預設語音: {self._default_voice}")
+                actual_voice_id = self._default_voice
+            
             # 執行語音合成
             if self._edge_tts_manager:
                 result = await self._edge_tts_manager.synthesize_speech(
@@ -158,35 +163,35 @@ class TTSService:
     
     def get_available_voices(self) -> List[Dict[str, str]]:
         """獲取可用的語音列表
-        
         Returns:
-            List[Dict[str, str]]: 語音列表，每個語音包含 id、name、description
+            List[Dict[str, str]]: 語音列表，每個語音包含 id、name、description、gender、style、voice_id
         """
         if not self.is_available():
             return []
-        
-        # 直接從語音配置獲取標準化的語音列表
         return [
             {
                 "id": "podrina",
                 "name": "Podrina",
                 "description": "溫柔親切的女聲，適合日常對話和情感表達",
                 "gender": "female",
-                "style": "friendly"
+                "style": "friendly",
+                "voice_id": "zh-TW-HsiaoChenNeural"
             },
             {
                 "id": "podrisa",
-                "name": "Podrisa", 
+                "name": "Podrisa",
                 "description": "活潑開朗的女聲，適合娛樂內容和輕鬆話題",
                 "gender": "female",
-                "style": "cheerful"
+                "style": "cheerful",
+                "voice_id": "zh-TW-HsiaoYuNeural"
             },
             {
                 "id": "podrino",
                 "name": "Podrino",
                 "description": "穩重可靠的男聲，適合正式場合和專業內容",
                 "gender": "male",
-                "style": "serious"
+                "style": "serious",
+                "voice_id": "zh-TW-YunJheNeural"
             }
         ]
     

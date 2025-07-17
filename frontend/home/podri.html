@@ -60,6 +60,11 @@
                                 <span class="voice-name">Podrino</span>
                                 <span class="voice-desc">（穩重男聲）</span>
                             </div>
+                            <div class="voice-model-card" data-model="podriso">
+                                <img src="images/podcasts_blue.png" class="voice-icon" alt="Podriso">
+                                <span class="voice-name">Podriso</span>
+                                <span class="voice-desc">（專業男聲）</span>
+                            </div>
                         </div>
                     </div>
                     <!-- 技能進度條區塊 -->
@@ -204,6 +209,25 @@
                 console.log('Podrina 已預設選中');
             }
             
+            // 添加語音切換事件監聽器
+            document.querySelectorAll('.voice-model-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // 移除所有選中狀態
+                    document.querySelectorAll('.voice-model-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    // 添加選中狀態到當前卡片
+                    this.classList.add('selected');
+                    
+                    const selectedVoice = this.dataset.model;
+                    console.log('切換語音到:', selectedVoice);
+                    
+                    // 可以添加視覺反饋
+                    const voiceName = this.querySelector('.voice-name').textContent;
+                    showToast(`已切換到 ${voiceName} 語音`);
+                });
+            });
+            
             // URL 參數填入對話框
             const searchText = urlParams.get('search');
             if (searchText) {
@@ -329,8 +353,8 @@
 
                 console.log('TTS 設定:', { ttsEnabled, selectedVoice, speed });
 
-                // 發送到 RAG Pipeline API 服務 (使用反向代理)
-                const response = await fetch('/api/v1/query', {
+                // 發送到 RAG Pipeline API 服務 (通過 FastAPI 代理)
+                const response = await fetch('/api/rag/query', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -339,7 +363,7 @@
                         query: message,
                         user_id: window.currentUserId || 'Podwise0001', // 使用 Podwise ID 格式
                         session_id: `session_${window.currentUserId}_${Date.now()}`,
-                        enable_tts: ttsEnabled, // 根據使用者設定啟用 TTS
+                        enable_tts: true, // 強制開啟 TTS
                         voice: selectedVoice,
                         speed: parseFloat(speed),
                         metadata: {
@@ -354,7 +378,7 @@
                 }
 
                 const data = await response.json();
-                console.log('ML Pipeline 回應:', data);
+                console.log('RAG Pipeline 回應:', data);
                 
                 // 移除載入訊息並添加 Podri 回覆
                 removeLoadingMessage();
@@ -368,10 +392,10 @@
                         console.log('TTS 已啟用，準備播放語音...');
                         
                         if (data.audio_data) {
-                            console.log('使用 ML Pipeline 返回的音頻數據');
+                            console.log('使用 RAG Pipeline 返回的音頻數據');
                             playTTSAudio(data.audio_data);
                         } else {
-                            console.log('ML Pipeline 沒有返回音頻，單獨呼叫 TTS 服務');
+                            console.log('RAG Pipeline 沒有返回音頻，單獨呼叫 TTS 服務');
                             // 如果 TTS 開啟但沒有音頻數據，單獨呼叫 TTS 服務
                             await generateTTS(data.response, selectedVoice, speed);
                         }
@@ -399,7 +423,7 @@
                 // 計算語速調整
                 const rateAdjustment = calculateRateAdjustment(speed);
                 
-                const response = await fetch('/api/v1/tts/synthesize', {
+                const response = await fetch('/api/rag/tts/synthesize', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -445,6 +469,39 @@
         }
 
 
+
+        // 顯示提示訊息
+        function showToast(message, duration = 2000) {
+            // 創建 toast 元素
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #333;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                transition: opacity 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            // 添加到頁面
+            document.body.appendChild(toast);
+            
+            // 自動移除
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
 
         // 播放 TTS 語音
         function playTTSAudio(base64Audio) {
@@ -1099,6 +1156,46 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+        
+        /* 語音切換樣式 */
+        .voice-model-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .voice-model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .voice-model-card.selected {
+            border-color: #7c4dff;
+            background-color: rgba(124, 77, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 77, 255, 0.3);
+        }
+        
+        .voice-model-card.selected .voice-name {
+            color: #7c4dff;
+            font-weight: 600;
+        }
+        
+        /* 語音切換動畫 */
+        .voice-model-card {
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </body>

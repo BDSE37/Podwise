@@ -63,7 +63,7 @@ class UserQueryRequest(BaseModel):
     user_id: str = Field(default="default_user", description="用戶ID")
     session_id: Optional[str] = Field(None, description="會話ID")
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="額外元數據")
-    enable_tts: bool = Field(default=False, description="是否啟用TTS")
+    enable_tts: bool = Field(default=True, description="是否啟用TTS")
     voice: str = Field(default="podrina", description="語音模型")
     speed: float = Field(default=1.0, description="語音速度")
 
@@ -81,7 +81,7 @@ class UserQueryResponse(BaseModel):
     audio_data: Optional[str] = None
     voice_used: Optional[str] = None
     speed_used: Optional[float] = None
-    tts_enabled: bool = False
+    tts_enabled: bool = True
 
 class UserValidationRequest(BaseModel):
     """用戶驗證請求"""
@@ -107,6 +107,7 @@ class TTSResponse(BaseModel):
     audio_data: Optional[str] = None
     voice: Optional[str] = None
     speed: Optional[float] = None
+    text: Optional[str] = None
     processing_time: float
     message: str
 
@@ -966,6 +967,9 @@ class PodwiseRAGPipeline:
             return None
         
         try:
+            # 記錄語音合成請求
+            logger.info(f"開始語音合成: 語音={voice}, 語速={speed}, 文字長度={len(text)}")
+            
             # 轉換語速參數為 Edge TTS 格式
             if speed != 1.0:
                 rate = f"{int((speed - 1) * 100):+d}%"
@@ -973,12 +977,12 @@ class PodwiseRAGPipeline:
                 rate = "+0%"
             
             # 執行語音合成
-            audio_data = await self.tts_service.語音合成(
+            audio_data = await self.tts_service.synthesize_speech(
                 text=text,
-                語音=voice,
-                語速=rate,
-                音量="+0%",
-                音調="+0%"
+                voice_id=voice,
+                rate=rate,
+                volume="+0%",
+                pitch="+0%"
             )
             
             if audio_data:
@@ -1170,12 +1174,15 @@ async def process_query(
         # 獲取推薦結果
         recommendations = await _get_recommendations(request.query, manager)
         
-        # 處理 TTS 語音合成
+        # 處理 TTS 語音合成（預設啟用）
         audio_data = None
         voice_used = None
         speed_used = None
         
-        if request.enable_tts and manager.rag_pipeline.tts_service:
+        # 預設啟用 TTS，除非明確禁用
+        should_enable_tts = request.enable_tts if hasattr(request, 'enable_tts') else True
+        
+        if should_enable_tts and manager.rag_pipeline.tts_service:
             try:
                 tts_result = await manager.rag_pipeline.synthesize_speech(
                     text=response.content,
@@ -1186,8 +1193,13 @@ async def process_query(
                     audio_data = tts_result.get("audio_data")
                     voice_used = tts_result.get("voice")
                     speed_used = tts_result.get("speed")
+                    logger.info(f"TTS 語音合成成功: 語音={voice_used}, 速度={speed_used}")
+                else:
+                    logger.warning("TTS 語音合成返回空結果")
             except Exception as e:
                 logger.warning(f"TTS 語音合成失敗: {e}")
+        else:
+            logger.info(f"TTS 未啟用或服務不可用: enable_tts={should_enable_tts}, tts_service={manager.rag_pipeline.tts_service is not None}")
         
         # 背景任務：記錄查詢歷史
         background_tasks.add_task(
@@ -1212,7 +1224,7 @@ async def process_query(
             audio_data=audio_data,
             voice_used=voice_used,
             speed_used=speed_used,
-            tts_enabled=request.enable_tts
+            tts_enabled=should_enable_tts
         )
         
     except Exception as e:
@@ -1338,14 +1350,13 @@ async def get_available_voices(manager: RAGPipelineService = Depends(get_service
     try:
         if not manager.rag_pipeline or not manager.rag_pipeline.tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務不可用")
-        
-        voices = manager.rag_pipeline.tts_service.獲取可用語音()
+        voices = manager.rag_pipeline.tts_service.get_available_voices()
+        logger.info(f"獲取到 {len(voices)} 個語音: {[v.get('id', 'unknown') for v in voices]}")
         return {
             "success": True,
             "voices": voices,
             "count": len(voices)
         }
-        
     except Exception as e:
         logger.error(f"獲取語音列表失敗: {e}")
         raise HTTPException(status_code=500, detail=f"獲取語音列表失敗: {str(e)}")

@@ -146,7 +146,7 @@ class IntegratedRAGService:
                            query: str, 
                            user_id: str = "default_user",
                            session_id: Optional[str] = None,
-                           enable_tts: bool = False,
+                           enable_tts: bool = True,
                            voice: str = "podrina",
                            speed: float = 1.0) -> Dict[str, Any]:
         """處理用戶查詢"""

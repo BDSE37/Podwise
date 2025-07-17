@@ -35,7 +35,7 @@ class QueryRequest:
     user_id: str = "default_user"
     session_id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
-    enable_tts: bool = False
+    enable_tts: bool = True
     voice: str = "podrina"
     speed: float = 1.0
 

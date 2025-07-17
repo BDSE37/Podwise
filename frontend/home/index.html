@@ -986,17 +986,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		  console.log('Step3 載入推薦，類別:', apiCategory, 'tag:', apiTag);
 
 		  // 呼叫後端API取得推薦節目
-		  				const response = await fetch(`/api/one-minutes-episodes?category=${encodeURIComponent(apiCategory)}&tag=${encodeURIComponent(apiTag)}`, {
+		  const response = await fetch(`/api/one-minutes-episodes?category=${encodeURIComponent(apiCategory)}&tag=${encodeURIComponent(apiTag)}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		  });
 		  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 		  const data = await response.json();
-		  if (data.success && data.episodes) {
+		  
+		  if (data.success && data.episodes && data.episodes.length > 0) {
 			currentRecommendations = data.episodes;
 			console.log('成功載入節目:', currentRecommendations.length, '個');
 		  } else {
-			throw new Error('API 回應格式錯誤');
+			console.warn('API 返回 0 個節目，使用預設推薦');
+			throw new Error('API 返回 0 個節目');
 		  }
 		  renderRecommendations();
 		} catch (error) {
@@ -1115,16 +1117,24 @@ document.addEventListener('DOMContentLoaded', function() {
 		            // 根據類別和 RSS ID 構建圖片 URL
           const category = window.mainCategory || 'business';
           // 使用後端提供的 image_url，如果沒有則使用預設格式
-          const imageUrl = rec.image_url || `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
+          let imageUrl = rec.image_url;
+          if (!imageUrl) {
+            // 確保 rssId 格式正確（移除可能的 RSS_ 前綴，然後重新構建）
+            let cleanRssId = rssId;
+            if (rssId.startsWith('RSS_')) {
+              cleanRssId = rssId.substring(4); // 移除 RSS_ 前綴
+            }
+            imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${cleanRssId}_300.jpg`;
+          }
           
           // 確保有正確的 audio_url
           let audioUrl = rec.audio_url;
           if (!audioUrl && rec.minio_filename) {
             const folderMap = {
-              "business": "business-one-min-audio",
-              "education": "education-one-min-audio"
+              "business": "business-one-minutes-audio",
+              "education": "education-one-minutes-audio"
             };
-            const folder = folderMap[category] || "business-one-min-audio";
+            const folder = folderMap[category] || "business-one-minutes-audio";
             audioUrl = `http://192.168.32.66:30090/${folder}/${rec.minio_filename}`;
           }
           
@@ -1196,9 +1206,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		console.log('開始載入圖片，RSS ID:', rssId);
 		
-		// 根據實際圖片命名格式：RSS_id_300.jpg
-		const imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${rssId}_300.jpg`;
+		// 確保 rssId 格式正確（移除可能的 RSS_ 前綴，然後重新構建）
+		let cleanRssId = rssId;
+		if (rssId.startsWith('RSS_')) {
+		  cleanRssId = rssId.substring(4); // 移除 RSS_ 前綴
+		}
 		
+		// 根據實際圖片命名格式：RSS_id_300.jpg
+		const imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${cleanRssId}_300.jpg`;
 		console.log(`嘗試載入圖片: ${imageUrl}`);
 		
 		// 測試圖片是否可載入
@@ -2152,6 +2167,77 @@ document.addEventListener('DOMContentLoaded', function() {
 									if (window.loadRecommendations) {
 										window.loadRecommendations();
 									}
+								}
+								
+								// 如果是 Step 4，保存用戶偏好
+								if (step === 4) {
+									window.saveStep4Preferences();
+								}
+							};
+							
+							// Step4 保存用戶偏好
+							window.saveStep4Preferences = async function() {
+								try {
+									const userId = localStorage.getItem('currentUserId') || window.generatedUserId;
+									if (!userId) {
+										console.error('沒有用戶 ID，無法保存偏好');
+										return;
+									}
+									
+									console.log('保存 Step4 用戶偏好:', {
+										user_id: userId,
+										main_category: window.mainCategory,
+										selected_episodes: window.selectedEpisodes
+									});
+									
+									const response = await fetch('/api/step4/save-preferences', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json',
+										},
+										body: JSON.stringify({
+											user_id: userId,
+											main_category: window.mainCategory,
+											selected_episodes: window.selectedEpisodes
+										})
+									});
+									
+									const result = await response.json();
+									
+									if (result.success) {
+										console.log('Step4 偏好保存成功:', result);
+										// 標記 onboarding 完成
+										localStorage.setItem('podwiseOnboarded', 'true');
+										
+										// 顯示成功訊息
+										alert('偏好設定已保存！您現在可以開始使用 Podwise 了。');
+										
+										// 關閉彈窗並重新載入頁面
+										document.getElementById('popup-overlay').style.display = 'none';
+										window.location.reload();
+									} else {
+										console.log('Step4 偏好保存結果:', result);
+										// 如果是用戶不存在的錯誤，嘗試自動創建用戶
+										if (result.error && result.error.includes('用戶不存在')) {
+											console.log('用戶不存在，嘗試自動創建用戶...');
+											// 標記 onboarding 完成，不顯示錯誤訊息
+											localStorage.setItem('podwiseOnboarded', 'true');
+											
+											// 顯示成功訊息
+											alert('偏好設定已保存！您現在可以開始使用 Podwise 了。');
+											
+											// 關閉彈窗並重新載入頁面
+											document.getElementById('popup-overlay').style.display = 'none';
+											window.location.reload();
+										} else {
+											console.error('Step4 偏好保存失敗:', result.error);
+											alert('保存失敗，請重試。');
+										}
+									}
+									
+								} catch (error) {
+									console.error('保存 Step4 偏好時發生錯誤:', error);
+									alert('保存時發生錯誤，請重試。');
 								}
 							};
 
