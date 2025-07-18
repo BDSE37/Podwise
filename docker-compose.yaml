@@ -156,6 +156,8 @@ services:
       retries: 3
       start_period: 60s
 
+
+
   # 前端服務
   frontend:
     build:
@@ -189,6 +191,7 @@ volumes:
     driver: local
   llm_logs:
     driver: local
+
 
 networks:
   podwise-network:

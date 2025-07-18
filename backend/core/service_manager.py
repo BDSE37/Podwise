@@ -68,7 +68,7 @@ class ServiceType(Enum):
     ML_PIPELINE = "ml_pipeline"
     WEB_SEARCH = "web_search"
     FRONTEND = "frontend"
-    PODRI_CHAT = "podri_chat"
+    # PODRI_CHAT = "podri_chat"  # 已移除，不再使用
     CRAWLER = "crawler"
     DATA_PROCESSOR = "data_processor"
 

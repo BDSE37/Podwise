@@ -145,7 +145,7 @@ stop_services() {
     
     # 停止 Python 進程
     pkill -f "fastapi_app.py" 2>/dev/null || true
-    pkill -f "streamlit.*podri_chat.py" 2>/dev/null || true
+    # pkill -f "streamlit.*podri_chat.py" 2>/dev/null || true  # 已移除，不再使用
     
     log_success "所有服務已停止"
 }

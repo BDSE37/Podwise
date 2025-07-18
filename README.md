@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 2. 運行開發服務器：
 ```bash
-cd chat && python podri_chat.py
+# cd chat && python podri_chat.py  # 已移除，不再使用
 ```
 
 ### Docker 部署

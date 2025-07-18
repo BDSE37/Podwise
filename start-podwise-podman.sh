@@ -159,7 +159,7 @@ wait_for_services() {
         "rag_pipeline:8005"
         "web_search:8006"
         "frontend:8080"
-        "podri_chat:8501"
+        # "podri_chat:8501"  # 已移除，不再使用
     )
     
     for service in "${services[@]}"; do
@@ -203,7 +203,7 @@ show_service_status() {
     echo "           服務訪問地址"
     echo "=========================================="
     echo "🌐 前端主頁面: http://localhost:8080"
-    echo "💬 Streamlit 聊天: http://localhost:8501"
+    # echo "💬 Streamlit 聊天: http://localhost:8501"  # 已移除，不再使用
     echo "🔊 TTS 服務: http://localhost:8003"
     echo "🎤 STT 服務: http://localhost:8001"
     echo "🤖 LLM 服務: http://localhost:8000"
@@ -232,7 +232,7 @@ show_logs() {
     echo "=========================================="
     
     # 顯示主要服務的日誌
-    local main_services=("rag_pipeline" "tts" "frontend" "podri_chat")
+    local main_services=("rag_pipeline" "tts" "frontend")
     
     for service in "${main_services[@]}"; do
         echo ""

@@ -82,7 +82,7 @@ Content-Type: application/json
   "system_prompt": "你是一個專業的 podcast 推薦助手",
   "user_id": "user123",
   "metadata": {
-    "source": "podri_chat"
+    "source": "llm_test"
   }
 }
 ```

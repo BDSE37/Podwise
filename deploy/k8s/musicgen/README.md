@@ -133,7 +133,7 @@ python app.py
 
 # 3. 啟動聊天服務
 cd ../../frontend/chat
-streamlit run podri_chat.py
+# streamlit run podri_chat.py  # 已移除，不再使用
 ```
 
 ### 新增音樂風格
