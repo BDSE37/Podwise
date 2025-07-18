@@ -828,11 +828,15 @@ async def proxy_to_service(service: str, path: str, request: Request):
     # 服務對應表
     SERVICE_MAP = {
         "tts": "http://localhost:8002",
-        "rag": "http://localhost:8004", 
+        "rag": "http://localhost:8011",  # 修正 RAG Pipeline 端口
         "ml": "http://localhost:8003",
         "llm": "http://localhost:8004",
         "stt": "http://localhost:8005",
     }
+    
+    # 特殊路由處理
+    if service == "rag" and path == "query":
+        path = "api/v1/query"  # 修正 RAG Pipeline 的查詢端點
     
     if service not in SERVICE_MAP:
         return JSONResponse(

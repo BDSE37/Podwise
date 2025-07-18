@@ -36,10 +36,10 @@ app.mount("/audio", StaticFiles(directory=Path(__file__).parent / "audio"), name
 # 設置模板
 templates = Jinja2Templates(directory=Path(__file__).parent)
 
-# 後端 API 服務 URL - 修正端口為 8006 (API 閘道)
-BACKEND_API_URL = "http://localhost:8006"
+# 後端 API 服務 URL - 修正端口為 8008 (API 閘道)
+BACKEND_API_URL = "http://localhost:8008"
 # RAG Pipeline API 服務 URL - 使用 API Gateway
-RAG_API_URL = "http://localhost:8006"
+RAG_API_URL = "http://localhost:8008"
 
 PROXY_PREFIXES = ["/api/", "/user_management/", "/utils/"]
 

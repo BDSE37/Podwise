@@ -127,6 +127,20 @@ videos/
 images/
 media/
 
+# Frontend assets exceptions - keep frontend images and assets
+!frontend/**/*.jpg
+!frontend/**/*.jpeg
+!frontend/**/*.png
+!frontend/**/*.gif
+!frontend/**/*.svg
+!frontend/**/*.ico
+!frontend/**/*.css
+!frontend/**/*.js
+!frontend/**/*.woff
+!frontend/**/*.woff2
+!frontend/**/*.eot
+!frontend/**/*.ttf
+
 # Database files
 *.db
 *.sqlite

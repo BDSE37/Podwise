@@ -60,11 +60,7 @@
                                 <span class="voice-name">Podrino</span>
                                 <span class="voice-desc">（穩重男聲）</span>
                             </div>
-                            <div class="voice-model-card" data-model="podriso">
-                                <img src="images/podcasts_blue.png" class="voice-icon" alt="Podriso">
-                                <span class="voice-name">Podriso</span>
-                                <span class="voice-desc">（專業男聲）</span>
-                            </div>
+
                         </div>
                     </div>
                     <!-- 技能進度條區塊 -->
@@ -423,15 +419,15 @@
                 // 計算語速調整
                 const rateAdjustment = calculateRateAdjustment(speed);
                 
-                const response = await fetch('/api/rag/tts/synthesize', {
+                const response = await fetch('/api/tts/synthesize', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        text: text,
-                        voice: voice,
-                        speed: rateAdjustment
+                        文字: text,
+                        語音: voice,
+                        語速: rateAdjustment
                     })
                 });
 
@@ -442,12 +438,12 @@
                 const data = await response.json();
                 console.log('TTS 服務回應:', data);
                 
-                if (data.success && data.audio_data) {
+                if (data.成功 && data.音訊檔案) {
                     console.log('TTS 生成成功，開始播放');
                     // 播放語音
-                    playTTSAudio(data.audio_data);
+                    playTTSAudio(data.音訊檔案);
                 } else {
-                    console.warn('TTS 生成失敗:', data.error_message || '未知錯誤');
+                    console.warn('TTS 生成失敗:', data.錯誤訊息 || '未知錯誤');
                 }
 
             } catch (error) {

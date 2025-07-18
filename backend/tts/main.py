@@ -116,7 +116,7 @@ async def get_available_voices():
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        語音列表 = tts_service.獲取可用語音()
+        語音列表 = tts_service.get_available_voices()
         return [
             VoiceInfo(
                 id=voice["id"],
@@ -141,12 +141,12 @@ async def synthesize_speech(request: TTSRequest):
         
         # 執行語音合成
         開始時間 = asyncio.get_event_loop().time()
-        音訊數據 = await tts_service.語音合成(
+        音訊數據 = await tts_service.synthesize_speech(
             text=request.文字,
-            語音=request.語音,
-            語速=request.語速,
-            音量=request.音量,
-            音調=request.音調
+            voice_id=request.語音,
+            rate=request.語速,
+            volume=request.音量,
+            pitch=request.音調
         )
         結束時間 = asyncio.get_event_loop().time()
         處理時間 = 結束時間 - 開始時間
@@ -183,7 +183,7 @@ async def get_voice_info(voice_id: str):
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        語音信息 = tts_service.獲取語音信息(voice_id)
+        語音信息 = tts_service.get_voice_info(voice_id)
         if not 語音信息:
             raise HTTPException(status_code=404, detail=f"語音 {voice_id} 不存在")
         
@@ -206,7 +206,7 @@ async def get_service_status():
         if not tts_service:
             raise HTTPException(status_code=503, detail="TTS 服務未初始化")
         
-        狀態 = await tts_service.獲取服務狀態()
+        狀態 = await tts_service.get_service_status()
         return ServiceStatus(podri_tts=狀態["podri_tts"])
     except Exception as e:
         logger.error(f"獲取服務狀態失敗: {e}")
@@ -223,12 +223,12 @@ async def synthesize_speech_stream(request: TTSRequest):
         logger.info(f"收到串流語音合成請求: {request.文字[:50]}...")
         
         # 目前返回標準回應，未來可實現真正的串流
-        音訊數據 = await tts_service.語音合成(
+        音訊數據 = await tts_service.synthesize_speech(
             text=request.文字,
-            語音=request.語音,
-            語速=request.語速,
-            音量=request.音量,
-            音調=request.音調
+            voice_id=request.語音,
+            rate=request.語速,
+            volume=request.音量,
+            pitch=request.音調
         )
         
         if 音訊數據:
