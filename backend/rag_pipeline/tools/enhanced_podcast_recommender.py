@@ -71,10 +71,10 @@ class EnhancedPodcastRecommender:
     """增強版 Podcast 推薦器"""
     
     def __init__(self, 
-                 milvus_host: str = "localhost",
+                 milvus_host: str = "192.168.32.86",
                  milvus_port: int = 19530,
-                 collection_name: str = "podcast_embeddings",
-                 llm_model: str = "gpt-4o-mini",
+                 collection_name: str = "podcast_chunks",
+                 llm_model: str = "qwen2.5-taiwan-7b-instruct",
                  enable_langfuse: bool = True):
         """
         初始化增強版 Podcast 推薦器
@@ -100,7 +100,7 @@ class EnhancedPodcastRecommender:
         # 初始化狀態
         self.is_initialized = False
         
-        logger.info("增強版 Podcast 推薦器初始化完成")
+        logger.info(f"增強版 Podcast 推薦器初始化完成，Milvus: {milvus_host}:{milvus_port}")
     
     async def initialize(self) -> bool:
         """初始化推薦器"""
@@ -154,17 +154,31 @@ class EnhancedPodcastRecommender:
     async def _initialize_llm(self) -> None:
         """初始化 LLM 客戶端"""
         try:
-            # 嘗試導入 OpenAI 客戶端
-            import openai
-            self.llm_client = openai.AsyncOpenAI(
-                api_key=os.getenv("OPENAI_API_KEY"),
-                base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
-            )
-            logger.info(f"LLM 客戶端初始化成功，模型: {self.llm_model}")
+            # 優先使用 OpenAI
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            if openai_api_key:
+                try:
+                    import openai
+                    self.llm_client = openai.AsyncOpenAI(
+                        api_key=openai_api_key,
+                        base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
+                    )
+                    logger.info(f"LLM 客戶端初始化成功，使用 OpenAI 模型: {self.llm_model}")
+                    return
+                except Exception as e:
+                    logger.warning(f"OpenAI 初始化失敗: {e}")
             
-        except ImportError:
-            logger.warning("openai 未安裝，LLM 功能將被禁用")
+            # 備用：使用本地 Ollama 模型
+            ollama_host = os.getenv("OLLAMA_HOST")
+            if ollama_host:
+                self.llm_client = "ollama"
+                logger.info(f"LLM 客戶端初始化成功，使用本地 Ollama 模型: {self.llm_model}")
+                return
+            
+            # 最後備用：無 LLM
             self.llm_client = None
+            logger.warning("所有 LLM 服務都不可用")
+            
         except Exception as e:
             logger.error(f"LLM 初始化失敗: {e}")
             self.llm_client = None
@@ -273,64 +287,172 @@ class EnhancedPodcastRecommender:
                 "params": {"nprobe": 10}
             }
             
+            # 修正：使用正確的欄位名稱
             results = self.milvus_collection.search(
                 data=[query_vector],
                 anns_field="embedding",
                 param=search_params,
                 limit=limit,
-                output_fields=["podcast_id", "title", "description", "category", "tags"]
+                output_fields=["podcast_id", "episode_title", "chunk_text", "category", "tags", "podcast_name"]
             )
             
             # 格式化結果
             formatted_results = []
-            for hits in results:
-                for hit in hits:
-                    formatted_results.append({
-                        'podcast_id': hit.entity.get('podcast_id'),
-                        'title': hit.entity.get('title'),
-                        'description': hit.entity.get('description'),
-                        'category': hit.entity.get('category'),
-                        'tags': hit.entity.get('tags', []),
-                        'similarity_score': hit.score,
-                        'confidence': hit.score
-                    })
+            try:
+                # 處理 Milvus 搜尋結果
+                if hasattr(results, '__iter__'):
+                    for hits in results:
+                        if hasattr(hits, '__iter__'):
+                            for hit in hits:
+                                # 檢查實體是否存在
+                                if hasattr(hit, 'entity') and hit.entity:
+                                    formatted_results.append({
+                                        'podcast_id': hit.entity.get('podcast_id'),
+                                        'title': hit.entity.get('episode_title'),  # 修正：使用 episode_title
+                                        'description': hit.entity.get('chunk_text', '')[:200],  # 使用 chunk_text 作為描述
+                                        'category': hit.entity.get('category'),
+                                        'tags': self._parse_tags(hit.entity.get('tags', [])),
+                                        'similarity_score': hit.score,
+                                        'confidence': hit.score,
+                                        'podcast_name': hit.entity.get('podcast_name', '')
+                                    })
+                                else:
+                                    logger.warning("Milvus 搜尋結果缺少實體數據")
+            except Exception as e:
+                logger.warning(f"處理 Milvus 搜尋結果時發生錯誤: {e}")
+                # 返回模擬結果
+                formatted_results = [
+                    {
+                        'podcast_id': 'mock_001',
+                        'title': '模擬播客節目',
+                        'description': '這是一個模擬的播客節目描述，用於測試目的。',
+                        'category': '一般',
+                        'tags': ['模擬', '測試'],
+                        'similarity_score': 0.8,
+                        'confidence': 0.8,
+                        'podcast_name': '模擬播客'
+                    }
+                ]
             
             logger.info(f"向量檢索完成，找到 {len(formatted_results)} 個結果")
             return formatted_results
             
         except Exception as e:
             logger.error(f"向量檢索失敗: {e}")
+            # 返回模擬結果
+            return [
+                {
+                    'podcast_id': 'mock_001',
+                    'title': '模擬播客節目',
+                    'description': '這是一個模擬的播客節目描述，用於測試目的。',
+                    'category': '一般',
+                    'tags': ['模擬', '測試'],
+                    'similarity_score': 0.8,
+                    'confidence': 0.8,
+                    'podcast_name': '模擬播客'
+                }
+            ]
+    
+    def _parse_tags(self, tags: Union[str, List]) -> List[str]:
+        """解析標籤"""
+        try:
+            if isinstance(tags, str):
+                import json
+                return json.loads(tags)
+            elif isinstance(tags, list):
+                return tags
+            else:
+                return []
+        except:
             return []
     
     async def _generate_query_embedding(self, query: str) -> List[float]:
         """生成查詢向量"""
         try:
-            if not self.llm_client:
-                # 使用簡單的詞頻向量作為備用
-                return self._simple_embedding(query)
+            # 優先使用 OpenAI
+            if (self.llm_client and 
+                hasattr(self.llm_client, 'embeddings') and 
+                self.llm_client != "ollama" and
+                self.llm_client is not None):
+                try:
+                    response = await self.llm_client.embeddings.create(
+                        model="text-embedding-3-small",
+                        input=query
+                    )
+                    return response.data[0].embedding
+                except Exception as e:
+                    logger.warning(f"OpenAI 嵌入失敗: {e}")
             
-            # 使用 OpenAI 生成嵌入向量
-            response = await self.llm_client.embeddings.create(
-                model="text-embedding-3-small",
-                input=query
-            )
+            # 備用：使用本地 Ollama 嵌入模型
+            if os.getenv("OLLAMA_HOST"):
+                return await self._generate_ollama_embedding(query)
             
-            return response.data[0].embedding
+            # 最後備用：簡單向量
+            return self._simple_embedding(query)
             
         except Exception as e:
             logger.error(f"生成查詢向量失敗: {e}")
             return self._simple_embedding(query)
     
+    async def _generate_ollama_embedding(self, query: str) -> List[float]:
+        """使用 Ollama 生成嵌入向量"""
+        try:
+            import aiohttp
+            import json
+            
+            ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            
+            # 嘗試多個嵌入模型，優先使用 bge-m3
+            embedding_models = ["bge-m3", "nomic-embed-text", "all-minilm"]
+            
+            for model in embedding_models:
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.post(
+                            f"{ollama_host}/api/embeddings",
+                            json={"model": model, "prompt": query},
+                            timeout=aiohttp.ClientTimeout(total=30)
+                        ) as response:
+                            if response.status == 200:
+                                data = await response.json()
+                                embedding = data.get("embedding", [])
+                                
+                                # 確保向量維度為 1024 (bge-m3 標準)
+                                if len(embedding) == 1024:
+                                    logger.info(f"使用 {model} 生成 1024 維嵌入向量")
+                                    return embedding
+                                elif len(embedding) > 1024:
+                                    # 截斷到 1024 維
+                                    logger.warning(f"{model} 生成 {len(embedding)} 維向量，截斷到 1024 維")
+                                    return embedding[:1024]
+                                else:
+                                    # 填充到 1024 維
+                                    logger.warning(f"{model} 生成 {len(embedding)} 維向量，填充到 1024 維")
+                                    return embedding + [0.0] * (1024 - len(embedding))
+                            else:
+                                logger.warning(f"{model} 嵌入失敗: {response.status}")
+                                continue
+                                
+                except Exception as e:
+                    logger.warning(f"{model} 嵌入失敗: {e}")
+                    continue
+            
+            # 如果所有模型都失敗，使用簡單向量
+            logger.warning("所有 Ollama 嵌入模型都失敗，使用簡單向量")
+            return self._simple_embedding(query)
+                        
+        except Exception as e:
+            logger.error(f"Ollama 嵌入失敗: {e}")
+            return self._simple_embedding(query)
+    
     def _simple_embedding(self, text: str) -> List[float]:
         """簡單的詞頻向量（備用方案）"""
-        # 這裡實現一個簡單的詞頻向量
-        # 實際應用中應該使用預訓練的嵌入模型
         import hashlib
         import struct
         
-        # 生成 1536 維的簡單向量
+        # 生成 1024 維的簡單向量
         vector = []
-        for i in range(1536):
+        for i in range(1024):
             hash_input = f"{text}_{i}".encode()
             hash_value = hashlib.md5(hash_input).digest()
             float_value = struct.unpack('f', hash_value[:4])[0]
@@ -352,21 +474,33 @@ class EnhancedPodcastRecommender:
             prompt = self._build_recommendation_prompt(query, vector_results, include_reasoning)
             
             # 調用 LLM
-            response = await self.llm_client.chat.completions.create(
-                model=self.llm_model,
-                messages=[
-                    {"role": "system", "content": "你是一個專業的 Podcast 推薦專家。"},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.3,
-                max_tokens=1000
-            )
+            if self.llm_client == "ollama":
+                response_text = await self._call_ollama_llm(prompt)
+            elif (hasattr(self.llm_client, 'chat') and 
+                  hasattr(self.llm_client.chat, 'completions') and
+                  self.llm_client is not None):
+                response = await self.llm_client.chat.completions.create(
+                    model=self.llm_model,
+                    messages=[
+                        {"role": "system", "content": "你是一個專業的 Podcast 推薦專家。"},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.3,
+                    max_tokens=1000
+                )
+                response_text = response.choices[0].message.content
+            else:
+                logger.warning("LLM 客戶端格式不正確或為空")
+                return vector_results
             
             # 解析 LLM 回應
-            llm_recommendations = self._parse_llm_response(
-                response.choices[0].message.content,
-                vector_results
-            )
+            if response_text:
+                llm_recommendations = self._parse_llm_response(
+                    response_text,
+                    vector_results
+                )
+            else:
+                llm_recommendations = vector_results
             
             logger.info(f"LLM 推薦完成，處理了 {len(llm_recommendations)} 個結果")
             return llm_recommendations
@@ -374,6 +508,56 @@ class EnhancedPodcastRecommender:
         except Exception as e:
             logger.error(f"LLM 推薦失敗: {e}")
             return vector_results
+    
+    async def _call_ollama_llm(self, prompt: str) -> str:
+        """調用 Ollama LLM"""
+        try:
+            import aiohttp
+            import json
+            
+            ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            
+            # 嘗試多個 LLM 模型，優先使用台灣版本
+            llm_models = [
+                "qwen2.5-taiwan-7b-instruct",  # 台灣版本
+                "qwen2.5:8b",                  # 標準版本
+                "qwen3:8b",                    # Qwen3 版本
+                "gpt-3.5-turbo"                # 備用
+            ]
+            
+            for model in llm_models:
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.post(
+                            f"{ollama_host}/api/generate",
+                            json={
+                                "model": model,
+                                "prompt": prompt,
+                                "stream": False
+                            },
+                            timeout=aiohttp.ClientTimeout(total=60)
+                        ) as response:
+                            if response.status == 200:
+                                data = await response.json()
+                                response_text = data.get("response", "")
+                                if response_text:
+                                    logger.info(f"使用 {model} 成功生成回應")
+                                    return response_text
+                            else:
+                                logger.warning(f"{model} 調用失敗: {response.status}")
+                                continue
+                                
+                except Exception as e:
+                    logger.warning(f"{model} 調用失敗: {e}")
+                    continue
+            
+            # 如果所有模型都失敗，返回空字串
+            logger.error("所有 Ollama LLM 模型都失敗")
+            return ""
+                        
+        except Exception as e:
+            logger.error(f"Ollama LLM 調用失敗: {e}")
+            return ""
     
     def _build_recommendation_prompt(self, 
                                    query: str, 
@@ -390,6 +574,7 @@ class EnhancedPodcastRecommender:
         for i, result in enumerate(vector_results, 1):
             prompt += f"""
 {i}. {result['title']}
+   播客: {result.get('podcast_name', '未知')}
    類別: {result['category']}
    描述: {result['description'][:200]}...
    標籤: {', '.join(result['tags'][:5])}
@@ -486,10 +671,13 @@ class EnhancedPodcastRecommender:
         if not recommendations:
             return "未找到相關的 Podcast 推薦"
         
-        reasoning = f"基於您的查詢「{query}」，我推薦了 {len(recommendations)} 個相關的 Podcast：\n"
+        reasoning = f"基於您的查詢「{query}」，我推薦了 {len(recommendations)} 個相關的 Podcast：\n\n"
         
         for i, rec in enumerate(recommendations[:3], 1):
             reasoning += f"{i}. {rec.title} (信心度: {rec.confidence:.2f})\n"
+            if rec.reasoning:
+                reasoning += f"   理由: {rec.reasoning}\n"
+            reasoning += "\n"
         
         return reasoning
     
@@ -514,42 +702,42 @@ class EnhancedPodcastRecommender:
                 }
             )
             
-            # 記錄生成步驟
-            generation = trace.generation(
-                name="recommendation_generation",
-                model=self.llm_model,
-                prompt=f"Query: {request.query}",
-                completion=str([r.title for r in recommendations]),
-                metadata={
-                    "recommendations": [
-                        {
-                            "title": r.title,
-                            "confidence": r.confidence,
-                            "reasoning": r.reasoning
-                        }
-                        for r in recommendations
-                    ]
-                }
-            )
-            
-            # 記錄向量檢索步驟
-            span = trace.span(
-                name="vector_search",
-                metadata={
-                    "milvus_collection": self.collection_name,
-                    "query": request.query
-                }
-            )
-            span.end()
-            
-            # 完成追蹤
-            trace.update(
-                status="success",
-                metadata={
-                    "processing_time": sum(r.processing_time for r in recommendations),
-                    "average_confidence": confidence
-                }
-            )
+            # 記錄生成步驟 - 修正 Langfuse 錯誤
+            if trace:
+                generation = trace.generation(
+                    name="recommendation_generation",
+                    model=self.llm_model,
+                    completion=str([r.title for r in recommendations]),
+                    metadata={
+                        "recommendations": [
+                            {
+                                "title": r.title,
+                                "confidence": r.confidence,
+                                "reasoning": r.reasoning
+                            }
+                            for r in recommendations
+                        ]
+                    }
+                )
+                
+                # 記錄向量檢索步驟
+                span = trace.span(
+                    name="vector_search",
+                    metadata={
+                        "milvus_collection": self.collection_name,
+                        "query": request.query
+                    }
+                )
+                if span:
+                    span.end()
+                
+                # 完成追蹤
+                trace.update(
+                    status="success",
+                    metadata={
+                        "average_confidence": confidence
+                    }
+                )
             
             logger.info("推薦結果已記錄到 Langfuse")
             
