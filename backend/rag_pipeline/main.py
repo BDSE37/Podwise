@@ -74,11 +74,18 @@ from pydantic import BaseModel, Field
 
 # 導入統一服務管理器
 try:
-    # 使用絕對導入路徑
-    from rag_pipeline.core.unified_service_manager import UnifiedServiceManager, ServiceConfig
-    from rag_pipeline.core.data_models import RAGResponse, UserQuery, AgentResponse
-    SERVICE_MANAGER_AVAILABLE = True
-    logger.info("✅ 統一服務管理器導入成功")
+    # 嘗試多種導入方式
+    try:
+        from core.unified_service_manager import UnifiedServiceManager, ServiceConfig
+        from core.data_models import RAGResponse, UserQuery, AgentResponse
+        SERVICE_MANAGER_AVAILABLE = True
+        logger.info("✅ 統一服務管理器導入成功")
+    except ImportError:
+        # 如果相對導入失敗，嘗試絕對導入
+        from rag_pipeline.core.unified_service_manager import UnifiedServiceManager, ServiceConfig
+        from rag_pipeline.core.data_models import RAGResponse, UserQuery, AgentResponse
+        SERVICE_MANAGER_AVAILABLE = True
+        logger.info("✅ 統一服務管理器導入成功 (絕對路徑)")
 except ImportError as e:
     logger.warning(f"統一服務管理器導入失敗: {e}")
     SERVICE_MANAGER_AVAILABLE = False
@@ -182,13 +189,16 @@ class PodwiseRAGPipeline:
             confidence_threshold: 信心度閾值
         """
         # 創建服務配置
-        service_config = ServiceConfig(
-            enable_monitoring=enable_monitoring,
-            enable_semantic_retrieval=enable_semantic_retrieval,
-            enable_chat_history=enable_chat_history,
-            enable_apple_ranking=enable_apple_ranking,
-            confidence_threshold=confidence_threshold
-        )
+        if SERVICE_MANAGER_AVAILABLE and ServiceConfig:
+            service_config = ServiceConfig(
+                enable_monitoring=enable_monitoring,
+                enable_semantic_retrieval=enable_semantic_retrieval,
+                enable_chat_history=enable_chat_history,
+                enable_apple_ranking=enable_apple_ranking,
+                confidence_threshold=confidence_threshold
+            )
+        else:
+            service_config = None
         
         # 初始化統一服務管理器
         if SERVICE_MANAGER_AVAILABLE:
