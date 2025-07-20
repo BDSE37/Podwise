@@ -257,11 +257,77 @@ def start_server():
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8002,
+        port=8002,  # TTS 服務端口
         log_level="info",
         access_log=True,
         reload=False  # 生產環境中應設為 False
     )
+
+# 添加 API v1 端點以符合前端期望
+@app.post("/api/v1/tts/synthesize")
+async def api_v1_synthesize(request: TTSRequest):
+    """API v1 語音合成端點"""
+    try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
+        logger.info(f"收到 API v1 語音合成請求: 文字='{request.文字[:50]}...', 語音='{request.語音}'")
+        
+        # 執行語音合成
+        開始時間 = asyncio.get_event_loop().time()
+        音訊數據 = await tts_service.synthesize_speech(
+            text=request.文字,
+            voice_id=request.語音,
+            rate=request.語速,
+            volume=request.音量,
+            pitch=request.音調
+        )
+        結束時間 = asyncio.get_event_loop().time()
+        處理時間 = 結束時間 - 開始時間
+        
+        if 音訊數據:
+            # 轉換為 Base64
+            import base64
+            音訊檔案 = base64.b64encode(音訊數據).decode('utf-8')
+            
+            return {
+                "success": True,
+                "audio_data": 音訊檔案,
+                "voice": request.語音,
+                "speed": request.語速,
+                "text": request.文字,
+                "processing_time": 處理時間
+            }
+        else:
+            return {
+                "success": False,
+                "error": "語音合成失敗",
+                "processing_time": 處理時間
+            }
+            
+    except ValueError as e:
+        logger.error(f"請求參數錯誤: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"語音合成失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"語音合成失敗: {str(e)}")
+
+@app.get("/api/v1/tts/voices")
+async def api_v1_voices():
+    """API v1 語音列表端點"""
+    try:
+        if not tts_service:
+            raise HTTPException(status_code=503, detail="TTS 服務未初始化")
+        
+        語音列表 = tts_service.get_available_voices()
+        return {
+            "success": True,
+            "voices": 語音列表,
+            "count": len(語音列表)
+        }
+    except Exception as e:
+        logger.error(f"獲取語音列表失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"獲取語音列表失敗: {str(e)}")
 
 
 if __name__ == "__main__":

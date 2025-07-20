@@ -395,15 +395,17 @@ class EnhancedPodcastRecommender:
             return self._simple_embedding(query)
     
     async def _generate_ollama_embedding(self, query: str) -> List[float]:
-        """使用 Ollama 生成嵌入向量"""
+        """生成 Ollama 嵌入向量"""
         try:
             import aiohttp
-            import json
             
             ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
             
-            # 嘗試多個嵌入模型，優先使用 bge-m3
-            embedding_models = ["bge-m3", "nomic-embed-text", "all-minilm"]
+            # 統一使用 BGE-M3 嵌入模型 (1024維)
+            embedding_models = [
+                "bge-m3",           # 1024維，主要模型
+                "BAAI/bge-m3"       # 完整名稱備用
+            ]
             
             for model in embedding_models:
                 try:
@@ -413,11 +415,12 @@ class EnhancedPodcastRecommender:
                             json={"model": model, "prompt": query},
                             timeout=aiohttp.ClientTimeout(total=30)
                         ) as response:
+                            
                             if response.status == 200:
                                 data = await response.json()
                                 embedding = data.get("embedding", [])
                                 
-                                # 確保向量維度為 1024 (bge-m3 標準)
+                                # 標準化向量維度為 1024
                                 if len(embedding) == 1024:
                                     logger.info(f"使用 {model} 生成 1024 維嵌入向量")
                                     return embedding
@@ -438,7 +441,7 @@ class EnhancedPodcastRecommender:
                     continue
             
             # 如果所有模型都失敗，使用簡單向量
-            logger.warning("所有 Ollama 嵌入模型都失敗，使用簡單向量")
+            logger.warning("BGE-M3 嵌入模型失敗，使用簡單向量")
             return self._simple_embedding(query)
                         
         except Exception as e:
@@ -517,12 +520,15 @@ class EnhancedPodcastRecommender:
             
             ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
             
-            # 嘗試多個 LLM 模型，優先使用台灣版本
+            # 嘗試多個 LLM 模型，按優先級排序
             llm_models = [
                 "qwen2.5-taiwan-7b-instruct",  # 台灣版本
+                "weiren119/Qwen2.5-Taiwan-8B-Instruct",  # 完整名稱
                 "qwen2.5:8b",                  # 標準版本
                 "qwen3:8b",                    # Qwen3 版本
-                "gpt-3.5-turbo"                # 備用
+                "gpt-3.5-turbo",               # 備用
+                "llama2:7b",                   # 最後備用
+                "mistral:7b"                   # 最後備用
             ]
             
             for model in llm_models:
@@ -551,13 +557,13 @@ class EnhancedPodcastRecommender:
                     logger.warning(f"{model} 調用失敗: {e}")
                     continue
             
-            # 如果所有模型都失敗，返回空字串
+            # 如果所有模型都失敗，返回預設回應
             logger.error("所有 Ollama LLM 模型都失敗")
-            return ""
+            return "抱歉，LLM 服務暫時不可用，請稍後再試。"
                         
         except Exception as e:
             logger.error(f"Ollama LLM 調用失敗: {e}")
-            return ""
+            return "LLM 服務發生錯誤，請稍後再試。"
     
     def _build_recommendation_prompt(self, 
                                    query: str, 

@@ -1,200 +1,195 @@
-# Podwise ML Pipeline 系統
+# Podwise ML Pipeline
 
-## 📋 概述
+## 概述
 
-Podwise ML Pipeline 是一個專門處理機器學習推薦的模組，主要負責協同過濾 (Collaborative Filtering) 的 KNN 推薦算法。系統遵循 OOP 原則和 Google Clean Code 標準，為 RAG Pipeline 提供精確的播客推薦服務。
+Podwise ML Pipeline 是機器學習推薦系統模組，負責提供智能的 Podcast 推薦服務。採用協同過濾和內容基於推薦算法，結合深度學習技術，提供個性化的推薦體驗。
 
-## 🎯 核心功能
+## 架構設計
 
-### 🤖 協同過濾推薦 (collaborative_filtering.py)
-- **KNN 演算法**: 基於用戶行為的協同過濾推薦
-- **相似度計算**: 餘弦相似度、皮爾森相關係數
-- **冷啟動處理**: 新用戶和新項目的推薦策略
-- **評分預測**: 用戶對未知項目的評分預測
+### 核心組件
 
-### 📊 數據管理 (data_manager.py)
-- **數據載入**: 從 MongoDB 載入用戶行為數據
-- **數據預處理**: 清洗、標準化、特徵工程
-- **數據分割**: 訓練集、測試集分割
-- **數據更新**: 增量數據更新機制
+#### 1. 數據管理器 (Data Manager)
+- **職責**：管理用戶行為數據和內容元數據
+- **實現**：`DataManager` 類別
+- **功能**：
+  - 數據載入和預處理
+  - 特徵工程
+  - 數據驗證和清理
 
-### 🔧 推薦引擎 (recommender.py)
-- **統一推薦介面**: 標準化推薦 API
-- **多策略推薦**: 支援多種推薦算法
-- **結果融合**: 多算法結果融合
-- **效能優化**: 快取機制、並行處理
+#### 2. 推薦引擎 (Recommender Engine)
+- **職責**：核心推薦算法實現
+- **實現**：`Recommender` 類別
+- **功能**：
+  - 協同過濾推薦
+  - 內容基於推薦
+  - 混合推薦策略
 
-### 📈 評估指標 (recommender_metrics.py)
-- **準確率評估**: Precision、Recall、F1-Score
-- **排序評估**: NDCG、MAP、MRR
-- **多樣性評估**: 推薦結果多樣性分析
-- **覆蓋率評估**: 推薦覆蓋率統計
+#### 3. 模型管理器 (Model Manager)
+- **職責**：機器學習模型的管理和部署
+- **實現**：`ModelManager` 類別
+- **功能**：
+  - 模型訓練和驗證
+  - 模型版本管理
+  - 模型性能監控
 
-### 🌐 API 服務 (api_service.py)
-- **RESTful API**: 標準化 HTTP 接口
-- **批次推薦**: 批量用戶推薦處理
-- **實時推薦**: 單用戶實時推薦
-- **健康檢查**: 服務狀態監控
+#### 4. 評估器 (Evaluator)
+- **職責**：推薦系統性能評估
+- **實現**：`RecommenderMetrics` 類別
+- **功能**：
+  - 準確率評估
+  - 多樣性評估
+  - A/B 測試支援
 
-## 🚀 快速開始
+## 統一服務管理器
 
-### 環境設置
-```bash
-# 進入虛擬環境
-source venv_podwise/bin/activate
+### MLPipelineManager 類別
+- **職責**：整合所有 ML 功能，提供統一的 OOP 介面
+- **主要方法**：
+  - `get_recommendations()`: 獲取推薦
+  - `train_model()`: 訓練模型
+  - `evaluate_model()`: 評估模型
+  - `health_check()`: 健康檢查
 
-# 安裝依賴
-pip install -r requirements.txt
-```
+### 推薦流程
+1. **用戶分析**：分析用戶歷史行為和偏好
+2. **內容分析**：分析 Podcast 內容特徵
+3. **相似度計算**：計算用戶-內容相似度
+4. **推薦生成**：生成個性化推薦列表
+5. **結果排序**：根據多個指標排序結果
 
-### 基本使用
+## 配置系統
 
-#### 1. 協同過濾推薦
+### ML 配置
+- **檔案**：`config/recommender_config.py`
+- **功能**：
+  - 推薦算法參數
+  - 模型配置
+  - 評估指標設定
+
+### 數據配置
+- **檔案**：`config/data_config.py`
+- **功能**：
+  - 數據源配置
+  - 特徵工程參數
+  - 數據預處理設定
+
+## 數據模型
+
+### 核心數據類別
+- `UserProfile`: 用戶檔案數據
+- `ContentProfile`: 內容檔案數據
+- `RecommendationResult`: 推薦結果
+- `ModelMetrics`: 模型指標
+
+### 工廠函數
+- `create_user_profile()`: 創建用戶檔案
+- `create_content_profile()`: 創建內容檔案
+- `create_recommendation_result()`: 創建推薦結果
+
+## OOP 設計原則
+
+### 單一職責原則 (SRP)
+- 每個類別只負責特定的 ML 功能
+- 清晰的職責分離
+
+### 開放封閉原則 (OCP)
+- 支援新的推薦算法
+- 可擴展的模型架構
+
+### 依賴反轉原則 (DIP)
+- 依賴抽象介面而非具體實現
+- 支援不同的推薦算法
+
+### 介面隔離原則 (ISP)
+- 精確的方法簽名
+- 避免不必要的依賴
+
+### 里氏替換原則 (LSP)
+- 所有推薦器都可以替換其基類
+- 保持行為一致性
+
+## 主要入口點
+
+### main.py
+- **職責**：FastAPI 應用程式入口
+- **功能**：
+  - 提供 RESTful API 端點
+  - 整合 ML 管道管理器
+  - 推薦服務控制
+  - 健康檢查和模型資訊
+
+### 使用方式
 ```python
-from ml_pipeline.core.recommender import CollaborativeFilteringRecommender
+# 創建 ML 管道實例
+from core.ml_pipeline_manager import MLPipelineManager
 
-# 創建推薦器
-recommender = CollaborativeFilteringRecommender(
-    n_neighbors=10,
-    similarity_metric='cosine'
+pipeline = MLPipelineManager()
+
+# 獲取推薦
+recommendations = await pipeline.get_recommendations(
+    user_id="Podwise0001",
+    category="business",
+    limit=10
 )
 
 # 訓練模型
-recommender.fit(user_item_matrix)
-
-# 獲取推薦
-recommendations = recommender.recommend(
-    user_id="user123",
-    top_k=5
+training_result = await pipeline.train_model(
+    model_type="collaborative_filtering",
+    data_source="user_interactions"
 )
 
-for item in recommendations:
-    print(f"推薦: {item['title']} (評分: {item['score']:.2f})")
-```
-
-#### 2. 數據管理
-```python
-from ml_pipeline.core.data_manager import DataManager
-
-# 創建數據管理器
-data_manager = DataManager(
-    mongo_uri="mongodb://worker3:27017/podwise"
+# 評估模型
+evaluation_result = await pipeline.evaluate_model(
+    model_id="latest",
+    test_data="validation_set"
 )
-
-# 載入數據
-user_data = data_manager.load_user_interactions()
-item_data = data_manager.load_item_features()
-
-# 預處理數據
-processed_data = data_manager.preprocess_data(user_data, item_data)
-
-# 創建用戶-項目矩陣
-user_item_matrix = data_manager.create_user_item_matrix(processed_data)
 ```
 
-#### 3. API 服務
-```python
-from ml_pipeline.services.api_service import MLPipelineAPI
+## 監控和健康檢查
 
-# 創建 API 服務
-api = MLPipelineAPI()
+### 健康檢查
+- 檢查所有組件狀態
+- 驗證模型可用性
+- 監控推薦性能
+- 檢查數據源連接
 
-# 啟動服務
-api.run(host="0.0.0.0", port=8004)
-```
+### 性能指標
+- 推薦準確率
+- 推薦多樣性
+- 用戶滿意度
+- 模型訓練時間
 
-#### 4. 評估指標
-```python
-from ml_pipeline.evaluation.recommender_metrics import RecommenderMetrics
+## 技術棧
 
-# 創建評估器
-metrics = RecommenderMetrics()
+- **框架**：FastAPI
+- **ML 庫**：scikit-learn, TensorFlow
+- **數據處理**：Pandas, NumPy
+- **推薦算法**：協同過濾、內容基於、深度學習
+- **數據庫**：PostgreSQL, Redis
+- **容器化**：Docker
 
-# 計算準確率
-precision = metrics.calculate_precision(y_true, y_pred, k=5)
-recall = metrics.calculate_recall(y_true, y_pred, k=5)
-f1_score = metrics.calculate_f1_score(precision, recall)
+## 部署
 
-print(f"Precision@5: {precision:.4f}")
-print(f"Recall@5: {recall:.4f}")
-print(f"F1-Score@5: {f1_score:.4f}")
-
-# 計算 NDCG
-ndcg = metrics.calculate_ndcg(y_true, y_pred, k=5)
-print(f"NDCG@5: {ndcg:.4f}")
-```
-
-## 🔧 主要設定
-
-### 環境變數設置
 ```bash
-# MongoDB 配置
-MONGO_HOST=worker3
-MONGO_PORT=27017
-MONGO_DB=podwise
+# 構建 Docker 映像
+docker build -t podwise-ml-pipeline .
 
-# Redis 配置 (快取)
-REDIS_HOST=worker3
-REDIS_PORT=6379
-
-# 服務配置
-ML_PIPELINE_PORT=8004
-ML_PIPELINE_HOST=0.0.0.0
-
-# 推薦配置
-DEFAULT_TOP_K=10
-MIN_INTERACTIONS=5
-SIMILARITY_THRESHOLD=0.1
+# 運行容器
+docker run -p 8002:8002 podwise-ml-pipeline
 ```
 
-### 配置檔案 (config/recommender_config.py)
-```python
-# 推薦器配置
-RECOMMENDER_CONFIG = {
-    'collaborative_filtering': {
-        'n_neighbors': 10,
-        'similarity_metric': 'cosine',
-        'min_interactions': 5,
-        'max_recommendations': 50
-    },
-    'data_processing': {
-        'min_rating': 1.0,
-        'max_rating': 5.0,
-        'implicit_feedback': True,
-        'normalize_ratings': True
-    },
-    'evaluation': {
-        'test_size': 0.2,
-        'random_state': 42,
-        'cross_validation_folds': 5
-    },
-    'caching': {
-        'enable_cache': True,
-        'cache_ttl': 3600,  # 1 小時
-        'max_cache_size': 10000
-    }
-}
-```
+## API 端點
 
-## 📁 檔案結構
+- `GET /health` - 健康檢查
+- `POST /api/v1/recommend` - 獲取推薦
+- `POST /api/v1/train` - 訓練模型
+- `POST /api/v1/evaluate` - 評估模型
+- `GET /api/v1/models` - 模型資訊
 
-```
-ml_pipeline/
-├── __init__.py
-├── main.py                     # 主程式入口
-├── Dockerfile                  # Docker 容器配置
-├── requirements.txt            # 依賴包清單
-├── config/
-│   ├── __init__.py
-│   └── recommender_config.py   # 推薦器配置
-├── core/
-│   ├── __init__.py
-│   ├── data_manager.py         # 數據管理
-│   └── recommender.py          # 推薦引擎
-├── services/
-│   ├── __init__.py
-│   └── api_service.py          # API 服務
-└── evaluation/
-    ├── __init__.py
-    └── recommender_metrics.py  # 評估指標
-```
+## 架構優勢
+
+1. **個性化**：基於用戶行為的個性化推薦
+2. **可擴展性**：支援多種推薦算法
+3. **可維護性**：清晰的模組化設計
+4. **可監控性**：完整的性能指標
+5. **一致性**：統一的數據模型和介面設計

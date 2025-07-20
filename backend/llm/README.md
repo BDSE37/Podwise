@@ -1,346 +1,191 @@
-# Podwise LLM 服務
+# Podwise LLM Pipeline
 
 ## 概述
 
-Podwise LLM 服務是一個整合多種語言模型的統一服務，採用 OOP 架構設計，支援 Qwen2.5-Taiwan、Qwen3:8b 等模型，並整合 Langfuse 追蹤功能。
+Podwise LLM Pipeline 是大語言模型服務模組，負責提供智能對話和文本生成服務。支援多種 LLM 模型，提供統一的 OOP 介面。
 
-## 功能特色
+## 架構設計
 
-### 🎯 核心功能
-- **多模型支援** - 支援 Qwen2.5-Taiwan、Qwen3:8b、DeepSeek 等模型
-- **OOP 架構** - 採用物件導向設計，易於擴展和維護
-- **自動 Fallback** - 當主要模型失敗時自動切換到備用模型
-- **Langfuse 追蹤** - 完整的請求追蹤和監控
-- **向量嵌入** - 支援 BGE-M3 向量嵌入模型
+### 核心組件
 
-### 📊 模型配置
-- **Qwen2.5-Taiwan** (優先級 1) - 台灣優化的 Qwen 模型
-- **Qwen3:8b** (優先級 2) - 標準 Qwen3 模型
-- **Qwen** (優先級 3) - 通用 Qwen 模型（向後相容）
-- **DeepSeek** (優先級 4) - DeepSeek 編程模型
+#### 1. 模型管理器 (Model Manager)
+- **職責**：管理不同的 LLM 模型
+- **實現**：`ModelManager` 類別
+- **功能**：
+  - 模型載入和切換
+  - 模型性能優化
+  - 模型版本管理
 
-## 系統架構
+#### 2. 對話管理器 (Conversation Manager)
+- **職責**：管理對話上下文和歷史
+- **實現**：`ConversationManager` 類別
+- **功能**：
+  - 對話歷史管理
+  - 上下文維護
+  - 會話狀態追蹤
 
-### 目錄結構
+#### 3. 提示詞管理器 (Prompt Manager)
+- **職責**：管理提示詞模板和優化
+- **實現**：`PromptManager` 類別
+- **功能**：
+  - 提示詞模板管理
+  - 動態提示詞生成
+  - 提示詞優化
+
+#### 4. 回應處理器 (Response Processor)
+- **職責**：處理和優化模型回應
+- **實現**：`ResponseProcessor` 類別
+- **功能**：
+  - 回應格式化
+  - 內容過濾
+  - 品質檢查
+
+## 統一服務管理器
+
+### LLMPipelineManager 類別
+- **職責**：整合所有 LLM 功能，提供統一的 OOP 介面
+- **主要方法**：
+  - `generate_response()`: 生成回應
+  - `start_conversation()`: 開始對話
+  - `health_check()`: 健康檢查
+  - `get_model_info()`: 獲取模型資訊
+
+### 對話流程
+1. **對話初始化**：建立新的對話會話
+2. **上下文處理**：處理對話歷史和上下文
+3. **提示詞生成**：生成優化的提示詞
+4. **模型推理**：使用 LLM 生成回應
+5. **回應處理**：處理和優化回應內容
+
+## 配置系統
+
+### LLM 配置
+- **檔案**：`config/llm_config.py`
+- **功能**：
+  - 模型配置
+  - 對話設定
+  - 性能參數
+
+### 模型配置
+- **檔案**：`config/model_config.py`
+- **功能**：
+  - 模型參數設定
+  - 推理配置
+  - 資源管理
+
+## 數據模型
+
+### 核心數據類別
+- `Conversation`: 對話會話
+- `Message`: 對話訊息
+- `ModelResponse`: 模型回應
+- `PromptTemplate`: 提示詞模板
+
+### 工廠函數
+- `create_conversation()`: 創建對話會話
+- `create_message()`: 創建訊息
+- `create_model_response()`: 創建模型回應
+
+## OOP 設計原則
+
+### 單一職責原則 (SRP)
+- 每個類別只負責特定的 LLM 功能
+- 清晰的職責分離
+
+### 開放封閉原則 (OCP)
+- 支援新的 LLM 模型
+- 可擴展的對話流程
+
+### 依賴反轉原則 (DIP)
+- 依賴抽象介面而非具體實現
+- 支援不同的 LLM 引擎
+
+### 介面隔離原則 (ISP)
+- 精確的方法簽名
+- 避免不必要的依賴
+
+### 里氏替換原則 (LSP)
+- 所有模型都可以替換其基類
+- 保持行為一致性
+
+## 主要入口點
+
+### main.py
+- **職責**：FastAPI 應用程式入口
+- **功能**：
+  - 提供 RESTful API 端點
+  - 整合 LLM 管道管理器
+  - 對話服務控制
+  - 健康檢查和模型資訊
+
+### 使用方式
+```python
+# 創建 LLM 管道實例
+from core.llm_pipeline_manager import LLMPipelineManager
+
+pipeline = LLMPipelineManager()
+
+# 開始對話
+conversation = await pipeline.start_conversation(
+    user_id="Podwise0001",
+    model="qwen-3.5"
+)
+
+# 生成回應
+response = await pipeline.generate_response(
+    conversation_id=conversation.id,
+    message="推薦一些投資理財的播客",
+    context="我對投資理財很感興趣"
+)
+
+# 獲取模型資訊
+model_info = pipeline.get_model_info()
 ```
-llm/
-├── main.py                    # 統一主介面 (FastAPI)
-├── core/                      # 核心模組
-│   ├── ollama_llm.py          # Ollama 整合
-│   └── base_llm.py            # 基礎 LLM 類別
-├── config/                    # 配置模組
-├── requirements.txt           # 依賴套件
-└── Dockerfile                 # 容器化配置
-```
 
-### 類別架構
-```
-LLMService
-├── ModelConfig               # 模型配置
-├── GenerationRequest         # 生成請求
-├── GenerationResponse        # 生成回應
-└── 核心方法
-    ├── generate_text()       # 文字生成
-    ├── _select_best_model()  # 模型選擇
-    ├── _fallback_generation() # Fallback 機制
-    └── _calculate_confidence() # 信心度計算
+## 監控和健康檢查
+
+### 健康檢查
+- 檢查所有組件狀態
+- 驗證模型可用性
+- 監控推理性能
+- 檢查記憶體使用
+
+### 性能指標
+- 回應生成時間
+- 模型準確率
+- 對話品質
+- 資源使用統計
+
+## 技術棧
+
+- **框架**：FastAPI
+- **LLM 引擎**：Ollama, OpenAI, Hugging Face
+- **對話管理**：Redis, PostgreSQL
+- **提示詞工程**：LangChain, PromptFlow
+- **容器化**：Docker
+
+## 部署
+
+```bash
+# 構建 Docker 映像
+docker build -t podwise-llm-pipeline .
+
+# 運行容器
+docker run -p 8005:8005 podwise-llm-pipeline
 ```
 
 ## API 端點
 
-### 健康檢查
-```http
-GET /health
-```
+- `GET /health` - 健康檢查
+- `POST /api/v1/chat` - 對話生成
+- `POST /api/v1/conversation/start` - 開始對話
+- `GET /api/v1/models` - 獲取模型資訊
+- `GET /api/v1/statistics` - 統計資訊
 
-回應：
-```json
-{
-  "status": "healthy",
-  "models": [
-    {
-      "name": "qwen2.5-Taiwan",
-      "model_id": "qwen2.5:7b",
-      "enabled": true,
-      "priority": 1
-    }
-  ],
-  "embedding_models": ["bge-m3"]
-}
-```
+## 架構優勢
 
-### 文字生成
-```http
-POST /generate
-Content-Type: application/json
-
-{
-  "prompt": "請推薦投資理財的 podcast",
-  "model": "qwen2.5-Taiwan",
-  "max_tokens": 2048,
-  "temperature": 0.7,
-  "system_prompt": "你是一個專業的 podcast 推薦助手",
-  "user_id": "user123",
-  "metadata": {
-    "source": "llm_test"
-  }
-}
-```
-
-回應：
-```json
-{
-  "text": "根據您的需求，我推薦以下投資理財 podcast...",
-  "model_used": "qwen2.5-Taiwan",
-  "tokens_used": 150,
-  "processing_time": 2.5,
-  "confidence": 0.85,
-  "trace_id": "trace_123"
-}
-```
-
-### 向量嵌入
-```http
-POST /embed
-Content-Type: application/json
-
-{
-  "text": "投資理財 podcast",
-  "model": "bge-m3"
-}
-```
-
-回應：
-```json
-{
-  "embedding": [[0.1, 0.2, 0.3, ...]]
-}
-```
-
-### 模型列表
-```http
-GET /models
-```
-
-回應：
-```json
-{
-  "llm_models": [
-    {
-      "name": "qwen2.5-Taiwan",
-      "model_id": "qwen2.5:7b",
-      "enabled": true,
-      "priority": 1
-    }
-  ],
-  "embedding_models": ["bge-m3"]
-}
-```
-
-## 配置說明
-
-### 環境變數
-```bash
-# Ollama 配置
-OLLAMA_HOST=localhost
-OLLAMA_PORT=11434
-
-# Langfuse 追蹤
-LANGFUSE_PUBLIC_KEY=your_public_key
-LANGFUSE_SECRET_KEY=your_secret_key
-LANGFUSE_HOST=http://localhost:3000
-
-# 向量模型路徑
-BGE_MODEL_PATH=/app/models/external/bge-m3
-
-# 服務配置
-LLM_SERVICE_PORT=8004
-LLM_SERVICE_HOST=0.0.0.0
-```
-
-### 模型配置
-```python
-# 在 main.py 中的 _load_model_configs 方法
-self.models["qwen2.5-Taiwan"] = ModelConfig(
-    model_name="Qwen2.5-Taiwan",
-    model_id="qwen2.5:7b",
-    host=os.getenv("OLLAMA_HOST", "localhost"),
-    port=int(os.getenv("OLLAMA_PORT", "11434")),
-    api_endpoint="/api/generate",
-    max_tokens=2048,
-    temperature=0.7,
-    priority=1
-)
-```
-
-## 使用範例
-
-### Python 客戶端
-```python
-import httpx
-import asyncio
-
-async def test_llm_service():
-    async with httpx.AsyncClient() as client:
-        # 健康檢查
-        response = await client.get("http://localhost:8004/health")
-        print("健康狀態:", response.json())
-        
-        # 文字生成
-        response = await client.post(
-            "http://localhost:8004/generate",
-            json={
-                "prompt": "推薦投資理財的 podcast",
-                "model": "qwen2.5-Taiwan",
-                "max_tokens": 500
-            }
-        )
-        print("生成結果:", response.json())
-
-# 執行測試
-asyncio.run(test_llm_service())
-```
-
-### JavaScript 客戶端
-```javascript
-// 健康檢查
-const healthResponse = await fetch('http://localhost:8004/health');
-const healthData = await healthResponse.json();
-console.log('健康狀態:', healthData);
-
-// 文字生成
-const generateResponse = await fetch('http://localhost:8004/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        prompt: '推薦投資理財的 podcast',
-        model: 'qwen2.5-Taiwan',
-        max_tokens: 500
-    })
-});
-const generateData = await generateResponse.json();
-console.log('生成結果:', generateData);
-```
-
-## 啟動指南
-
-### 1. 安裝依賴
-```bash
-cd backend/llm
-pip install -r requirements.txt
-```
-
-### 2. 啟動 Ollama 服務
-```bash
-# 確保 Ollama 已安裝並運行
-ollama serve
-
-# 拉取模型
-ollama pull qwen2.5:7b
-ollama pull qwen3:8b
-```
-
-### 3. 啟動 LLM 服務
-```bash
-python main.py
-```
-
-### 4. 驗證服務
-```bash
-curl http://localhost:8004/health
-```
-
-## 故障排除
-
-### 常見問題
-
-1. **模型連接失敗**
-   - 檢查 Ollama 服務是否運行
-   - 確認模型是否已下載
-   - 檢查網路連接
-
-2. **Langfuse 追蹤失敗**
-   - 檢查 Langfuse 配置
-   - 確認 API 金鑰是否正確
-
-3. **向量模型載入失敗**
-   - 檢查模型路徑是否正確
-   - 確認模型檔案是否完整
-
-### 日誌檢查
-```bash
-# 查看服務日誌
-tail -f logs/llm_service.log
-
-# 查看 Ollama 日誌
-ollama logs
-```
-
-## 整合測試
-
-### 與 RAG Pipeline 整合
-```python
-# 在 RAG Pipeline 中使用 LLM 服務
-import httpx
-
-async def get_llm_response(prompt: str, model: str = "qwen2.5-Taiwan"):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "http://localhost:8004/generate",
-            json={
-                "prompt": prompt,
-                "model": model,
-                "max_tokens": 2048
-            }
-        )
-        return response.json()
-```
-
-### 與 TTS 服務整合
-```python
-# 生成文字後轉為語音
-async def generate_and_speak(prompt: str):
-    # 1. 生成文字
-    llm_response = await get_llm_response(prompt)
-    text = llm_response["text"]
-    
-    # 2. 轉為語音
-    tts_response = await generate_tts(text)
-    return tts_response
-```
-
-## 效能優化
-
-### 1. 模型快取
-- 使用 HTTP 連接池
-- 實作模型回應快取
-- 優化模型載入時間
-
-### 2. 並行處理
-- 支援多個並發請求
-- 實作請求隊列
-- 優化資源使用
-
-### 3. 監控指標
-- 請求延遲監控
-- 模型使用率統計
-- 錯誤率追蹤
-
-## 未來規劃
-
-1. **模型擴展**
-   - 支援更多語言模型
-   - 實作模型自動選擇
-   - 支援模型微調
-
-2. **功能增強**
-   - 支援串流回應
-   - 實作對話記憶
-   - 支援多語言
-
-3. **效能提升**
-   - 實作模型量化
-   - 優化記憶體使用
-   - 支援 GPU 加速
-
-這個 LLM 服務確保了與其他 Podwise 模組的無縫整合，為整個系統提供強大的語言模型支援。 
+1. **智能對話**：支援上下文感知的智能對話
+2. **多模型支援**：支援多種 LLM 模型
+3. **可擴展性**：支援新的模型和對話策略
+4. **可維護性**：清晰的模組化設計
+5. **一致性**：統一的數據模型和介面設計 

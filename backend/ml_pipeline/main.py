@@ -84,7 +84,7 @@ async def startup_event():
     try:
         # 獲取配置
         config = get_recommender_config()
-        db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
+        db_url = os.getenv("DATABASE_URL", config["database"]["database_url"])
         
         if not db_url:
             logger.error("未設定資料庫連接 URL")

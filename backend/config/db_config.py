@@ -37,7 +37,7 @@ MINIO_CONFIG: Dict = {
     "access_key": os.getenv("MINIO_ROOT_USER", "bdse37"),
     "secret_key": os.getenv("MINIO_ROOT_PASSWORD", "11111111"),
     "secure": False,
-    "bucket_name": os.getenv("MINIO_BUCKET_NAME", "podwise")
+    "bucket_name": os.getenv("MINIO_BUCKET_NAME", "podcast")
 }
 
 # MongoDB 配置
@@ -46,7 +46,7 @@ MONGO_CONFIG: Dict = {
     "port": int(os.getenv("MONGO_PORT", "30017")),  # NodePort
     "username": os.getenv("MONGO_USER", "bdse37"),
     "password": os.getenv("MONGO_PASSWORD", "111111"),
-    "database": os.getenv("MONGO_DB", "podwise"),
+    "database": os.getenv("MONGO_DB", "podcast"),
     "collections": {
         "transcripts": "transcripts",
         "summaries": "summaries",

@@ -74,6 +74,15 @@ except ImportError as e:
     VectorSearchTool = None
     get_vector_search_tool = None
 
+try:
+    from .bgem3_model import Text2VecModel, get_bgem3_model
+    TEXT2VEC_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Text2VecModel 導入失敗: {e}")
+    TEXT2VEC_AVAILABLE = False
+    Text2VecModel = None
+    get_bgem3_model = lambda: None
+
 
 class ToolsManager:
     """工具管理器"""
@@ -131,6 +140,14 @@ class ToolsManager:
                 logger.info("VectorSearchTool 初始化成功")
             except Exception as e:
                 logger.error(f"VectorSearchTool 初始化失敗: {e}")
+        
+        # 初始化文字向量化模型
+        if TEXT2VEC_AVAILABLE and Text2VecModel is not None and get_bgem3_model is not None:
+            try:
+                self.tools['bgem3_model'] = get_bgem3_model()
+                logger.info("BGE-M3 模型初始化成功")
+            except Exception as e:
+                logger.error(f"BGE-M3 模型初始化失敗: {e}")
     
     def get_tool(self, name: str) -> Optional[Any]:
         """獲取指定工具"""
@@ -160,6 +177,10 @@ class ToolsManager:
         """獲取向量搜尋工具"""
         return self.get_tool('vector_search')
     
+    def get_bgem3_model(self) -> Optional[Any]:
+        """獲取 BGE-M3 模型"""
+        return self.get_tool('bgem3_model')
+    
     def get_available_tools(self) -> List[str]:
         """獲取可用工具列表"""
         return list(self.tools.keys())
@@ -172,7 +193,8 @@ class ToolsManager:
             'similarity_matcher': SIMILARITY_MATCHER_AVAILABLE,
             'podcast_formatter': PODCAST_FORMATTER_AVAILABLE,
             'web_search': WEB_SEARCH_AVAILABLE,
-            'vector_search': VECTOR_SEARCH_AVAILABLE
+            'vector_search': VECTOR_SEARCH_AVAILABLE,
+            'bgem3_model': TEXT2VEC_AVAILABLE
         }
 
 
@@ -212,6 +234,11 @@ def get_web_search() -> Optional[Any]:
 def get_vector_search() -> Optional[Any]:
     """獲取向量搜尋工具"""
     return tools_manager.get_vector_search()
+
+
+def get_bgem3_model() -> Optional[Any]:
+    """獲取 BGE-M3 模型"""
+    return tools_manager.get_bgem3_model()
 
 
 def get_available_tools() -> List[str]:

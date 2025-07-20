@@ -174,7 +174,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/milvus
+      device: /tmp/podwise-data/milvus
 
   # MinIO 資料
   minio_data:
@@ -182,7 +182,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/minio
+      device: /tmp/podwise-data/minio
 
   # PostgreSQL 資料
   postgresql_data:
@@ -190,7 +190,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/postgresql
+      device: /tmp/podwise-data/postgresql
 
   # pgAdmin 資料
   pgadmin_data:
@@ -198,7 +198,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/pgadmin
+      device: /tmp/podwise-data/pgadmin
 
   # MongoDB 資料
   mongodb_data:
@@ -206,7 +206,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/mongodb
+      device: /tmp/podwise-data/mongodb
 
   # Portainer 資料
   portainer_data:
@@ -214,4 +214,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Volumes/Transcend/docker-data/portainer
+      device: /tmp/podwise-data/portainer

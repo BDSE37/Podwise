@@ -37,9 +37,10 @@ logger = logging.getLogger(__name__)
 class LLMConfig:
     """LLM 配置類別"""
     # 模型啟用配置
-    enable_qwen_taiwan: bool = True
-    enable_qwen3: bool = True
-    enable_huggingface: bool = True
+    enable_openai: bool = True
+    enable_qwen_taiwan: bool = False
+    enable_qwen3: bool = False
+    enable_huggingface: bool = False
     enable_fallback: bool = True
     
     # 生成參數
@@ -56,6 +57,7 @@ class LLMConfig:
     # Ollama 配置
     ollama_host: str = "http://localhost:11434"
     ollama_timeout: int = 120
+    ollama_model: str = "gpt-3.5-turbo"
     
     # Hugging Face 配置
     hf_model_path: str = "./models"
@@ -97,6 +99,8 @@ class OllamaLLM:
         self.http_session: Optional[aiohttp.ClientSession] = None
         self.available_models: List[str] = []
         self.model_mapping = {
+            "gpt-3.5-turbo": "gpt-3.5-turbo:latest",
+            "gpt-3.5": "gpt-3.5-turbo:latest",
             "qwen2.5:7b-taiwan": "qwen2.5-taiwan-7b-instruct:latest",
             "qwen3:8b": "qwen3-8b:latest",
             "qwen2.5-taiwan": "qwen2.5-taiwan-7b-instruct:latest",
@@ -355,7 +359,9 @@ class LLMManager:
         """生成文字"""
         # 如果沒有指定模型，使用預設模型
         if not model_name:
-            if self.config.enable_qwen_taiwan:
+            if self.config.enable_openai:
+                model_name = "gpt-3.5-turbo"
+            elif self.config.enable_qwen_taiwan:
                 model_name = "qwen2.5:7b-taiwan"
             elif self.config.enable_qwen3:
                 model_name = "qwen3:8b"
@@ -370,7 +376,20 @@ class LLMManager:
                 )
         
         # 根據模型名稱選擇服務
-        if model_name in ["qwen2.5:7b-taiwan", "qwen3:8b", "qwen2.5-taiwan", "qwen3", "qwen2.5-taiwan-7b-instruct", "qwen2.5-taiwan-7b-instruct:latest"]:
+        if model_name in ["gpt-3.5-turbo", "gpt-3.5", "gpt-3.5-turbo:latest"]:
+            # 優先使用 Ollama 的 GPT-3.5
+            if self.ollama_llm:
+                return await self.ollama_llm.generate_text(request, model_name)
+            else:
+                return GenerationResponse(
+                    text="",
+                    model_used=model_name,
+                    tokens_used=0,
+                    processing_time=0,
+                    success=False,
+                    error="Ollama 服務不可用"
+                )
+        elif model_name in ["qwen2.5:7b-taiwan", "qwen3:8b", "qwen2.5-taiwan", "qwen3", "qwen2.5-taiwan-7b-instruct", "qwen2.5-taiwan-7b-instruct:latest"]:
             if self.ollama_llm:
                 return await self.ollama_llm.generate_text(request, model_name)
             else:
@@ -480,31 +499,6 @@ async def generate_text(prompt: str, model_name: Optional[str] = None, **kwargs)
     }
 
 
-if __name__ == "__main__":
-    async def test_llm():
-        """測試 LLM 服務"""
-        config = LLMConfig(
-            enable_qwen_taiwan=True,
-            enable_qwen3=True,
-            enable_huggingface=False,
-            ollama_host="http://localhost:11434"
-        )
-        
-        manager = await initialize_llm(config)
-        
-        # 測試文字生成
-        test_prompt = "請用繁體中文介紹台灣的科技發展"
-        result = await generate_text(test_prompt, "qwen2.5:7b-taiwan")
-        
-        print(f"測試結果: {result}")
-        
-        # 健康檢查
-        health = await manager.health_check()
-        print(f"健康檢查: {health}")
-    
-    asyncio.run(test_llm())
-
-
 # FastAPI 應用程式
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -521,10 +515,11 @@ async def lifespan(app: FastAPI):
     # 啟動時初始化
     try:
         config = LLMConfig(
-            enable_qwen_taiwan=True,
-            enable_qwen3=True,
+            enable_openai=True,
+            enable_qwen_taiwan=False,
+            enable_qwen3=False,
             enable_huggingface=False,
-            ollama_host=os.getenv("OLLAMA_HOST", "http://ollama:11434")
+            ollama_host=os.getenv("OLLAMA_HOST", "http://localhost:11434")
         )
         llm_manager = await initialize_llm(config)
         logger.info("LLM 服務啟動成功")
@@ -539,6 +534,7 @@ async def lifespan(app: FastAPI):
         await llm_manager.cleanup()
         logger.info("LLM 服務已關閉")
 
+# 創建 FastAPI 應用
 app = FastAPI(
     title="Podwise LLM Service",
     description="統一的語言模型服務",
@@ -648,4 +644,17 @@ async def root():
             "generate": "/generate",
             "models": "/models"
         }
-    } 
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    # 啟動 FastAPI 應用
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8006,
+        reload=False,
+        log_level="info"
+    ) 

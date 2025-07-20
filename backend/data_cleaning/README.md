@@ -1,227 +1,196 @@
-# Data Cleaning 模組
+# Podwise Data Cleaning Pipeline
 
-## 📋 概述
+## 概述
 
-Data Cleaning 模組提供完整的資料清理功能，專門處理 podcast 相關的文本資料，包括 MongoDB 文檔、PostgreSQL 資料和一般文本清理。採用 OOP 設計原則，提供統一的對外接口。
+Podwise Data Cleaning Pipeline 是數據清理和預處理服務模組，負責清理、標準化和驗證 Podcast 數據。採用 OOP 設計原則，提供統一的介面。
 
-## 🎯 功能特色
+## 架構設計
 
-- **統一清理器**: 整合所有清理功能，提供統一的 OOP 介面
-- **MongoDB 文檔清理**: 專門處理 MongoDB 中的 podcast 文檔
-- **股癌節目清理**: 針對股癌節目的特殊清理邏輯（保留在 stock_cancer 資料夾）
-- **長文本清理**: 處理長文本內容的清理
-- **PostgreSQL 資料清理**: 清理和轉換 PostgreSQL 資料
-- **批次處理**: 支援批次清理指定資料夾下所有檔案
-- **多格式輸出**: 支援 JSON、CSV 等輸出格式
-- **JSON 格式修正**: 自動修正 JSON 檔案格式
-- **檔案名稱清理**: 清理檔案名稱中的特殊字元
-- **快速表情符號清理**: 專門用於清理 comment_data 中的表情符號
+### 核心組件
 
-## 🏗️ 架構設計
+#### 1. 數據清理器 (Data Cleaner)
+- **職責**：核心數據清理功能
+- **實現**：`DataCleaner` 類別
+- **功能**：
+  - 文本清理和標準化
+  - 數據格式驗證
+  - 重複數據處理
 
-### OOP 設計原則
+#### 2. 清理策略管理器 (Cleaning Strategy Manager)
+- **職責**：管理不同的清理策略
+- **實現**：`CleaningStrategyManager` 類別
+- **功能**：
+  - 策略選擇和應用
+  - 自定義清理規則
+  - 策略效能評估
 
-- 所有清理器皆繼承自 `BaseCleaner`，符合物件導向設計，易於擴充與維護
-- 各清理器（如 `MongoCleaner`, `StockCancerCleaner`, `LongTextCleaner`, `EpisodeCleaner`, `PodcastCleaner`）皆封裝單一責任
-- `CleanerOrchestrator` 統一調度各清理器，實現高內聚、低耦合
-- `UnifiedCleaner` 提供統一的對外接口，整合所有清理功能
-- 批次處理與遞迴掃描皆以函式封裝，符合 Google Clean Code 原則
+#### 3. 數據驗證器 (Data Validator)
+- **職責**：數據品質驗證
+- **實現**：`DataValidator` 類別
+- **功能**：
+  - 數據完整性檢查
+  - 格式驗證
+  - 異常檢測
 
-### 模組結構
+#### 4. 批次處理器 (Batch Processor)
+- **職責**：大規模數據批次處理
+- **實現**：`BatchProcessor` 類別
+- **功能**：
+  - 分批處理控制
+  - 進度追蹤
+  - 錯誤處理
 
-```
-data_cleaning/
-├── __init__.py              # 統一對外接口
-├── main.py                  # 命令列工具
-├── README.md               # 模組文檔
-├── core/                   # 核心清理器
-│   ├── base_cleaner.py     # 基底清理器
-│   ├── unified_cleaner.py  # 統一清理器
-│   ├── mongo_cleaner.py    # MongoDB 清理器
-│   ├── longtext_cleaner.py # 長文本清理器
-│   ├── episode_cleaner.py  # Episode 清理器
-│   ├── podcast_cleaner.py  # Podcast 清理器
-│   └── youtube_cleaner.py  # YouTube 清理器
-├── services/               # 服務層
-│   ├── cleaner_orchestrator.py # 清理協調器
-│   └── cleanup_service.py      # 清理服務
-├── utils/                  # 工具類
-│   ├── data_extractor.py   # 資料提取器
-│   ├── db_utils.py         # 資料庫工具
-│   └── file_format_detector.py # 檔案格式檢測器
-├── config/                 # 配置管理
-│   └── config.py           # 配置類別
-├── database/               # 資料庫操作
-│   └── postgresql_inserter.py # PostgreSQL 插入器
-├── scripts/                # 實用腳本
-│   ├── safe_batch_upload.py    # 安全批次上傳
-│   └── detailed_db_inspection.py # 詳細資料庫檢查
-└── stock_cancer/           # 股癌特殊處理（例外）
-    └── stock_cancer_cleaner.py # 股癌清理器
-```
+## 統一服務管理器
 
-## 🚀 快速開始
+### DataCleaningManager 類別
+- **職責**：整合所有數據清理功能，提供統一的 OOP 介面
+- **主要方法**：
+  - `clean_data()`: 數據清理
+  - `validate_data()`: 數據驗證
+  - `batch_process()`: 批次處理
+  - `health_check()`: 健康檢查
 
-### 1. 統一清理器（推薦）
+### 清理流程
+1. **數據載入**：從多個來源載入原始數據
+2. **初步驗證**：檢查數據完整性和格式
+3. **策略選擇**：選擇適當的清理策略
+4. **數據清理**：執行清理和標準化
+5. **品質驗證**：驗證清理結果品質
+6. **結果輸出**：輸出清理後的數據
 
+## 配置系統
+
+### 清理配置
+- **檔案**：`config/cleaning_config.py`
+- **功能**：
+  - 清理策略配置
+  - 驗證規則設定
+  - 批次處理參數
+
+### 數據配置
+- **檔案**：`config/data_config.py`
+- **功能**：
+  - 數據源配置
+  - 格式定義
+  - 品質標準
+
+## 數據模型
+
+### 核心數據類別
+- `CleaningRequest`: 清理請求
+- `CleaningResult`: 清理結果
+- `DataQuality`: 數據品質指標
+- `CleaningStrategy`: 清理策略
+
+### 工廠函數
+- `create_cleaning_request()`: 創建清理請求
+- `create_cleaning_result()`: 創建清理結果
+- `create_data_quality()`: 創建數據品質指標
+
+## OOP 設計原則
+
+### 單一職責原則 (SRP)
+- 每個類別只負責特定的數據清理功能
+- 清晰的職責分離
+
+### 開放封閉原則 (OCP)
+- 支援新的清理策略
+- 可擴展的驗證規則
+
+### 依賴反轉原則 (DIP)
+- 依賴抽象介面而非具體實現
+- 支援不同的數據源
+
+### 介面隔離原則 (ISP)
+- 精確的方法簽名
+- 避免不必要的依賴
+
+### 里氏替換原則 (LSP)
+- 所有清理器都可以替換其基類
+- 保持行為一致性
+
+## 主要入口點
+
+### main.py
+- **職責**：FastAPI 應用程式入口
+- **功能**：
+  - 提供 RESTful API 端點
+  - 整合數據清理管理器
+  - 清理服務控制
+  - 健康檢查和統計
+
+### 使用方式
 ```python
-from data_cleaning import UnifiedCleaner
+# 創建數據清理實例
+from core.data_cleaning_manager import DataCleaningManager
 
-# 建立統一清理器
-cleaner = UnifiedCleaner()
-
-# 清理文本
-cleaned_text = cleaner.clean_text("Hello 😊 World :)")
-
-# 清理檔案
-cleaned_file = cleaner.clean_file("input.json")
-
-# 批次清理
-cleaned_files = cleaner.batch_clean_files(["file1.json", "file2.json"])
-
-# 修正 JSON 格式
-fixed_count = cleaner.batch_fix_json_format("directory/")
-
-# 快速清理表情符號
-stats = cleaner.quick_clean_emoji_from_folder("comment_data", "cleaned_data")
-```
-
-### 2. 工廠模式
-
-```python
-from data_cleaning import DataCleaningFactory
-
-# 建立工廠
-factory = DataCleaningFactory()
-
-# 建立特定清理器
-episode_cleaner = factory.create_cleaner('episode')
-podcast_cleaner = factory.create_cleaner('podcast')
-stock_cleaner = factory.create_cleaner('stock_cancer')
-
-# 清理資料
-cleaned_episode = episode_cleaner.clean(episode_data)
-cleaned_podcast = podcast_cleaner.clean(podcast_data)
-cleaned_stock = stock_cleaner.clean(stock_data)
-```
-
-### 3. 管理器模式
-
-```python
-from data_cleaning import DataCleaningManager
-
-# 建立管理器
 manager = DataCleaningManager()
 
-# 清理各種資料
-cleaned_episode = manager.clean_episode_data(episode_data)
-cleaned_podcast = manager.clean_podcast_data(podcast_data)
-cleaned_stock = manager.clean_stock_cancer_data(stock_data)
+# 數據清理
+result = await manager.clean_data(
+    data_source="raw_podcast_data",
+    strategy="standard_cleaning",
+    output_format="cleaned"
+)
+
+# 數據驗證
+validation_result = await manager.validate_data(
+    data=cleaned_data,
+    quality_threshold=0.8
+)
 
 # 批次處理
-cleaned_files = manager.batch_clean_files(["file1.json", "file2.json"])
+batch_result = await manager.batch_process(
+    input_directory="raw_data",
+    output_directory="cleaned_data",
+    batch_size=1000
+)
 ```
 
-### 4. 命令列工具
+## 監控和健康檢查
+
+### 健康檢查
+- 檢查所有組件狀態
+- 驗證數據源連接
+- 監控清理性能
+- 檢查策略可用性
+
+### 性能指標
+- 清理速度
+- 數據品質提升
+- 錯誤率統計
+- 處理效率
+
+## 技術棧
+
+- **框架**：FastAPI
+- **數據處理**：Pandas, NumPy
+- **文本處理**：NLTK, spaCy
+- **數據庫**：PostgreSQL, MongoDB
+- **容器化**：Docker
+
+## 部署
 
 ```bash
-# 列出所有清理器
-python backend/data_cleaning/main.py --list-cleaners
+# 構建 Docker 映像
+docker build -t podwise-data-cleaning .
 
-# 測試清理器
-python backend/data_cleaning/main.py --test-cleaners
-
-# 清理單個檔案
-python backend/data_cleaning/main.py --clean --input data.json --output cleaned_data.json
-
-# 批次清理資料夾
-python backend/data_cleaning/main.py --batch-clean --input-folder batch_input --output-folder cleaned_data
-
-# 快速清理表情符號
-python backend/data_cleaning/main.py --quick-clean-emoji --source-dir comment_data --target-dir cleaned_comment_data
-
-# 處理股癌資料
-python backend/data_cleaning/main.py --process-stock-cancer --input stock_cancer.json
-
-# 處理股癌資料並匯入 PostgreSQL
-python backend/data_cleaning/main.py --process-stock-cancer --input stock_cancer.json --import-postgresql
-
-# 匯入 PostgreSQL
-python backend/data_cleaning/main.py --import-postgresql --input cleaned_data.json
-
-# 執行服務測試
-python backend/data_cleaning/main.py --service-test local --sample-size 50
-python backend/data_cleaning/main.py --service-test database --sample-size 50
-python backend/data_cleaning/main.py --service-test full --sample-size 50
+# 運行容器
+docker run -p 8007:8007 podwise-data-cleaning
 ```
 
-## 🎯 設計原則
+## API 端點
 
-### 乾淨程式碼原則
-- 所有清理器皆以單一職責原則（SRP）設計
-- 無多餘全域變數，所有狀態皆以物件屬性封裝
-- 批次處理、遞迴掃描、檔案過濾皆以獨立函式實作
-- 變數命名清楚、無魔法數字、無重複程式碼
-- 例外處理明確，錯誤訊息具體
+- `GET /health` - 健康檢查
+- `POST /api/v1/clean` - 數據清理
+- `POST /api/v1/validate` - 數據驗證
+- `POST /api/v1/batch-clean` - 批次清理
+- `GET /api/v1/statistics` - 統計資訊
 
-### OOP 設計模式
-- **工廠模式**: `DataCleaningFactory` 統一建立清理器
-- **策略模式**: 不同清理器實現相同介面
-- **協調器模式**: `CleanerOrchestrator` 統一調度
-- **單例模式**: 配置和服務管理器
-- **模板方法模式**: `BaseCleaner` 定義清理流程
+## 架構優勢
 
-## 📁 檔案管理
-
-### 批次處理流程
-
-```
-指定資料夾 → 自動選擇清理器 → 執行清理 → 驗證結果 → 輸出清理後資料
-```
-
-### 支援的檔案格式
-- **輸入**: JSON, CSV, TXT
-- **輸出**: JSON (預設), CSV (可配置)
-
-### 檔案命名規則
-- 清理後的檔案會自動重命名，移除特殊字元
-- 支援自定義輸出目錄
-- 保留原始檔案，生成新的清理檔案
-
-## ⚠️ 注意事項
-
-- 請將所有要清理的資料放入指定資料夾
-- 執行批次清理腳本即可自動處理所有檔案
-- 清理結果會自動輸出到指定資料夾 
-- 請刪除所有 .DS_Store、__pycache__、._*、暫存檔案等與主程式無關之檔案
-- 保留所有核心清理模組和 stock_cancer 特殊處理模組
-- 所有功能都通過統一的 `main.py` 接口提供
-
-## 🔧 配置管理
-
-### 環境變數
-- 資料庫連接配置
-- 清理參數配置
-- 輸出目錄配置
-
-### 自定義配置
-```python
-config = {
-    "enable_emoji_removal": True,
-    "enable_html_removal": True,
-    "enable_special_char_removal": True,
-    "enable_json_format_fix": True,
-    "enable_filename_cleaning": True,
-    "preserve_urls": True,
-    "max_filename_length": 100
-}
-
-cleaner = UnifiedCleaner(config)
-```
-
-## 📈 效能優化
-
-- 批次處理支援並行處理
-- 記憶體使用優化
-- 錯誤處理和重試機制
-- 進度監控和日誌記錄 
+1. **高品質**：確保數據品質和一致性
+2. **可擴展性**：支援新的清理策略和數據源
+3. **可維護性**：清晰的模組化設計
+4. **可監控性**：完整的品質指標
+5. **一致性**：統一的數據模型和介面設計 

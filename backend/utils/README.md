@@ -1,150 +1,196 @@
-# Podwise Utils 模組
+# Podwise Utils
 
 ## 概述
-Podwise Utils 提供統一的工具模組，包含各種功能性服務和工具類別。所有服務都可以通過 `main.py` 統一調用和管理。
 
-## 新增服務模組
+Podwise Utils 是通用工具模組，提供各種輔助功能和服務。採用 OOP 設計原則，提供統一的工具介面。
 
-### 音檔流服務 (audio_stream_service.py)
-- **功能**: 提供 MinIO 音檔的直接 URL 和流式播放
-- **主要類別**: `AudioStreamService`
-- **調用方式**: `get_audio_stream()`
-- **端口**: 8006
+## 架構設計
 
-### 反饋服務 (feedback_service.py)
-- **功能**: 處理用戶反饋和偏好儲存，符合 PostgreSQL 資料庫結構
-- **主要類別**: `DatabaseManager`, `FeedbackRequest`, `UserPreferencesRequest`
-- **調用方式**: `get_feedback_service()`
-- **端口**: 8007
+### 核心組件
 
-### MinIO 節目服務 (minio_episode_service.py)
-- **功能**: 獲取 business-one-minutes 和 education-one-minutes 資料夾中的可用節目
-- **主要類別**: `MinioEpisodeService`
-- **調用方式**: `get_minio_episode()`
-- **支援格式**: Spotify_RSS_{rss_id}_{episode_title}.mp3, RSS_{rss_id}_{episode_title}.mp3
+#### 1. 批次處理器 (Batch Processor)
+- **職責**：大規模數據批次處理
+- **實現**：`BatchProcessor` 類別
+- **功能**：
+  - 分批處理控制
+  - 進度追蹤
+  - 錯誤處理和重試
 
-## 原有工具模組
+#### 2. 音頻流服務 (Audio Stream Service)
+- **職責**：音頻流處理和管理
+- **實現**：`AudioStreamService` 類別
+- **功能**：
+  - 音頻流處理
+  - 格式轉換
+  - 流媒體支援
 
-### 文本處理 (text_processing.py)
-- **功能**: 文本分塊、標籤提取、語義分析
-- **主要類別**: `TextChunker`, `TagExtractor`, `UnifiedTagProcessor`
-- **調用方式**: `get_text_processor()`
+#### 3. MinIO 服務 (MinIO Service)
+- **職責**：MinIO 物件存儲管理
+- **實現**：`MinIOService` 類別
+- **功能**：
+  - 檔案上傳下載
+  - 存儲桶管理
+  - 物件生命週期管理
 
-### 向量搜尋 (vector_search.py)
-- **功能**: 向量相似度計算、Milvus 整合
-- **主要類別**: `VectorSearchEngine`, `MilvusVectorSearch`
-- **調用方式**: `get_vector_search()`
+#### 4. 文本處理器 (Text Processor)
+- **職責**：文本處理和轉換
+- **實現**：`TextProcessor` 類別
+- **功能**：
+  - 文本清理
+  - 格式轉換
+  - 語言處理
 
-### 共用工具 (common_utils.py)
-- **功能**: 通用工具函數、路徑處理、錯誤處理
-- **主要類別**: `DictToAttrRecursive`, 各種工具函數
+## 統一服務管理器
 
-### 環境配置 (env_config.py)
-- **功能**: 環境變數管理、配置載入
-- **主要類別**: `PodriConfig`
-- **調用方式**: `get_config()`
+### UtilsServiceManager 類別
+- **職責**：整合所有工具功能，提供統一的 OOP 介面
+- **主要方法**：
+  - `batch_process()`: 批次處理
+  - `process_audio()`: 音頻處理
+  - `manage_storage()`: 存儲管理
+  - `health_check()`: 健康檢查
 
-### 日誌配置 (logging_config.py)
-- **功能**: 統一日誌配置、日誌格式化
-- **主要函數**: `setup_logging`
+### 工具使用流程
+1. **需求分析**：分析具體需求
+2. **工具選擇**：選擇適當的工具
+3. **參數配置**：配置處理參數
+4. **執行處理**：執行具體處理
+5. **結果驗證**：驗證處理結果
 
-## 使用方式
+## 配置系統
 
-### 統一初始化
+### 工具配置
+- **檔案**：`config/utils_config.py`
+- **功能**：
+  - 工具參數配置
+  - 處理策略設定
+  - 性能優化參數
+
+### 環境配置
+- **檔案**：`env_config.py`
+- **功能**：
+  - 環境變數管理
+  - 配置載入
+  - 環境檢測
+
+## 數據模型
+
+### 核心數據類別
+- `ProcessingRequest`: 處理請求
+- `ProcessingResult`: 處理結果
+- `BatchStatus`: 批次狀態
+- `StorageConfig`: 存儲配置
+
+### 工廠函數
+- `create_processing_request()`: 創建處理請求
+- `create_processing_result()`: 創建處理結果
+- `create_batch_status()`: 創建批次狀態
+
+## OOP 設計原則
+
+### 單一職責原則 (SRP)
+- 每個類別只負責特定的工具功能
+- 清晰的職責分離
+
+### 開放封閉原則 (OCP)
+- 支援新的工具和處理方式
+- 可擴展的處理策略
+
+### 依賴反轉原則 (DIP)
+- 依賴抽象介面而非具體實現
+- 支援不同的處理引擎
+
+### 介面隔離原則 (ISP)
+- 精確的方法簽名
+- 避免不必要的依賴
+
+### 里氏替換原則 (LSP)
+- 所有工具都可以替換其基類
+- 保持行為一致性
+
+## 主要入口點
+
+### main.py
+- **職責**：FastAPI 應用程式入口
+- **功能**：
+  - 提供 RESTful API 端點
+  - 整合工具服務管理器
+  - 工具服務控制
+  - 健康檢查和統計
+
+### 使用方式
 ```python
-from backend.utils.main import initialize_utils, UtilsConfig
+# 創建工具服務實例
+from utils.utils_service_manager import UtilsServiceManager
 
-# 基本初始化
-utils_manager = initialize_utils()
+manager = UtilsServiceManager()
 
-# 自定義配置初始化
-config = UtilsConfig(
-    enable_audio_stream=True,
-    enable_feedback_service=True,
-    enable_minio_episode=True,
-    log_level="INFO"
+# 批次處理
+result = await manager.batch_process(
+    data_source="input_data",
+    processor="text_processor",
+    batch_size=1000
 )
-utils_manager = initialize_utils(config)
-```
 
-### 獲取服務
-```python
-# 獲取音檔流服務
-audio_stream = utils_manager.get_audio_stream()
-
-# 獲取反饋服務
-feedback_service = utils_manager.get_feedback_service()
-
-# 獲取 MinIO 節目服務
-minio_episode = utils_manager.get_minio_episode()
-
-# 獲取其他服務
-text_processor = utils_manager.get_text_processor()
-vector_search = utils_manager.get_vector_search()
-```
-
-### 便捷函數調用
-```python
-from backend.utils.main import (
-    get_audio_stream,
-    get_feedback_service,
-    get_minio_episode,
-    get_text_processor,
-    get_vector_search
+# 音頻處理
+audio_result = await manager.process_audio(
+    audio_file="input.wav",
+    format="mp3",
+    quality="high"
 )
 
-# 直接獲取服務
-audio_stream = get_audio_stream()
-feedback_service = get_feedback_service()
-minio_episode = get_minio_episode()
+# 存儲管理
+storage_result = await manager.manage_storage(
+    operation="upload",
+    file_path="data.json",
+    bucket="podwise-data"
+)
 ```
+
+## 監控和健康檢查
 
 ### 健康檢查
-```python
-# 檢查所有服務健康狀態
-health_status = utils_manager.health_check()
-print(f"健康狀態: {health_status}")
+- 檢查所有組件狀態
+- 驗證工具可用性
+- 監控處理性能
+- 檢查存儲連接
 
-# 獲取服務資訊
-service_info = utils_manager.get_service_info()
-print(f"服務資訊: {service_info}")
+### 性能指標
+- 處理速度
+- 資源使用效率
+- 錯誤率統計
+- 工具可用性
+
+## 技術棧
+
+- **框架**：FastAPI
+- **數據處理**：Pandas, NumPy
+- **音頻處理**：librosa, pydub
+- **存儲**：MinIO, S3
+- **容器化**：Docker
+
+## 部署
+
+```bash
+# 構建 Docker 映像
+docker build -t podwise-utils .
+
+# 運行容器
+docker run -p 8010:8010 podwise-utils
 ```
 
-## 專案結構
-```
-backend/utils/
-├── main.py                      # 統一服務管理器
-├── audio_stream_service.py      # 音檔流服務
-├── feedback_service.py          # 反饋服務
-├── minio_episode_service.py     # MinIO 節目服務
-├── text_processing.py           # 文本處理工具
-├── vector_search.py             # 向量搜尋工具
-├── common_utils.py              # 共用工具
-├── env_config.py                # 環境配置
-├── logging_config.py            # 日誌配置
-└── __init__.py                  # 模組初始化
-```
+## API 端點
 
-## 配置選項
+- `GET /health` - 健康檢查
+- `POST /api/v1/batch-process` - 批次處理
+- `POST /api/v1/process-audio` - 音頻處理
+- `POST /api/v1/storage` - 存儲管理
+- `GET /api/v1/statistics` - 統計資訊
 
-### UtilsConfig 配置類別
-```python
-@dataclass
-class UtilsConfig:
-    enable_text_processing: bool = True      # 啟用文本處理
-    enable_vector_search: bool = True        # 啟用向量搜尋
-    enable_audio_search: bool = True         # 啟用音檔搜尋
-    enable_user_auth: bool = True            # 啟用用戶認證
-    enable_minio_utils: bool = True          # 啟用 MinIO 工具
-    enable_audio_stream: bool = True         # 啟用音檔流服務
-    enable_feedback_service: bool = True     # 啟用反饋服務
-    enable_minio_episode: bool = True        # 啟用 MinIO 節目服務
-    log_level: str = "INFO"                  # 日誌等級
-```
+## 架構優勢
 
-## 開發規範
-- 遵循 OOP 原則和 Google Clean Code 標準
-- 所有服務模組都應該有完整的錯誤處理
-- 使用統一的日誌配置
-- 提供清晰的 API 文檔和類型提示
-- 通過 main.py 統一管理所有服務
+1. **通用性**：提供各種通用工具功能
+2. **可擴展性**：支援新的工具和處理方式
+3. **可維護性**：清晰的模組化設計
+4. **高效性**：優化的處理和存儲機制
+5. **一致性**：統一的介面設計和錯誤處理

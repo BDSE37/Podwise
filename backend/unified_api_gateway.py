@@ -45,7 +45,7 @@ try:
     from config.db_config import POSTGRES_CONFIG, MINIO_CONFIG
     from core.podwise_service_manager import podwise_service
     # 導入用戶管理服務（混合方案）
-    from user_management.integrated_user_service import IntegratedUserService, UserRegistrationRequest, UserPreferenceRequest, UserFeedbackRequest, CategoryRequest
+    from user_management.integrated_user_service import IntegratedUserService, UserRegistrationRequest, UserPreferenceRequest, CategoryRequest
 except ImportError as e:
     print(f"警告: 無法導入某些後端模組: {e}")
 
@@ -78,7 +78,7 @@ except Exception as e:
 
 # 路徑配置
 PROJECT_ROOT = Path(__file__).parent.parent
-FRONTEND_PATH = PROJECT_ROOT / "frontend" / "home"
+FRONTEND_PATH = PROJECT_ROOT / "frontend"
 IMAGES_PATH = FRONTEND_PATH / "images"
 ASSETS_PATH = FRONTEND_PATH / "assets"
 
@@ -86,18 +86,50 @@ ASSETS_PATH = FRONTEND_PATH / "assets"
 app.mount("/images", StaticFiles(directory=str(IMAGES_PATH)), name="images")
 app.mount("/assets", StaticFiles(directory=str(ASSETS_PATH)), name="assets")
 
+# 添加 JavaScript 文件路由
+@app.get("/migrate_localStorage.js")
+async def migrate_local_storage_js():
+    """返回 migrate_localStorage.js 文件"""
+    try:
+        js_path = Path(__file__).parent.parent / "frontend" / "migrate_localStorage.js"
+        if js_path.exists():
+            return FileResponse(js_path, media_type="application/javascript")
+        else:
+            return Response(status_code=404, content="File not found")
+    except Exception as e:
+        logger.error(f"讀取 migrate_localStorage.js 失敗: {e}")
+        return Response(status_code=404, content="File not found")
+
+# 添加 favicon 路由
+@app.get("/favicon.ico")
+async def favicon():
+    """返回 favicon"""
+    try:
+        favicon_path = ASSETS_PATH / "favicon.ico"
+        if favicon_path.exists():
+            return FileResponse(favicon_path)
+        else:
+            # 如果沒有 favicon 檔案，返回空的回應
+            return Response(status_code=204)
+    except Exception:
+        return Response(status_code=204)
+
 # 服務配置
 SERVICE_CONFIGS = {
     "tts": {
-        "url": os.getenv("TTS_SERVICE_URL", "http://localhost:8001"),
+        "url": os.getenv("TTS_SERVICE_URL", "http://localhost:8002"),
         "health_endpoint": "/health"
     },
     "stt": {
-        "url": os.getenv("STT_SERVICE_URL", "http://localhost:8002"),
+        "url": os.getenv("STT_SERVICE_URL", "http://localhost:8003"),
+        "health_endpoint": "/health"
+    },
+    "rag": {
+        "url": os.getenv("RAG_PIPELINE_URL", "http://localhost:8005"),
         "health_endpoint": "/health"
     },
     "rag_pipeline": {
-        "url": os.getenv("RAG_PIPELINE_URL", "http://localhost:8011"),  # 修正端口
+        "url": os.getenv("RAG_PIPELINE_URL", "http://localhost:8005"),
         "health_endpoint": "/health"
     },
     "ml_pipeline": {
@@ -105,7 +137,7 @@ SERVICE_CONFIGS = {
         "health_endpoint": "/health"
     },
     "llm": {
-        "url": os.getenv("LLM_SERVICE_URL", "http://localhost:8005"),
+        "url": os.getenv("LLM_SERVICE_URL", "http://localhost:8004"),
         "health_endpoint": "/health"
     }
 }
@@ -150,6 +182,23 @@ class AudioRequest(BaseModel):
     category: str = Field("business", description="類別")
 
 class RandomAudioRequest(BaseModel):
+    category: str = Field("business", description="類別")
+
+class AudioPlayRequest(BaseModel):
+    user_id: str = Field(..., description="用戶 ID")
+    podcast_id: int = Field(..., description="播客 ID")
+    episode_title: str = Field(..., description="節目標題")
+
+class HeartLikeRequest(BaseModel):
+    user_id: str = Field(..., description="用戶 ID")
+    podcast_id: int = Field(..., description="播客 ID")
+    episode_title: str = Field(..., description="節目標題")
+
+class UserFeedbackRequest(BaseModel):
+    user_id: str = Field(..., description="用戶 ID")
+    podcast_id: int = Field(..., description="播客 ID")
+    episode_title: str = Field(..., description="節目標題")
+    action: str = Field("preview", description="操作類型: preview, heart_like, both")
     category: str = Field("business", description="類別")
 
 # 工具函數
@@ -214,6 +263,17 @@ def get_podcast_name_from_db(podcast_id: int) -> str:
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """返回首頁"""
+    try:
+        index_path = FRONTEND_PATH / "index.html"
+        with open(index_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except Exception as e:
+        logger.error(f"讀取首頁失敗: {e}")
+        return HTMLResponse(content="<h1>Podwise 首頁載入失敗</h1>", status_code=500)
+
+@app.get("/index.html", response_class=HTMLResponse)
+async def index_page():
+    """返回首頁 (index.html)"""
     try:
         index_path = FRONTEND_PATH / "index.html"
         with open(index_path, "r", encoding="utf-8") as f:
@@ -441,22 +501,55 @@ def save_user_preferences(request: UserPreferenceRequest):
         logger.error(f"保存用戶偏好失敗: {e}")
         return {"success": False, "error": str(e)}
 
-@app.post("/api/user/feedback")
-def record_user_feedback(request: UserFeedbackRequest):
-    """記錄用戶反饋（暴露路由）"""
+@app.post("/api/user/heart-like")
+def record_user_heart_like(request: UserFeedbackRequest):
+    """記錄愛心點擊"""
     try:
-        if not user_service:
-            return {"success": False, "error": "用戶服務未初始化"}
-        
-        result = user_service.record_user_feedback(
+        result = podwise_service.record_heart_like(
             user_id=request.user_id,
-            podcast_id=0,  # 從 episode_id 轉換
-            episode_title=request.episode_title,
-            like_count=1 if request.action == "like" else 0,
-            preview_play_count=1
+            podcast_id=request.podcast_id,
+            episode_title=request.episode_title
         )
         
-        return result
+        if result["success"]:
+            logger.info(f"愛心點擊記錄成功: {request.user_id}, 音檔: RSS_{request.podcast_id}_{request.episode_title}.mp3")
+            return {
+                "success": True,
+                "message": result["message"],
+                "audio_filename": f"RSS_{request.podcast_id}_{request.episode_title}.mp3",
+                "podcast_id": request.podcast_id,
+                "episode_title": request.episode_title
+            }
+        else:
+            return result
+            
+    except Exception as e:
+        logger.error(f"記錄愛心點擊失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/user/feedback")
+def record_user_feedback(request: UserFeedbackRequest):
+    """記錄用戶反饋（包含 podcast_id 和 episode_title）"""
+    try:
+        result = podwise_service.record_user_feedback(
+            user_id=request.user_id,
+            podcast_id=request.podcast_id,
+            episode_title=request.episode_title,
+            action=request.action
+        )
+        
+        if result["success"]:
+            logger.info(f"用戶反饋記錄成功: {request.user_id}, 操作: {request.action}, 音檔: {result.get('audio_filename', 'N/A')}")
+            return {
+                "success": True,
+                "message": result["message"],
+                "audio_filename": result.get("audio_filename"),
+                "podcast_id": request.podcast_id,
+                "episode_title": request.episode_title
+            }
+        else:
+            return result
+            
     except Exception as e:
         logger.error(f"記錄用戶反饋失敗: {e}")
         return {"success": False, "error": str(e)}
@@ -540,31 +633,36 @@ def generate_podwise_id():
 
 @app.post("/api/feedback")
 def record_feedback(feedback: FeedbackData):
-    """記錄用戶反饋"""
+    """記錄用戶反饋（支援舊格式和新格式）"""
     try:
-        # 處理 episode_id，如果是字串格式的 RSS ID，轉換為數字
-        episode_id = 0
-        if feedback.episode_id:
-            if feedback.episode_id.startswith("RSS_"):
-                try:
-                    # 從 RSS_1500839292 格式提取數字
-                    episode_id = int(feedback.episode_id.split("_")[1])
-                except (ValueError, IndexError):
-                    episode_id = 0
-            else:
-                try:
-                    episode_id = int(feedback.episode_id)
-                except ValueError:
-                    episode_id = 0
+        # 從 RSS ID 提取 podcast_id
+        podcast_id = 0
+        if feedback.rss_id and feedback.rss_id.startswith("RSS_"):
+            try:
+                podcast_id = int(feedback.rss_id.split("_")[1])
+            except (ValueError, IndexError):
+                podcast_id = 0
         
+        # 使用新的 record_user_feedback 函數
         result = podwise_service.record_user_feedback(
-            feedback.user_id,
-            episode_id,
-            feedback.episode_title,
-            like_count=1 if feedback.action == "like" else 0,
-            preview_play_count=1
+            user_id=feedback.user_id,
+            podcast_id=podcast_id,
+            episode_title=feedback.episode_title,
+            action="heart_like" if feedback.action == "like" else "preview"
         )
-        return result
+        
+        if result["success"]:
+            logger.info(f"反饋記錄成功: {feedback.user_id}, 操作: {feedback.action}, 音檔: {result.get('audio_filename', 'N/A')}")
+            return {
+                "success": True,
+                "message": result["message"],
+                "audio_filename": result.get("audio_filename"),
+                "podcast_id": podcast_id,
+                "episode_title": feedback.episode_title
+            }
+        else:
+            return result
+            
     except Exception as e:
         logger.error(f"記錄反饋失敗: {e}")
         return {"success": False, "error": str(e)}
@@ -664,6 +762,60 @@ def get_random_audio(request: RandomAudioRequest):
         logger.error(f"獲取隨機音檔失敗: {e}")
         return {"success": False, "error": str(e)}
 
+# ==================== 音檔播放和愛心點擊 API ====================
+
+@app.post("/api/audio/play")
+def record_audio_play(request: AudioPlayRequest):
+    """記錄音檔播放"""
+    try:
+        result = podwise_service.record_audio_play(
+            user_id=request.user_id,
+            podcast_id=request.podcast_id,
+            episode_title=request.episode_title
+        )
+        
+        if result["success"]:
+            logger.info(f"音檔播放記錄成功: {request.user_id}, 音檔: RSS_{request.podcast_id}_{request.episode_title}.mp3")
+            return {
+                "success": True,
+                "message": result["message"],
+                "audio_filename": f"RSS_{request.podcast_id}_{request.episode_title}.mp3",
+                "podcast_id": request.podcast_id,
+                "episode_title": request.episode_title
+            }
+        else:
+            return result
+            
+    except Exception as e:
+        logger.error(f"記錄音檔播放失敗: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/audio/heart-like")
+def record_heart_like(request: HeartLikeRequest):
+    """記錄愛心點擊"""
+    try:
+        result = podwise_service.record_heart_like(
+            user_id=request.user_id,
+            podcast_id=request.podcast_id,
+            episode_title=request.episode_title
+        )
+        
+        if result["success"]:
+            logger.info(f"愛心點擊記錄成功: {request.user_id}, 音檔: RSS_{request.podcast_id}_{request.episode_title}.mp3")
+            return {
+                "success": True,
+                "message": result["message"],
+                "audio_filename": f"RSS_{request.podcast_id}_{request.episode_title}.mp3",
+                "podcast_id": request.podcast_id,
+                "episode_title": request.episode_title
+            }
+        else:
+            return result
+            
+    except Exception as e:
+        logger.error(f"記錄愛心點擊失敗: {e}")
+        return {"success": False, "error": str(e)}
+
 # ==================== 推薦系統 API ====================
 
 @app.get("/api/category-tags/{category}")
@@ -697,7 +849,16 @@ async def get_one_minutes_episodes(category: str, tag: str = ""):
         logger.error(f"獲取節目推薦失敗: {e}")
         return {"success": False, "error": str(e)}
 
+# ==================== 代理路由 ====================
+
+
+
 # ==================== RAG Pipeline API ====================
+
+@app.post("/api/v1/rag/query")
+async def rag_query_alias(request: ChatRequest):
+    """RAG Pipeline 查詢別名端點"""
+    return await rag_query(request)
 
 @app.post("/api/v1/query")
 async def rag_query(request: ChatRequest):
@@ -766,15 +927,16 @@ async def synthesize_speech(request: TTSRequest):
         # 調用 TTS 服務
         tts_url = SERVICE_CONFIGS["tts"]["url"]
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(f"{tts_url}/synthesize", json={
-                "text": request.text,
-                "voice": request.voice,
-                "speed": request.speed
+            response = await client.post(f"{tts_url}/api/v1/tts/synthesize", json={
+                "文字": request.text,
+                "語音": request.voice,
+                "語速": request.speed
             })
             
             if response.status_code == 200:
                 return response.json()
             else:
+                logger.error(f"TTS 服務錯誤: {response.status_code}, 回應: {response.text}")
                 return {
                     "success": False,
                     "error": f"TTS 服務錯誤: {response.status_code}"
@@ -817,7 +979,23 @@ async def transcribe_audio(file: UploadFile = File(...)):
             "error": str(e)
         }
 
+# ==================== 全局異常處理 ====================
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """全局異常處理器"""
+    logger.error(f"全局異常: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": str(exc),
+            "message": "內部服務器錯誤"
+        }
+    )
+
 # ==================== 通用代理路由 ====================
+# 注意：這個通用代理路由在所有特定端點之後定義，以避免路由衝突
 
 @app.api_route("/api/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 async def proxy_to_service(service: str, path: str, request: Request):
@@ -827,11 +1005,12 @@ async def proxy_to_service(service: str, path: str, request: Request):
     """
     # 服務對應表
     SERVICE_MAP = {
-        "tts": "http://localhost:8002",
-        "rag": "http://localhost:8011",  # 修正 RAG Pipeline 端口
-        "ml": "http://localhost:8003",
-        "llm": "http://localhost:8004",
-        "stt": "http://localhost:8005",
+        "tts": "http://localhost:8002",  # TTS 服務端口
+        "rag": "http://localhost:8005",  # RAG Pipeline 端口
+        "rag_pipeline": "http://localhost:8005",  # RAG Pipeline 端口
+        "ml": "http://localhost:8004",
+        "llm": "http://localhost:8004",  # LLM 服務端口
+        "stt": "http://localhost:8003",  # STT 服務端口
     }
     
     # 特殊路由處理
@@ -877,21 +1056,6 @@ async def proxy_to_service(service: str, path: str, request: Request):
         headers=resp.headers
     )
 
-# ==================== 全局異常處理 ====================
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """全局異常處理器"""
-    logger.error(f"全局異常: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "success": False,
-            "error": str(exc),
-            "message": "內部服務器錯誤"
-        }
-    )
-
 # ==================== 啟動腳本 ====================
 
 if __name__ == "__main__":
@@ -917,7 +1081,7 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8006,
+        port=8008,
         reload=False,
         log_level="info"
     ) 

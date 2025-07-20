@@ -117,10 +117,14 @@ class WebSearchExpert:
             self._initialized = False
             return
         
-        self.http_client: Optional[httpx.AsyncClient] = None
+        self.http_client = None
         self._initialized = False
         
         logger.info(f"WebSearchExpert 初始化完成，模型: {self.model}")
+    
+    def is_configured(self) -> bool:
+        """檢查是否已配置"""
+        return bool(self.api_key and self._initialized)
     
     async def initialize(self) -> bool:
         """初始化 HTTP 客戶端"""
@@ -219,20 +223,27 @@ class WebSearchExpert:
         language = language_map.get(request.language, "繁體中文")
         
         prompt = f"""
-請為以下查詢進行網路搜尋並提供最新的相關資訊：
+請為以下查詢進行網路搜尋，專門尋找 Podcast 相關的資訊：
 
 查詢：{request.query}
 語言：{language}
 搜尋類型：{request.search_type}
 
-請使用網路搜尋工具獲取最新的相關資訊，並提供以下格式的結果：
-1. 標題
-2. URL
-3. 摘要（100-200字）
-4. 來源
-5. 相關性評分（0-1）
+請使用網路搜尋工具獲取最新的 Podcast 相關資訊，包括：
+- Podcast 節目推薦
+- Podcast 平台資訊
+- Podcast 主持人或嘉賓資訊
+- Podcast 內容摘要或評論
+- Podcast 相關新聞或趨勢
 
-如果找不到相關資訊，請說明原因。
+請提供以下格式的結果：
+1. 標題（Podcast 節目名稱或相關標題）
+2. URL（Podcast 平台連結或相關網址）
+3. 摘要（100-200字，描述 Podcast 內容或相關資訊）
+4. 來源（Podcast 平台或網站名稱）
+5. 相關性評分（0-1，評估與查詢的相關程度）
+
+如果找不到相關的 Podcast 資訊，請說明原因。
 """
         return prompt
     
@@ -246,7 +257,7 @@ class WebSearchExpert:
             "messages": [
                 {
                     "role": "system",
-                    "content": "你是一個專業的網路搜尋助手，能夠提供準確、最新的資訊。請使用網路搜尋工具獲取最新資訊。"
+                    "content": "你是一個專業的 Podcast 搜尋助手，專門幫助用戶找到相關的 Podcast 節目、主持人、平台和內容。請使用網路搜尋工具獲取最新的 Podcast 相關資訊。"
                 },
                 {
                     "role": "user", 
@@ -422,11 +433,11 @@ class WebSearchExpert:
         )
     
     async def _generate_summary_with_tools(self, query: str, results: List[SearchResult]) -> str:
-        """使用 tools 生成搜尋摘要"""
+        """使用 tools 生成 Podcast 搜尋摘要"""
         try:
             # 構建摘要提示
             summary_prompt = f"""
-基於以下搜尋結果，為查詢「{query}」生成一個簡潔的摘要（100-150字）：
+基於以下 Podcast 搜尋結果，為查詢「{query}」生成一個簡潔的 Podcast 推薦摘要（100-150字）：
 
 """
             for i, result in enumerate(results, 1):
@@ -437,7 +448,7 @@ class WebSearchExpert:
 來源：{result.source}
 """
             
-            summary_prompt += "\n請提供一個客觀、準確的摘要。"
+            summary_prompt += "\n請提供一個客觀、準確的 Podcast 推薦摘要，重點說明這些 Podcast 節目如何符合用戶的查詢需求。"
             
             # 調用 OpenAI API 生成摘要
             response = await self._call_openai_api_with_tools(summary_prompt)
@@ -499,8 +510,87 @@ class WebSearchExpert:
             return False
 
 
+class WebSearchTool:
+    """WebSearchTool 包裝類別 - 專門給 crew_agents.py 使用"""
+    
+    def __init__(self):
+        """初始化 WebSearchTool"""
+        self.expert = WebSearchExpert()
+        self._initialized = False
+    
+    def is_configured(self) -> bool:
+        """檢查是否已配置"""
+        return self.expert.is_configured()
+    
+    async def search_with_openai(self, query: str, context: str = "") -> Dict[str, Any]:
+        """使用 OpenAI 進行搜尋（適合 crew_agents 使用）"""
+        try:
+            if not self._initialized:
+                await self.expert.initialize()
+                self._initialized = True
+            
+            # 確保查詢包含 podcast 關鍵字
+            if "podcast" not in query.lower() and "播客" not in query:
+                enhanced_query = f"{query} podcast 推薦"
+            else:
+                enhanced_query = query
+            
+            request = SearchRequest(
+                query=enhanced_query,
+                max_results=3,
+                language="zh-TW"
+            )
+            
+            response = await self.expert.search(request)
+            
+            if response.results:
+                # 格式化結果為 crew_agents 需要的格式
+                formatted_results = []
+                for result in response.results:
+                    formatted_results.append({
+                        'title': result.title,
+                        'url': result.url,
+                        'snippet': result.snippet,
+                        'confidence': result.confidence
+                    })
+                
+                return {
+                    "success": True,
+                    "response": response.summary or "搜尋完成",
+                    "results": formatted_results,
+                    "method": "openai"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "未找到相關結果",
+                    "response": ""
+                }
+                
+        except Exception as e:
+            logger.error(f"OpenAI 搜尋失敗: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "response": ""
+            }
+    
+    async def search_business_topic(self, query: str) -> Dict[str, Any]:
+        """搜尋商業主題 Podcast"""
+        business_query = f"商業 {query} podcast 推薦"
+        return await self.search_with_openai(business_query)
+    
+    async def search_education_topic(self, query: str) -> Dict[str, Any]:
+        """搜尋教育主題 Podcast"""
+        education_query = f"教育 {query} podcast 推薦"
+        return await self.search_with_openai(education_query)
+
+
 # 全域 WebSearchExpert 實例
 _web_search_expert: Optional[WebSearchExpert] = None
+
+# 全域 WebSearchTool 實例
+_web_search_tool: Optional[WebSearchTool] = None
 
 
 def get_web_search_expert() -> WebSearchExpert:
@@ -509,6 +599,14 @@ def get_web_search_expert() -> WebSearchExpert:
     if _web_search_expert is None:
         _web_search_expert = WebSearchExpert()
     return _web_search_expert
+
+
+def get_web_search_tool() -> WebSearchTool:
+    """獲取全域 WebSearchTool 實例"""
+    global _web_search_tool
+    if _web_search_tool is None:
+        _web_search_tool = WebSearchTool()
+    return _web_search_tool
 
 
 async def search_web(query: str, max_results: int = 3, language: str = "zh-TW") -> SearchResponse:
@@ -524,19 +622,19 @@ async def search_web(query: str, max_results: int = 3, language: str = "zh-TW") 
 
 # 測試函數
 async def test_web_search():
-    """測試網路搜尋功能"""
+    """測試 Podcast 網路搜尋功能"""
     try:
         expert = WebSearchExpert()
         await expert.initialize()
         
         request = SearchRequest(
-            query="台灣最新科技新聞",
+            query="台灣科技 podcast 推薦",
             max_results=2,
             language="zh-TW"
         )
         
         response = await expert.search(request)
-        print(f"搜尋結果: {response}")
+        print(f"Podcast 搜尋結果: {response}")
         
         await expert.cleanup()
         

@@ -87,6 +87,14 @@ class PodwiseServiceManager:
         try:
             if not self.db_connection or self.db_connection.closed:
                 self.db_connection = psycopg2.connect(**POSTGRES_CONFIG)
+            else:
+                # 檢查交易狀態，如果被中止則重置
+                try:
+                    self.db_connection.rollback()
+                except:
+                    # 如果 rollback 失敗，重新建立連接
+                    self.db_connection.close()
+                    self.db_connection = psycopg2.connect(**POSTGRES_CONFIG)
             return self.db_connection
         except Exception as e:
             logger.error(f"❌ 資料庫連接失敗: {e}")
@@ -325,37 +333,58 @@ class PodwiseServiceManager:
             return f"Podcast_{podcast_id}"
     
     def generate_user_id(self) -> str:
-        """生成新的用戶 ID"""
+        """生成新的用戶 ID - PodwiseXXXX 格式"""
         try:
             conn = self.get_db_connection()
             if not conn:
-                return f"Podwise{random.randint(1000, 9999)}"
+                return f"Podwise{random.randint(1000, 9999):04d}"
             
             with conn.cursor() as cursor:
-                # 查找最大的用戶 ID
-                cursor.execute("SELECT MAX(user_id) FROM users")
+                # 查找最大的 Podwise ID 數字
+                cursor.execute("""
+                    SELECT user_id FROM users 
+                    WHERE user_id LIKE 'Podwise%' 
+                    ORDER BY CAST(SUBSTRING(user_id FROM 8) AS INTEGER) DESC 
+                    LIMIT 1
+                """)
                 result = cursor.fetchone()
-                max_id = result[0] if result[0] else 0
                 
-                new_id = max_id + 1
-                user_code = f"Podwise{new_id:04d}"
+                if result:
+                    # 提取數字部分並加1
+                    last_number = int(result[0][7:])  # 跳過 'Podwise' 前綴
+                    new_number = last_number + 1
+                else:
+                    # 如果沒有現有的 Podwise ID，從 0001 開始
+                    new_number = 1
+                
+                # 生成新的 Podwise ID - 確保 4 位數格式
+                new_user_id = f"Podwise{new_number:04d}"
                 
                 # 插入新用戶
                 cursor.execute("""
-                    INSERT INTO users (user_id, user_identifier, user_type, is_active)
-                    VALUES (%s, %s, 'guest', true)
-                """, (new_id, user_code))
+                    INSERT INTO users (user_id, username, created_at, updated_at)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                """, (new_user_id, new_user_id))
                 
                 conn.commit()
-                return user_code
+                logger.info(f"✅ 成功生成新用戶 ID: {new_user_id}")
+                return new_user_id
                 
         except Exception as e:
             logger.error(f"生成用戶 ID 失敗: {e}")
-            return f"Podwise{random.randint(1000, 9999)}"
+            # 備用方案：生成隨機 4 位數 ID
+            fallback_id = f"Podwise{random.randint(1000, 9999):04d}"
+            logger.info(f"使用備用用戶 ID: {fallback_id}")
+            return fallback_id
     
     def check_user_exists(self, user_code: str) -> bool:
         """檢查用戶是否存在"""
         try:
+            # 檢查 user_code 是否為空或 None
+            if not user_code or user_code.strip() == "":
+                logger.warning("用戶代碼為空或 None")
+                return False
+            
             conn = self.get_db_connection()
             if not conn:
                 return False
@@ -373,26 +402,24 @@ class PodwiseServiceManager:
             return False
     
     def save_user_preferences(self, user_id: str, main_category: str, sub_category: str = "") -> Dict:
-        """保存用戶偏好"""
+        """保存用戶偏好到 user_feedback 表"""
         try:
             conn = self.get_db_connection()
             if not conn:
                 return {"success": False, "error": "資料庫連接失敗"}
             
-            # 獲取用戶 ID
-            user_db_id = self._get_user_db_id(user_id)
-            if not user_db_id:
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
                 return {"success": False, "error": "用戶不存在"}
             
             with conn.cursor() as cursor:
+                # 使用 user_feedback 表存儲用戶偏好
+                # 使用 podcast_id = 0 表示這是一個偏好記錄而不是具體節目的反饋
                 cursor.execute("""
-                    INSERT INTO user_preferences (user_id, category, preference_score)
-                    VALUES (%s, %s, 0.8)
-                    ON CONFLICT (user_id, category) 
-                    DO UPDATE SET 
-                        preference_score = 0.8,
-                        updated_at = CURRENT_TIMESTAMP
-                """, (user_db_id, main_category))
+                    INSERT INTO user_feedback 
+                    (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, 0, f"PREFERENCE:{main_category}:{sub_category}", 1, 1))
                 
                 conn.commit()
                 return {"success": True, "message": "偏好保存成功"}
@@ -401,40 +428,120 @@ class PodwiseServiceManager:
             logger.error(f"保存用戶偏好失敗: {e}")
             return {"success": False, "error": str(e)}
     
-    def record_user_feedback(self, user_id: str, episode_id: int, episode_title: str, 
-                           like_count: int = 0, preview_play_count: int = 0) -> Dict:
-        """記錄用戶反饋"""
+    def record_user_feedback(self, user_id: str, podcast_id: int, episode_title: str, 
+                           action: str = "preview", like_count: int = 0, preview_play_count: int = 0) -> Dict:
+        """記錄用戶反饋（包含 podcast_id 和 episode_title）"""
         try:
             conn = self.get_db_connection()
             if not conn:
                 return {"success": False, "error": "資料庫連接失敗"}
             
-            # 獲取用戶 ID
-            user_db_id = self._get_user_db_id(user_id)
-            if not user_db_id:
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
                 return {"success": False, "error": "用戶不存在"}
             
             with conn.cursor() as cursor:
+                # 根據操作類型設置計數
+                if action == "heart_like":
+                    like_count = 1
+                    preview_play_count = 0
+                elif action == "preview":
+                    like_count = 0
+                    preview_play_count = 1
+                elif action == "both":
+                    like_count = 1
+                    preview_play_count = 1
+                
+                # 記錄用戶反饋（不使用 ON CONFLICT，因為表沒有主鍵約束）
                 cursor.execute("""
                     INSERT INTO user_feedback 
-                    (user_id, episode_id, like_count, preview_play_count, created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                    ON CONFLICT (user_id, episode_id) 
-                    DO UPDATE SET 
-                        like_count = user_feedback.like_count + %s,
-                        preview_play_count = user_feedback.preview_play_count + %s,
-                        updated_at = CURRENT_TIMESTAMP
-                """, (user_db_id, episode_id, like_count, preview_play_count, like_count, preview_play_count))
+                    (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, podcast_id, episode_title, like_count, preview_play_count))
                 
                 conn.commit()
-                return {"success": True, "message": "反饋記錄成功"}
+                
+                # 記錄音檔名稱格式
+                audio_filename = f"RSS_{podcast_id}_{episode_title}.mp3"
+                logger.info(f"用戶 {user_id} 操作: {action}, 音檔: {audio_filename}")
+                
+                return {
+                    "success": True, 
+                    "message": f"反饋記錄成功: {action}",
+                    "audio_filename": audio_filename,
+                    "podcast_id": podcast_id,
+                    "episode_title": episode_title
+                }
                 
         except Exception as e:
             logger.error(f"記錄用戶反饋失敗: {e}")
             return {"success": False, "error": str(e)}
     
-    def _get_user_db_id(self, user_code: str) -> Optional[int]:
-        """獲取用戶的資料庫 ID"""
+    def record_audio_play(self, user_id: str, podcast_id: int, episode_title: str) -> Dict:
+        """記錄音檔播放（RSS_{podcast_id}_{episode_title}.mp3）"""
+        try:
+            conn = self.get_db_connection()
+            if not conn:
+                return {"success": False, "error": "資料庫連接失敗"}
+            
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
+                return {"success": False, "error": "用戶不存在"}
+            
+            with conn.cursor() as cursor:
+                # 記錄音檔播放
+                cursor.execute("""
+                    INSERT INTO user_feedback 
+                    (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, podcast_id, f"RSS_{podcast_id}_{episode_title}.mp3", 0, 1))
+                
+                conn.commit()
+                return {"success": True, "message": "音檔播放記錄成功"}
+                
+        except Exception as e:
+            logger.error(f"記錄音檔播放失敗: {e}")
+            return {"success": False, "error": str(e)}
+    
+    def record_heart_like(self, user_id: str, podcast_id: int, episode_title: str) -> Dict:
+        """記錄愛心點擊"""
+        try:
+            conn = self.get_db_connection()
+            if not conn:
+                return {"success": False, "error": "資料庫連接失敗"}
+            
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
+                return {"success": False, "error": "用戶不存在"}
+            
+            with conn.cursor() as cursor:
+                # 記錄愛心點擊
+                cursor.execute("""
+                    INSERT INTO user_feedback 
+                    (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, podcast_id, episode_title, 1, 0))
+                
+                conn.commit()
+                
+                # 記錄音檔名稱格式
+                audio_filename = f"RSS_{podcast_id}_{episode_title}.mp3"
+                logger.info(f"愛心點擊記錄成功: {user_id}, 音檔: {audio_filename}")
+                
+                return {
+                    "success": True, 
+                    "message": "愛心點擊記錄成功",
+                    "audio_filename": audio_filename,
+                    "podcast_id": podcast_id,
+                    "episode_title": episode_title
+                }
+                
+        except Exception as e:
+            logger.error(f"記錄愛心點擊失敗: {e}")
+            return {"success": False, "error": str(e)}
+    
+    def _get_user_db_id(self, user_code: str) -> Optional[str]:
+        """獲取用戶的資料庫 ID（現在直接返回 user_id 字串）"""
         try:
             conn = self.get_db_connection()
             if not conn:
@@ -478,36 +585,33 @@ class PodwiseServiceManager:
             if not conn:
                 return {"success": False, "error": "資料庫連接失敗"}
             
-            # 獲取用戶的資料庫 ID
-            user_db_id = self._get_user_db_id(user_id)
-            if not user_db_id:
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
                 return {"success": False, "error": "用戶不存在"}
             
             with conn.cursor() as cursor:
-                # 1. 保存用戶偏好
+                # 1. 保存用戶偏好到 user_feedback 表
                 cursor.execute("""
-                    INSERT INTO user_preferences (user_id, category, preference_score)
-                    VALUES (%s, %s, 0.9)
-                    ON CONFLICT (user_id, category) 
-                    DO UPDATE SET 
-                        preference_score = 0.9,
-                        updated_at = CURRENT_TIMESTAMP
-                """, (user_db_id, main_category))
+                    INSERT INTO user_feedback 
+                    (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                    VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, 0, f"PREFERENCE:{main_category}", 1, 1))
                 
                 # 2. 保存選中的節目到用戶偏好
                 for episode in selected_episodes:
                     episode_id = episode.get('episode_id', 0)
+                    # 確保 episode_id 是整數類型
+                    try:
+                        episode_id = int(episode_id) if episode_id else 0
+                    except (ValueError, TypeError):
+                        episode_id = 0
+                    
                     if episode_id > 0:
                         cursor.execute("""
                             INSERT INTO user_feedback 
-                            (user_id, episode_id, like_count, preview_play_count, created_at, updated_at)
-                            VALUES (%s, %s, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                            ON CONFLICT (user_id, episode_id) 
-                            DO UPDATE SET 
-                                like_count = user_feedback.like_count + 1,
-                                preview_play_count = user_feedback.preview_play_count + 1,
-                                updated_at = CURRENT_TIMESTAMP
-                        """, (user_db_id, episode_id))
+                            (user_id, podcast_id, episode_title, like_count, preview_play_count, created_at)
+                            VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                        """, (user_id, episode_id, episode.get('episode_title', ''), 1, 1))
                 
                 # 3. 保存用戶會話資訊（用於 RAG Pipeline）
                 session_data = {
@@ -517,22 +621,8 @@ class PodwiseServiceManager:
                     "timestamp": datetime.now().isoformat()
                 }
                 
-                cursor.execute("""
-                    INSERT INTO user_sessions (user_id, session_data, created_at)
-                    VALUES (%s, %s, CURRENT_TIMESTAMP)
-                """, (user_db_id, json.dumps(session_data)))
-                
                 conn.commit()
-                
-                logger.info(f"Step4 用戶偏好保存成功: {user_id}, 類別: {main_category}, 選中節目: {len(selected_episodes)} 個")
-                
-                return {
-                    "success": True,
-                    "message": "偏好保存成功",
-                    "user_id": user_id,
-                    "main_category": main_category,
-                    "selected_episodes_count": len(selected_episodes)
-                }
+                return {"success": True, "message": "用戶偏好和節目選擇保存成功"}
                 
         except Exception as e:
             logger.error(f"保存 Step4 用戶偏好失敗: {e}")
@@ -541,59 +631,116 @@ class PodwiseServiceManager:
     def get_user_context_for_rag(self, user_id: str) -> Dict:
         """獲取用戶上下文資訊（用於 RAG Pipeline）"""
         try:
+            # 檢查 user_id 是否為空或 None
+            if not user_id or user_id.strip() == "":
+                logger.warning("用戶 ID 為空或 None")
+                return {"user_id": "unknown", "context": "用戶 ID 為空"}
+            
             conn = self.get_db_connection()
             if not conn:
                 return {"user_id": user_id, "context": "無法連接資料庫"}
             
-            user_db_id = self._get_user_db_id(user_id)
-            if not user_db_id:
+            # 檢查用戶是否存在
+            if not self.check_user_exists(user_id):
                 return {"user_id": user_id, "context": "用戶不存在"}
             
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-                # 獲取用戶偏好
+                # 獲取用戶偏好（從 user_feedback 表中查找 PREFERENCE 記錄）
                 cursor.execute("""
-                    SELECT category, preference_score 
-                    FROM user_preferences 
-                    WHERE user_id = %s 
-                    ORDER BY preference_score DESC
-                """, (user_db_id,))
+                    SELECT episode_title, like_count, preview_play_count
+                    FROM user_feedback 
+                    WHERE user_id = %s AND episode_title LIKE 'PREFERENCE:%'
+                    ORDER BY created_at DESC
+                """, (user_id,))
                 preferences = cursor.fetchall()
-                
-                # 獲取最近的會話資訊
-                cursor.execute("""
-                    SELECT session_data 
-                    FROM user_sessions 
-                    WHERE user_id = %s 
-                    ORDER BY created_at DESC 
-                    LIMIT 1
-                """, (user_db_id,))
-                session_result = cursor.fetchone()
                 
                 # 獲取用戶喜歡的節目
                 cursor.execute("""
-                    SELECT e.episode_title, p.podcast_name, p.category
+                    SELECT uf.podcast_id, uf.episode_title, uf.like_count, uf.preview_play_count
                     FROM user_feedback uf
-                    JOIN episodes e ON uf.episode_id = e.episode_id
-                    JOIN podcasts p ON e.podcast_id = p.podcast_id
-                    WHERE uf.user_id = %s AND uf.like_count > 0
-                    ORDER BY uf.updated_at DESC
+                    WHERE uf.user_id = %s AND uf.like_count > 0 AND uf.episode_title NOT LIKE 'PREFERENCE:%'
+                    ORDER BY uf.created_at DESC
                     LIMIT 5
-                """, (user_db_id,))
+                """, (user_id,))
                 liked_episodes = cursor.fetchall()
+                
+                # 解析偏好數據 - 基於實際的節目標題和標籤
+                parsed_preferences = []
+                for pref in preferences:
+                    # 檢查是否有 like_count > 0 的記錄作為偏好
+                    if pref['like_count'] > 0:
+                        # 從節目標題推斷類別
+                        episode_title = pref['episode_title'].lower()
+                        category = "general"
+                        
+                        # 基於標題內容推斷類別
+                        if any(keyword in episode_title for keyword in ['投資', '股票', '理財', '經濟', '商業', '創業', '公司', '市場']):
+                            category = "business"
+                        elif any(keyword in episode_title for keyword in ['學習', '教育', '知識', '成長', '心理', '自我提升', '方法']):
+                            category = "education"
+                        elif any(keyword in episode_title for keyword in ['科技', 'AI', '人工智慧', '數位', '創新']):
+                            category = "technology"
+                        
+                            parsed_preferences.append({
+                                "category": category,
+                            "sub_category": "",
+                            "score": pref['like_count'],
+                            "episode_title": pref['episode_title']
+                        })
+                
+                # 如果沒有明確的偏好，基於用戶的收聽歷史推斷
+                if not parsed_preferences and liked_episodes:
+                    # 分析喜歡的節目標題來推斷偏好
+                    business_count = 0
+                    education_count = 0
+                    technology_count = 0
+                    
+                    for episode in liked_episodes:
+                        title = episode['episode_title'].lower()
+                        if any(keyword in title for keyword in ['投資', '股票', '理財', '經濟', '商業', '創業', '公司', '市場']):
+                            business_count += 1
+                        elif any(keyword in title for keyword in ['學習', '教育', '知識', '成長', '心理', '自我提升', '方法']):
+                            education_count += 1
+                        elif any(keyword in title for keyword in ['科技', 'AI', '人工智慧', '數位', '創新']):
+                            technology_count += 1
+                    
+                    # 添加推斷的偏好
+                    if business_count > 0:
+                        parsed_preferences.append({
+                            "category": "business",
+                            "sub_category": "",
+                            "score": business_count,
+                            "episode_title": "推斷偏好"
+                        })
+                    if education_count > 0:
+                        parsed_preferences.append({
+                            "category": "education", 
+                            "sub_category": "",
+                            "score": education_count,
+                            "episode_title": "推斷偏好"
+                        })
+                    if technology_count > 0:
+                        parsed_preferences.append({
+                            "category": "technology",
+                            "sub_category": "",
+                            "score": technology_count,
+                            "episode_title": "推斷偏好"
+                            })
                 
                 context = {
                     "user_id": user_id,
-                    "preferences": [{"category": p['category'], "score": p['preference_score']} for p in preferences],
-                    "recent_session": json.loads(session_result['session_data']) if session_result else None,
-                    "liked_episodes": [{"title": ep['episode_title'], "podcast": ep['podcast_name'], "category": ep['category']} for ep in liked_episodes],
+                    "preferences": parsed_preferences,
+                    "liked_episodes": [{"title": ep['episode_title'], "podcast_id": ep['podcast_id'], "like_count": ep['like_count']} for ep in liked_episodes],
                     "timestamp": datetime.now().isoformat()
                 }
                 
-                logger.info(f"獲取用戶上下文: {user_id}, 偏好: {len(preferences)}, 喜歡節目: {len(liked_episodes)}")
+                logger.info(f"獲取用戶上下文: {user_id}, 偏好: {len(parsed_preferences)}, 喜歡節目: {len(liked_episodes)}")
                 return context
                 
         except Exception as e:
             logger.error(f"獲取用戶上下文失敗: {e}")
+            import traceback
+            logger.error(f"詳細錯誤信息: {traceback.format_exc()}")
             return {"user_id": user_id, "context": f"獲取失敗: {str(e)}"}
     
     def close_connections(self):

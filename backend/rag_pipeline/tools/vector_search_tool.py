@@ -96,9 +96,9 @@ class MilvusVectorSearch:
     """Milvus 向量搜尋實現"""
     
     def __init__(self, 
-                 host: str = "localhost",
-                 port: int = 19530,
-                 collection_name: str = "podcast_chunks"):
+                 host: str = os.getenv("MILVUS_HOST", "192.168.32.86"),
+                 port: int = int(os.getenv("MILVUS_PORT", "19530")),
+                 collection_name: str = os.getenv("MILVUS_COLLECTION", "podcast_chunks")):
         self.host = host
         self.port = port
         self.collection_name = collection_name
@@ -185,9 +185,9 @@ class VectorSearchTool:
     """RAG Pipeline 向量搜尋工具"""
     
     def __init__(self, 
-                 host: str = "localhost",
-                 port: int = 19530,
-                 collection_name: str = "podcast_chunks",
+                 host: str = os.getenv("MILVUS_HOST", "192.168.32.86"),
+                 port: int = int(os.getenv("MILVUS_PORT", "19530")),
+                 collection_name: str = os.getenv("MILVUS_COLLECTION", "podcast_chunks"),
                  similarity_threshold: float = 0.7):
         """
         初始化向量搜尋工具
@@ -388,7 +388,7 @@ class VectorSearchTool:
 _vector_search_tool: Optional[VectorSearchTool] = None
 
 
-def get_vector_search_tool(host: str = "localhost",
+def get_vector_search_tool(host: str = "192.168.32.86",
                           port: int = 19530,
                           collection_name: str = "podcast_chunks",
                           similarity_threshold: float = 0.7) -> VectorSearchTool:

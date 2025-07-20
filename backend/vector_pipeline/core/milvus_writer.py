@@ -75,7 +75,9 @@ class MilvusWriter:
                 # 時間和評分欄位
                 FieldSchema(name="duration", dtype=DataType.VARCHAR, max_length=255),
                 FieldSchema(name="published_date", dtype=DataType.VARCHAR, max_length=64),
-                FieldSchema(name="apple_rating", dtype=DataType.INT32),
+                FieldSchema(name="apple_rating", dtype=DataType.FLOAT32),
+                FieldSchema(name="sentiment_rating", dtype=DataType.FLOAT32),
+                FieldSchema(name="total_rating", dtype=DataType.FLOAT32),
                 
                 # 內容欄位
                 FieldSchema(name="chunk_text", dtype=DataType.VARCHAR, max_length=1024),
@@ -188,9 +190,10 @@ class MilvusWriter:
             # 定義欄位順序（必須與 schema 一致）
             field_order = [
                 "chunk_id", "chunk_index", "episode_id", "podcast_id", 
-                "episode_title", "chunk_text", "embedding", "language", 
-                "created_at", "source_model", "podcast_name", "author", 
-                "category", "tags"
+                "podcast_name", "author", "category", "episode_title",
+                "duration", "published_date", "apple_rating", "sentiment_rating", "total_rating",
+                "chunk_text", "embedding", "language",
+                "created_at", "source_model", "tags"
             ]
             
             # 將 dict 轉換為 list of list（每個欄位一個 list）
@@ -265,15 +268,20 @@ class MilvusWriter:
             "chunk_index": [],
             "episode_id": [],
             "podcast_id": [],
+            "podcast_name": [],
+            "author": [],
+            "category": [],
             "episode_title": [],
+            "duration": [],
+            "published_date": [],
+            "apple_rating": [],
+            "sentiment_rating": [],
+            "total_rating": [],
             "chunk_text": [],
             "embedding": [],
             "language": [],
             "created_at": [],
             "source_model": [],
-            "podcast_name": [],
-            "author": [],
-            "category": [],
             "tags": []
         }
         

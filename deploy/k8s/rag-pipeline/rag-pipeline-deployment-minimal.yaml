@@ -1,0 +1,197 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-pipeline-service-minimal
+  namespace: podwise
+  labels:
+    app: rag-pipeline-service-minimal
+    component: rag-pipeline
+    network: podwise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-pipeline-service-minimal
+      network: podwise
+  template:
+    metadata:
+      labels:
+        app: rag-pipeline-service-minimal
+        component: rag-pipeline
+        network: podwise
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker2
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1.35
+          command: ['sh', '-c', 'echo "等待依賴服務就緒..." && sleep 10']
+      containers:
+        - name: rag-pipeline-service-minimal
+          image: 192.168.32.38:5000/podwise-rag-pipeline-minimal:latest
+          ports:
+            - containerPort: 8004
+              name: rag-api
+              protocol: TCP
+          env:
+            - name: PYTHONPATH
+              value: "/app"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: DATA_DIR
+              value: "/app/data"
+            - name: CACHE_DIR
+              value: "/app/cache"
+            - name: LOGS_DIR
+              value: "/app/logs"
+            - name: TEMP_DIR
+              value: "/app/temp"
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0"
+            - name: NETWORK_NAME
+              value: "podwise"
+            - name: SERVICE_NAME
+              value: "rag-pipeline-service-minimal"
+            - name: LANGFUSE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_PUBLIC_KEY
+            - name: LANGFUSE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_SECRET_KEY
+            - name: LANGFUSE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: langfuse-secrets
+                  key: LANGFUSE_HOST
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "6Gi"
+              cpu: "3"
+          volumeMounts:
+            - name: rag-data
+              mountPath: /app/data
+            - name: rag-models
+              mountPath: /app/models
+            - name: rag-cache
+              mountPath: /app/cache
+            - name: rag-temp
+              mountPath: /app/temp
+          workingDir: /app
+          # 使用啟動腳本，會自動安裝額外套件
+          command: ["/app/start-rag-service.sh"]
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+              httpHeaders:
+                - name: Host
+                  value: rag-pipeline-service-minimal.podwise.svc.cluster.local
+            initialDelaySeconds: 120  # 增加延遲時間，等待套件安裝
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+              httpHeaders:
+                - name: Host
+                  value: rag-pipeline-service-minimal.podwise.svc.cluster.local
+            initialDelaySeconds: 90   # 增加延遲時間，等待套件安裝
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: rag-data
+          persistentVolumeClaim:
+            claimName: rag-data-pvc
+        - name: rag-models
+          persistentVolumeClaim:
+            claimName: rag-models-pvc
+        - name: rag-cache
+          persistentVolumeClaim:
+            claimName: rag-cache-pvc
+        - name: rag-temp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-pipeline-service-minimal
+  namespace: podwise
+  labels:
+    app: rag-pipeline-service-minimal
+    network: podwise
+    component: rag-pipeline
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8004"
+    prometheus.io/path: "/metrics"
+spec:
+  type: NodePort
+  ports:
+    - port: 8004
+      targetPort: 8004
+      nodePort: 30807  # 使用不同的 NodePort
+      name: rag-api
+      protocol: TCP
+  selector:
+    app: rag-pipeline-service-minimal
+    network: podwise
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rag-pipeline-network-policy
+  namespace: podwise
+spec:
+  podSelector:
+    matchLabels:
+      app: rag-pipeline-service-minimal
+      network: podwise
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: podwise
+        - podSelector:
+            matchLabels:
+              network: podwise
+      ports:
+        - protocol: TCP
+          port: 8004
+    - from:
+        - namespaceSelector: {}  # 允許所有命名空間的健康檢查
+      ports:
+        - protocol: TCP
+          port: 8004
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: podwise
+      ports:
+        - protocol: TCP
+          port: 5432  # PostgreSQL
+        - protocol: TCP
+          port: 6379  # Redis
+        - protocol: TCP
+          port: 19530  # Milvus
+        - protocol: TCP
+          port: 27017  # MongoDB
+    - to: []  # 允許所有出站流量（用於外部 API 調用）
+      ports:
+        - protocol: TCP
+          port: 443  # HTTPS
+        - protocol: TCP
+          port: 80   # HTTP 

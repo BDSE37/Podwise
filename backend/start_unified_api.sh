@@ -6,13 +6,10 @@ echo "🚀 啟動 Podwise 統一 API Gateway..."
 
 # 檢查 Python 版本
 python_version=$(python3 --version 2>&1 | grep -oP '\d+\.\d+')
-if [[ $(echo "$python_version >= 3.8" | bc -l) -eq 0 ]]; then
-    echo "❌ 需要 Python 3.8 或更高版本，當前版本: $python_version"
-    exit 1
-fi
+echo "✅ Python 版本: $python_version"
 
 # 檢查必要目錄
-FRONTEND_PATH="../frontend/home"
+FRONTEND_PATH="../frontend"
 IMAGES_PATH="$FRONTEND_PATH/images"
 ASSETS_PATH="$FRONTEND_PATH/assets"
 
@@ -41,11 +38,11 @@ if ! python3 -c "import fastapi" 2>/dev/null; then
 fi
 
 # 設定環境變數
-export TTS_SERVICE_URL=${TTS_SERVICE_URL:-"http://localhost:8001"}
-export STT_SERVICE_URL=${STT_SERVICE_URL:-"http://localhost:8002"}
-export RAG_PIPELINE_URL=${RAG_PIPELINE_URL:-"http://localhost:8003"}
+export TTS_SERVICE_URL=${TTS_SERVICE_URL:-"http://localhost:8002"}
+export STT_SERVICE_URL=${STT_SERVICE_URL:-"http://localhost:8003"}
+export RAG_PIPELINE_URL=${RAG_PIPELINE_URL:-"http://localhost:8005"}
 export ML_PIPELINE_URL=${ML_PIPELINE_URL:-"http://localhost:8004"}
-export LLM_SERVICE_URL=${LLM_SERVICE_URL:-"http://localhost:8005"}
+export LLM_SERVICE_URL=${LLM_SERVICE_URL:-"http://localhost:8004"}
 
 echo "🔧 服務配置:"
 echo "  TTS: $TTS_SERVICE_URL"

@@ -655,4 +655,4 @@ async def get_category_recommendations(request: CategoryRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8006) 
+    uvicorn.run(app, host="0.0.0.0", port=8007) 

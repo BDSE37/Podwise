@@ -1,149 +1,188 @@
-# PodWise Podri TTS 語音合成服務
+# Podwise TTS Pipeline
 
-基於 Microsoft Podri TTS 的高品質語音合成服務，專為台灣語音優化設計。
+## 概述
 
-## 🎯 功能特色
+Podwise TTS Pipeline 是語音合成服務模組，負責將文本轉換為高品質的語音輸出。支援多種語音模型和語言，提供統一的 OOP 介面。
 
-- **四種台灣語音**：溫柔女聲、活潑女聲、穩重男聲、專業男聲
-- **高品質合成**：基於 Microsoft Podri TTS 技術
-- **RESTful API**：提供完整的 HTTP API 介面
-- **OOP 設計**：符合 Google Code Style 的物件導向設計
-- **完整測試**：包含單元測試和整合測試
+## 架構設計
 
-## 🏗️ 系統架構
+### 核心組件
 
-```
-tts/
-├── main.py                 # FastAPI 主程式
-├── requirements.txt        # 依賴套件
-├── Dockerfile             # Docker 配置
-├── README.md              # 說明文件
-├── core/
-│   ├── __init__.py        # 核心模組初始化
-│   └── tts_service.py     # TTS 服務核心類別
-├── config/
-│   └── voice_config.py    # 語音配置管理
-├── providers/
-│   └── edge_tts_provider.py # Podri TTS 提供者
-├── constants/
-│   └── constants.py       # 系統常數
-├── utils/
-│   └── logging_config.py  # 日誌配置
-└── tests/
-    ├── __init__.py        # 測試模組初始化
-    ├── test_edge_tts_connection.py # Edge TTS 連接測試
-    └── test_tts_integration.py    # 整合測試
-```
+#### 1. 語音合成器 (Speech Synthesizer)
+- **職責**：核心語音合成功能
+- **實現**：`SpeechSynthesizer` 類別
+- **功能**：
+  - 文本預處理
+  - 語音合成
+  - 音頻後處理
 
-## 🎵 支援語音
+#### 2. 語音模型管理器 (Voice Model Manager)
+- **職責**：管理不同的語音模型
+- **實現**：`VoiceModelManager` 類別
+- **功能**：
+  - 模型載入和切換
+  - 模型性能優化
+  - 模型版本管理
 
-### Podri TTS 語音
-- **Podrina (溫柔女聲)**：溫柔親切的女聲，適合日常對話和情感表達
-- **Podrisa (活潑女聲)**：活潑開朗的女聲，適合娛樂內容和輕鬆話題
-- **Podrino (穩重男聲)**：穩重可靠的男聲，適合正式場合和專業內容
-- **Podriso (專業男聲)**：專業權威的男聲，適合新聞播報和學術內容
+#### 3. 音頻處理器 (Audio Processor)
+- **職責**：音頻格式處理和轉換
+- **實現**：`AudioProcessor` 類別
+- **功能**：
+  - 音頻格式轉換
+  - 音頻品質優化
+  - 音頻壓縮
 
-## 🚀 快速開始
+#### 4. 快取管理器 (Cache Manager)
+- **職責**：語音合成結果快取
+- **實現**：`CacheManager` 類別
+- **功能**：
+  - 結果快取
+  - 快取清理
+  - 快取統計
 
-### 1. 安裝依賴
+## 統一服務管理器
 
-```bash
-pip install -r requirements.txt
-```
+### TTSPipelineManager 類別
+- **職責**：整合所有 TTS 功能，提供統一的 OOP 介面
+- **主要方法**：
+  - `synthesize_speech()`: 語音合成
+  - `get_available_voices()`: 獲取可用語音
+  - `health_check()`: 健康檢查
+  - `clear_cache()`: 清理快取
 
-### 2. 啟動服務
+### 合成流程
+1. **文本預處理**：清理和標準化文本
+2. **語音選擇**：選擇合適的語音模型
+3. **語音合成**：生成語音音頻
+4. **音頻後處理**：優化音頻品質
+5. **結果快取**：快取合成結果
 
-```bash
-python main.py
-```
+## 配置系統
 
-服務將在 `http://localhost:8501` 啟動
-
-### 3. API 文檔
-
-訪問 `http://localhost:8501/docs` 查看互動式 API 文檔
-
-## 📋 API 參考
-
-### 主要端點
-
-- `GET /` - 服務狀態檢查
-- `GET /health` - 健康檢查
-- `GET /voices` - 獲取可用語音列表
-- `POST /synthesize` - 語音合成
-- `GET /voice/{voice_id}` - 獲取特定語音信息
-- `GET /status` - 獲取服務狀態
-
-### 語音合成請求範例
-
-```bash
-curl -X POST "http://localhost:8501/synthesize" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "文字": "您好，我是 Podrina，您的智能語音助手。",
-       "語音": "podrina",
-       "語速": "+0%",
-       "音量": "+0%",
-       "音調": "+0%"
-     }'
-```
-
-## 🔧 主要設定
+### TTS 配置
+- **檔案**：`config/tts_config.py`
+- **功能**：
+  - 語音模型配置
+  - 音頻格式設定
+  - 快取配置
 
 ### 語音配置
+- **檔案**：`config/voice_config.py`
+- **功能**：
+  - 語音模型參數
+  - 語音特性設定
+  - 語言支援配置
 
-在 `config/voice_config.py` 中定義四種台灣語音：
+## 數據模型
 
+### 核心數據類別
+- `SynthesisRequest`: 合成請求
+- `SynthesisResult`: 合成結果
+- `VoiceModel`: 語音模型
+- `AudioFormat`: 音頻格式
+
+### 工廠函數
+- `create_synthesis_request()`: 創建合成請求
+- `create_synthesis_result()`: 創建合成結果
+- `create_voice_model()`: 創建語音模型
+
+## OOP 設計原則
+
+### 單一職責原則 (SRP)
+- 每個類別只負責特定的 TTS 功能
+- 清晰的職責分離
+
+### 開放封閉原則 (OCP)
+- 支援新的語音模型
+- 可擴展的合成流程
+
+### 依賴反轉原則 (DIP)
+- 依賴抽象介面而非具體實現
+- 支援不同的語音引擎
+
+### 介面隔離原則 (ISP)
+- 精確的方法簽名
+- 避免不必要的依賴
+
+### 里氏替換原則 (LSP)
+- 所有合成器都可以替換其基類
+- 保持行為一致性
+
+## 主要入口點
+
+### main.py
+- **職責**：FastAPI 應用程式入口
+- **功能**：
+  - 提供 RESTful API 端點
+  - 整合 TTS 管道管理器
+  - 語音合成服務控制
+  - 健康檢查和語音資訊
+
+### 使用方式
 ```python
-{
-    "id": "podrina",
-    "name": "Podrina (溫柔女聲)",
-    "voice_id": "zh-TW-HsiaoChenNeural",
-    "description": "溫柔親切的女聲，適合日常對話和情感表達",
-    "type": "podri_tts",
-    "language": "zh-TW",
-    "gender": "female",
-    "style": "friendly"
-}
+# 創建 TTS 管道實例
+from core.tts_pipeline_manager import TTSPipelineManager
+
+pipeline = TTSPipelineManager()
+
+# 語音合成
+result = await pipeline.synthesize_speech(
+    text="歡迎使用 Podwise 語音合成服務",
+    voice="podrina",
+    speed=1.0
+)
+
+# 獲取可用語音
+voices = pipeline.get_available_voices()
+
+# 清理快取
+pipeline.clear_cache()
 ```
 
-### 系統常數
+## 監控和健康檢查
 
-在 `constants/constants.py` 中定義音訊配置：
+### 健康檢查
+- 檢查所有組件狀態
+- 驗證語音模型可用性
+- 監控合成性能
+- 檢查快取狀態
 
-```python
-class AudioConfig:
-    INPUT_SAMPLE_RATE = 16000   # 輸入採樣率
-    OUTPUT_SAMPLE_RATE = 24000  # 輸出採樣率
-    CHANNELS = 1                # 單聲道
-```
+### 性能指標
+- 合成速度
+- 音頻品質
+- 快取命中率
+- 錯誤率統計
 
-## 🐳 Docker 部署
+## 技術棧
 
-### 建置映像
+- **框架**：FastAPI
+- **語音引擎**：OpenAI TTS, Azure Speech
+- **音頻處理**：librosa, pydub
+- **快取**：Redis
+- **容器化**：Docker
+
+## 部署
 
 ```bash
-docker build -t podwise-tts .
+# 構建 Docker 映像
+docker build -t podwise-tts-pipeline .
+
+# 運行容器
+docker run -p 8003:8003 podwise-tts-pipeline
 ```
 
-### 執行容器
+## API 端點
 
-```bash
-docker run -p 8501:8501 podwise-tts
-```
+- `GET /health` - 健康檢查
+- `POST /api/v1/synthesize` - 語音合成
+- `GET /api/v1/voices` - 獲取可用語音
+- `POST /api/v1/cache/clear` - 清理快取
+- `GET /api/v1/statistics` - 統計資訊
 
-## 🛠️ 依賴項目
+## 架構優勢
 
-- fastapi
-- uvicorn
-- edge-tts
-- pydantic
-- python-multipart
-
-## ⚠️ 重要注意事項
-
-- 確保網路連接正常（需要連接到 Microsoft TTS 服務）
-- 語音合成需要一定的處理時間
-- 大量請求時注意 API 限制
-- 音訊檔案會暫存在記憶體中
-- 定期檢查服務健康狀態 
+1. **高品質**：支援多種高品質語音模型
+2. **可擴展性**：支援新的語音引擎和模型
+3. **可維護性**：清晰的模組化設計
+4. **可監控性**：完整的性能指標
+5. **一致性**：統一的數據模型和介面設計 

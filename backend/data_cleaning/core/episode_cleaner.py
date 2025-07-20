@@ -9,8 +9,17 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 try:
     from data_cleaning.core.base_cleaner import BaseCleaner
 except ImportError:
-    # Fallback: 相對導入
-    from core.base_cleaner import BaseCleaner
+    try:
+        # Fallback: 相對導入
+        from core.base_cleaner import BaseCleaner
+    except ImportError:
+        # 最後的 fallback: 直接導入
+        import sys
+        import os
+        current_dir = os.path.dirname(__file__)
+        if current_dir not in sys.path:
+            sys.path.insert(0, current_dir)
+        from base_cleaner import BaseCleaner
 
 class EpisodeCleaner(BaseCleaner):
     """Episode 資料清理器。"""

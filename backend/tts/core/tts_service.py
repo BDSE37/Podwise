@@ -22,6 +22,11 @@ import wave
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
+# 修正相對導入問題
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from providers.edge_tts_provider import EdgeTTSManager
 from config.voice_config import VoiceConfig
 
@@ -168,32 +173,11 @@ class TTSService:
         """
         if not self.is_available():
             return []
-        return [
-            {
-                "id": "podrina",
-                "name": "Podrina",
-                "description": "溫柔親切的女聲，適合日常對話和情感表達",
-                "gender": "female",
-                "style": "friendly",
-                "voice_id": "zh-TW-HsiaoChenNeural"
-            },
-            {
-                "id": "podrisa",
-                "name": "Podrisa",
-                "description": "活潑開朗的女聲，適合娛樂內容和輕鬆話題",
-                "gender": "female",
-                "style": "cheerful",
-                "voice_id": "zh-TW-HsiaoYuNeural"
-            },
-            {
-                "id": "podrino",
-                "name": "Podrino",
-                "description": "穩重可靠的男聲，適合正式場合和專業內容",
-                "gender": "male",
-                "style": "serious",
-                "voice_id": "zh-TW-YunJheNeural"
-            }
-        ]
+        
+        if self._edge_tts_manager:
+            return self._edge_tts_manager.get_voices()
+        
+        return []
     
     def get_voice_info(self, voice_id: str) -> Optional[Dict[str, str]]:
         """獲取特定語音信息

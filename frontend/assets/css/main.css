@@ -211,11 +211,7 @@ body,
 input,
 select,
 textarea {
-<<<<<<< HEAD
   color: #7f888f;
-=======
-  color: #b29bc7;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   font-family: "Open Sans", sans-serif;
   font-size: 13pt;
   font-weight: 400;
@@ -258,22 +254,13 @@ a {
   -ms-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
   transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
   border-bottom: dotted 1px;
-<<<<<<< HEAD
-  color: #d7b590;
-=======
-  color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  color: rgb(29, 209, 149);
   text-decoration: none;
 }
 
 a:hover {
-<<<<<<< HEAD
-  border-bottom-color: #d7b590;
-  color: #d7b590 !important;
-=======
-  border-bottom-color: #e64199;
-  color: #e64199 !important;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  border-bottom-color: rgb(29, 209, 149);
+  color: rgb(29, 209, 149) !important;
 }
 
 a:hover strong {
@@ -282,11 +269,7 @@ a:hover strong {
 
 strong,
 b {
-<<<<<<< HEAD
   color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   font-weight: 600;
 }
 
@@ -305,11 +288,7 @@ h3,
 h4,
 h5,
 h6 {
-<<<<<<< HEAD
   color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   font-family: "Roboto Slab", serif;
   font-weight: 700;
   line-height: 1.5;
@@ -1914,11 +1893,7 @@ header p {
 }
 
 header.major> :last-child {
-<<<<<<< HEAD
-  border-bottom: solid 3px #d7b590;
-=======
-  border-bottom: solid 3px #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  border-bottom: solid 3px rgb(29, 209, 149);
   display: inline-block;
   margin: 0 0 2em 0;
   padding: 0 0.75em 0.5em 0;
@@ -1928,229 +1903,7 @@ header.main> :last-child {
   margin: 0 0 1em 0;
 }
 
-/* Form */
-form {
-  margin: 0 0 2em 0;
-}
 
-label {
-<<<<<<< HEAD
-  color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-  display: block;
-  font-size: 0.9em;
-  font-weight: 600;
-  margin: 0 0 1em 0;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="tel"],
-input[type="search"],
-input[type="url"],
-select,
-textarea {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  background: #ffffff;
-  border-radius: 0.375em;
-  border: none;
-  border: solid 1px rgba(210, 215, 217, 0.75);
-  color: inherit;
-  display: block;
-  outline: 0;
-  padding: 0 1em;
-  text-decoration: none;
-  width: 100%;
-}
-
-input[type="text"]:invalid,
-input[type="password"]:invalid,
-input[type="email"]:invalid,
-input[type="tel"]:invalid,
-input[type="search"]:invalid,
-input[type="url"]:invalid,
-select:invalid,
-textarea:invalid {
-  box-shadow: none;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-input[type="search"]:focus,
-input[type="url"]:focus,
-select:focus,
-textarea:focus {
-<<<<<<< HEAD
-  border-color: #d7b590;
-  box-shadow: 0 0 0 1px #d7b590;
-=======
-  border-color: #e64199;
-  box-shadow: 0 0 0 1px #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-}
-
-select {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' preserveAspectRatio='none' viewBox='0 0 40 40'%3E%3Cpath d='M9.4,12.3l10.4,10.4l10.4-10.4c0.2-0.2,0.5-0.4,0.9-0.4c0.3,0,0.6,0.1,0.9,0.4l3.3,3.3c0.2,0.2,0.4,0.5,0.4,0.9 c0,0.4-0.1,0.6-0.4,0.9L20.7,31.9c-0.2,0.2-0.5,0.4-0.9,0.4c-0.3,0-0.6-0.1-0.9-0.4L4.3,17.3c-0.2-0.2-0.4-0.5-0.4-0.9 c0-0.4,0.1-0.6,0.4-0.9l3.3-3.3c0.2-0.2,0.5-0.4,0.9-0.4S9.1,12.1,9.4,12.3z' fill='rgba(210, 215, 217, 0.75)' /%3E%3C/svg%3E");
-  background-size: 1.25em;
-  background-repeat: no-repeat;
-  background-position: calc(100% - 1em) center;
-  height: 2.75em;
-  padding-right: 2.75em;
-  text-overflow: ellipsis;
-}
-
-select option {
-<<<<<<< HEAD
-  color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-  background: #ffffff;
-}
-
-select:focus::-ms-value {
-  background-color: transparent;
-}
-
-select::-ms-expand {
-  display: none;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="tel"],
-input[type="search"],
-input[type="url"],
-select {
-  height: 2.75em;
-}
-
-textarea {
-  padding: 0.75em 1em;
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  display: block;
-  float: left;
-  margin-right: -2em;
-  opacity: 0;
-  width: 1em;
-  z-index: -1;
-}
-
-input[type="checkbox"]+label,
-input[type="radio"]+label {
-  text-decoration: none;
-<<<<<<< HEAD
-  color: #7f888f;
-=======
-  color: #b29bc7;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-  cursor: pointer;
-  display: inline-block;
-  font-size: 1em;
-  font-weight: 400;
-  padding-left: 2.4em;
-  padding-right: 0.75em;
-  position: relative;
-}
-
-input[type="checkbox"]+label:before,
-input[type="radio"]+label:before {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-  text-transform: none !important;
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-}
-
-input[type="checkbox"]+label:before,
-input[type="radio"]+label:before {
-  background: #ffffff;
-  border-radius: 0.375em;
-  border: solid 1px rgba(210, 215, 217, 0.75);
-  content: '';
-  display: inline-block;
-  font-size: 0.8em;
-  height: 2.0625em;
-  left: 0;
-  line-height: 2.0625em;
-  position: absolute;
-  text-align: center;
-  top: 0;
-  width: 2.0625em;
-}
-
-input[type="checkbox"]:checked+label:before,
-input[type="radio"]:checked+label:before {
-<<<<<<< HEAD
-  background: #3d4449;
-  border-color: #3d4449;
-=======
-  background: #1f192b;
-  border-color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-  color: #ffffff;
-  content: '\f00c';
-}
-
-input[type="checkbox"]:focus+label:before,
-input[type="radio"]:focus+label:before {
-<<<<<<< HEAD
-  border-color: #d7b590;
-  box-shadow: 0 0 0 1px #d7b590;
-=======
-  border-color: #e64199;
-  box-shadow: 0 0 0 1px #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
-}
-
-input[type="checkbox"]+label:before {
-  border-radius: 0.375em;
-}
-
-input[type="radio"]+label:before {
-  border-radius: 100%;
-}
-
-::-webkit-input-placeholder {
-  color: #9fa3a6 !important;
-  opacity: 1.0;
-}
-
-:-moz-placeholder {
-  color: #9fa3a6 !important;
-  opacity: 1.0;
-}
-
-::-moz-placeholder {
-  color: #9fa3a6 !important;
-  opacity: 1.0;
-}
-
-:-ms-input-placeholder {
-  color: #9fa3a6 !important;
-  opacity: 1.0;
-}
 
 /* Box */
 .box {
@@ -2402,7 +2155,7 @@ ul.actions.fit.stacked {
 }
 
 /* Icons */
-ul.icons {
+/* ul.icons {
   cursor: default;
   list-style: none;
   padding-left: 0;
@@ -2423,7 +2176,7 @@ ul.icons li .icon {
 
 ul.icons li .icon:before {
   font-size: 1.25em;
-}
+} */
 
 /* Contact */
 ul.contact {
@@ -2453,11 +2206,7 @@ ul.contact li:before {
 }
 
 ul.contact li:before {
-<<<<<<< HEAD
-  color: #d7b590;
-=======
-  color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  color: rgb(29, 209, 149);
   display: inline-block;
   font-size: 1.5em;
   height: 1.125em;
@@ -2515,28 +2264,16 @@ ul.pagination li>.page {
 }
 
 ul.pagination li>.page.active {
-<<<<<<< HEAD
-  background-color: #d7b590;
-=======
-  background-color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  background-color: rgb(29, 209, 149);
   color: #ffffff !important;
 }
 
 ul.pagination li>.page.active:hover {
-<<<<<<< HEAD
   background-color: #f6eac3;
 }
 
 ul.pagination li>.page.active:active {
   background-color: #f6eac3;
-=======
-  background-color: #e64199;
-}
-
-ul.pagination li>.page.active:active {
-  background-color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
 }
 
 ul.pagination li:first-child {
@@ -2583,11 +2320,7 @@ table td {
 }
 
 table th {
-<<<<<<< HEAD
   color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   font-size: 0.9em;
   font-weight: 600;
   padding: 0 0.75em 0.75em 0.75em;
@@ -2645,13 +2378,8 @@ button,
   background-color: transparent;
   border-radius: 0.375em;
   border: 0;
-<<<<<<< HEAD
-  box-shadow: inset 0 0 0 2px #d7b590;
-  color: #d7b590 !important;
-=======
-  box-shadow: inset 0 0 0 2px #e64199;
-  color: #e64199 !important;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  box-shadow: inset 0 0 0 2px rgb(29, 209, 149);
+  color: rgb(29, 209, 149) !important;
   cursor: pointer;
   display: inline-block;
   font-family: "Roboto Slab", serif;
@@ -2722,11 +2450,7 @@ input[type="reset"].primary,
 input[type="button"].primary,
 button.primary,
 .button.primary {
-<<<<<<< HEAD
-  background-color: #d7b590;
-=======
-  background-color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  background-color: rgb(29, 209, 149);
   box-shadow: none;
   color: #ffffff !important;
 }
@@ -2736,11 +2460,9 @@ input[type="reset"].primary:hover,
 input[type="button"].primary:hover,
 button.primary:hover,
 .button.primary:hover {
-<<<<<<< HEAD
-  background-color: #f6eac3;
-=======
-  background-color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  background: #7c4dff !important;
+  color: #fff !important;
+  border-color: #7c4dff !important;
 }
 
 input[type="submit"].primary:active,
@@ -2748,11 +2470,7 @@ input[type="reset"].primary:active,
 input[type="button"].primary:active,
 button.primary:active,
 .button.primary:active {
-<<<<<<< HEAD
   background-color: #f45c5c;
-=======
-  background-color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
 }
 
 input[type="submit"].disabled,
@@ -2851,11 +2569,7 @@ button:disabled,
 }
 
 .features article .icon:before {
-<<<<<<< HEAD
-  color: #d7b590;
-=======
-  color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  color: rgb(29, 209, 149);
   font-size: 2.75rem;
   position: relative;
   top: 0.05em;
@@ -3251,11 +2965,7 @@ button:disabled,
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
   transform: scaleX(-1);
-<<<<<<< HEAD
   color: #7f888f;
-=======
-  color: #b29bc7;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   content: '\f002';
   cursor: default;
   display: block;
@@ -3465,11 +3175,7 @@ button:disabled,
   }
 
   #sidebar .toggle:before {
-<<<<<<< HEAD
     color: #7f888f;
-=======
-    color: #b29bc7;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
     margin-left: -0.0625em;
     margin-top: -0.25em;
     font-size: 1.1rem;
@@ -3494,12 +3200,8 @@ button:disabled,
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
-<<<<<<< HEAD
-  /* border-bottom: solid 5px #d7b590; */
-  border-bottom: solid 5px #d7b590;
-=======
-  border-bottom: solid 5px #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  /* border-bottom: solid 5px rgb(29, 209, 149); */
+  border-bottom: solid 5px rgb(29, 209, 149);
   padding: 6em 0 1em 0;
   position: relative;
 }
@@ -3663,11 +3365,7 @@ button:disabled,
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-<<<<<<< HEAD
   color: #3d4449;
-=======
-  color: #1f192b;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
   font-family: "Roboto Slab", serif;
   font-weight: 400;
   letter-spacing: 0.075em;
@@ -3689,11 +3387,7 @@ button:disabled,
 
 #menu ul a:hover,
 #menu ul span:hover {
-<<<<<<< HEAD
-  color: #d7b590;
-=======
-  color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  color: rgb(29, 209, 149);
 }
 
 #menu ul a.opener,
@@ -3735,11 +3429,7 @@ button:disabled,
 
 #menu ul a.opener:hover:before,
 #menu ul span.opener:hover:before {
-<<<<<<< HEAD
-  color: #d7b590;
-=======
-  color: #e64199;
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
+  color: rgb(29, 209, 149);
 }
 
 #menu ul a.opener.active+ul,
@@ -3782,7 +3472,6 @@ button:disabled,
   border-top: 0;
   margin-top: 0;
   padding-top: 0;
-<<<<<<< HEAD
 }
 
 /* Quiz Overlay Style */
@@ -3802,7 +3491,7 @@ button:disabled,
 #popup-container {
   position: relative;
   /* 讓子元素絕對定位基於此容器 */
-  background-color: #f6ece3;
+  background-color: #dddada;
   padding: 2.5em;
   border-radius: 2em;
   max-width: 600px;
@@ -3812,7 +3501,7 @@ button:disabled,
 
 /* 共用 Step 樣式 */
 .popup-step h2 {
-  color: #583e3d;
+  color: #7c4dff;
   text-align: left;
   font-size: 1.8em;
   margin-bottom: 1.5em;
@@ -3829,7 +3518,7 @@ button:disabled,
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #583e3d;
+  color: #7c4dff;
   cursor: pointer;
   transition: transform 0.25s ease;
   font-size: 1.5em;
@@ -3859,7 +3548,7 @@ button:disabled,
 
 .quiz-type-btn {
   background-color: white;
-  color: #d7b590;
+  color: rgb(29, 209, 149);
   border: none;
   border-radius: 999px;
   padding: 0.6em 1.2em;
@@ -3875,133 +3564,70 @@ button:disabled,
 }
 
 .quiz-type-btn:hover {
-  background-color: #f6eac3;
+  background-color: #ededea;
+}
+
+.quiz-type-btn.selected {
+  background-color: #7c4dff;
+  color: white;
+  border: 2px solid #7c4dff;
 }
 
 /* Step 3 推薦項目 */
+
 .quiz-recommendations {
-  position: relative;
-  /* 加這行讓子元素可以絕對定位 */
-  display: flex;
-  gap: 1em;
-  justify-content: center;
-}
-
-.recommend-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  padding: 1em;
-  width: 100px;
-}
-
-.recommend-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.5em;
-}
-
-.recommend-item audio {
-  width: 100%;
-}
-
-
-
-/* 推薦卡片區塊 */
-.quiz-recommendations {
-  position: relative;
-  /* ⬅️ 加這行讓子元素可以絕對定位 */
   display: flex;
   gap: 1em;
   justify-content: center;
   flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .recommend-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  position: relative;
   background: white;
   border-radius: 10px;
   padding: 1em;
-  width: 150px;
+  /* 1. 寬度跟父容器一樣寬（自動調整） */
+  width: 100%;
+  /* 2. 但最大不要超過 550px */
+  max-width: 1000px;
+  /* 3. padding 算在寬度內 */
+  box-sizing: border-box;
+  gap: 12px;
 }
 
-/* 節目圖片 */
-.recommend-item img:first-child {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.5em;
-}
-
-/* 標題文字 */
+/* 標題字體加粗 */
 .recommend-item .title {
-  font-weight: bold;
-  margin-top: 0.5em;
-  margin-bottom: 0.3em;
-  color: #3e373a;
-  font-size: 1em;
-  text-align: center;
+  font-weight: 800;
 }
 
-/* 簡介文字 */
-.recommend-item .description {
-  font-size: 0.85em;
-  color: #444;
-  text-align: left;
-  margin: 0.2em 0 0.6em 0;
-  line-height: 1.4;
-  padding: 0 0.5em;
+/* 第一張圖 (節目 logo) */
+.recommend-item img:first-child {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 1em;
+  /* 與後方文字間距 */
+  margin-bottom: 0;
+  /* 取消原本的下邊距 */
+}
+
+.recommend-item .text {
+  flex: 0 1 50%;
 }
 
 /* 播放按鈕 */
-.play-button {
-  width: 50px !important;
-  height: 50px !important;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  align-self: center;
-  top: 10px;
-  left: 10px;
-}
-
-
-.play-button:hover {
-  transform: scale(1.1);
-}
-
-
-.play-button:hover {
-  transform: scale(1.1);
-}
-
-.recommend-item {
-  position: relative;
-  /* 🔑 為內部絕對定位的子元素定位參考 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  padding: 1em;
-  width: 150px;
-}
-
-/* 關閉按鈕 */
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  z-index: 10;
+.recommend-item .play-button {
+  width: 40px;
+  height: 40px;
+  margin-left: 1em;
+  /* 拉開與文字的距離 */
 }
 
 /*podri*/
@@ -4028,6 +3654,679 @@ button:disabled,
   justify-content: center;
   gap: 5em;
   /* 可自行調整為你想要的寬度 */
-=======
->>>>>>> c18001d136c71bee09db0f4a8d90af8288bfecff
 }
+
+/* step4 */
+/* —— Step 4：亂碼顯示與複製 —— */
+#popup-step-4 {
+  display: none;
+  /* 預設隱藏，切換步驟時再打開 */
+  text-align: center;
+}
+
+/* 建立一個 flex 容器，所有欄位都水平置中、垂直堆疊 */
+#popup-step-4 .form-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;              /* 欄位之間垂直間距 */
+  margin-top: 1em;       /* 與標題之間的間距 */
+}
+
+/* 統一輸入框、按鈕寬度 */
+#popup-step-4 .form-center input,
+#popup-step-4 .form-center button {
+  width: 200px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+
+#popup-step-4 h2 {
+  color: #7c4dff;
+  font-size: 1.8em;
+  margin-bottom: 1em;
+}
+
+#popup-step-4 .code-block-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 1.5em;
+}
+
+#popup-step-4 pre#generated-code {
+  background: #f5f5f5;
+  padding: 1em;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+  /* 允許自動換行 */
+  word-break: break-all;
+  /* 長字串時強制換行 */
+  flex: 1;
+  /* 撐滿剩餘寬度 */
+  max-height: 150px;
+  overflow: auto;
+  border: 1px solid rgba(210, 215, 217, 0.75);
+}
+
+#popup-step-4 button#copy-code-btn {
+  background-color: white;
+  color: rgb(29, 209, 149);
+  border: none;
+  border-radius: 999px;
+  padding: 0.6em 1.2em;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* 文字置中關鍵 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#popup-step-4 button#copy-code-btn:active {
+  transform: scale(0.95);
+}
+
+
+.quiz-type-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
+  justify-content: center;
+  /* 水平置中整個 grid */
+  align-items: center;
+  /* 垂直置中按鈕 */
+}
+
+button[onclick="closePopup()"] {
+  display: block;
+  margin: 1em auto 0;
+}
+
+
+/*取得專屬ID*/
+#popup-step-3 {
+  /* 如果 quiz-recommendations 本身有 margin-bottom，可以先清掉 */
+  margin-bottom: 0;
+}
+
+#popup-step-3 .button.primary {
+  margin-top: 2em;
+  /* 或者直接 0，視你要的緊密度 */
+  display: block;
+  /* 讓按鈕獨佔一行 */
+  margin-left: auto;
+  /* 置中 */
+  margin-right: auto;
+}
+
+#popup-step-3 .button.secondary {
+  margin-top: 3em;
+}
+
+/* like botton */
+.heart-container {
+  --heart-color: rgb(255,91,137);
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.heart-container .checkbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.heart-container .svg-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.heart-container .svg-container svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heart-container .svg-outline {
+  fill: none;
+  stroke: var(--heart-color);
+  stroke-width: 2px;
+}
+
+.heart-container .svg-filled {
+  fill: var(--heart-color);
+  display: none;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-outline {
+  display: none;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-filled {
+  display: block;
+  animation: keyframes-svg-filled 0.5s;
+}
+
+@keyframes keyframes-svg-filled {
+  0%   { transform: scale(0); }
+  25%  { transform: scale(1.2); }
+  50%  { transform: scale(1); filter: brightness(1.5); }
+}
+
+@keyframes keyframes-svg-filled {
+  0% {
+    transform: scale(0);
+  }
+
+  25% {
+    transform: scale(1.2);
+  }
+
+  50% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes keyframes-svg-celebrate {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+    display: none;
+  }
+}
+
+#header {
+  text-align: center;
+}
+#header .logo,
+#header ul.icons {
+  justify-content: center;
+  text-align: center;
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+#banner .content header {
+  text-align: center;
+}
+
+
+
+/* From Uiverse.io by Tsiangana */ 
+.card {
+  width: 190px;
+  height: 254px;
+  background: lightgrey;
+  border-radius: 10px;
+}
+
+.card .one {
+  width: 190px;
+  height: 254px;
+  z-index: 10;
+  position: absolute;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8.5px);
+  -webkit-backdrop-filter: blur(8.5px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.card .one .title {
+  width: 70px;
+  border: 1px solid rgba(180, 177, 177, 0.308);
+  display: block;
+  margin: 12px auto;
+  text-align: center;
+  font-size: 10px;
+  border-radius: 12px;
+  font-family: Roboto, sans-serif;
+  color: rgba(102, 100, 100, 0.911);
+}
+
+.card .one .music {
+  width: 80px;
+  height: 80px;
+  background: rgba(216, 212, 212, 0.726);
+  margin: 30px auto;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card .one .name {
+  width: 150px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+  padding: 0 5px;
+  margin: -22px auto;
+  display: block;
+  overflow: hidden;
+  text-align: center;
+  color: rgba(50, 49, 51, 0.637);
+}
+.card .one .name1 {
+  width: 120px;
+  height: 20px;
+  font-size: 9px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+  padding: 0 5px;
+  margin: 19px auto;
+  display: block;
+  overflow: hidden;
+  text-align: center;
+  color: rgba(50, 49, 51, 0.637);
+}
+.card .one .bar {
+  width: 100px;
+  margin: -15px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  cursor: pointer;
+}
+
+.card .one .bar:last-child {
+  margin: 35px auto;
+  width: 100%;
+  padding: 2px 23px;
+}
+.card .one .bar .color {
+  fill: rgba(82, 79, 79, 0.829);
+}
+.card .one .bar .color1 {
+  fill: rgba(29, 28, 28, 0.829);
+  cursor: pointer;
+}
+
+.card .one .bar .bi:first-child {
+  transform: rotate(180deg);
+}
+.card .one .bar:last-child .color1:first-child {
+  transform: rotate(0deg);
+}
+
+
+
+.card .two {
+  width: 60px;
+  height: 60px;
+  background-color: rgb(131, 25, 163);
+  filter: drop-shadow(0 0 10px rgb(131, 25, 163));
+  border-radius: 50%;
+  position: relative;
+  top: 30px;
+  left: 20px;
+  animation: one 5s infinite;
+}
+
+.card .three {
+  width: 60px;
+  height: 60px;
+  background-color: rgb(29, 209, 149);
+  filter: drop-shadow(0 0 10px rgb(29, 209, 149));
+  border-radius: 50%;
+  position: relative;
+  top: 90px;
+  left: 90px;
+  animation: two 5s infinite;
+}
+
+@keyframes one {
+  0% {
+    top: 30px;
+    left: 20px;
+  }
+  20% {
+    top: 50px;
+    left: 40px;
+  }
+  40% {
+    top: 80px;
+    left: 70px;
+  }rgb(131, 25, 163)
+  50% {
+    top: 60px;
+    left: 40px;
+  }
+  60% {
+    top: 35px;
+    left: 90px;
+  }
+  80% {
+    top: 70px;
+    left: 70px;
+  }
+  100% {
+    top: 30px;
+    left: 20px;
+  }
+}
+
+@keyframes two {
+  0% {
+    top: 90px;
+    left: 90px;
+  }
+  20% {
+    top: 50px;
+    left: 40px;
+  }
+  40% {
+    top: 60px;
+    left: 20px;
+  }
+  50% {
+    top: 80px;
+    left: 30px;
+  }
+  60% {
+    top: 35px;
+    left: 90px;
+  }
+  80% {
+    top: 70px;
+    left: 60px;
+  }
+  100% {
+    top: 90px;
+    left: 90px;
+  }
+}
+
+/* search bar*/ 
+.InputContainer {
+  width: 210px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom,rgb(227, 213, 255),rgb(189, 247, 229));
+  border-radius: 30px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.075);
+}
+
+.input {
+  width: 200px;
+  height: 40px;
+  border: none;
+  outline: none;
+  caret-color: #1dd195;
+  background-color: rgb(255, 255, 255);
+  border-radius: 30px;
+  padding-left: 15px;
+  letter-spacing: 0.8px;
+  color: rgb(19, 19, 19);
+  font-size: 13.4px;
+}
+
+/* 將 .footer-searchbar 改成 Flex 置中整個搜尋列 */
+.footer-searchbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 2em 0;       /* 上方 2em，左右 auto（由 width:100% + flex 決定） */
+  background: transparent;
+  padding: 0;
+}
+
+/* 你原本的搜尋列樣式 */
+.InputContainer {
+  width: 210px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, rgb(227, 213, 255), rgb(189, 247, 229));
+  border-radius: 30px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.075);
+}
+
+#footer-search-form {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 2em;
+  box-shadow: 0 4px 16px 0 rgba(29, 209, 149, 0.10);
+  padding: 0.3em 1em;
+}
+
+#footer-search-input {
+  width: 100%;
+  padding: 0.7em 1em;
+  border: none;
+  border-radius: 2em;
+  font-size: 1.1em;
+  background: transparent;
+  color: #444;
+  outline: none;
+  text-align: center;
+}
+
+#footer-search-form button {
+  background: #1dd195;
+  color: #fff;
+  border: none;
+  border-radius: 2em;
+  padding: 0 1.2em;
+  font-size: 1em;
+  margin-left: 0.5em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#footer-search-form button:hover {
+  background: #13b98a;
+}
+
+.searchbar-outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 2em;
+}
+
+/* Header Flex 排版 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 32px 0 32px;
+  background: #fff;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+}
+.logo {
+  height: 32px;
+  margin-right: 12px;
+}
+.header-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #222;
+}
+.header-desc {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #888;
+  margin-left: 8px;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+}
+.user-login-btn {
+  width: 38px;
+  height: 38px;
+  padding-left: 0;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+.user-login-btn:hover, .user-login-btn:focus {
+  box-shadow: 0 4px 16px rgba(29,209,149,0.18);
+  border: 2px solid #1dd195;
+}
+.header-divider {
+  border: none;
+  border-bottom: 3px solid #1dd195;
+  margin: 0 0 0 0;
+  width: 100%;
+}
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 8px 0 8px;
+  }
+  .header-left {
+    margin-bottom: 8px;
+  }
+  .header-right {
+    align-self: flex-end;
+  }
+}
+
+.footer {
+  width: 100%;
+  text-align: center;
+  color: #888;
+  background: #f8f8f8;
+  padding: 18px 0 12px 0;
+  font-size: 1em;
+  letter-spacing: 1px;
+  left: 0;
+  z-index: 100;
+}
+
+.input-logo {
+  height: 32px;
+  width: 32px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: filter 0.2s;
+  vertical-align: middle;
+}
+.input-logo:hover {
+  filter: brightness(0.8);
+}
+
+.button.primary:hover,
+.button.primary:active,
+.button.primary:focus {
+  background: #7c4dff !important;
+  color: #fff !important;
+  border-color: #7c4dff !important;
+}
+
+/* Step4: Podwise ID 欄位同按鈕一樣的邊框 */
+#popup-step-4 input[type="text"]#demo-name,
+#popup-step-4 input[type="text"]#podwiseIdField {
+  border: none;
+  box-shadow: inset 0 0 0 2px #7c4dff;
+  border-radius: 0.375em;
+  padding: 0.6em 1.2em;
+  background: transparent;
+  /* 若想要固定寬度也可以加上 width */
+  /* width: 200px; */
+}
+
+
+/* Like button */
+.recommend-item { position: relative; }
+.heart-container {
+  --heart-color: #ff5b89;
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 24px; height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+.heart-container .checkbox {
+  position: absolute;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 20;
+}
+.heart-container .svg-container,
+.heart-container .svg-container svg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+.heart-container .svg-outline {
+  fill: none;
+  stroke: var(--heart-color);
+  stroke-width: 2px;
+}
+.heart-container .svg-filled {
+  display: none;
+  fill: var(--heart-color);
+}
+.heart-container .checkbox:checked ~ .svg-container .svg-outline {
+  display: none;
+}
+.heart-container .checkbox:checked ~ .svg-container .svg-filled {
+  display: block;
+  animation: keyframes-svg-filled 0.5s forwards;
+}
+@keyframes keyframes-svg-filled {
+  0%   { transform: scale(0); }
+  25%  { transform: scale(1.2); }
+  50%  { transform: scale(1); filter: brightness(1.5); }
+  100% { transform: scale(1); }
+}
+

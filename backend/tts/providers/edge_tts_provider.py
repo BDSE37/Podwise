@@ -7,7 +7,6 @@ This module provides Podri TTS integration with four Taiwanese voices:
 - Podrina (溫柔女聲)
 - Podrisa (活潑女聲) 
 - Podrina (穩重男聲)
-- Podrisa (專業男聲)
 
 Author: Podri Team
 License: MIT

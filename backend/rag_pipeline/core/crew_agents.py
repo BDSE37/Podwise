@@ -30,39 +30,10 @@ logger = logging.getLogger(__name__)
 
 
 # 導入統一數據模型
-from .integrated_core import AgentResponse
-
-
-@dataclass(frozen=True)
-class UserQuery:
-    """
-    用戶查詢數據類別
-    
-    此類別封裝了用戶查詢的完整資訊，包含查詢內容、
-    用戶 ID 和上下文資訊。
-    
-    Attributes:
-        query: 查詢內容
-        user_id: 用戶 ID
-        category: 預分類類別
-        context: 上下文資訊
-    """
-    query: str
-    user_id: str
-    category: Optional[str] = None
-    context: Optional[str] = None
-    
-    def __post_init__(self) -> None:
-        """驗證數據完整性"""
-        if not self.query.strip():
-            raise ValueError("查詢內容不能為空")
-        
-        if not self.user_id.strip():
-            raise ValueError("用戶 ID 不能為空")
-
+from .data_models import AgentResponse, UserQuery
 
 # 導入統一基礎代理類別
-from .integrated_core import BaseAgent
+from .base_agent import BaseAgent
 
 
 # ==================== 第三層：功能專家層 ====================
@@ -80,12 +51,30 @@ class WebSearchAgent(BaseAgent):
         super().__init__("Web Search Expert", "網路搜尋備援專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("web_search_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("web_search_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         # 初始化 Web Search 工具
-        from core.web_search_tool import WebSearchTool
-        self.web_search_tool = WebSearchTool()
+        try:
+            import sys
+            import os
+            tools_dir = os.path.join(os.path.dirname(__file__), '..', 'tools')
+            if tools_dir not in sys.path:
+                sys.path.insert(0, tools_dir)
+            from web_search_tool import WebSearchTool
+            self.web_search_tool = WebSearchTool()
+        except ImportError as e:
+            logger.info(f"ℹ️ Web Search 工具不可用: {e}")
+            self.web_search_tool = None
         
         # 設定信心度閾值（使用配置系統）
         self.confidence_threshold = self.role_config.confidence_threshold if self.role_config else 0.7
@@ -130,11 +119,11 @@ class WebSearchAgent(BaseAgent):
                 )
             
             # 檢查 Web Search 工具是否可用
-            if not self.web_search_tool.is_configured():
+            if not self.web_search_tool or not hasattr(self.web_search_tool, 'is_configured') or not self.web_search_tool.is_configured():
                 return AgentResponse(
                     content="Web 搜尋服務未配置，無法執行備援搜尋",
                     confidence=0.2,
-                    reasoning="OpenAI API 未配置",
+                    reasoning="Web Search 工具不可用",
                     metadata={"web_search_available": False},
                     processing_time=time.time() - start_time
                 )
@@ -222,8 +211,17 @@ class RAGExpertAgent(BaseAgent):
         super().__init__("rag_expert", "RAG 檢索專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("intelligent_retrieval_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         # 初始化智能檢索專家
         from core.intelligent_retrieval_expert import get_intelligent_retrieval_expert
@@ -369,8 +367,17 @@ class SummaryExpertAgent(BaseAgent):
         super().__init__("Summary Expert", "內容摘要生成專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("content_summary_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("content_summary_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
     
     async def process(self, input_data: List[Dict[str, Any]]) -> AgentResponse:
         """
@@ -433,8 +440,17 @@ class TagClassificationExpertAgent(BaseAgent):
         super().__init__("TAG Classification Expert", "關鍵詞映射與內容分類專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("tag_classification_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("tag_classification_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         # 初始化提示詞處理器
         self.prompt_processor = PromptProcessor()
@@ -668,8 +684,17 @@ class TTSExpertAgent(BaseAgent):
         super().__init__("TTS Expert", "語音合成專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("tts_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("tts_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
     
     async def process(self, input_data: str) -> AgentResponse:
         """
@@ -732,8 +757,17 @@ class UserManagerAgent(BaseAgent):
         super().__init__("User Manager", "用戶管理專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("user_experience_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("user_experience_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -805,8 +839,17 @@ class BusinessExpertAgent(BaseAgent):
         super().__init__("Business Expert", "商業專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("business_intelligence_expert")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("business_intelligence_expert")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         self.prompt_processor = PromptProcessor()
     
@@ -908,8 +951,17 @@ class EducationExpertAgent(BaseAgent):
         super().__init__("Education Expert", "教育專家", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("educational_growth_strategist")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("educational_growth_strategist")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         self.prompt_processor = PromptProcessor()
     
@@ -1013,8 +1065,17 @@ class LeaderAgent(BaseAgent):
         super().__init__("Leader", "領導者", config)
         
         # 載入角色配置
-        from config.agent_roles_config import get_agent_roles_manager
-        self.role_config = get_agent_roles_manager().get_role("chief_decision_orchestrator")
+        try:
+            import sys
+            import os
+            config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+            if config_dir not in sys.path:
+                sys.path.insert(0, config_dir)
+            from agent_roles_config import get_agent_roles_manager
+            self.role_config = get_agent_roles_manager().get_role("chief_decision_orchestrator")
+        except ImportError as e:
+            logger.info(f"ℹ️ 無法載入角色配置: {e}")
+            self.role_config = None
         
         # 初始化下層專家
         self.rag_expert = RAGExpertAgent(config.get('rag_expert', {}))

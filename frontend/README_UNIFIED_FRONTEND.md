@@ -24,9 +24,9 @@ FastAPI 前端 (端口 8081)
 - `start_frontend.sh` - 前端服務啟動腳本
 
 ### 主要頁面
-- `home/index.html` - 主頁面（onboarding 流程）
-- `home/podri.html` - Podri 聊天頁面
-- `home/fastapi_app.py` - FastAPI 應用服務器
+- `index.html` - 主頁面（onboarding 流程）
+- `podri.html` - Podri 聊天頁面
+- `fastapi_app.py` - FastAPI 應用服務器
 
 ## 使用方法
 
@@ -171,7 +171,7 @@ cd frontend
 
 如果需要添加新的頁面或服務：
 
-1. 在 `home/` 目錄添加新的 HTML 文件
+1. 在 `frontend/` 目錄添加新的 HTML 文件
 2. 在 `fastapi_app.py` 添加新的路由
 3. 在 `nginx-unified.conf` 添加代理規則
 4. 重新啟動服務

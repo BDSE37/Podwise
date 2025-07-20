@@ -1,0 +1,108 @@
+# 層級化樹狀結構 RAG Pipeline 配置
+# 作者: Podwise Team
+# 版本: 1.0.0
+
+hierarchical_structure:
+  # 第一層：查詢重寫轉換拓展
+  level_1_query_processing:
+    name: "查詢重寫轉換拓展"
+    confidence_threshold: 0.6
+    max_processing_time: 5.0
+    enable_synonym_expansion: true
+    enable_intent_recognition: true
+    enable_entity_extraction: true
+    enable_domain_classification: true
+    
+  # 第二層：混合搜尋
+  level_2_hybrid_search:
+    name: "混合搜尋"
+    confidence_threshold: 0.7
+    max_processing_time: 10.0
+    enable_dense_retrieval: true
+    enable_sparse_retrieval: true
+    enable_semantic_search: true
+    top_k: 8
+    fusion_method: "weighted_sum"
+    
+  # 第三層：檢索增強
+  level_3_retrieval_augmentation:
+    name: "檢索增強"
+    confidence_threshold: 0.75
+    max_processing_time: 8.0
+    enable_context_augmentation: true
+    enable_knowledge_injection: true
+    enable_query_expansion: true
+    augmentation_ratio: 0.3
+    
+  # 第四層：重新排序
+  level_4_reranking:
+    name: "重新排序"
+    confidence_threshold: 0.8
+    max_processing_time: 5.0
+    enable_cross_encoder: true
+    enable_learning_to_rank: true
+    enable_diversity_ranking: true
+    rerank_top_k: 5
+    
+  # 第五層：上下文壓縮
+  level_5_context_compression:
+    name: "上下文壓縮"
+    confidence_threshold: 0.85
+    max_processing_time: 6.0
+    enable_summarization: true
+    enable_extraction: true
+    enable_abstraction: true
+    compression_ratio: 0.5
+    max_context_length: 2048
+    
+  # 第六層：混合式RAG
+  level_6_hybrid_rag:
+    name: "混合式RAG"
+    confidence_threshold: 0.9
+    max_processing_time: 12.0
+    enable_multi_model_generation: true
+    enable_adaptive_generation: true
+    enable_ml_pipeline_integration: true
+    enable_quality_control: true
+    models:
+      - "qwen2.5-7b"
+      - "deepseek-coder-6.7b"
+    quality_threshold: 0.8
+
+# 備援服務配置
+fallback_service:
+  name: "AnythingLLM"
+  endpoint: "http://localhost:3001/api/chat"
+  timeout: 30.0
+  retry_attempts: 3
+  enable_cache: true
+  cache_ttl: 3600
+
+# 監控配置
+monitoring:
+  enable_logging: true
+  enable_metrics: true
+  enable_tracing: true
+  log_level: "INFO"
+  metrics_interval: 60
+  trace_sampling_rate: 0.1
+
+# 性能配置
+performance:
+  max_concurrent_requests: 10
+  request_timeout: 30.0
+  memory_limit: "2GB"
+  cpu_limit: "4"
+  enable_async_processing: true
+  enable_batch_processing: true
+  batch_size: 5
+
+# 錯誤處理配置
+error_handling:
+  enable_graceful_degradation: true
+  enable_circuit_breaker: true
+  circuit_breaker_threshold: 5
+  circuit_breaker_timeout: 60
+  enable_retry_with_backoff: true
+  max_retry_attempts: 3
+  retry_backoff_factor: 2.0 

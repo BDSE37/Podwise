@@ -51,7 +51,7 @@ class PodwiseServiceLauncher:
         
         service_config = self.services[service_name]
         
-                try:
+        try:
             logger.info(f"🚀 啟動 {service_config['name']}...")
             
             # 啟動 FastAPI 服務

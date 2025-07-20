@@ -9,7 +9,8 @@ import asyncio
 import logging
 import pandas as pd
 
-from core import RecommenderEngine
+# 避免循環導入，使用延遲導入
+# from core import RecommenderEngine
 from config.recommender_config import get_recommender_config
 
 logger = logging.getLogger(__name__)
@@ -33,24 +34,29 @@ class RecommendationService:
         
         logger.info("推薦服務初始化完成")
     
-    def _init_recommender_engine(self) -> Optional[RecommenderEngine]:
+    def _init_recommender_engine(self) -> Optional[Any]:
         """初始化推薦引擎"""
         try:
-            # 創建模擬數據用於測試
-            podcast_data = pd.DataFrame({
-                'id': ['podcast_1', 'podcast_2', 'podcast_3'],
-                'title': ['財經播客', '科技播客', '自我成長播客'],
-                'category': ['財經', '科技', '自我成長'],
-                'description': ['財經相關內容', '科技相關內容', '自我成長相關內容'],
-                'tags': ['財經,投資', '科技,AI', '成長,心理']
-            })
+            # 避免循環導入，使用延遲導入
+            from core.recommender import RecommenderEngine
+            from core.data_manager import RecommenderData
             
-            user_history = pd.DataFrame({
-                'user_id': ['user_1', 'user_1', 'user_2'],
-                'podcast_id': ['podcast_1', 'podcast_2', 'podcast_1'],
-                'rating': [4.5, 4.0, 4.2],
-                'listen_time': [1800, 1200, 900]
-            })
+            data_manager = RecommenderData(self.db_url)
+            
+            # 轉換為 DataFrame
+            podcast_data = pd.DataFrame(data_manager.episodes)
+            user_history = pd.DataFrame(data_manager.interactions)
+            
+            # 確保必要的欄位存在
+            if 'episode_id' not in podcast_data.columns:
+                logger.error("Podcast 資料缺少 episode_id 欄位")
+                return None
+                
+            if 'user_id' not in user_history.columns or 'episode_id' not in user_history.columns:
+                logger.error("使用者歷史資料缺少必要欄位")
+                return None
+            
+            logger.info(f"載入 {len(podcast_data)} 個節目，{len(user_history)} 個互動記錄")
             
             return RecommenderEngine(podcast_data, user_history, self.config)
             

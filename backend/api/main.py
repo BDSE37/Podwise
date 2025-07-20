@@ -11,7 +11,7 @@ import random
 from typing import Dict, Any, Optional, List
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 import logging
 
@@ -101,9 +101,9 @@ SERVICE_CONFIG = {
         "description": "大語言模型服務"
     },
     "rag": {
-        "url": os.getenv("RAG_SERVICE_URL", "http://localhost:8011"),
+        "url": os.getenv("RAG_SERVICE_URL", "http://localhost:8012"),
         "health_endpoint": "/health",
-        "description": "檢索增強生成服務"
+        "description": "檢索增強生成服務 (CrewAI 三層架構)"
     },
     "ml": {
         "url": os.getenv("ML_SERVICE_URL", "http://localhost:8004"),
@@ -114,6 +114,35 @@ SERVICE_CONFIG = {
         "url": os.getenv("CONFIG_SERVICE_URL", "http://localhost:8008"),
         "health_endpoint": "/health",
         "description": "配置管理服務"
+    }
+}
+
+# 反向代理路由配置
+PROXY_ROUTES = {
+    "/api/rag": {
+        "target": SERVICE_CONFIG["rag"]["url"],
+        "strip_prefix": "/api/rag",
+        "description": "RAG Pipeline 服務代理"
+    },
+    "/api/tts": {
+        "target": SERVICE_CONFIG["tts"]["url"],
+        "strip_prefix": "/api/tts",
+        "description": "TTS 服務代理"
+    },
+    "/api/stt": {
+        "target": SERVICE_CONFIG["stt"]["url"],
+        "strip_prefix": "/api/stt",
+        "description": "STT 服務代理"
+    },
+    "/api/llm": {
+        "target": SERVICE_CONFIG["llm"]["url"],
+        "strip_prefix": "/api/llm",
+        "description": "LLM 服務代理"
+    },
+    "/api/ml": {
+        "target": SERVICE_CONFIG["ml"]["url"],
+        "strip_prefix": "/api/ml",
+        "description": "ML 服務代理"
     }
 }
 
@@ -151,16 +180,37 @@ class SynthesizeRequest(BaseModel):
     voice: Optional[str] = Field("zh-TW-HsiaoChenNeural", description="語音設定")
 
 class SynthesizeResponse(BaseModel):
-    audio_url: str
-    duration: Optional[float] = None
+    success: bool
+    audio_data: Optional[str] = None
+    voice: Optional[str] = None
+    speed: Optional[float] = None
+    text: Optional[str] = None
+    processing_time: Optional[float] = None
+    message: str = ""
 
 class RAGRequest(BaseModel):
     query: str = Field(..., description="查詢內容")
     user_id: Optional[str] = Field(None, description="用戶 ID")
+    session_id: Optional[str] = Field(None, description="會話 ID")
+    enable_tts: Optional[bool] = Field(True, description="是否啟用 TTS")
+    voice: Optional[str] = Field("podrina", description="語音模型")
+    speed: Optional[float] = Field(1.0, description="語音速度")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="額外元數據")
 
 class RAGResponse(BaseModel):
-    answer: str
-    sources: Optional[list] = None
+    user_id: str
+    query: str
+    response: str
+    category: Optional[str] = None
+    confidence: Optional[float] = None
+    recommendations: Optional[List[Dict[str, Any]]] = None
+    reasoning: Optional[str] = None
+    processing_time: Optional[float] = None
+    timestamp: Optional[str] = None
+    audio_data: Optional[str] = None
+    voice_used: Optional[str] = None
+    speed_used: Optional[float] = None
+    tts_enabled: Optional[bool] = None
 
 class RecommendRequest(BaseModel):
     user_id: str = Field(..., description="用戶 ID")
@@ -200,7 +250,7 @@ async def check_service_health(service_name: str, config: dict) -> ServiceStatus
             error=str(e)
         )
 
-async def forward_request(service_name: str, endpoint: str, data: dict) -> dict:
+async def forward_request(service_name: str, endpoint: str, data: dict, method: str = "POST") -> dict:
     """轉發請求到對應服務"""
     config = SERVICE_CONFIG.get(service_name)
     if not config:
@@ -208,6 +258,9 @@ async def forward_request(service_name: str, endpoint: str, data: dict) -> dict:
     
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
+            if method.upper() == "GET":
+                response = await client.get(f"{config['url']}{endpoint}")
+            else:
             response = await client.post(f"{config['url']}{endpoint}", json=data)
             response.raise_for_status()
             return response.json()
@@ -291,15 +344,36 @@ async def transcribe_audio(request: TranscribeRequest):
     result = await forward_request("stt", "/transcribe", data)
     return TranscribeResponse(**result)
 
+@app.get("/api/v1/tts/voices")
+async def get_tts_voices():
+    """獲取可用的語音列表"""
+    try:
+        logger.info("API Gateway: 開始獲取TTS語音列表")
+        result = await forward_request("tts", "/api/v1/tts/voices", {}, method="GET")
+        logger.info(f"API Gateway: TTS語音列表結果: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"獲取語音列表失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"獲取語音列表失敗: {str(e)}")
+
 @app.post("/api/v1/tts/synthesize", response_model=SynthesizeResponse)
 async def synthesize_speech(request: SynthesizeRequest):
     """文字轉語音"""
     data = {
-        "text": request.text,
-        "voice": request.voice
+        "文字": request.text,
+        "語音": request.voice
     }
     result = await forward_request("tts", "/synthesize", data)
-    return SynthesizeResponse(**result)
+    
+    # 轉換 TTS 服務的回應格式
+    return SynthesizeResponse(
+        success=result.get("成功", False),
+        audio_data=result.get("音訊檔案"),
+        voice=request.voice,
+        text=request.text,
+        processing_time=result.get("處理時間"),
+        message=result.get("錯誤訊息") or ""
+    )
 
 @app.post("/api/v1/llm/chat", response_model=ChatResponse)
 async def llm_chat(request: ChatRequest):
@@ -316,9 +390,14 @@ async def rag_query(request: RAGRequest):
     """RAG 查詢"""
     data = {
         "query": request.query,
-        "user_id": request.user_id
+        "user_id": request.user_id,
+        "session_id": request.session_id,
+        "enable_tts": request.enable_tts,
+        "voice": request.voice,
+        "speed": request.speed,
+        "metadata": request.metadata
     }
-    result = await forward_request("rag", "/query", data)
+    result = await forward_request("rag", "/api/v1/query", data)
     return RAGResponse(**result)
 
 @app.post("/api/v1/ml/recommend", response_model=RecommendResponse)
@@ -371,19 +450,25 @@ async def get_one_minutes_episodes(category: str = "business", tag: str = ""):
                 # 隨機分配一個 tag（讓前端不會壞）
                 episode_tags = [random.choice(CATEGORY_TAGS.get(category, []))]
                 
-                # 構建正確的音檔 URL 格式：RSS_{podcast_id}_{episode_title}.mp3
-                podcast_id = episode.get('podcast_id', '')
-                episode_title = episode.get('episode_title', '')
-                
-                # 根據類別選擇正確的 bucket
-                bucket_map = {
-                    "business": "business-one-min-audio",
-                    "education": "education-one-min-audio"
-                }
-                bucket = bucket_map.get(category, "business-one-min-audio")
-                
-                # 構建音檔 URL
-                audio_url = f"http://192.168.32.66:30090/{bucket}/RSS_{podcast_id}_{episode_title}.mp3"
+                # 優先使用 CSV 中的 audio_url，如果沒有則構建新的 URL
+                audio_url = episode.get('audio_url', '')
+                if not audio_url:
+                    podcast_id = episode.get('podcast_id', '')
+                    episode_title = episode.get('episode_title', '')
+                    
+                    # 根據類別選擇正確的 bucket
+                    bucket_map = {
+                        "business": "business-one-min-audio",
+                        "education": "education-one-min-audio"
+                    }
+                    bucket = bucket_map.get(category, "business-one-min-audio")
+                    
+                    # 構建音檔 URL
+                    audio_url = f"http://192.168.32.66:30090/{bucket}/RSS_{podcast_id}_{episode_title}.mp3"
+                else:
+                    # 如果 CSV 中有 audio_url，但包含過期的預簽名參數，則移除預簽名參數
+                    if '?' in audio_url:
+                        audio_url = audio_url.split('?')[0]
                 
                 selected_episode = {
                     "episode_id": len(selected_episodes) + 1,
@@ -507,6 +592,39 @@ async def record_feedback(request: Request):
         logger.error(f"記錄反饋失敗: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/step4/save-preferences")
+async def save_step4_preferences(request: Request):
+    """保存 Step4 用戶偏好和選中的節目（前端專用）"""
+    try:
+        body = await request.json()
+        user_id = body.get("user_id")
+        main_category = body.get("main_category", "business")
+        selected_episodes = body.get("selected_episodes", [])
+        
+        # 檢查用戶是否存在，如果不存在則自動創建
+        if not user_id or not user_id.startswith("Podwise"):
+            # 自動生成新的 Podwise ID
+            import random
+            import string
+            random_suffix = ''.join(random.choices(string.digits, k=4))
+            user_id = f"Podwise{random_suffix}"
+            logger.info(f"自動生成新用戶 ID: {user_id}")
+        
+        # 模擬保存用戶偏好
+        logger.info(f"保存用戶偏好: {user_id}, 主類別: {main_category}, 選中節目數: {len(selected_episodes)}")
+        
+        return {
+            "success": True,
+            "message": "Step4 用戶偏好保存成功",
+            "user_id": user_id,
+            "main_category": main_category,
+            "selected_episodes_count": len(selected_episodes),
+            "data": body
+        }
+    except Exception as e:
+        logger.error(f"保存 Step4 偏好失敗: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/audio/presigned-url")
 async def get_audio_presigned_url(request: Request):
     """獲取音檔預簽名 URL（前端專用）"""
@@ -529,6 +647,85 @@ async def get_audio_presigned_url(request: Request):
         logger.error(f"獲取音檔 URL 失敗: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== 反向代理功能 ====================
+
+async def proxy_request(request: Request, target_url: str, strip_prefix: str = ""):
+    """通用反向代理函數"""
+    try:
+        # 構建目標 URL
+        path = request.url.path
+        if strip_prefix and path.startswith(strip_prefix):
+            path = path[len(strip_prefix):]
+        
+        target_path = f"{target_url}{path}"
+        if request.url.query:
+            target_path += f"?{request.url.query}"
+        
+        logger.info(f"代理請求: {request.url.path} -> {target_path}")
+        
+        # 準備請求頭
+        headers = dict(request.headers)
+        # 移除可能導致問題的頭部
+        headers.pop("host", None)
+        headers.pop("Host", None)
+        
+        # 準備請求體
+        body = None
+        if request.method in ["POST", "PUT", "PATCH"]:
+            try:
+                body = await request.body()
+            except:
+                body = None
+        
+        # 發送請求到目標服務
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            if request.method == "GET":
+                response = await client.get(target_path, headers=headers)
+            elif request.method == "POST":
+                response = await client.post(target_path, headers=headers, content=body)
+            elif request.method == "PUT":
+                response = await client.put(target_path, headers=headers, content=body)
+            elif request.method == "DELETE":
+                response = await client.delete(target_path, headers=headers)
+            elif request.method == "PATCH":
+                response = await client.patch(target_path, headers=headers, content=body)
+            else:
+                raise HTTPException(status_code=405, detail="Method not allowed")
+            
+            # 返回響應
+            if response.headers.get("content-type", "").startswith("text/event-stream"):
+                # 處理 SSE 流
+                async def stream_response():
+                    async for chunk in response.aiter_bytes():
+                        yield chunk
+                
+                return StreamingResponse(
+                    stream_response(),
+                    media_type=response.headers.get("content-type"),
+                    headers=dict(response.headers)
+                )
+            else:
+                # 處理普通響應
+                return JSONResponse(
+                    content=response.json() if response.headers.get("content-type", "").startswith("application/json") else response.text,
+                    status_code=response.status_code,
+                    headers=dict(response.headers)
+                )
+                
+    except httpx.HTTPStatusError as e:
+        logger.error(f"代理請求失敗 (HTTP {e.response.status_code}): {e}")
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+    except Exception as e:
+        logger.error(f"代理請求失敗: {e}")
+        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
+
+# 動態創建反向代理路由
+for route_prefix, config in PROXY_ROUTES.items():
+    @app.api_route(f"{route_prefix}{{path:path}}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+    async def proxy_route(request: Request, path: str, route_config=config):
+        """動態反向代理路由"""
+        return await proxy_request(request, route_config["target"], route_config["strip_prefix"])
+
 # 全域異常處理
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
@@ -541,4 +738,4 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8006) 
+    uvicorn.run(app, host="0.0.0.0", port=8011) 

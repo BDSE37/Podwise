@@ -233,8 +233,8 @@ class Qwen3LLMManager:
             self.models["openai:gpt-3.5"] = Qwen3LLM(model_config=openai_gpt35_config)
             self.models["openai:gpt-4"] = Qwen3LLM(model_config=openai_gpt4_config)
         
-        # 設置預設模型為台灣優化版本
-        self.current_model = "qwen2.5:taiwan"
+        # 設置預設模型為 OpenAI GPT-3.5
+        self.current_model = "openai:gpt-3.5"
         
         # 初始化健康狀態
         for model_name in self.models.keys():
@@ -250,11 +250,11 @@ class Qwen3LLMManager:
     def get_model(self, model_name: Optional[str] = None) -> Qwen3LLM:
         """獲取指定模型"""
         if model_name is None:
-            model_name = self.current_model or "qwen2.5:taiwan"
+            model_name = self.current_model or "openai:gpt-3.5"
         
         if model_name not in self.models:
             logger.warning(f"模型 {model_name} 不存在，使用預設模型")
-            model_name = self.current_model or "qwen2.5:taiwan"
+            model_name = self.current_model or "openai:gpt-3.5"
         
         return self.models[model_name]
     
@@ -356,7 +356,7 @@ class Qwen3LLMManager:
         
         # 如果所有模型都不健康，返回預設模型
         logger.warning("所有模型都不健康，使用預設模型")
-        return self.current_model or "qwen2.5:taiwan"
+        return self.current_model or "openai:gpt-3.5"
     
     def call_with_fallback(self, prompt: str, **kwargs) -> str:
         """帶回退機制的模型呼叫"""

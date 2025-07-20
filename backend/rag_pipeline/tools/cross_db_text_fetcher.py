@@ -65,17 +65,19 @@ class CrossDBTextFetcher:
             mongodb_config: MongoDB 連接配置
         """
         self.postgres_config = postgres_config or {
-            "host": "localhost",
+            "host": "postgres.podwise.svc.cluster.local",
             "port": "5432",
-            "database": "podwise",
-            "user": "postgres",
-            "password": "password"
+            "database": "podcast",
+            "user": "bdse37",
+            "password": "111111"
         }
         
         self.mongodb_config = mongodb_config or {
-            "host": "localhost",
+            "host": "mongodb.podwise.svc.cluster.local",
             "port": "27017",
-            "database": "podwise"
+            "database": "podcast",
+            "username": "bdse37",
+            "password": "111111"
         }
         
         self.postgres_conn = None
@@ -94,9 +96,13 @@ class CrossDBTextFetcher:
             
             # 連接 MongoDB
             if MONGODB_AVAILABLE:
-                self.mongodb_client = MongoClient(
-                    f"mongodb://{self.mongodb_config['host']}:{self.mongodb_config['port']}"
-                )
+                # 構建 MongoDB 連接字串
+                if 'username' in self.mongodb_config and 'password' in self.mongodb_config:
+                    mongo_uri = f"mongodb://{self.mongodb_config['username']}:{self.mongodb_config['password']}@{self.mongodb_config['host']}:{self.mongodb_config['port']}/{self.mongodb_config['database']}?authSource=admin"
+                else:
+                    mongo_uri = f"mongodb://{self.mongodb_config['host']}:{self.mongodb_config['port']}/{self.mongodb_config['database']}"
+                
+                self.mongodb_client = MongoClient(mongo_uri)
                 self.mongodb_db = self.mongodb_client[self.mongodb_config['database']]
                 logger.info("MongoDB 連接成功")
             
@@ -180,16 +186,16 @@ class CrossDBTextFetcher:
         
         try:
             with self.postgres_conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                # 模糊比對 podcast_name 和 author
+                # 模糊比對 podcast_name
                 query = """
                 SELECT podcast_id 
                 FROM podcasts 
-                WHERE podcast_name ILIKE %s OR author ILIKE %s
+                WHERE podcast_name ILIKE %s
                 LIMIT 1
                 """
                 
                 search_pattern = f"%{tag1}%"
-                cursor.execute(query, (search_pattern, search_pattern))
+                cursor.execute(query, (search_pattern,))
                 
                 result = cursor.fetchone()
                 if result:
@@ -232,6 +238,9 @@ class CrossDBTextFetcher:
                 episode_titles = [row['episode_title'] for row in cursor.fetchall()]
                 
                 # 精確比對 episode_title
+                logger.info(f"搜尋 episode_title，podcast_id: {podcast_id}, tag2: {tag2}")
+                logger.info(f"可用的 episode_titles: {episode_titles[:5]}")  # 只顯示前5個
+                
                 for title in episode_titles:
                     if tag2.lower() in title.lower():
                         logger.info(f"找到 episode_title: {title} (tag2: {tag2})")
@@ -249,34 +258,96 @@ class CrossDBTextFetcher:
         從 MongoDB collection 模糊比對取得 text 內容
         
         Args:
-            podcast_id: podcast ID
+            podcast_id: podcast ID (RSS_id)
             episode_title: episode 標題
             
         Returns:
             Optional[str]: text 內容或 None
         """
-        if not MONGODB_AVAILABLE or not self.mongodb_db:
+        if not MONGODB_AVAILABLE:
             logger.error("MongoDB 不可用")
             return None
         
+        if self.mongodb_db is None:
+            logger.error("MongoDB 連接不可用")
+            return None
+        
         try:
-            # 使用 podcast_id 找到對應的 collection
-            collection_name = f"podcast_{podcast_id}"
+            # 使用 RSS_{podcast_id} 作為 collection 名稱
+            collection_name = f"RSS_{podcast_id}"
+            logger.info(f"嘗試連接 MongoDB collection: {collection_name}")
+            
+            # 檢查 collection 是否存在
+            if collection_name not in self.mongodb_db.list_collection_names():
+                logger.warning(f"MongoDB collection '{collection_name}' 不存在")
+                return None
+            
             collection = self.mongodb_db[collection_name]
             
-            # 模糊比對 file 欄位（第四個 "_" 之後的字串）
-            # 假設 file 欄位格式為: "prefix_podcast_id_episode_id_episode_title_suffix"
-            search_pattern = re.compile(f".*_{episode_title}.*", re.IGNORECASE)
+            # 優先使用 file 欄位進行搜尋
+            document = None
             
-            # 查詢匹配的 document
-            document = collection.find_one({"file": search_pattern})
+            # 從 episode_title 中提取 EP 編號
+            episode_pattern = episode_title
+            if "_" in episode_pattern:
+                episode_pattern = episode_pattern.split("_")[0]  # 取 EPXXX 部分
             
-            if document and "text" in document:
-                text_content = document["text"]
-                logger.info(f"找到文本內容，長度: {len(text_content)} 字元")
-                return text_content
+            # 確保是 EP 格式
+            if not episode_pattern.upper().startswith("EP"):
+                if episode_pattern.isdigit():
+                    episode_pattern = f"EP{episode_pattern}"
+                else:
+                    episode_pattern = f"EP{episode_pattern}"
+            
+            logger.info(f"搜尋 EP 編號: {episode_pattern}")
+            
+            # 優先搜尋 file 欄位包含 EP 編號的 document
+            try:
+                file_query = {"file": {"$regex": episode_pattern, "$options": "i"}}
+                document = collection.find_one(file_query)
+                if document:
+                    logger.info(f"在 file 欄位中找到匹配的 document: {document.get('file', '')}")
+                else:
+                    logger.warning(f"file 欄位中未找到包含 {episode_pattern} 的 document")
+            except Exception as e:
+                logger.debug(f"搜尋 file 欄位失敗: {e}")
+            
+            # 如果 file 欄位沒有找到，嘗試其他欄位
+            if not document:
+                search_pattern = re.compile(f".*{re.escape(episode_title)}.*", re.IGNORECASE)
+                possible_fields = ["episode_title", "title", "filename", "content"]
+                
+                for field in possible_fields:
+                    try:
+                        document = collection.find_one({field: search_pattern})
+                        if document:
+                            logger.info(f"在欄位 '{field}' 中找到匹配的 document")
+                            break
+                    except Exception as e:
+                        logger.debug(f"搜尋欄位 '{field}' 失敗: {e}")
+                        continue
+                else:
+                    # 如果沒有找到，嘗試搜尋所有欄位
+                    document = collection.find_one({"$or": [{field: search_pattern} for field in possible_fields]})
+            
+            if document:
+                # 嘗試取得 text 內容
+                text_content = None
+                text_fields = ["text", "content", "summary", "transcript"]
+                
+                for field in text_fields:
+                    if field in document and document[field]:
+                        text_content = document[field]
+                        logger.info(f"從欄位 '{field}' 取得文本內容，長度: {len(text_content)} 字元")
+                        break
+                
+                if text_content:
+                    return text_content
+                else:
+                    logger.warning(f"Document 存在但沒有找到文本內容欄位: {list(document.keys())}")
+                    return None
             else:
-                logger.warning(f"未找到文本內容 (podcast_id: {podcast_id}, episode_title: {episode_title})")
+                logger.warning(f"未找到文本內容 (collection: {collection_name}, episode_title: {episode_title})")
                 return None
                 
         except Exception as e:

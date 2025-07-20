@@ -1,22 +1,5 @@
-# FastAPI 相關
-fastapi==0.109.2
-uvicorn==0.27.1
-python-multipart==0.0.6
-
-# Streamlit 相關 (更新到支援 audio_recorder 的版本)
-# streamlit==1.28.1
-httpx==0.26.0
-
-# 工具
-python-dotenv==1.0.0
-requests==2.31.0
-
-# 靜態文件處理
-aiofiles==23.2.1
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
 jinja2==3.1.2
-
-Flask
-requests-oauthlib
-websockets==12.0
-pydantic==2.5.0
-asyncio==3.4.3
+aiofiles==23.2.1
+python-multipart==0.0.6 

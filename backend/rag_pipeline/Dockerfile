@@ -49,7 +49,7 @@ RUN pip install --no-cache-dir \
 COPY . .
 
 # 複製環境變數檔案
-COPY env.local .env
+COPY .env.example .env
 
 # 創建必要目錄
 RUN mkdir -p /app/data/documents \

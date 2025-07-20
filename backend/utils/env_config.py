@@ -40,7 +40,7 @@ class PodriConfig:
         # Milvus 配置 - worker3 容器
         self.milvus_host = os.getenv("MILVUS_HOST", "worker3")
         self.milvus_port = os.getenv("MILVUS_PORT", "19530")
-        self.milvus_collection = os.getenv("MILVUS_COLLECTION", "podwise_vectors")
+        self.milvus_collection = os.getenv("MILVUS_COLLECTION", "podcast_chunks")
         
         # OpenAI API 配置（備援用）
         self.openai_api_key = os.getenv("OPENAI_API_KEY", "")

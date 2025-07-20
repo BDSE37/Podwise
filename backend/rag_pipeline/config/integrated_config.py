@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Podwise 統一配置管理器
+Podwise 統一配置管理器 (簡化版本)
 
 整合所有配置功能：
 - 模型配置（LLM、向量、嵌入）
@@ -12,14 +12,11 @@ Podwise 統一配置管理器
 - 語意檢索配置
 
 作者: Podwise Team
-版本: 2.0.0
+版本: 2.0.0 (簡化版)
 """
 
 import os
-import yaml
 from typing import Dict, Any, Optional, List
-from pydantic import Field
-from pydantic_settings import BaseSettings
 from dataclasses import dataclass
 
 
@@ -30,21 +27,23 @@ class ModelConfig:
     qwen3_8b_model: str = "Qwen/Qwen2.5-8B-Instruct"
     qwen3_taiwan_model: str = "weiren119/Qwen2.5-Taiwan-8B-Instruct"
     
-    # 向量模型配置
-    bge_m3_model: str = "BAAI/bge-m3"
+    # 向量模型配置 - 統一使用 BGE-M3
+    bge_m3_model: str = "bge-m3"
+    bge_m3_path: str = "BAAI/bge-m3"
     bge_m3_dimension: int = 1024
     
-    # 語意檢索模型配置
-    text2vec_model: str = "text2vec-base-chinese"
-    text2vec_path: str = "shibing624/text2vec-base-chinese"
+    # 語意檢索模型配置 - 統一使用 BGE-M3
+    text2vec_model: str = "bge-m3"
+    text2vec_path: str = "BAAI/bge-m3"
     text2vec_max_length: int = 512
     text2vec_batch_size: int = 32
     text2vec_normalize_embeddings: bool = True
     text2vec_pooling_strategy: str = "mean"
     text2vec_device: str = "auto"
     
-    # 嵌入模型配置
-    embedding_model: str = "BAAI/bge-m3"
+    # 嵌入模型配置 - 統一使用 BGE-M3
+    embedding_model: str = "bge-m3"
+    embedding_path: str = "BAAI/bge-m3"
     embedding_dimension: int = 1024
     
     # 模型優先級配置
@@ -53,9 +52,9 @@ class ModelConfig:
     def __post_init__(self):
         if self.llm_priority is None:
             self.llm_priority = [
-                "qwen2.5:taiwan",     # 第一優先：台灣優化版本
-                "qwen3:8b",           # 第二優先：Qwen3:8b
-                "openai:gpt-3.5",     # 備援：OpenAI GPT-3.5
+                "openai:gpt-3.5",     # 第一優先：OpenAI GPT-3.5
+                "qwen2.5:taiwan",     # 第二優先：台灣優化版本
+                "qwen3:8b",           # 第三優先：Qwen3:8b
                 "openai:gpt-4"        # 最後備援：OpenAI GPT-4
             ]
 
@@ -64,8 +63,8 @@ class ModelConfig:
 class DatabaseConfig:
     """資料庫配置"""
     # MongoDB
-    mongodb_uri: str = "mongodb://worker3:27017/podwise"
-    mongodb_database: str = "podwise"
+    mongodb_uri: str = "mongodb://bdse37:111111@mongodb.podwise.svc.cluster.local:27017/podcast"
+    mongodb_database: str = "podcast"
     mongodb_collection: str = "conversations"
     
     # PostgreSQL
@@ -205,8 +204,8 @@ class SemanticConfig:
     tag_weight: float = 0.3
     
     # 分類關鍵詞
-    business_keywords: List[str] = None
-    education_keywords: List[str] = None
+    business_keywords: Optional[List[str]] = None
+    education_keywords: Optional[List[str]] = None
     
     def __post_init__(self):
         if self.business_keywords is None:
@@ -222,61 +221,55 @@ class SemanticConfig:
             ]
 
 
-class PodwiseIntegratedConfig(BaseSettings):
-    """Podwise 統一配置主類別"""
-    
-    # 環境配置
-    environment: str = Field(default="development")
-    debug: bool = Field(default=True)
-    log_level: str = Field(default="INFO")
-    
-    # 各模組配置
-    models: ModelConfig = Field(default_factory=ModelConfig)
-    database: DatabaseConfig = Field(default_factory=DatabaseConfig)
-    api: APIConfig = Field(default_factory=APIConfig)
-    langfuse: LangfuseConfig = Field(default_factory=LangfuseConfig)
-    crewai: CrewAIConfig = Field(default_factory=CrewAIConfig)
-    rag: RAGConfig = Field(default_factory=RAGConfig)
-    semantic: SemanticConfig = Field(default_factory=SemanticConfig)
-    
-    # 服務配置
-    rag_pipeline_host: str = Field(default="localhost")
-    rag_pipeline_port: int = Field(default=8002)
-    tts_host: str = Field(default="localhost")
-    tts_port: int = Field(default=8002)
-    stt_host: str = Field(default="localhost")
-    stt_port: int = Field(default=8003)
-    llm_host: str = Field(default="localhost")
-    llm_port: int = Field(default=8004)
-    
-    # Ollama 配置
-    ollama_host: str = Field(default="http://worker1:11434")
-    ollama_model: str = Field(default="qwen2.5:8b")
-    
-    # 安全配置
-    secret_key: str = Field(default="")
-    jwt_secret_key: str = Field(default="")
-    encryption_key: str = Field(default="")
-    
-    # Kubernetes 配置
-    k8s_namespace: str = Field(default="podwise")
-    k8s_registry: str = Field(default="192.168.32.38:5000")
-    k8s_image_tag: str = Field(default="latest")
-    
-    # 快取配置
-    cache_enabled: bool = Field(default=True)
-    cache_ttl: int = Field(default=3600)
-    cache_max_size: int = Field(default=1000)
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "allow"  # 允許額外的輸入參數
+class PodwiseIntegratedConfig:
+    """Podwise 統一配置主類別 (簡化版)"""
     
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        # 環境配置
+        self.environment = kwargs.get("environment", "development")
+        self.debug = kwargs.get("debug", True)
+        self.log_level = kwargs.get("log_level", "INFO")
+        
+        # 各模組配置
+        self.models = ModelConfig()
+        self.database = DatabaseConfig()
+        self.api = APIConfig()
+        self.langfuse = LangfuseConfig()
+        self.crewai = CrewAIConfig()
+        self.rag = RAGConfig()
+        self.semantic = SemanticConfig()
+        
+        # 服務配置
+        self.rag_pipeline_host = kwargs.get("rag_pipeline_host", "localhost")
+        self.rag_pipeline_port = kwargs.get("rag_pipeline_port", 8011)
+        self.tts_host = kwargs.get("tts_host", "localhost")
+        self.tts_port = kwargs.get("tts_port", 8002)
+        self.stt_host = kwargs.get("stt_host", "localhost")
+        self.stt_port = kwargs.get("stt_port", 8003)
+        self.llm_host = kwargs.get("llm_host", "localhost")
+        self.llm_port = kwargs.get("llm_port", 8004)
+        
+        # Ollama 配置
+        self.ollama_host = kwargs.get("ollama_host", "http://worker1:11434")
+        self.ollama_model = kwargs.get("ollama_model", "qwen2.5:8b")
+        
+        # 安全配置
+        self.secret_key = kwargs.get("secret_key", "")
+        self.jwt_secret_key = kwargs.get("jwt_secret_key", "")
+        self.encryption_key = kwargs.get("encryption_key", "")
+        
+        # Kubernetes 配置
+        self.k8s_namespace = kwargs.get("k8s_namespace", "podwise")
+        self.k8s_registry = kwargs.get("k8s_registry", "192.168.32.38:5000")
+        self.k8s_image_tag = kwargs.get("k8s_image_tag", "latest")
+        
+        # 快取配置
+        self.cache_enabled = kwargs.get("cache_enabled", True)
+        self.cache_ttl = kwargs.get("cache_ttl", 3600)
+        self.cache_max_size = kwargs.get("cache_max_size", 1000)
+        
+        # 載入環境變數
         self._load_from_env()
-        self._load_from_yaml()
     
     def _load_from_env(self):
         """從環境變數載入配置"""
@@ -304,31 +297,6 @@ class PodwiseIntegratedConfig(BaseSettings):
         self.secret_key = os.getenv("SECRET_KEY", "")
         self.jwt_secret_key = os.getenv("JWT_SECRET_KEY", "")
         self.encryption_key = os.getenv("ENCRYPTION_KEY", "")
-    
-    def _load_from_yaml(self):
-        """從 YAML 檔案載入配置"""
-        yaml_path = "config/hierarchical_rag_config.yaml"
-        if os.path.exists(yaml_path):
-            try:
-                with open(yaml_path, 'r', encoding='utf-8') as f:
-                    yaml_config = yaml.safe_load(f)
-                
-                # 更新 RAG 配置
-                if 'rag' in yaml_config:
-                    rag_config = yaml_config['rag']
-                    for key, value in rag_config.items():
-                        if hasattr(self.rag, key):
-                            setattr(self.rag, key, value)
-                
-                # 更新語意檢索配置
-                if 'semantic' in yaml_config:
-                    semantic_config = yaml_config['semantic']
-                    for key, value in semantic_config.items():
-                        if hasattr(self.semantic, key):
-                            setattr(self.semantic, key, value)
-                            
-            except Exception as e:
-                print(f"載入 YAML 配置失敗: {e}")
     
     # ==================== 配置檢查方法 ====================
     
@@ -515,8 +483,12 @@ class PodwiseIntegratedConfig(BaseSettings):
         print(f"日誌等級：{self.log_level}")
         
         print("\n🤖 模型配置：")
-        print(f"  主要 LLM：{self.models.llm_priority[0]}")
-        print(f"  台灣優化：{self.models.llm_priority[1]}")
+        if self.models.llm_priority:
+            print(f"  主要 LLM：{self.models.llm_priority[0]}")
+            print(f"  台灣優化：{self.models.llm_priority[1]}")
+        else:
+            print("  主要 LLM：未配置")
+            print("  台灣優化：未配置")
         print(f"  向量模型：{self.models.bge_m3_model}")
         print(f"  語意模型：{self.models.text2vec_model}")
         
@@ -559,14 +531,15 @@ def get_config() -> PodwiseIntegratedConfig:
     global podwise_config
     if podwise_config is None:
         # 確保載入環境變數
-        from dotenv import load_dotenv
-        import os
-        load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '.env'))
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '.env'))
+        except ImportError:
+            pass  # 如果沒有 dotenv，就跳過
         
         # 初始化配置
         podwise_config = PodwiseIntegratedConfig()
         podwise_config._load_from_env()
-        podwise_config._load_from_yaml()
     
     return podwise_config
 

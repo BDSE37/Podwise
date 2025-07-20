@@ -84,24 +84,23 @@ class RecommenderData:
         try:
             query = """
                 SELECT 
-                    episode_id,
-                    podcast_id,
-                    episode_title,
-                    podcast_name,
-                    author,
-                    category,
-                    tags,
-                    description,
-                    duration,
-                    created_at
-                FROM episodes
-                WHERE status = 'active'
-                ORDER BY created_at DESC
+                    e.episode_id,
+                    e.podcast_id,
+                    e.episode_title,
+                    p.podcast_name,
+                    p.author,
+                    p.category,
+                    e.description,
+                    e.duration,
+                    e.created_at
+                FROM episodes e
+                LEFT JOIN podcasts p ON e.podcast_id = p.podcast_id
+                ORDER BY e.created_at DESC
             """
             
             with self.engine.connect() as conn:
                 result = conn.execute(text(query))
-                episodes = [dict(row) for row in result]
+                episodes = [dict(row._mapping) for row in result]
             
             return episodes
             
@@ -117,15 +116,16 @@ class RecommenderData:
                     user_id,
                     username,
                     email,
-                    preferences,
+                    given_name,
+                    family_name,
                     created_at
                 FROM users
-                WHERE status = 'active'
+                WHERE is_active = true
             """
             
             with self.engine.connect() as conn:
                 result = conn.execute(text(query))
-                users = [dict(row) for row in result]
+                users = [dict(row._mapping) for row in result]
             
             return users
             
@@ -134,23 +134,30 @@ class RecommenderData:
             return []
     
     def _load_interactions(self) -> List[Dict[str, Any]]:
-        """載入互動資料"""
+        """載入互動資料（使用 user_feedback 表）"""
         try:
             query = """
                 SELECT 
-                    user_id,
-                    episode_id,
-                    interaction_type,
-                    rating,
-                    listen_time,
-                    created_at
-                FROM user_interactions
-                WHERE created_at >= NOW() - INTERVAL '90 days'
+                    uf.user_id,
+                    e.episode_id,
+                    'feedback' as interaction_type,
+                    CASE 
+                        WHEN uf.like_count > 0 THEN 5.0
+                        WHEN uf.preview_play_count > 0 THEN 3.0
+                        ELSE 1.0
+                    END as rating,
+                    uf.preview_play_count as listen_time,
+                    uf.created_at
+                FROM user_feedback uf
+                LEFT JOIN episodes e ON uf.podcast_id = e.podcast_id 
+                    AND uf.episode_title = e.episode_title
+                WHERE uf.created_at >= NOW() - INTERVAL '90 days'
+                    AND e.episode_id IS NOT NULL
             """
             
             with self.engine.connect() as conn:
                 result = conn.execute(text(query))
-                interactions = [dict(row) for row in result]
+                interactions = [dict(row._mapping) for row in result]
             
             return interactions
             
@@ -179,19 +186,19 @@ class RecommenderData:
                     created_at,
                     updated_at
                 FROM transcripts
-                WHERE transcript_length > %s
+                WHERE transcript_length > :min_length
             """
-            params = [min_length]
+            params = {"min_length": min_length}
             
             if language_filter:
-                query += " AND language = %s"
-                params.append(language_filter)
+                query += " AND language = :language"
+                params["language"] = language_filter
             
             query += " ORDER BY created_at DESC"
             
             with self.engine.connect() as conn:
                 result = conn.execute(text(query), params)
-                transcripts = [dict(row) for row in result]
+                transcripts = [dict(row._mapping) for row in result]
             
             logger.info(f"載入 {len(transcripts)} 個節目轉錄")
             return transcripts
@@ -215,7 +222,8 @@ class RecommenderData:
                 return []
             
             # 建立 IN 查詢的參數
-            placeholders = ','.join(['%s'] * len(episode_ids))
+            placeholders = ','.join([f':id_{i}' for i in range(len(episode_ids))])
+            params = {f'id_{i}': episode_id for i, episode_id in enumerate(episode_ids)}
             
             query = f"""
                 SELECT 
@@ -233,8 +241,8 @@ class RecommenderData:
             """
             
             with self.engine.connect() as conn:
-                result = conn.execute(text(query), episode_ids)
-                metadata = [dict(row) for row in result]
+                result = conn.execute(text(query), params)
+                metadata = [dict(row._mapping) for row in result]
             
             logger.info(f"載入 {len(metadata)} 個節目元數據")
             return metadata

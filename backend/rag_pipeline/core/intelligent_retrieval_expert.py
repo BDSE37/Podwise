@@ -28,8 +28,18 @@ from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 # 導入配置
-from config.agent_roles_config import get_agent_roles_manager
-from config.integrated_config import get_config
+try:
+    import sys
+    import os
+    config_dir = os.path.join(os.path.dirname(__file__), '..', 'config')
+    if config_dir not in sys.path:
+        sys.path.insert(0, config_dir)
+    from agent_roles_config import get_agent_roles_manager
+    from integrated_config import get_config
+except ImportError as e:
+    logger.warning(f"配置模組導入失敗: {e}")
+    get_agent_roles_manager = None
+    get_config = None
 
 logger = logging.getLogger(__name__)
 
@@ -305,19 +315,35 @@ class MilvusDB:
                 anns_field="embedding",
                 param=search_params,
                 limit=top_k,
-                output_fields=["chunk_id", "chunk_text", "metadata", "tags"]
+                output_fields=["chunk_id", "chunk_text", "tags", "podcast_name", "episode_title", "category"]
             )
             
             # 格式化結果
             formatted_results = []
             for hits in results:
                 for hit in hits:
+                    # 解析 tags 欄位（JSON 格式）
+                    tags = []
+                    try:
+                        if hit.entity.get("tags"):
+                            if isinstance(hit.entity.get("tags"), str):
+                                tags = json.loads(hit.entity.get("tags"))
+                            else:
+                                tags = hit.entity.get("tags")
+                    except:
+                        tags = []
+                    
                     formatted_results.append({
                         "chunk_id": hit.entity.get("chunk_id"),
                         "content": hit.entity.get("chunk_text"),
                         "similarity_score": hit.score,
-                        "metadata": hit.entity.get("metadata", {}),
-                        "tags": hit.entity.get("tags", []),
+                        "metadata": {
+                            "podcast_name": hit.entity.get("podcast_name", ""),
+                            "episode_title": hit.entity.get("episode_title", ""),
+                            "category": hit.entity.get("category", ""),
+                            "chunk_id": hit.entity.get("chunk_id", "")
+                        },
+                        "tags": tags,
                         "source": "milvus"
                     })
             

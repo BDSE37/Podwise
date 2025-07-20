@@ -42,15 +42,8 @@ class SearchResult:
     source: str
     metadata: Dict[str, Any]
 
-@dataclass
-class RAGResponse:
-    """RAG 回應"""
-    content: str
-    confidence: float
-    sources: List[str]
-    processing_time: float
-    level_used: str
-    metadata: Dict[str, Any]
+# 使用統一的數據模型
+from .data_models import RAGResponse
 
 class RAGLevel(ABC):
     """RAG 層級抽象基類"""
@@ -623,21 +616,39 @@ class Level6HybridRAG(RAGLevel):
             if ml_pipeline_path not in sys.path:
                 sys.path.insert(0, ml_pipeline_path)
             
-            from backend.ml_pipeline.services import RecommendationService
-            from backend.ml_pipeline.config.recommender_config import get_recommender_config
-            
-            # 初始化推薦服務
-            config = get_recommender_config()
-            db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
-            
-            if db_url:
-                self.ml_pipeline_service = RecommendationService(db_url, config)
-                logger.info("ML Pipeline 服務初始化成功")
+            # 檢查 ml_pipeline 目錄是否存在
+            if os.path.exists(ml_pipeline_path):
+                try:
+                    # 避免循環導入，直接檢查模組是否存在
+                    import importlib.util
+                    spec = importlib.util.find_spec('ml_pipeline.services')
+                    if spec is not None:
+                        from ml_pipeline.services import RecommendationService
+                        from ml_pipeline.config.recommender_config import get_recommender_config
+                        
+                        # 初始化推薦服務
+                        config = get_recommender_config()
+                        db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
+                        
+                        if db_url:
+                            self.ml_pipeline_service = RecommendationService(db_url, config)
+                            logger.info("✅ ML Pipeline 服務初始化成功")
+                        else:
+                            logger.info("ℹ️ 未設定 DATABASE_URL，ML Pipeline 功能將不可用")
+                            self.ml_pipeline_service = None
+                    else:
+                        logger.info("ℹ️ ml_pipeline.services 模組不存在")
+                        self.ml_pipeline_service = None
+                except ImportError as e:
+                    logger.info(f"ℹ️ ML Pipeline 模組導入失敗: {e}")
+                    self.ml_pipeline_service = None
             else:
-                logger.warning("未設定 DATABASE_URL，ML Pipeline 功能將不可用")
+                logger.info("ℹ️ ML Pipeline 目錄不存在，跳過初始化")
+                self.ml_pipeline_service = None
                 
         except Exception as e:
-            logger.warning(f"ML Pipeline 服務初始化失敗: {str(e)}")
+            logger.info(f"ℹ️ ML Pipeline 服務初始化失敗: {str(e)}")
+            self.ml_pipeline_service = None
     
     async def process(self, input_data: List[SearchResult]) -> Tuple[RAGResponse, float]:
         """執行混合式RAG生成"""
@@ -840,12 +851,15 @@ class HierarchicalRAGPipeline:
         logger.info(f"✅ 初始化了 {len(levels)} 個層級")
         return levels
     
-    async def process_query(self, query: str) -> RAGResponse:
+    async def process_query(self, query: str, user_id: str = "default_user", session_id: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> RAGResponse:
         """
         處理查詢（層級化處理）
         
         Args:
             query: 使用者查詢
+            user_id: 用戶 ID
+            session_id: 會話 ID
+            metadata: 額外元數據
             
         Returns:
             RAGResponse: 最終回應

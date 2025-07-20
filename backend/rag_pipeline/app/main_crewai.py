@@ -34,9 +34,25 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import PodwiseRAGPipeline, get_rag_pipeline
 
 # 導入工具
-from core.enhanced_vector_search import RAGVectorSearch as UnifiedVectorSearch
-from tools.web_search_tool import WebSearchExpert as WebSearchTool
-from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
+try:
+    from core.enhanced_vector_search import RAGVectorSearch as UnifiedVectorSearch
+except ImportError:
+    print("無法導入 enhanced_vector_search，使用備用")
+    UnifiedVectorSearch = None
+
+try:
+    from tools.web_search_tool import WebSearchExpert as WebSearchTool
+except ImportError:
+    print("無法導入 web_search_tool，使用備用")
+    WebSearchTool = None
+
+try:
+    from tools.podcast_formatter import PodcastFormatter, FormattedPodcast, PodcastRecommendationResult
+except ImportError:
+    print("無法導入 podcast_formatter，使用備用")
+    PodcastFormatter = None
+    FormattedPodcast = None
+    PodcastRecommendationResult = None
 
 # 導入配置
 from config.integrated_config import get_config
@@ -52,24 +68,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class AppConfig:
-    """應用程式配置數據類別"""
-    title: str = "Podwise RAG Pipeline - FastAPI 介面"
-    description: str = "提供 REST API 介面的智能 Podcast 推薦系統"
-    version: str = "3.0.0"
-    docs_url: str = "/docs"
-    redoc_url: str = "/redoc"
-
-
-@dataclass(frozen=True)
-class SystemStatus:
-    """系統狀態數據類別"""
-    is_ready: bool
-    components: Dict[str, bool]
-    timestamp: str
-    version: str
-
+# ==================== 應用程式管理器 ====================
 
 class ApplicationManager:
     """應用程式管理器 - 專注於 Web API 功能"""
@@ -83,9 +82,9 @@ class ApplicationManager:
         self.rag_pipeline: Optional[PodwiseRAGPipeline] = None
         
         # Web API 專用組件
-        self.vector_search_tool: Optional[UnifiedVectorSearch] = None
-        self.web_search_tool: Optional[WebSearchTool] = None
-        self.podcast_formatter: Optional[PodcastFormatter] = None
+        self.vector_search_tool: Optional[Any] = None
+        self.web_search_tool: Optional[Any] = None
+        self.podcast_formatter: Optional[Any] = None
         
         # 系統狀態
         self._is_initialized = False
@@ -114,64 +113,76 @@ class ApplicationManager:
             self.vector_search_tool = UnifiedVectorSearch(search_config)
             logger.info("✅ 統一向量搜尋工具初始化完成")
             
-            # 初始化 Web Search 工具
+            # 初始化 Web 搜尋工具
+            if WebSearchTool:
             self.web_search_tool = WebSearchTool()
-            if hasattr(self.web_search_tool, 'is_configured') and self.web_search_tool.is_configured():
-                logger.info("✅ Web Search 工具初始化完成 (OpenAI 可用)")
-            else:
-                logger.warning("⚠️ Web Search 工具初始化完成 (OpenAI 未配置)")
+                logger.info("✅ Web 搜尋工具初始化完成")
             
             # 初始化 Podcast 格式化工具
+            if PodcastFormatter:
             self.podcast_formatter = PodcastFormatter()
             logger.info("✅ Podcast 格式化工具初始化完成")
             
             self._is_initialized = True
-            logger.info("✅ 所有核心組件初始化完成")
+            logger.info("🎉 所有組件初始化完成")
             
         except Exception as e:
-            logger.error(f"❌ 初始化失敗: {str(e)}")
+            logger.error(f"❌ 初始化失敗: {e}")
             raise
     
-    def get_system_status(self) -> SystemStatus:
-        """獲取系統狀態"""
-        return SystemStatus(
-            is_ready=self._is_initialized,
-            components={
-                "rag_pipeline": self.rag_pipeline is not None,
-                "vector_search_tool": self.vector_search_tool is not None,
-                "web_search_tool": self.web_search_tool is not None and hasattr(self.web_search_tool, 'is_configured') and self.web_search_tool.is_configured(),
-                "podcast_formatter": self.podcast_formatter is not None
-            },
-            timestamp=datetime.now().isoformat(),
-            version="3.0.0"
-        )
+    async def cleanup(self) -> None:
+        """清理資源"""
+        try:
+            if self.rag_pipeline:
+                await self.rag_pipeline.cleanup()
+            logger.info("✅ 資源清理完成")
+        except Exception as e:
+            logger.error(f"❌ 清理失敗: {e}")
     
     def is_ready(self) -> bool:
-        """檢查系統是否準備就緒"""
-        return self._is_initialized
+        """檢查是否準備就緒"""
+        return self._is_initialized and self.rag_pipeline is not None
 
 
-# 創建應用程式管理器實例
+# ==================== 配置類別 ====================
+
+@dataclass
+class AppConfig:
+    """應用程式配置"""
+    host: str = "0.0.0.0"
+    port: int = 8012
+    debug: bool = False
+    title: str = "Podwise RAG Pipeline API"
+    version: str = "3.0.0"
+    description: str = "Podwise RAG Pipeline REST API"
+
+
+# ==================== FastAPI 應用程式 ====================
+
+# 應用程式管理器實例
 app_manager = ApplicationManager()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """應用程式生命週期管理器"""
+    """應用程式生命週期管理"""
     # 啟動時初始化
     await app_manager.initialize()
+    logger.info("🚀 應用程式啟動完成")
+    
     yield
+    
     # 關閉時清理
-    logger.info("應用程式關閉，清理資源...")
+    await app_manager.cleanup()
+    logger.info("🛑 應用程式關閉完成")
 
 
-# 創建 FastAPI 應用
+# 創建 FastAPI 應用程式
 app = FastAPI(
     title=app_manager.app_config.title,
-    description=app_manager.app_config.description,
     version=app_manager.app_config.version,
-    docs_url=app_manager.app_config.docs_url,
-    redoc_url=app_manager.app_config.redoc_url,
+    description=app_manager.app_config.description,
+    debug=app_manager.app_config.debug,
     lifespan=lifespan
 )
 
@@ -185,401 +196,131 @@ app.add_middleware(
 )
 
 
-# 依賴注入
-def get_app_manager() -> ApplicationManager:
-    """獲取應用程式管理器"""
-    return app_manager
+# ==================== API 端點 ====================
 
-
-def validate_system_ready(manager: ApplicationManager = Depends(get_app_manager)) -> None:
-    """驗證系統是否準備就緒"""
-    if not manager.is_ready():
-        raise HTTPException(
-            status_code=503,
-            detail="系統尚未準備就緒，請稍後再試"
-        )
-
-
-# API 端點
-@app.get("/")
-async def root() -> Dict[str, Any]:
-    """根端點"""
-    return {
-        "message": "Podwise RAG Pipeline - FastAPI 介面運行中",
-        "version": app_manager.app_config.version,
-        "timestamp": datetime.now().isoformat(),
-        "features": [
-            "核心 RAG Pipeline 整合",
-            "統一向量搜尋",
-            "用戶 ID 管理",
-            "REST API 介面"
-        ],
-        "supported_categories": ["商業", "教育"],
-        "status": "running"
-    }
+@app.get("/", response_model=SystemInfoResponse)
+async def root():
+    """根端點 - 系統資訊"""
+    return SystemInfoResponse(
+        service="Podwise RAG Pipeline API",
+        version=app_manager.app_config.version,
+        status="running",
+        timestamp=datetime.now().isoformat()
+    )
 
 
 @app.get("/health", response_model=HealthCheckResponse)
-async def health_check(manager: ApplicationManager = Depends(get_app_manager)) -> HealthCheckResponse:
+async def health_check():
     """健康檢查端點"""
-    status = manager.get_system_status()
-    
-    # 獲取核心 RAG Pipeline 健康狀態
-    rag_health = {}
-    if manager.rag_pipeline:
-        try:
-            rag_health = await manager.rag_pipeline.health_check()
-        except Exception as e:
-            rag_health = {"status": "error", "error": str(e)}
-    
+    is_healthy = app_manager.is_ready()
     return HealthCheckResponse(
-        status="healthy" if status.is_ready else "unhealthy",
-        timestamp=status.timestamp,
-        components=status.components,
-        rag_pipeline_health=rag_health,
-        web_search_available=manager.web_search_tool.is_configured() if manager.web_search_tool and hasattr(manager.web_search_tool, 'is_configured') else False
+        status="healthy" if is_healthy else "unhealthy",
+        timestamp=datetime.now().isoformat(),
+        services={
+            "rag_pipeline": "healthy" if app_manager.rag_pipeline else "unhealthy",
+            "vector_search": "healthy" if app_manager.vector_search_tool else "unhealthy",
+            "web_search": "healthy" if app_manager.web_search_tool else "unhealthy",
+            "podcast_formatter": "healthy" if app_manager.podcast_formatter else "unhealthy"
+        }
     )
 
 
-@app.post("/api/v1/validate-user", response_model=UserValidationResponse)
-async def validate_user(
-    request: UserValidationRequest,
-    manager: ApplicationManager = Depends(get_app_manager),
-    _: None = Depends(validate_system_ready)
-) -> UserValidationResponse:
-    """
-    驗證用戶 ID
-    
-    此端點驗證用戶 ID 的有效性，並檢查是否有歷史記錄。
-    """
+@app.post("/api/v1/rag/query", response_model=UserQueryResponse)
+async def process_query(request: UserQueryRequest):
+    """處理用戶查詢"""
     try:
-        user_id = request.user_id
+        if not app_manager.is_ready():
+            raise HTTPException(status_code=503, detail="服務未準備就緒")
         
-        # 基本驗證
-        is_valid = len(user_id) >= 3 and user_id.isalnum()
-        
-        if not is_valid:
-            return UserValidationResponse(
-                user_id=user_id,
-                is_valid=False,
-                has_history=False,
-                message="用戶 ID 格式無效，必須至少 3 個字符且只包含字母和數字"
-            )
-        
-        # 檢查歷史記錄（簡化版本）
-        has_history = False
-        preferred_category = None
-        
-        message = "用戶驗證成功"
-        
-        return UserValidationResponse(
-            user_id=user_id,
-            is_valid=True,
-            has_history=has_history,
-            preferred_category=preferred_category,
-            message=message
+        # 處理查詢
+        response = await app_manager.rag_pipeline.process_query(
+            query=request.query,
+            user_id=request.user_id,
+            session_id=request.session_id,
+            metadata=request.metadata
         )
-        
-    except Exception as e:
-        logger.error(f"用戶驗證失敗: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"用戶驗證失敗: {str(e)}")
-
-
-@app.post("/api/v1/query", response_model=UserQueryResponse)
-async def process_query(
-    request: UserQueryRequest,
-    background_tasks: BackgroundTasks,
-    manager: ApplicationManager = Depends(get_app_manager),
-    _: None = Depends(validate_system_ready)
-) -> UserQueryResponse:
-    """
-    處理用戶查詢
-    
-    此端點使用核心 RAG Pipeline 處理用戶查詢，並整合推薦功能。
-    """
-    start_time = datetime.now()
-    
-    try:
-        user_id = request.user_id
-        query = request.query
-        session_id = request.session_id
-        
-        # 確保有有效的使用者ID
-        effective_user_id = user_id or "default_user"
-        effective_session_id = session_id or f"session_{effective_user_id}_{int(start_time.timestamp())}"
-        
-        logger.info(f"🔄 處理用戶查詢: {effective_user_id} - {query[:50]}...")
-        
-        # 使用核心 RAG Pipeline 處理查詢
-        if manager.rag_pipeline is None:
-            raise HTTPException(status_code=500, detail="RAG Pipeline 未初始化")
-        
-        # 使用核心 RAG Pipeline 處理
-        rag_response = await manager.rag_pipeline.process_query(
-            query=query,
-            user_id=effective_user_id,
-            session_id=effective_session_id,
-            metadata={
-                **(request.metadata or {}),
-                "api_endpoint": "/api/v1/query",
-                "request_timestamp": start_time.isoformat(),
-                "user_identifier": effective_user_id
-            }
-        )
-        
-        # 獲取推薦項目
-        recommendations = await _get_recommendations(query, manager)
-        
-        # 計算處理時間
-        processing_time = (datetime.now() - start_time).total_seconds()
-        
-        # 記錄歷史（背景任務）
-        background_tasks.add_task(
-            _log_query_history,
-            effective_user_id, effective_session_id, query, rag_response.content, 
-            rag_response.confidence
-        )
-        
-        # 記錄成功的API調用
-        logger.info(f"✅ API查詢成功: {effective_user_id} - 處理時間: {processing_time:.2f}s")
         
         return UserQueryResponse(
-            user_id=effective_user_id,
-            query=query,
-            response=rag_response.content,
-            category=rag_response.metadata.get("category", "其他"),
-            confidence=rag_response.confidence,
-            recommendations=recommendations,
-            reasoning=f"使用 {rag_response.level_used} 層級處理",
-            processing_time=processing_time,
+            content=response.content,
+            confidence=response.confidence,
+            sources=response.sources,
+            processing_time=response.processing_time,
+            level_used=response.level_used,
+            metadata=response.metadata,
             timestamp=datetime.now().isoformat()
         )
         
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(f"❌ 查詢處理失敗: {str(e)}")
-        # 記錄失敗的API調用
-        if 'effective_user_id' in locals():
-            logger.error(f"❌ API查詢失敗: {effective_user_id} - 錯誤: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"查詢處理失敗: {str(e)}")
+        logger.error(f"查詢處理失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"處理失敗: {str(e)}")
 
 
-async def _get_recommendations(query: str, manager: ApplicationManager) -> List[Dict[str, Any]]:
-    """獲取推薦項目（整合 ML Pipeline）"""
-    recommendations = []
-    
+@app.post("/api/v1/user/validate", response_model=UserValidationResponse)
+async def validate_user(request: UserValidationRequest):
+    """驗證用戶"""
     try:
-        # 1. 使用統一向量搜尋工具
-        if manager.vector_search_tool:
-            search_results = await manager.vector_search_tool.search(query, top_k=3)
-            
-            # 轉換向量搜尋結果
-            for result in search_results.get("combined_results", [])[:3]:
-                recommendations.append({
-                    "id": result.get("id", ""),
-                    "title": result.get("title", ""),
-                    "content": result.get("content", ""),
-                    "category": result.get("category", ""),
-                    "tags": result.get("tags", []),
-                    "score": result.get("score", 0.0),
-                    "source": "vector_search",
-                    "type": "content_based"
-                })
+        if not app_manager.is_ready():
+            raise HTTPException(status_code=503, detail="服務未準備就緒")
         
-        # 2. 整合 ML Pipeline 推薦功能
-        try:
-            # 動態導入 ML Pipeline 服務
-            import sys
-            import os
-            ml_pipeline_path = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                'ml_pipeline'
-            )
-            if ml_pipeline_path not in sys.path:
-                sys.path.insert(0, ml_pipeline_path)
-            
-            from services.api_service import RecommendationService
-            from config.recommender_config import get_recommender_config
-            
-            # 初始化推薦服務（使用模擬數據）
-            config = get_recommender_config()
-            db_url = os.getenv("DATABASE_URL", config.get("database_url", ""))
-            
-            # 創建推薦服務實例
-            recommendation_service = RecommendationService(db_url or "mock://localhost", config)
-            
-            # 獲取 ML 推薦結果（使用預設用戶 ID）
-            ml_recommendations = await recommendation_service.get_recommendations(
-                user_id=1,  # 預設用戶 ID
-                top_k=3,
-                category_filter=None,
-                context={"query": query}
-            )
-            
-            # 轉換 ML 推薦結果
-            for i, rec in enumerate(ml_recommendations[:3]):
-                recommendations.append({
-                    "id": rec.get("podcast_id", f"ml_rec_{i}"),
-                    "title": rec.get("title", f"ML 推薦 {i+1}"),
-                    "content": rec.get("description", "基於機器學習的推薦"),
-                    "category": rec.get("category", "推薦"),
-                    "tags": rec.get("tags", []),
-                    "score": rec.get("average_rating", 0.0),
-                    "source": "ml_pipeline",
-                    "type": "collaborative_filtering",
-                    "recommendation_reason": rec.get("recommendation_reason", "基於協同過濾推薦")
-                })
-            
-            logger.info(f"ML Pipeline 推薦成功，獲得 {len(ml_recommendations)} 個推薦")
-            
-        except Exception as ml_error:
-            logger.warning(f"ML Pipeline 推薦失敗: {str(ml_error)}")
-            # 添加備用推薦
-            recommendations.append({
-                "id": "fallback_1",
-                "title": "熱門商業 Podcast",
-                "content": "基於查詢內容的智能推薦",
-                "category": "商業",
-                "tags": ["商業", "投資", "理財"],
-                "score": 0.8,
-                "source": "fallback",
-                "type": "popular",
-                "recommendation_reason": "基於查詢關鍵詞的熱門推薦"
-            })
+        # 驗證用戶（這裡可以添加實際的驗證邏輯）
+        is_valid = True  # 暫時設為 True
         
-        # 3. 去重並限制數量
-        seen_ids = set()
-        unique_recommendations = []
-        for rec in recommendations:
-            if rec["id"] not in seen_ids:
-                seen_ids.add(rec["id"])
-                unique_recommendations.append(rec)
-                if len(unique_recommendations) >= 5:  # 最多返回 5 個推薦
-                    break
-        
-        logger.info(f"總共生成 {len(unique_recommendations)} 個推薦")
-        return unique_recommendations
+        return UserValidationResponse(
+            user_id=request.user_id,
+            is_valid=is_valid,
+            timestamp=datetime.now().isoformat()
+        )
         
     except Exception as e:
-        logger.error(f"獲取推薦失敗: {str(e)}")
-        # 返回基本推薦
-        return [{
-            "id": "basic_1",
-            "title": "推薦內容",
-            "content": "基於您的查詢提供的推薦",
-            "category": "一般",
-            "tags": [],
-            "score": 0.5,
-            "source": "basic",
-            "type": "fallback"
-        }]
+        logger.error(f"用戶驗證失敗: {e}")
+        raise HTTPException(status_code=500, detail=f"驗證失敗: {str(e)}")
 
 
-async def _log_query_history(
-    user_id: str,
-    session_id: Optional[str],
-    query: str,
-    response: str,
-    confidence: float
-) -> None:
-    """記錄查詢歷史"""
-    try:
-        # 確保有有效的使用者ID
-        effective_user_id = user_id or "default_user"
-        effective_session_id = session_id or f"session_{effective_user_id}_{int(datetime.now().timestamp())}"
-        
-        # 記錄到日誌
-        logger.info(f"📝 記錄查詢歷史: {effective_user_id} - 信心度: {confidence:.2f}")
-        
-        # 這裡可以添加資料庫記錄邏輯
-        # 例如：記錄到 user_chat_history 表格
-        try:
-            # 如果有資料庫連接，記錄到資料庫
-            # 這是一個示例，實際實現需要根據資料庫配置調整
-            pass
-        except Exception as db_error:
-            logger.warning(f"⚠️ 資料庫記錄失敗: {db_error}")
-        
-        # 記錄詳細資訊
-        history_entry = {
-            "user_id": effective_user_id,
-            "session_id": effective_session_id,
-            "query": query,
-            "response": response[:200] + "..." if len(response) > 200 else response,  # 截斷長回應
-            "confidence": confidence,
-            "timestamp": datetime.now().isoformat(),
-            "source": "rag_pipeline_api"
-        }
-        
-        logger.info(f"📋 歷史記錄: {history_entry}")
-        
-    except Exception as e:
-        logger.error(f"❌ 記錄歷史失敗: {str(e)}")
-
-
-@app.get("/api/v1/system-info", response_model=SystemInfoResponse)
-async def get_system_info(manager: ApplicationManager = Depends(get_app_manager)) -> SystemInfoResponse:
+@app.get("/api/v1/system/info", response_model=SystemInfoResponse)
+async def get_system_info():
     """獲取系統資訊"""
-    status = manager.get_system_status()
-    
-    # 獲取向量搜尋統計
-    vector_stats = {}
-    if manager.vector_search_tool:
-        vector_stats = manager.vector_search_tool.get_statistics()
-    
     return SystemInfoResponse(
-        version=status.version,
-        timestamp=status.timestamp,
-        environment=manager.config.environment,
-        debug=manager.config.debug,
-        components=status.components,
-        features=[
-            "核心 RAG Pipeline 整合",
-            "統一向量搜尋",
-            "用戶 ID 管理",
-            "REST API 介面"
-        ],
-        configuration={
-            "app_title": manager.app_config.title,
-            "app_version": manager.app_config.version,
-            "supported_categories": ["商業", "教育"]
-        },
-        statistics={
-            "vector_search_stats": vector_stats
+        service="Podwise RAG Pipeline API",
+        version=app_manager.app_config.version,
+        status="running" if app_manager.is_ready() else "initializing",
+        timestamp=datetime.now().isoformat(),
+        metadata={
+            "config": app_manager.config.get_system_config(),
+            "components": {
+                "rag_pipeline": "available" if app_manager.rag_pipeline else "unavailable",
+                "vector_search": "available" if app_manager.vector_search_tool else "unavailable",
+                "web_search": "available" if app_manager.web_search_tool else "unavailable",
+                "podcast_formatter": "available" if app_manager.podcast_formatter else "unavailable"
+            }
         }
     )
 
 
-# 錯誤處理
+# ==================== 錯誤處理 ====================
+
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc: Exception) -> JSONResponse:
+async def global_exception_handler(request, exc):
     """全局異常處理器"""
-    logger.error(f"未處理的異常: {str(exc)}")
-    
+    logger.error(f"未處理的異常: {exc}")
     return JSONResponse(
         status_code=500,
         content=ErrorResponse(
             error="Internal Server Error",
-            detail="系統內部錯誤，請稍後再試",
+            message="服務內部錯誤",
             timestamp=datetime.now().isoformat()
         ).dict()
     )
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc: HTTPException) -> JSONResponse:
-    """HTTP 異常處理器"""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=ErrorResponse(
-            error="HTTP Error",
-            detail=exc.detail,
-            timestamp=datetime.now().isoformat()
-        ).dict()
-    )
-
+# ==================== 主程式入口 ====================
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    
+    uvicorn.run(
+        "main_crewai:app",
+        host=app_manager.app_config.host,
+        port=app_manager.app_config.port,
+        reload=app_manager.app_config.debug,
+        log_level="info"
+    ) 

@@ -1,0 +1,2313 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+	<title>PodWise Podcast自動摘要與個人化推薦系統</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+
+	<style>
+		/* —— Step 4：亂碼顯示與複製 —— */
+		#popup-step-4 {
+			display: none;
+			text-align: left;
+		}
+
+		#popup-step-4 h2 {
+			color: #583e3d;
+			font-size: 1.8em;
+			margin-bottom: 1em;
+		}
+
+		#popup-step-4 .code-block-container {
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 1.5em;
+		}
+
+		#popup-step-4 pre#generated-code {
+			background: #f5f5f5;
+			padding: 1em;
+			border-radius: 4px;
+			font-family: monospace;
+			font-size: 0.9em;
+			white-space: pre-wrap;
+			word-break: break-all;
+			flex: 1;
+			max-height: 150px;
+			overflow: auto;
+			border: 1px solid rgba(210, 215, 217, 0.75);
+		}
+
+		#popup-step-4 button#copy-code-btn {
+			background-color: #d7b590;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			padding: 0.6em 1.2em;
+			font-size: 0.9em;
+			cursor: pointer;
+			transition: transform 0.1s ease;
+		}
+
+		#popup-step-4 button#copy-code-btn:active {
+			transform: scale(0.95);
+		}
+		.music-cards {
+			display: flex;
+			gap: 2em;
+			margin-top: 2em;
+		}
+		.music-card {
+			background: #ebebeb;
+			border-radius: 1em;
+			box-shadow: 0 4px 16px rgba(88,62,61,0.08);
+			width: 220px;
+			overflow: hidden;
+			transition: box-shadow 0.2s;
+		}
+		.music-card:hover {
+			box-shadow: 0 8px 24px rgba(88,62,61,0.18);
+		}
+		.music-card-img {
+			position: relative;
+			width: 100%;
+			height: 180px;
+			overflow: hidden;
+		}
+		.music-card-img img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+		.play-btn {
+			position: absolute;
+			bottom: 12px;
+			right: 12px;
+			background: rgba(215,181,144,0.9);
+			border: none;
+			border-radius: 50%;
+			width: 44px;
+			height: 44px;
+			font-size: 1.5em;
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 2px 8px rgba(88,62,61,0.15);
+			transition: background 0.2s;
+		}
+		.play-btn:hover {
+			background: #583e3d;
+		}
+		.music-card-info {
+			padding: 1em;
+			text-align: left;
+		}
+		.music-card-title {
+			font-weight: bold;
+			font-size: 1.1em;
+			color: #583e3d;
+		}
+		.music-card-author {
+			color: #a08c7d;
+			font-size: 0.95em;
+			margin-top: 0.3em;
+		}
+		header.major {
+			text-align: center;
+		}
+		.music-cards,
+		.quiz-recommendations {
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			gap: 2em;
+			flex-wrap: wrap;
+		}
+
+		header.major h2 { 
+  color: inherit; 
+}
+
+/* 只把前面的 dash 設為白色 */
+header.major .dash {
+  color: #fff;
+}
+
+.searchbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px; /* 控制間距，可調整 */
+  width: 100%;
+  margin-top: 1em;
+}
+
+.InputContainer {
+  display: flex;
+  align-items: center;
+  /* 其他原有樣式不變 */
+}
+
+.input-logo {
+  height: 38px;
+  width: 38px;
+  cursor: pointer;
+  transition: filter 0.2s;
+  vertical-align: middle;
+}
+.input-logo:hover {
+  filter: brightness(0.8);
+}
+
+		/* 新增 TAG 按鈕樣式：這裡只保留純 CSS，不要有 JS */
+		
+		/* From Uiverse.io by catraco */ 
+		.heart-container {
+		  --heart-color: rgb(255, 91, 137);
+		  position: relative;
+		  width: 32px;
+		  height: 32px;
+		  transition: .3s;
+		}
+
+		.heart-container .checkbox {
+		  position: absolute;
+		  width: 100%;
+		  height: 100%;
+		  opacity: 0;
+		  z-index: 20;
+		  cursor: pointer;
+		}
+
+		.heart-container .svg-container {
+		  width: 100%;
+		  height: 100%;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		}
+
+		.heart-container .svg-outline,
+				.heart-container .svg-filled {
+		  fill: var(--heart-color);
+		  position: absolute;
+		}
+
+		.heart-container .svg-filled {
+		  animation: keyframes-svg-filled 1s;
+		  display: none;
+		}
+
+		.heart-container .svg-celebrate {
+		  position: absolute;
+		  animation: keyframes-svg-celebrate .5s;
+		  animation-fill-mode: forwards;
+		  display: none;
+		  stroke: var(--heart-color);
+		  fill: var(--heart-color);
+		  stroke-width: 2px;
+		}
+
+		.heart-container .checkbox:checked~.svg-container .svg-filled {
+		  display: block
+		}
+
+		.heart-container .checkbox:checked~.svg-container .svg-celebrate {
+		  display: block
+		}
+
+		@keyframes keyframes-svg-filled {
+		  0% {
+			transform: scale(0);
+		  }
+
+		  25% {
+			transform: scale(1.2);
+		  }
+
+		  50% {
+			transform: scale(1);
+			filter: brightness(1.5);
+		  }
+		}
+
+		@keyframes keyframes-svg-celebrate {
+		  0% {
+			transform: scale(0);
+		  }
+
+		  50% {
+			opacity: 1;
+			filter: brightness(1.5);
+		  }
+
+		  100% {
+			transform: scale(1.4);
+			opacity: 0;
+			display: none;
+		  }
+		}
+	</style>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header" style="display: flex; justify-content: space-between; align-items: center; 
+				padding: 10px 30px; width: 100%; box-sizing: border-box; margin-top: 40px;margin-bottom: 60px;">
+				<!-- 左側：logo + 文字 -->
+				<a href="podri.html" class="logo" style="display: flex; align-items: center; text-decoration: none;">
+				  <img src="images/logo_black.png" alt="PodWise Logo" style="height: 60px; margin-right: 10px;">
+				  <strong>PodWise</strong> Podcast自動摘要與個人化推薦系統
+				</a>
+				<!-- 右側：使用者頭像 -->
+				<div>
+				  <img src="images/user.png" id="user-login-btn" alt="登入"
+					style="width:40px; height:40px; cursor:pointer; border-radius:50%; border:2px solid #1dd195; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+				</div>
+				<!-- 登入彈窗 -->
+				<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:9999;">
+					<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.18); padding:2em 2.5em; min-width:260px;">
+						<div style="text-align:center; margin-bottom:1em; font-weight:bold; font-size:1.1em;">請輸入使用者ID</div>
+						<input type="text" id="user-id-input" placeholder="TYPE YOUR ID" style="width:100%; padding:0.7em; border-radius:8px; border:1px solid #1dd195; margin-bottom:1em; text-align:center; font-size:1em;">
+						<div id="login-close-btn" style="position:absolute; top:10px; right:14px; font-size:1.3em; color:#aaa; cursor:pointer;">&times;</div>
+					</div>
+				</div>
+					<!-- <ul class="icons">
+						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a>
+						</li>
+						<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+					</ul> -->
+				</header>
+
+				<!-- Banner -->
+				<section id="banner">
+					<div class="content">
+						<header>
+							<h1>PodWise<br /></h1>
+							<h2>AI 精準調頻，打造你的個人聲音空間。</h2>
+							<p> PodWise希望成為你的智能嚮導,幫助你發現符合你聆聽習慣的專屬精彩內容。</p>
+							<p>讓每一次收聽,都更貼近你的需求。
+							</p>
+						</header>
+<!-- 搜尋欄置中外層 -->
+<div class="searchbar-row">
+  <div class="InputContainer">
+    <input placeholder="Ask Podri.. (按 Enter 開始對話)" id="input" class="input" name="text" type="text">
+  </div>
+</div>
+
+<script>
+// 搜尋欄 Enter 鍵跳轉功能
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('input');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const searchText = this.value.trim();
+                if (searchText) {
+                    // 獲取當前用戶ID
+                    const userId = window.generatedUserId || localStorage.getItem('currentUserId') || 'default_user';
+                    // 跳轉到 podri.html 並帶入搜尋文字參數和用戶ID
+                    window.location.href = `podri.html?search=${encodeURIComponent(searchText)}&user_id=${encodeURIComponent(userId)}`;
+                }
+            }
+        });
+    }
+});
+// 登入彈窗互動
+(function(){
+	const loginBtn = document.getElementById('user-login-btn');
+	const loginModal = document.getElementById('login-modal');
+	const closeBtn = document.getElementById('login-close-btn');
+	const userIdInput = document.getElementById('user-id-input');
+
+	if(loginBtn && loginModal) {
+		loginBtn.onclick = function(e) {
+			loginModal.style.display = 'block';
+			userIdInput.value = '';
+			userIdInput.focus();
+			e.stopPropagation();
+		};
+	}
+	if(closeBtn && loginModal) {
+		closeBtn.onclick = function() {
+			loginModal.style.display = 'none';
+		};
+	}
+	if(loginModal) {
+		loginModal.onclick = function(e) {
+			if(e.target === loginModal) loginModal.style.display = 'none';
+		};
+	}
+			if(userIdInput) {
+			userIdInput.addEventListener('keydown', function(e){
+				if(e.key === 'Enter') {
+					const userId = userIdInput.value.trim();
+					if (userId) {
+						// 保存用戶ID到 localStorage
+						localStorage.setItem('currentUserId', userId);
+						window.generatedUserId = userId;
+						alert('已輸入ID：' + userId);
+						loginModal.style.display = 'none';
+					}
+				}
+			});
+		}
+})();
+</script>
+
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2 style="margin-top:6em; text-align:center;">
+						  <span class="dash">--</span>熱門推薦
+						</h2>
+					  </header>
+					  
+					<div class="music-cards">
+						<!-- 卡片1 - Business -->
+						<div class="card" data-category="business">
+							<div class="one">
+							  <div class="music">
+								<img src="http://192.168.32.66:30090/podcast-images/RSS_262026947_300.jpg" 
+									 alt="Business Podcast" 
+									 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+									 onerror="this.src='images/default_podcast.png'">
+							  </div>
+							  <span class="name">
+								<div></div>
+								商業精選
+							  </span>
+							  <span class="name1">
+								<div></div>
+								Business Collection
+							  </span>
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill play-button"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								  style="cursor: pointer;"
+								  onclick="playRandomAudio('business', this)"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						</div>
+						
+						<!-- 卡片2 - Education -->
+						<div class="card" data-category="education">
+							<div class="one">
+							  <div class="music">
+								<img src="http://192.168.32.66:30090/podcast-images/RSS_1533782597_300.jpg" 
+									 alt="Education Podcast" 
+									 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+									 onerror="this.src='images/default_podcast.png'">
+							  </div>
+							  <span class="name">
+								<div></div>
+								教育精選
+							  </span>
+							  <span class="name1">
+								<div></div>
+								Education Collection
+							  </span>
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill play-button"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								  style="cursor: pointer;"
+								  onclick="playRandomAudio('education', this)"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						</div>
+						
+						<!-- 卡片3 - Business 2 -->
+						<div class="card" data-category="business">
+							<div class="one">
+							  <div class="music">
+								<img src="http://192.168.32.66:30090/podcast-images/RSS_1452688611_300.jpg" 
+									 alt="Business Podcast 2" 
+									 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+									 onerror="this.src='images/default_podcast.png'">
+							  </div>
+							  <span class="name">
+								<div></div>
+								投資理財
+							  </span>
+							  <span class="name1">
+								<div></div>
+								Investment & Finance
+							  </span>
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill play-button"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								  style="cursor: pointer;"
+								  onclick="playRandomAudio('business', this)"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						</div>
+						
+						<!-- 卡片4 - Education 2 -->
+						<div class="card" data-category="education">
+							<div class="one">
+							  <div class="music">
+								<img src="http://192.168.32.66:30090/podcast-images/RSS_1590806478_300.jpg" 
+									 alt="Education Podcast 2" 
+									 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+									 onerror="this.src='images/default_podcast.png'">
+							  </div>
+							  <span class="name">
+								<div></div>
+								學習成長
+							  </span>
+							  <span class="name1">
+								<div></div>
+								Learning & Growth
+							  </span>
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill play-button"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								  style="cursor: pointer;"
+								  onclick="playRandomAudio('education', this)"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						</div>
+						
+						<!-- 卡片5 - Business 3 -->
+						<div class="card" data-category="business">
+							<div class="one">
+							  <div class="music">
+								<img src="http://192.168.32.66:30090/podcast-images/RSS_1488718553_300.jpg" 
+									 alt="Business Podcast 3" 
+									 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
+									 onerror="this.src='images/default_podcast.png'">
+							  </div>
+							  <span class="name">
+								<div></div>
+								科技趨勢
+							  </span>
+							  <span class="name1">
+								<div></div>
+								Tech Trends
+							  </span>
+							  <div class="bar">
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-caret-right-fill play-button"
+								  fill="currentColor"
+								  height="18"
+								  width="18"
+								  xmlns="http://www.w3.org/2000/svg"
+								  style="cursor: pointer;"
+								  onclick="playRandomAudio('business', this)"
+								>
+								  <path
+									d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+								  ></path>
+								</svg>
+								<svg
+								  viewBox="0 0 16 16"
+								  class="color bi bi-fast-forward-fill"
+								  fill="currentColor"
+								  height="16"
+								  width="16"
+								  xmlns="http://www.w3.org/2000/svg"
+								>
+								  <path
+									d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								  <path
+									d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692Z"
+								  ></path>
+								</svg>
+							  </div>
+							</div>
+							<div class="two"></div>
+							<div class="three"></div>
+						</div>
+
+					</div>
+					<audio id="audio-player"></audio>
+					
+					<!-- 首頁音樂卡片播放功能 -->
+					<script>
+						// 全域音檔播放器
+						let homePageAudio = null;
+						let currentPlayingButton = null;
+						
+						// 播放隨機音檔
+						async function playRandomAudio(category, button) {
+							try {
+								console.log('播放隨機音檔，類別:', category);
+								
+								// 停止當前播放
+								if (homePageAudio) {
+									homePageAudio.pause();
+									homePageAudio = null;
+								}
+								
+								// 重置所有播放按鈕
+								document.querySelectorAll('.play-button').forEach(btn => {
+									btn.style.fill = 'currentColor';
+								});
+								
+								// 獲取隨機音檔
+								const response = await fetch('/api/random-audio', {
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json',
+									},
+									body: JSON.stringify({
+										category: category
+									})
+								});
+								
+								if (response.ok) {
+									const data = await response.json();
+									if (data.success && data.audio_url) {
+										// 創建新的音檔物件
+										homePageAudio = new Audio(data.audio_url);
+										currentPlayingButton = button;
+										
+										// 設定事件監聽器
+										homePageAudio.addEventListener('play', () => {
+											console.log('開始播放隨機音檔');
+											button.style.fill = '#4CAF50'; // 播放時變綠色
+										});
+										
+										homePageAudio.addEventListener('pause', () => {
+											console.log('暫停播放');
+											button.style.fill = 'currentColor';
+										});
+										
+										homePageAudio.addEventListener('ended', () => {
+											console.log('播放結束');
+											button.style.fill = 'currentColor';
+											homePageAudio = null;
+											currentPlayingButton = null;
+										});
+										
+										homePageAudio.addEventListener('error', (e) => {
+											console.error('播放錯誤:', e);
+											button.style.fill = 'currentColor';
+											alert('音檔播放失敗，請稍後再試');
+										});
+										
+										// 開始播放
+										await homePageAudio.play();
+										
+										// 顯示播放提示
+										showPlayNotification(category);
+										
+									} else {
+										throw new Error(data.message || '無法獲取音檔');
+									}
+								} else {
+									throw new Error(`API 請求失敗: ${response.status}`);
+								}
+								
+							} catch (error) {
+								console.error('播放隨機音檔失敗:', error);
+								alert('播放失敗: ' + error.message);
+								button.style.fill = 'currentColor';
+							}
+						}
+						
+						// 顯示播放提示
+						function showPlayNotification(category) {
+							const categoryName = category === 'business' ? '商業' : '教育';
+							
+							// 創建或更新播放提示
+							let notificationDiv = document.getElementById('home-play-notification');
+							if (!notificationDiv) {
+								notificationDiv = document.createElement('div');
+								notificationDiv.id = 'home-play-notification';
+								notificationDiv.style.cssText = `
+									position: fixed;
+									bottom: 20px;
+									right: 20px;
+									background: #4CAF50;
+									color: white;
+									padding: 12px 18px;
+									border-radius: 8px;
+									z-index: 10000;
+									font-size: 14px;
+									box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+									max-width: 300px;
+									word-wrap: break-word;
+									transform: translateX(100%);
+									transition: transform 0.3s ease;
+								`;
+								document.body.appendChild(notificationDiv);
+							}
+							
+							notificationDiv.innerHTML = `
+								<div style="display: flex; align-items: center; gap: 8px;">
+									<span style="font-size: 18px;">🎵</span>
+									<div>
+										<div style="font-weight: bold;">正在播放</div>
+										<div style="font-size: 12px; opacity: 0.9;">${categoryName}類別隨機音檔</div>
+									</div>
+								</div>
+							`;
+							
+							// 顯示動畫
+							setTimeout(() => {
+								notificationDiv.style.transform = 'translateX(0)';
+							}, 100);
+							
+							// 3秒後自動隱藏
+							setTimeout(() => {
+								notificationDiv.style.transform = 'translateX(100%)';
+								setTimeout(() => {
+									if (notificationDiv) {
+										notificationDiv.remove();
+									}
+								}, 300);
+							}, 3000);
+						}
+						
+						// 頁面離開時停止播放
+						window.addEventListener('beforeunload', () => {
+							if (homePageAudio) {
+								homePageAudio.pause();
+								homePageAudio = null;
+							}
+						});
+					</script>
+				</section>
+			</div>
+		</div>
+		<!--sidebay-->
+	</div>
+	
+	<!-- Scripts -->
+	<script>
+		window.addEventListener('DOMContentLoaded', () => {
+			// 第一次造訪才顯示 popup
+			const hasVisited = localStorage.getItem('hasVisitedPopup');
+
+			if (!hasVisited) {
+				document.getElementById('popup-overlay').style.display = 'flex';
+				localStorage.setItem('hasVisitedPopup', 'true');
+			}
+		});
+
+		function closePopup() {
+			document.getElementById("popup-overlay").style.display = "none";
+		}
+	</script>
+
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<!-- Quiz Overlay -->
+	<div id="popup-overlay"
+		style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center;">
+		<div id="popup-container"
+			style="background:#ebebeb; padding:2.5em; border-radius:2em; max-width:600px; width:90%; position:relative;">
+			<!-- 關閉按鈕 -->
+			<img src="images/delete.png" alt="關閉" class="close-button"
+				style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; cursor:pointer; z-index:10;"
+				onclick="closePopup()">
+			<!-- Step 1 -->
+			<div class="popup-step" id="popup-step-1">
+				<h2>Taste of PodWise !</h2>
+				<div class="quiz-option-container">
+					<div class="quiz-option" data-category="business" onclick="window.selectMainCategory && window.selectMainCategory('business')">
+						<img src="images/financial-profit_golden.png" alt="商業">
+						<div>商業</div>
+					</div>
+					<div class="quiz-option" data-category="education" onclick="window.selectMainCategory && window.selectMainCategory('education')">
+						<img src="images/school_golden.png" alt="教育">
+						<div>教育</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Step 2 -->
+			<div class="popup-step" id="popup-step-2" style="display:none;">
+				<h2>Which type?</h2>
+				<div id="category-tags" style="display: flex; gap: 1em; margin-bottom: 1.5em; justify-content: center;"></div>
+				<button class="button primary" style="margin-top:2em;" onclick="goToStep(3)">下一步</button>
+			</div>
+			
+			</script>
+
+
+
+<!-- Step 3 -->
+<div class="popup-step" id="popup-step-3" style="display:none;">
+	<h2>You may like…</h2>
+	<h3 style="text-align:left; margin-left:0; padding-left:0;">
+	  試聽你有興趣的節目 並按下喜歡
+	</h3>
+	<div class="quiz-recommendations" id="recommendations-container" style="display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: center; align-items: center;">
+	  <!-- 推薦節目將在這裡動態載入 -->
+	  </div>
+  
+	<button class="button secondary" onclick="refreshRecommendations()">重新整理</button>
+	<button class="button primary" onclick="goToStep(4)">下一步</button>
+  
+	<script>
+	  // 全域變數
+	  let currentCategory = '';
+	  let selectedEpisodes = [];
+	  let currentRecommendations = [];
+	  
+	  // 主類別對應 TAG pool（與後端一致）
+	  // 注意：CATEGORY_TAGS 已在 Step 2 中定義，這裡移除重複宣告
+	  
+	  window.selectedTag = null;
+	  
+	  // 注意：renderCategoryTags 函數已在 Step 2 中定義，這裡不再重複定義
+	  
+	  // 從 Step 2 獲取類別
+	  function getCategoryFromStep2() {
+		// 使用全域變數 mainCategory
+		if (mainCategory) {
+		  console.log('使用全域變數 mainCategory:', mainCategory);
+		  return mainCategory;
+		}
+		console.log('沒有找到選中的類別，使用預設值: business');
+		return 'business'; // 預設值
+	  }
+	  
+	  // 映射類別到 API 類別
+	  function mapCategoryToAPI(category) {
+		// 直接使用 mainCategory，因為已經是 'business' 或 'education'
+		return category || 'business';
+	  }
+	  
+	  // 載入推薦節目（根據tag與category動態取得）
+	  window.loadRecommendations = async function() {
+		try {
+		  // 取得目前選擇的主類別與tag
+		  const apiCategory = window.mainCategory || 'business';
+		  const apiTag = window.selectedTag || '';
+		  console.log('Step3 載入推薦，類別:', apiCategory, 'tag:', apiTag);
+
+		  // 呼叫後端API取得推薦節目
+		  const response = await fetch(`/api/one-minutes-episodes?category=${encodeURIComponent(apiCategory)}&tag=${encodeURIComponent(apiTag)}`, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' }
+		  });
+		  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		  const data = await response.json();
+		  
+		  if (data.success && data.episodes && data.episodes.length > 0) {
+			currentRecommendations = data.episodes;
+			console.log('成功載入節目:', currentRecommendations.length, '個');
+		  } else {
+			console.warn('API 返回 0 個節目，使用預設推薦');
+			throw new Error('API 返回 0 個節目');
+		  }
+		  renderRecommendations();
+		} catch (error) {
+		  console.error('載入推薦失敗:', error);
+		  loadDefaultRecommendations();
+		}
+	  }
+	  
+	  // 載入預設推薦（當 API 不可用時）
+	  window.loadDefaultRecommendations = function() {
+		const category = window.mainCategory || 'business';
+		let defaultRecommendations = [];
+		
+		if (category === 'business') {
+		  defaultRecommendations = [
+		  {
+			podcast_name: '股癌 Gooaye',
+			episode_title: '投資理財精選',
+			episode_description: '晦澀金融投資知識直白講，重要海內外時事輕鬆談。',
+			podcast_image: 'images/股癌.png',
+			audio_url: 'http://192.168.32.66:30090/business-one-min-audio/RSS_1500839292_EP569_股癌.mp3',
+			        episode_id: 4,
+			rss_id: 'RSS_1500839292',
+			tags: ['投資理財', '股票分析', '市場趨勢', '經濟分析']
+		  },
+		  {
+			podcast_name: '矽谷輕鬆談',
+			episode_title: 'AI 技術趨勢',
+			episode_description: 'Google 搜尋、AI 技術、科技趨勢都能輕鬆聽懂。',
+			podcast_image: 'images/矽谷輕鬆談.png',
+			audio_url: 'http://192.168.32.66:30090/business-one-min-audio/RSS_1531106786_台幣漲夠了嗎 台積電增資100億美元避險玩什麼 2025.07.02.mp3',
+			episode_id: 2,
+			rss_id: 'RSS_1531106786',
+			tags: ['科技趨勢', '人工智慧', '創新思維', '數位轉型']
+		  },
+		  {
+			podcast_name: '天下學習',
+			episode_title: '管理思維分享',
+			episode_description: '訪談頂尖領導者，探索管理思維、教育創新與未來趨勢。',
+			podcast_image: 'images/天下學習.png',
+			audio_url: 'http://192.168.32.66:30090/business-one-min-audio/RSS_1536242998_EP2020吳淡如為什麼到了這個年紀我竟然覺得智商加倍了.mp3',
+			episode_id: 3,
+			rss_id: 'RSS_1536242998',
+			tags: ['企業管理', '領導力', '學習方法', '個人成長']
+		  }
+		];
+		} else if (category === 'education') {
+		  defaultRecommendations = [
+			{
+			  podcast_name: '啟點文化一天聽一點',
+			  episode_title: '學習方法論',
+			  episode_description: '探討有效的學習方法和知識獲取技巧。',
+			  podcast_image: 'images/知識就是力量.png',
+			  audio_url: 'http://192.168.32.66:30090/education-one-min-audio/RSS_1488718553_幸福翹翹板#29體制外教育真的比傳統體制內教育更好更自由嗎.mp3',
+			  episode_id: 4,
+			  rss_id: 'RSS_1488718553',
+			  tags: ['學習方法', '教育理念', '知識分享', '個人成長']
+			},
+			{
+			  podcast_name: '文森說書',
+			  episode_title: '未來教育趨勢',
+			  episode_description: '探討科技如何改變教育方式和學習體驗。',
+			  podcast_image: 'images/科技新知.png',
+			  audio_url: 'http://192.168.32.66:30090/education-one-min-audio/RSS_1513786617_拿錢換到快樂的極限致富的心魔.mp3',
+			  episode_id: 5,
+			  rss_id: 'RSS_1513786617',
+			  tags: ['教育科技', '未來趨勢', '創新教育', '數位學習']
+			},
+			{
+			  podcast_name: '大人的Small Talk',
+			  episode_title: '自我提升指南',
+			  episode_description: '幫助你建立積極心態，實現個人成長目標。',
+			  podcast_image: 'images/心靈成長.png',
+			  audio_url: 'http://192.168.32.66:30090/education-one-min-audio/RSS_1452688611_EP577 工作中那些讓你看不過去忍不住想出手的鳥事多半是你找到天命的暗示.mp3',
+			  episode_id: 6,
+			  rss_id: 'RSS_1452688611',
+			  tags: ['個人成長', '心理學', '自我提升', '心靈成長']
+			}
+		  ];
+		}
+  
+		currentRecommendations = defaultRecommendations;
+		renderRecommendations();
+	  }
+	  
+	  // 渲染推薦節目
+	  window.renderRecommendations = function() {
+		const container = document.getElementById('recommendations-container');
+		container.innerHTML = '';
+  
+		// 去重：確保沒有重複的節目和頻道
+		const uniqueRecommendations = [];
+		const usedEpisodeIds = new Set();
+		const usedPodcastNames = new Set();
+		
+		for (const rec of currentRecommendations) {
+			                const episodeId = rec.episode_id;
+			const podcastName = rec.podcast_name || rec.rss_id;
+			
+			if (episodeId && !usedEpisodeIds.has(episodeId) && 
+				podcastName && !usedPodcastNames.has(podcastName)) {
+				uniqueRecommendations.push(rec);
+				usedEpisodeIds.add(episodeId);
+				usedPodcastNames.add(podcastName);
+			}
+		}
+  
+		uniqueRecommendations.forEach((rec, index) => {
+		  // 取得podcast_id與標題
+		  const rssId = rec.rss_id || rec.podcast_id;
+		  const episodeTitle = rec.episode_title;
+		  const podcastName = rec.podcast_name || rssId;
+		  const playBtnId = `play-btn-${index}`;
+		  const imgId = `podcast-img-${index}`;
+		  
+		            // 根據類別和 RSS ID 構建圖片 URL
+          const category = window.mainCategory || 'business';
+          // 使用後端提供的 image_url，如果沒有則使用預設格式
+          let imageUrl = rec.image_url;
+          if (!imageUrl) {
+            // 確保 rssId 格式正確（移除可能的 RSS_ 前綴，然後重新構建）
+            let cleanRssId = rssId;
+            if (rssId.startsWith('RSS_')) {
+              cleanRssId = rssId.substring(4); // 移除 RSS_ 前綴
+            }
+            imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${cleanRssId}_300.jpg`;
+          }
+          
+          // 確保有正確的 audio_url
+          let audioUrl = rec.audio_url;
+          if (!audioUrl && rec.minio_filename) {
+            const folderMap = {
+              "business": "business-one-minutes-audio",
+              "education": "education-one-minutes-audio"
+            };
+            const folder = folderMap[category] || "business-one-minutes-audio";
+            audioUrl = `http://192.168.32.66:30090/${folder}/${rec.minio_filename}`;
+          }
+          
+          // 更新 currentRecommendations 中的 audio_url
+          const currentIndex = currentRecommendations.findIndex(ep => 
+            (ep.rss_id === rssId || ep.podcast_id === rssId) && ep.episode_title === episodeTitle
+          );
+          if (currentIndex !== -1 && audioUrl) {
+            currentRecommendations[currentIndex].audio_url = audioUrl;
+          }
+		  
+		  // 圖片HTML
+		  const imgHtml = `<img id="${imgId}" alt="${podcastName}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" src="${imageUrl}" onerror="this.src='images/default_podcast.png'">`;
+		  
+		  // 音檔URL直接用API回傳
+		  const item = document.createElement('div');
+		  item.className = 'recommend-item';
+		  item.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin: 10px; min-width: 300px; background: white;';
+		  item.innerHTML = `
+			${imgHtml}
+			<img src="images/play_gray.png" alt="播放" class="play-button" id="${playBtnId}" style="cursor:pointer; width:44px; height:44px;" onclick="playOrPauseAudio(this, '${rssId}', '${episodeTitle}', '${category}')">
+		<div class="text" style="flex: 1; min-width: 0;">
+			  <div class="title" style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #333;">${podcastName}</div>
+			  <p class="description" style="font-size: 14px; color: #666; margin: 0; line-height: 1.4;">${episodeTitle || '無標題'}</p>
+			<div style="font-size: 12px; color: #888; margin-top: 4px;">RSS_ID: ${rssId}</div>
+			</div>
+			<div class="heart-container" title="Like">
+			  <input type="checkbox" class="checkbox" id="like-${index}" onchange="toggleLike(${index}, '${rssId}', '${podcastName}', '${episodeTitle}', '${rssId}')">
+		  <div class="svg-container">
+			<svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+				  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+			</svg>
+			<svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+				  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+			</svg>
+			<svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+			  <polygon points="10,10 20,20"></polygon>
+			  <polygon points="10,50 20,50"></polygon>
+			  <polygon points="20,80 30,70"></polygon>
+			  <polygon points="90,10 80,20"></polygon>
+			  <polygon points="90,50 80,50"></polygon>
+			  <polygon points="80,80 70,70"></polygon>
+			</svg>
+		  </div>
+		</div>
+		  `;
+		  container.appendChild(item);
+		  
+		  // 確保 checkbox 初始狀態為未選中
+		  const checkbox = document.getElementById(`like-${index}`);
+		  if (checkbox) {
+			checkbox.checked = false;
+			checkbox.removeAttribute('checked');
+			// 添加 data 屬性來追蹤狀態
+			checkbox.setAttribute('data-initial-state', 'false');
+		  }
+		});
+	  }
+	  
+	  // 設定節目圖片（從 MinIO 載入）
+	  window.setPodcastImage = function(imgElement, rssId) {
+		if (!imgElement || !rssId) {
+		  console.error('setPodcastImage: 缺少必要參數', { imgElement, rssId });
+		  return;
+		}
+		
+		console.log('開始載入圖片，RSS ID:', rssId);
+		
+		// 確保 rssId 格式正確（移除可能的 RSS_ 前綴，然後重新構建）
+		let cleanRssId = rssId;
+		if (rssId.startsWith('RSS_')) {
+		  cleanRssId = rssId.substring(4); // 移除 RSS_ 前綴
+		}
+		
+		// 根據實際圖片命名格式：RSS_id_300.jpg
+		const imageUrl = `http://192.168.32.66:30090/podcast-images/RSS_${cleanRssId}_300.jpg`;
+		console.log(`嘗試載入圖片: ${imageUrl}`);
+		
+		// 測試圖片是否可載入
+		const testImg = new Image();
+		testImg.onload = function() {
+		  console.log(`成功載入圖片: ${imageUrl}`);
+		  imgElement.src = imageUrl;
+		};
+		testImg.onerror = function() {
+		  console.log(`圖片載入失敗: ${imageUrl}，使用預設圖片`);
+		  imgElement.src = 'images/default_podcast.png';
+		};
+		
+		testImg.src = imageUrl;
+	  }
+	  
+	  let globalAudio = null;
+	  let currentPlayButton = null;
+	  let lastAudioUrl = '';
+	  let lastAudioTime = 0;
+
+	  // 修正 1: playOrPauseAudio 暫停/播放切換
+	  window.playOrPauseAudio = async function(button, rssId, episodeTitle, category) {
+		try {
+		  console.log('playOrPauseAudio 被呼叫:', { rssId, episodeTitle, category });
+		  console.log('當前按鈕狀態:', button.src);
+		  console.log('globalAudio 狀態:', globalAudio ? (globalAudio.paused ? 'paused' : 'playing') : 'null');
+
+		  // 從當前推薦列表中獲取音檔 URL
+		  console.log('currentRecommendations:', currentRecommendations);
+		  console.log('尋找條件:', { rssId, episodeTitle, category });
+		  
+		  const currentEpisode = currentRecommendations.find(ep => {
+			const epRssId = ep.rss_id || ep.podcast_id;
+			const epTitle = ep.episode_title;
+			// 修正比對邏輯：只比對 RSS ID，因為 episodeTitle 可能包含特殊字符
+			const match = (epRssId == rssId || epRssId.toString() === rssId.toString());
+			console.log('比對:', { epRssId, epTitle, rssId, episodeTitle, match });
+			return match;
+		  });
+		  
+		  console.log('找到的節目:', currentEpisode);
+		  
+		  let audioUrl = '';
+		  if (currentEpisode && currentEpisode.audio_url) {
+			audioUrl = currentEpisode.audio_url;
+			console.log('從 currentEpisode 獲取音檔 URL:', audioUrl);
+		  } else {
+			console.log('currentEpisode 中沒有 audio_url，嘗試從 MinIO 獲取');
+			// 如果沒有找到音檔 URL，嘗試從 MinIO 獲取
+			try {
+			  						const response = await fetch('/api/audio/presigned-url', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				rss_id: rssId,
+				episode_title: episodeTitle,
+				category: category
+			})
+		});
+			  
+			  if (response.ok) {
+				const data = await response.json();
+				if (data.success && data.audio_url) {
+				  audioUrl = data.audio_url;
+				  console.log('從 MinIO 獲取音檔:', audioUrl);
+				}
+			  }
+			} catch (error) {
+			  console.log('無法從 MinIO 獲取音檔:', error);
+			}
+		  }
+		  
+		  if (!audioUrl) {
+			throw new Error('無法找到對應的音檔 URL');
+		  }
+		  
+		  console.log('使用音檔 URL:', audioUrl);
+
+		  // 如果已經有 audio 物件且是同一首歌曲
+		  if (globalAudio && lastAudioUrl === audioUrl) {
+			if (!globalAudio.paused) {
+			  // 正在播放，執行暫停
+			  console.log('執行暫停');
+			  globalAudio.pause();
+			  lastAudioTime = globalAudio.currentTime;
+			  button.src = 'images/play_gray.png';
+			  return;
+			} else {
+			  // 已暫停，執行播放
+			  console.log('執行播放');
+			  globalAudio.currentTime = lastAudioTime;
+			  globalAudio.play();
+			  button.src = 'images/stop_gray.png';
+			  return;
+			}
+		  }
+
+		  // 如果是新歌曲或沒有 audio 物件，先停止當前播放
+		  if (globalAudio) {
+			console.log('停止當前播放，切換到新歌曲');
+			globalAudio.pause();
+			if (currentPlayButton && currentPlayButton !== button) {
+			  currentPlayButton.src = 'images/play_gray.png';
+			}
+		  }
+
+		  // 建立新的 audio 物件
+		  console.log('建立新音檔物件');
+		  globalAudio = new Audio(audioUrl);
+		  lastAudioUrl = audioUrl;
+		  lastAudioTime = 0;
+		  currentPlayButton = button;
+
+		  // 設定事件監聽器
+		  globalAudio.addEventListener('ended', () => {
+			console.log('播放結束');
+			button.src = 'images/play_gray.png';
+			lastAudioTime = 0;
+		  });
+		  
+		  globalAudio.addEventListener('pause', () => {
+			console.log('暫停事件觸發');
+			button.src = 'images/play_gray.png';
+		  });
+		  
+		  globalAudio.addEventListener('play', () => {
+			console.log('播放事件觸發');
+			button.src = 'images/stop_gray.png';
+		  });
+		  
+		  globalAudio.addEventListener('error', (e) => {
+			console.log('播放錯誤:', e);
+			button.src = 'images/play_gray.png';
+			alert('音檔播放失敗，請檢查網路連線或音檔是否存在');
+			console.error('音檔播放錯誤詳情:', e);
+		  });
+
+		  // 開始播放
+		  console.log('開始播放新歌曲');
+		  console.log('音檔 URL:', audioUrl);
+		  
+		  // 測試音檔是否可以載入
+		  globalAudio.addEventListener('loadstart', () => {
+			console.log('開始載入音檔...');
+		  });
+		  
+		  globalAudio.addEventListener('canplay', () => {
+			console.log('音檔可以播放');
+		  });
+		  
+		  globalAudio.addEventListener('error', (e) => {
+			console.error('音檔載入失敗:', e);
+			button.src = 'images/play_gray.png';
+		  });
+		  
+		  await globalAudio.play();
+		  button.src = 'images/stop_gray.png';
+
+		} catch (error) {
+		  console.error('播放失敗:', error);
+		  alert('播放失敗: ' + error.message);
+		  button.src = 'images/play_gray.png';
+		}
+	  }
+	  
+	  // 播放音檔
+	  async function playAudio(audioUrl, episodeId, podcastName, episodeTitle, rssId) {
+		try {
+		  console.log('開始播放音檔:', audioUrl);
+		  
+		  // 檢查是否為 MinIO 音檔 URL
+		  let finalAudioUrl = audioUrl;
+		  
+		  // 如果 URL 不包含 MinIO 預簽名 URL，則嘗試獲取
+		  if (!audioUrl.includes('localhost:9000') && !audioUrl.includes('192.168.32.66:30090') && !audioUrl.includes('audio/sample')) {
+			try {
+			  						const response = await fetch('/api/audio/presigned-url', {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+				  rss_id: rssId,
+				  episode_title: episodeTitle,
+				  category: mapCategoryToAPI(window.mainCategory || 'business')
+				})
+			  });
+			  
+			  if (response.ok) {
+				const data = await response.json();
+				if (data.success && data.audio_url) {
+				  finalAudioUrl = data.audio_url;
+				  console.log('從 MinIO 獲取音檔:', finalAudioUrl);
+				}
+			  }
+			} catch (error) {
+			  console.log('無法從 MinIO 獲取音檔，使用預設音檔');
+			}
+		  }
+		  
+		  // 停止當前播放的音檔
+		  const existingAudio = document.getElementById('audio-player');
+		  if (existingAudio) {
+			existingAudio.pause();
+			existingAudio.currentTime = 0;
+		  }
+		  
+		  // 創建新的音檔元素
+		  const audio = new Audio();
+		  audio.id = 'audio-player';
+		  audio.src = finalAudioUrl;
+		  
+		  // 添加播放事件監聽器
+		  audio.addEventListener('loadstart', () => {
+			console.log('開始載入音檔...');
+		  });
+		  
+		  audio.addEventListener('canplay', () => {
+			console.log('音檔可以播放');
+		  });
+		  
+		  audio.addEventListener('play', () => {
+			console.log('開始播放:', podcastName, '-', episodeTitle);
+			// 顯示播放狀態
+			showPlayStatus(podcastName, episodeTitle, true);
+		  });
+		  
+		  audio.addEventListener('ended', () => {
+			console.log('播放結束');
+			showPlayStatus(podcastName, episodeTitle, false);
+		  });
+		  
+		  audio.addEventListener('error', (e) => {
+			console.error('播放錯誤:', e);
+			alert('音檔播放失敗，請檢查音檔是否存在');
+			showPlayStatus(podcastName, episodeTitle, false);
+		  });
+		  
+		  // 開始播放
+		  const playPromise = audio.play();
+		  if (playPromise !== undefined) {
+			playPromise.then(() => {
+			  // 播放成功
+			  console.log('播放成功啟動');
+			}).catch(error => {
+			  console.error('播放失敗:', error);
+			  alert('播放失敗，可能是瀏覽器阻止了自動播放');
+			});
+		  }
+		  
+		  // 記錄播放行為
+		  recordFeedback('play', episodeId, podcastName, episodeTitle, rssId);
+		  
+		} catch (error) {
+		  console.error('播放失敗:', error);
+		  alert('播放失敗: ' + error.message);
+		}
+	  }
+	  
+	  // 顯示播放狀態
+	  function showPlayStatus(podcastName, episodeTitle, isPlaying) {
+		// 創建或更新播放狀態提示
+		let statusDiv = document.getElementById('play-status');
+		if (!statusDiv) {
+		  statusDiv = document.createElement('div');
+		  statusDiv.id = 'play-status';
+		  statusDiv.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: ${isPlaying ? '#4CAF50' : '#f44336'};
+			color: white;
+			padding: 10px 15px;
+			border-radius: 5px;
+			z-index: 10000;
+			font-size: 14px;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+		  `;
+		  document.body.appendChild(statusDiv);
+		}
+		
+		statusDiv.textContent = isPlaying ? 
+		  `🎵 正在播放: ${podcastName} - ${episodeTitle}` : 
+		  `⏹️ 播放結束: ${podcastName} - ${episodeTitle}`;
+		
+		// 3秒後自動隱藏
+		setTimeout(() => {
+		  if (statusDiv && !isPlaying) {
+			statusDiv.remove();
+		  }
+		}, 3000);
+	  }
+	  
+	  // 切換喜歡狀態
+	  function toggleLike(index, episodeId, podcastName, episodeTitle, rssId) {
+		const checkbox = document.getElementById(`like-${index}`);
+		const isLiked = checkbox.checked;
+		
+		console.log('toggleLike 被呼叫:', { index, episodeId, isLiked });
+		
+		// 更新選中的節目列表
+		const episodeData = {
+		  episode_id: episodeId,
+		  podcast_name: podcastName,
+		  episode_title: episodeTitle,
+		  rss_id: rssId
+		};
+		
+		if (isLiked) {
+		  // 添加到選中列表（checkbox 被勾選時加入喜好）
+		  window.selectedEpisodes.push(episodeData);
+		  recordFeedback('like', episodeId, podcastName, episodeTitle, rssId);
+		  console.log(`❤️ 加入喜好: ${podcastName} - ${episodeTitle}`);
+		} else {
+		  // 從選中列表移除（checkbox 取消勾選時移除喜好）
+		  window.selectedEpisodes = window.selectedEpisodes.filter(ep => ep.episode_id !== episodeId);
+		  recordFeedback('unlike', episodeId, podcastName, episodeTitle, rssId);
+		  console.log(`💔 移除喜好: ${podcastName} - ${episodeTitle}`);
+		}
+		
+		console.log('選中的節目數量:', window.selectedEpisodes.length);
+		console.log('選中的節目:', window.selectedEpisodes);
+		
+		// 顯示用戶偏好提示 - 傳入當前狀態（checkbox.checked）
+		showPreferenceNotification(podcastName, episodeTitle, isLiked);
+	  }
+	  
+	  // 顯示用戶偏好提示
+	  function showPreferenceNotification(podcastName, episodeTitle, isLiked) {
+		// 創建或更新偏好提示
+		let notificationDiv = document.getElementById('preference-notification');
+		if (!notificationDiv) {
+		  notificationDiv = document.createElement('div');
+		  notificationDiv.id = 'preference-notification';
+		  notificationDiv.style.cssText = `
+			position: fixed;
+			top: 80px;
+			right: 20px;
+			background: ${isLiked ? '#4CAF50' : '#f44336'};
+			color: white;
+			padding: 12px 18px;
+			border-radius: 8px;
+			z-index: 10000;
+			font-size: 14px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+			max-width: 300px;
+			word-wrap: break-word;
+			transform: translateX(100%);
+			transition: transform 0.3s ease;
+		  `;
+		  document.body.appendChild(notificationDiv);
+		}
+		
+		const emoji = isLiked ? '❤️' : '💔';
+		const action = isLiked ? '已加入喜好' : '已移除喜好';
+		
+		notificationDiv.innerHTML = `
+		  <div style="display: flex; align-items: center; gap: 8px;">
+			<span style="font-size: 18px;">${emoji}</span>
+			<div>
+			  <div style="font-weight: bold;">${action}</div>
+			  <div style="font-size: 12px; opacity: 0.9;">${podcastName}</div>
+			  <div style="font-size: 11px; opacity: 0.8;">${episodeTitle}</div>
+	  </div>
+	</div>
+  `;
+		
+		// 顯示動畫
+		setTimeout(() => {
+		  notificationDiv.style.transform = 'translateX(0)';
+		}, 100);
+		
+		// 3秒後自動隱藏
+		setTimeout(() => {
+		  notificationDiv.style.transform = 'translateX(100%)';
+		  setTimeout(() => {
+			if (notificationDiv) {
+			  notificationDiv.remove();
+			}
+		  }, 300);
+		}, 3000);
+	  }
+	  
+	  // 記錄用戶反饋
+	  async function recordFeedback(action, episodeId, podcastName, episodeTitle, rssId) {
+		try {
+		  				// 使用臨時用戶ID，在 Step 4 時會更新為真實的用戶ID
+						const tempUserId = window.generatedUserId || localStorage.getItem('currentUserId') || 'temp_user';
+		  
+		  const response = await fetch('/api/feedback', {
+				method: 'POST',
+				headers: {
+			  		'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+			  		        user_id: tempUserId,
+			  	episode_id: episodeId,
+			  podcast_name: podcastName,
+			  episode_title: episodeTitle,
+			  rss_id: rssId,
+			  action: action,
+			  category: window.mainCategory || 'business'
+			})
+		  });
+		  
+		  if (response.ok) {
+			console.log(`${action} 操作記錄成功`);
+		  }
+		  
+		} catch (error) {
+		  console.error('記錄反饋失敗:', error);
+		}
+	  }
+	  
+	  // 重新整理推薦
+	  function refreshRecommendations() {
+		loadRecommendations();
+	  }
+	  
+	  // 頁面載入時載入推薦
+	  document.addEventListener('DOMContentLoaded', () => {
+		// 延遲載入，確保 Step 2 已完成
+		setTimeout(loadRecommendations, 100);
+	  });
+	  
+	  // 頁面離開時停止音檔播放
+	  window.addEventListener('beforeunload', () => {
+		if (globalAudio) {
+		  globalAudio.pause();
+		  globalAudio = null;
+		}
+	  });
+	  
+	  // 注意：goToStep 函數已在後面的全域腳本中重新定義，包含停止音檔功能
+	</script>
+  </div>
+  
+			<!-- Step 4 -->
+<div class="popup-step" id="popup-step-4" style="display: none;">
+  <h2 style="color: #7c4dff;">Sign in Your Podwise</h2>
+  <!-- 這裡開始： -->
+  <div class="form-center">
+    <!-- Podwise ID 輸入 -->
+    <input
+      type="text"
+      name="demo-name"
+      id="demo-name"
+      placeholder="輸入你的Podwise ID"
+    />
+
+    <!-- or 分隔 -->
+    <span style="color:#666;">— or —</span>
+
+    <!-- 產生 ID 按鈕 -->
+    <input
+      type="button"
+      value="產生Podwise ID"
+      id="generateIdBtn"
+      class="secondary"
+      onclick="generatePodwiseID()"
+    />
+
+    <!-- 顯示產生後的 ID -->
+    <input
+      type="text"
+      id="podwiseIdField"
+      readonly
+      placeholder="Generating..."
+    />
+
+    <!-- 進入 Podwise 按鈕 -->
+    <button
+      type="button"
+      class="button primary"
+      onclick="enterPodwise()"
+    >
+      進入Podwise
+    </button>
+  </div>
+  <!-- 這裡結束 -->
+</div>
+
+									<script>
+										async function generatePodwiseID() {
+											try {
+												// 顯示載入狀態
+												const idField = document.getElementById('podwiseIdField');
+												const generateBtn = document.getElementById('generateIdBtn');
+												
+												idField.value = '正在生成...';
+												generateBtn.disabled = true;
+												generateBtn.value = '生成中...';
+												
+												        // 調用用戶管理 API 生成 Podwise ID
+        const response = await fetch('/api/generate-podwise-id', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json',
+													},
+													body: JSON.stringify({})
+												});
+												
+												if (response.ok) {
+													const data = await response.json();
+													if (data.success) {
+														// 顯示生成的 Podwise ID
+														idField.value = data.podwise_id;
+														        // 儲存 user_id 供後續使用
+        window.generatedUserId = data.user_id; // 使用 user_id
+        console.log('Podwise ID 生成成功:', data.user_id);
+													} else {
+														throw new Error(data.message || '生成失敗');
+													}
+												} else {
+													throw new Error(`API 請求失敗: ${response.status}`);
+												}
+												
+											} catch (error) {
+												console.error('生成 Podwise ID 失敗:', error);
+												document.getElementById('podwiseIdField').value = '生成失敗，請重試';
+												alert('生成 Podwise ID 失敗，請重試');
+											} finally {
+												// 恢復按鈕狀態
+												const generateBtn = document.getElementById('generateIdBtn');
+												generateBtn.disabled = false;
+												generateBtn.value = '產生Podwise ID';
+											}
+										}
+										
+										// 收集所有 Like 的節目資訊
+										function collectLikedEpisodes() {
+										  // 使用全域變數中已收集的節目，如果沒有則從 checkbox 重新收集
+										  if (window.selectedEpisodes && window.selectedEpisodes.length > 0) {
+										    console.log('使用已收集的節目:', window.selectedEpisodes);
+										    return;
+										  }
+										  
+										  const likedEpisodes = [];
+										  if (window.currentRecommendations) {
+										    window.currentRecommendations.forEach((rec, idx) => {
+										      const checkbox = document.getElementById(`like-${idx}`);
+										      if (checkbox && checkbox.checked) {
+										        likedEpisodes.push({
+										          podcast_name: rec.podcast_name,
+										          episode_title: rec.episode_title,
+										          rss_id: rec.rss_id || rec.podcast_id,
+										                                  episode_id: rec.episode_id
+										        });
+										      }
+										    });
+										  }
+										  window.selectedEpisodes = likedEpisodes;
+										  console.log('重新收集節目:', window.selectedEpisodes);
+										}
+										
+																				// 進入 Podwise 按鈕觸發
+										async function enterPodwise() {
+										  collectLikedEpisodes(); // 先收集 Like 節目
+
+										  const userIdInput = document.getElementById('demo-name');
+										  const generatedIdInput = document.getElementById('podwiseIdField');
+										  let userId = userIdInput.value.trim();
+										  const isNewUser = generatedIdInput.value.trim() !== '';
+										  
+										  if (isNewUser) {
+										    // 使用生成的用戶ID
+										    userId = window.generatedUserId || 'Podwise0001'; // 預設使用 Podwise0001
+										  } else {
+										    // 檢查是否為有效的 Podwise ID 格式
+										    if (!userId.startsWith('Podwise')) {
+										      alert('請輸入有效的 Podwise ID 格式（例如：Podwise0001）');
+										      return;
+										    }
+										    
+										    // 檢查現有用戶是否存在於資料庫
+										    try {
+										      const checkResponse = await fetch(`/api/user/check/${userId}`, {
+										        method: 'GET',
+										        headers: { 'Content-Type': 'application/json' }
+										      });
+										      
+										      if (checkResponse.ok) {
+										        const checkData = await checkResponse.json();
+										        if (!checkData.exists) {
+										          alert('此 Podwise ID 不存在，請重新輸入或創建新的 ID');
+										          return;
+										        }
+										      } else {
+										        console.warn('無法檢查用戶存在性，繼續執行');
+										      }
+										    } catch (error) {
+										      console.warn('檢查用戶存在性失敗:', error);
+										    }
+										    
+										    // 對於現有用戶，直接使用輸入的 ID
+										    console.log('使用現有用戶 ID:', userId);
+										  }
+										  
+										  if (!userId) {
+										    alert('請輸入或產生 Podwise ID');
+										    return;
+										  }
+										  
+										  // 檢查是否至少選擇了一個節目
+										  if (window.selectedEpisodes.length === 0) {
+										    alert('請至少選擇一個您喜歡的節目');
+										    return;
+										  }
+										  
+										  try {
+										    // 儲存完整的用戶偏好資料
+										    await saveUserPreferences(userId);
+										    console.log('用戶偏好儲存成功，準備跳轉到沒有彈出視窗的 index.html');
+										    // 確保設置正確的 localStorage 值
+										    localStorage.setItem('podwiseOnboarded', 'true');
+										    localStorage.setItem('currentUserId', userId);
+										    console.log('localStorage 已設置:', { 
+										        podwiseOnboarded: localStorage.getItem('podwiseOnboarded'),
+										        currentUserId: localStorage.getItem('currentUserId')
+										    });
+										    // 延遲跳轉確保 localStorage 已保存
+										    setTimeout(() => {
+										        window.location.href = '/';
+										    }, 100);
+										  } catch (error) {
+										    console.error('儲存用戶偏好失敗:', error);
+										    alert('儲存失敗，請重試');
+										  }
+										}
+										
+										// 儲存用戶偏好資料
+										async function saveUserPreferences(userId) {
+										  try {
+										    const userData = {
+										              user_id: userId,
+										      main_category: window.mainCategory || 'business', // Step 1 選擇的主類別
+										      sub_category: window.selectedTag || '', // Step 2 選擇的標籤作為 sub_category
+										    };
+										
+										        // 先儲存用戶偏好
+    const response = await fetch('/api/user/preferences', {
+										      method: 'POST',
+										      headers: {
+										        'Content-Type': 'application/json',
+										      },
+										      body: JSON.stringify(userData)
+										    });
+										
+										    if (response.ok) {
+										      const data = await response.json();
+										      console.log('用戶偏好儲存成功:', data);
+										      
+										      // 儲存每個喜歡的節目的反饋到 user_feedback 表
+										      for (const episode of window.selectedEpisodes) {
+										        try {
+										          const feedbackData = {
+										            user_id: userId,
+										            podcast_id: episode.episode_id || 0, // 使用 episode_id 作為 podcast_id
+										            episode_title: episode.episode_title,
+										            like_count: 1, // 因為是喜歡操作
+										            preview_play_count: 0
+										          };
+										          
+										          												          const feedbackResponse = await fetch('/api/feedback', {
+										            method: 'POST',
+										            headers: {
+										              'Content-Type': 'application/json',
+										            },
+										            body: JSON.stringify(feedbackData)
+										          });
+										          
+										          if (feedbackResponse.ok) {
+										            console.log(`節目反饋儲存成功: ${episode.podcast_name} - ${episode.episode_title}`);
+										          } else {
+										            console.warn(`節目反饋儲存失敗: ${episode.podcast_name}`);
+										          }
+										        } catch (error) {
+										          console.warn(`儲存節目反饋時發生錯誤: ${error}`);
+										        }
+										      }
+										      
+										      return data;
+										    } else {
+										      const errorData = await response.json();
+										      throw new Error(errorData.detail || '儲存失敗');
+										    }
+										  } catch (error) {
+										    console.error('儲存用戶偏好失敗:', error);
+										    throw error;
+										  }
+										}
+										
+										async function registerNewUser(userId) {
+											try {
+												    // 使用用戶管理 API 來創建新用戶
+    const response = await fetch('/user-api/api/generate-podwise-id', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json',
+													},
+													body: JSON.stringify({})
+												});
+												
+												if (response.ok) {
+													const data = await response.json();
+													console.log('用戶註冊成功:', data);
+													return data;
+												} else {
+													throw new Error('註冊失敗');
+												}
+												
+											} catch (error) {
+												console.error('註冊用戶失敗:', error);
+												throw error;
+											}
+										}
+									</script>
+						<!-- <button type="button" class="button" onclick="closePopup()">進入Podwise</button> -->
+								</div>
+
+						</div>
+					</div>
+
+						<!-- Scripts -->
+	<script src="migrate_localStorage.js"></script>
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+					<script>
+						// 初次顯示 - 檢查是否已經完成 onboarding
+						window.addEventListener('DOMContentLoaded', () => {
+							const isOnboarded = localStorage.getItem('podwiseOnboarded') === 'true';
+							const currentUserId = localStorage.getItem('currentUserId');
+							
+							console.log('檢查 onboarding 狀態:', { isOnboarded, currentUserId });
+							
+							// 檢查是否是第一次訪問（沒有 onboarding 記錄）
+							const isFirstVisit = !localStorage.getItem('hasVisitedBefore');
+							
+							if (isFirstVisit) {
+								console.log('第一次訪問，顯示 Step4 讓用戶輸入或生成 ID');
+								localStorage.setItem('hasVisitedBefore', 'true');
+								document.getElementById('popup-overlay').style.display = 'flex';
+								// 直接跳轉到 Step4
+								setTimeout(() => {
+									if (window.goToStep) {
+										window.goToStep(4);
+									}
+								}, 100);
+							} else if (!isOnboarded || !currentUserId) {
+								console.log('顯示 onboarding 彈窗');
+								document.getElementById('popup-overlay').style.display = 'flex';
+							} else {
+								console.log('用戶已完成 onboarding，檢查用戶 ID');
+								// 檢查用戶 ID 是否有效（以 Podwise 開頭）
+								if (currentUserId && currentUserId.startsWith('Podwise')) {
+									console.log('用戶 ID 有效，顯示歡迎訊息');
+									showWelcomeMessage(currentUserId);
+								} else {
+									console.log('用戶 ID 無效，顯示 Step4 讓用戶輸入或生成 ID');
+									document.getElementById('popup-overlay').style.display = 'flex';
+									// 直接跳轉到 Step4
+									setTimeout(() => {
+										if (window.goToStep) {
+											window.goToStep(4);
+										}
+									}, 100);
+								}
+							}
+						});
+						
+						// 顯示歡迎訊息和操作按鈕
+						function showWelcomeMessage(userId) {
+							const banner = document.querySelector('#banner .content');
+							if (banner && userId) {
+								const welcomeDiv = document.createElement('div');
+								welcomeDiv.style.cssText = 'text-align: center; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.9); border-radius: 8px;';
+								welcomeDiv.innerHTML = `
+									<h3 style="color: #583e3d; margin-bottom: 10px;">歡迎回來，${userId}！</h3>
+									<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+										<button onclick="window.location.href='podri.html?user_id=${userId}'" 
+												style="padding: 8px 16px; background: #583e3d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+											進入 Podri 聊天
+										</button>
+										<button onclick="showStep4ForNewId()" 
+												style="padding: 8px 16px; background: #7c4dff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+											使用新 ID
+										</button>
+										<button onclick="resetOnboarding()" 
+												style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+											重新開始
+										</button>
+									</div>
+								`;
+								banner.appendChild(welcomeDiv);
+							} else if (banner && !userId) {
+								// 如果沒有用戶 ID，顯示 Step4 讓用戶輸入或生成 ID
+								console.log('沒有用戶 ID，顯示 Step4 讓用戶輸入或生成 ID');
+								document.getElementById('popup-overlay').style.display = 'flex';
+								// 直接跳轉到 Step4
+								setTimeout(() => {
+									if (window.goToStep) {
+										window.goToStep(4);
+									}
+								}, 100);
+							}
+						}
+						
+						// 顯示 Step4 讓用戶輸入或生成新 ID
+						function showStep4ForNewId() {
+							console.log('顯示 Step4 讓用戶輸入或生成新 ID');
+							document.getElementById('popup-overlay').style.display = 'flex';
+							// 直接跳轉到 Step4
+							setTimeout(() => {
+								if (window.goToStep) {
+									window.goToStep(4);
+								}
+							}, 100);
+						}
+						
+						// 重置 onboarding 狀態
+						function resetOnboarding() {
+							localStorage.removeItem('podwiseOnboarded');
+							localStorage.removeItem('currentUserId');
+							localStorage.removeItem('hasVisitedBefore');
+							window.location.reload();
+						}
+
+						// 向後端取得 ID 並顯示
+						function fetchGeneratedCode() {
+							    fetch('/user-api/api/generate-podwise-id', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+								},
+								body: JSON.stringify({})
+							})
+							.then(res => res.json())
+							.then(data => {
+								if (data.success) {
+									document.getElementById('generated-code').textContent = data.podwise_id;
+								} else {
+									document.getElementById('generated-code').textContent = '取得失敗';
+								}
+							})
+							.catch(() => {
+								document.getElementById('generated-code').textContent = '取得失敗';
+							});
+						}
+
+						// 關閉
+						function closePopup() {
+							document.getElementById('popup-overlay').style.display = 'none';
+						}
+					</script>
+					
+					<!-- 我們的 Step 功能 JavaScript -->
+					<script>
+						// 等待所有腳本載入完成後執行
+						window.addEventListener('load', function() {
+							console.log('所有資源載入完成');
+							
+							// 全域變數和函數定義
+							window.mainCategory = 'business'; // 預設值
+							window.selectedEpisodes = []; // 儲存選中的節目
+
+							// 主類別對應的標籤（將從後端動態獲取）
+							window.CATEGORY_TAGS = {
+								business: ["投資理財", "股票分析", "經濟分析", "財務規劃"],
+								education: ["學習方法", "教育理念", "知識分享", "個人成長"]
+							};
+
+							window.selectMainCategory = function(category) {
+								console.log('selectMainCategory 被調用，category:', category);
+								window.mainCategory = category;
+								window.selectedMainCategory = category;
+								window.selectedTag = null;
+								window.goToStep(2);
+							};
+
+							window.renderCategoryTags = function() {
+								console.log('renderCategoryTags 被調用');
+								console.log('mainCategory:', window.mainCategory);
+								
+								const tagDiv = document.getElementById('category-tags');
+								console.log('tagDiv:', tagDiv);
+								
+								if (!tagDiv) {
+									console.error('找不到 category-tags div');
+									return;
+								}
+								
+								tagDiv.innerHTML = '';
+								
+								// 從後端動態獲取類別標籤
+								fetch(`/api/category-tags/${window.mainCategory}`)
+									.then(response => response.json())
+									.then(data => {
+										if (data.success) {
+											const tags = data.tags;
+											console.log('從後端獲取的標籤:', tags);
+											
+											// 確保只顯示4個標籤，以2行2列顯示
+											const displayTags = tags.slice(0, 4);
+											
+											displayTags.forEach(tag => {
+												const btn = document.createElement('button');
+												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
+												btn.textContent = tag;
+												btn.onclick = function() {
+													window.selectedTag = tag;
+													window.renderCategoryTags(); // 只高亮
+													// 點擊後自動進入 Step3
+													setTimeout(() => { window.goToStep(3); }, 200);
+												};
+												tagDiv.appendChild(btn);
+											});
+										} else {
+											console.error('獲取標籤失敗:', data.message);
+											// 使用預設標籤
+											const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
+											const displayTags = defaultTags.slice(0, 4);
+											displayTags.forEach(tag => {
+												const btn = document.createElement('button');
+												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
+												btn.textContent = tag;
+												btn.onclick = function() {
+													window.selectedTag = tag;
+													window.renderCategoryTags();
+													setTimeout(() => { window.goToStep(3); }, 200);
+												};
+												tagDiv.appendChild(btn);
+											});
+										}
+									})
+									.catch(error => {
+										console.error('獲取標籤異常:', error);
+										// 使用預設標籤
+										const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
+										const displayTags = defaultTags.slice(0, 4);
+										displayTags.forEach(tag => {
+											const btn = document.createElement('button');
+											btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
+											btn.textContent = tag;
+											btn.onclick = function() {
+												window.selectedTag = tag;
+												window.renderCategoryTags();
+												setTimeout(() => { window.goToStep(3); }, 200);
+											};
+											tagDiv.appendChild(btn);
+										});
+									});
+							};
+
+							window.goToStep = function(step) {
+								console.log('goToStep 被調用，step:', step);
+								
+								// 停止當前播放的音檔（從 Step 2 到 Step 3 時特別重要）
+								if (window.globalAudio) {
+									console.log('停止當前音檔播放');
+									window.globalAudio.pause();
+									window.globalAudio.currentTime = 0;
+									window.globalAudio = null;
+									if (window.currentPlayButton) {
+										window.currentPlayButton.src = 'images/play_gray.png';
+									}
+									console.log('已停止音檔播放');
+								}
+								
+								// 同時停止其他可能的音檔播放器
+								const existingAudio = document.getElementById('audio-player');
+								if (existingAudio) {
+									console.log('停止 audio-player 音檔');
+									existingAudio.pause();
+									existingAudio.currentTime = 0;
+								}
+								
+								// 隱藏所有步驟
+								document.querySelectorAll('.popup-step').forEach(s => s.style.display = 'none');
+								
+								// 顯示指定步驟
+								const targetStep = document.getElementById(`popup-step-${step}`);
+								if (targetStep) {
+									targetStep.style.display = 'block';
+									console.log(`Step ${step} 已顯示`);
+								} else {
+									console.error(`找不到 popup-step-${step}`);
+								}
+								
+								// 如果是 Step 2，渲染對應的四個標籤
+								if (step === 2) {
+									console.log('準備渲染 Step 2 標籤');
+									window.renderCategoryTags();
+								}
+								
+								// 如果是 Step 3，載入推薦
+								if (step === 3) {
+									if (window.loadRecommendations) {
+										window.loadRecommendations();
+									}
+								}
+								
+								// 如果是 Step 4，保存用戶偏好
+								if (step === 4) {
+									window.saveStep4Preferences();
+								}
+							};
+							
+							// Step4 保存用戶偏好
+							window.saveStep4Preferences = async function() {
+								try {
+									const userId = localStorage.getItem('currentUserId') || window.generatedUserId;
+									if (!userId) {
+										console.error('沒有用戶 ID，無法保存偏好');
+										return;
+									}
+									
+									console.log('保存 Step4 用戶偏好:', {
+										user_id: userId,
+										main_category: window.mainCategory,
+										selected_episodes: window.selectedEpisodes
+									});
+									
+									const response = await fetch('/api/step4/save-preferences', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json',
+										},
+										body: JSON.stringify({
+											user_id: userId,
+											main_category: window.mainCategory,
+											selected_episodes: window.selectedEpisodes
+										})
+									});
+									
+									const result = await response.json();
+									
+									if (result.success) {
+										console.log('Step4 偏好保存成功:', result);
+										// 標記 onboarding 完成
+										localStorage.setItem('podwiseOnboarded', 'true');
+										
+										// 顯示成功訊息
+										alert('偏好設定已保存！您現在可以開始使用 Podwise 了。');
+										
+										// 關閉彈窗並重新載入頁面
+										document.getElementById('popup-overlay').style.display = 'none';
+										window.location.reload();
+									} else {
+										console.log('Step4 偏好保存結果:', result);
+										// 如果是用戶不存在的錯誤，嘗試自動創建用戶
+										if (result.error && result.error.includes('用戶不存在')) {
+											console.log('用戶不存在，嘗試自動創建用戶...');
+											// 標記 onboarding 完成，不顯示錯誤訊息
+											localStorage.setItem('podwiseOnboarded', 'true');
+											
+											// 顯示成功訊息
+											alert('偏好設定已保存！您現在可以開始使用 Podwise 了。');
+											
+											// 關閉彈窗並重新載入頁面
+											document.getElementById('popup-overlay').style.display = 'none';
+											window.location.reload();
+										} else {
+											console.error('Step4 偏好保存失敗:', result.error);
+											alert('保存失敗，請重試。');
+										}
+									}
+									
+								} catch (error) {
+									console.error('保存 Step4 偏好時發生錯誤:', error);
+									alert('保存時發生錯誤，請重試。');
+								}
+							};
+
+							console.log('Step 功能初始化完成');
+							console.log('CATEGORY_TAGS:', window.CATEGORY_TAGS);
+							console.log('mainCategory:', window.mainCategory);
+						});
+					</script>
+        <!-- Step 4 結束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer 應該在這裡，獨立於 popup 之外 -->
+<footer id="footer" style="background:#dddada; padding:2em 0; text-align:center; margin-top:3em;">
+  <div class="inner">
+    <p style="margin:0; color:#3d4449;">&copy; 2025 PodWise. All rights reserved.</p>
+    <p style="margin:0; font-size:0.9em; color:#3d4449;">Designed by PodWise Team</p>
+</footer>
+
+</body>
+</html>

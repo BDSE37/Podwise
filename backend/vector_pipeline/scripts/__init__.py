@@ -3,10 +3,18 @@ Vector Pipeline 腳本模組
 提供批次處理和清理腳本
 """
 
-from .batch_processor import BatchProcessor
-from .cleanup_scripts import CleanupScripts
+# 動態導入可用的模組
+try:
+    from .batch_insert_with_resume import BatchInsertWithResume
+except ImportError:
+    BatchInsertWithResume = None
+
+try:
+    from .insert_stage4_to_milvus import Stage4MilvusInserter
+except ImportError:
+    Stage4MilvusInserter = None
 
 __all__ = [
-    'BatchProcessor',
-    'CleanupScripts'
+    'BatchInsertWithResume',
+    'Stage4MilvusInserter'
 ] 
