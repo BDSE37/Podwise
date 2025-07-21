@@ -22,7 +22,7 @@ from typing import List, Dict, Any, Optional, Union
 from dataclasses import dataclass, field
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
@@ -53,6 +53,14 @@ except ImportError:
     PodcastFormatter = None
     FormattedPodcast = None
     PodcastRecommendationResult = None
+
+try:
+    from tools.security_tool import create_fastapi_middleware, create_security_tool, SecurityLevel
+except ImportError:
+    print("無法導入 security_tool，使用備用")
+    create_fastapi_middleware = None
+    create_security_tool = None
+    SecurityLevel = None
 
 # 導入配置
 from config.integrated_config import get_config
@@ -115,13 +123,13 @@ class ApplicationManager:
             
             # 初始化 Web 搜尋工具
             if WebSearchTool:
-            self.web_search_tool = WebSearchTool()
+                self.web_search_tool = WebSearchTool()
                 logger.info("✅ Web 搜尋工具初始化完成")
             
             # 初始化 Podcast 格式化工具
             if PodcastFormatter:
-            self.podcast_formatter = PodcastFormatter()
-            logger.info("✅ Podcast 格式化工具初始化完成")
+                self.podcast_formatter = PodcastFormatter()
+                logger.info("✅ Podcast 格式化工具初始化完成")
             
             self._is_initialized = True
             logger.info("🎉 所有組件初始化完成")
@@ -194,6 +202,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 加入 Guardrails AI 安全中間件
+app.add_middleware(
+    create_fastapi_middleware(security_level=SecurityLevel.HIGH)
+)
+
+# 建立安全工具實例（可重用）
+security_tool = create_security_tool(security_level=SecurityLevel.HIGH)
+
+@app.post("/api/security/precheck")
+async def security_precheck(request: Request):
+    """
+    前端進入頁面時可呼叫此 API，檢查用戶輸入/URL/Referer 等內容是否安全
+    """
+    data = await request.json()
+    content = data.get("content", "")
+    result = security_tool.validate_content(content)
+    if not result.is_valid:
+        return JSONResponse(status_code=400, content={"error": "內容不安全", "violations": result.violations})
+    return {"success": True}
 
 
 # ==================== API 端點 ====================

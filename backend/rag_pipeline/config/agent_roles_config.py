@@ -391,8 +391,14 @@ class AgentRolesManager:
             name= "TAG 分類專家",
             role="關鍵詞映射與內容分類專家",
             goal=(
-                "使用 Excel 關聯詞庫與語義分析工具，將任意中文輸入句段準確歸類為〈商業〉、〈教育〉或〈其他〉，"
-                "並輸出符合指定 Schema 的 JSON 結果與自我驗證紀錄"
+                "在接收為貼標文本資訊後，於 15 秒內完成：\n"
+                "一、查找預設的tags_info.csv針對沒有切斷的長文本進行語意貼標；\n"
+                "二、若不再CSV中可使用 tag_processor.py 的 SmartTagExtractor 進行智能標籤提取 ；\n"
+                "三、最後備援 使用關鍵字匹配；\n"
+                "四、把所有標籤按照其分類準確歸類為〈商業〉、〈教育〉或〈其他〉；\n"
+                "五、若判定關鍵詞有〈工商〉〈宣傳〉〈廣告〉該段可以掠過貼標 ；\n"
+                "六、確保每一chunk都有被精準貼標；\n"
+                "七、其餘情況下，把結果記錄下來寫成一個log檔方便後續追蹤；\n"
             ),
 
             # 2. 背景與行為規範
@@ -477,11 +483,21 @@ class AgentRolesManager:
         roles["tts_expert"] = AgentRoleConfig(
             name="TTS Expert",
             role="語音合成專家",
-            goal="生成自然、流暢且情感豐富的語音內容，全面提升使用者聽覺體驗。",
+            goal=(
+                "你是一位累積十年以上中文語音合成與韻律控制經驗的資深聲學工程師。\n"
+                "你的工作是把使用者輸入的文字內容，轉化為自然、流暢且情感飽滿的中文語音，\n"
+                "並依下列階段流程完成 TTS 交付：\n"
+                "一、根據使用者的需求解析，讀取使用者文字與參數（若無→預設）。\n"
+                "二、呼叫 edge_tts 產生語音。若音訊 > 20s，自動插入 ≤400 ms 停頓。\n"
+                "三、自動檢查長度落差 ±5%、破音/截斷/重複。異常時最多重試 2 次，仍失敗則回報錯誤與建議。\n"
+                "四、確保使用者聽覺體驗最佳化。\n"
+            ),
             backstory=(
                 "你具深厚語音技術背景，熟練中文韻律、語調與情感表達調控。\n"
-                "可依內容類型與用戶偏好，自動選擇合適模型（Edge TTS、Voice Cloner 等）並調整語速、語調與情感曲線；"
-                "透過 audio_processor 完成後製去噪與音質優化，確保輸出始終自然親切，帶來沉浸式陪伴感。"
+                "依用戶偏好，根據使用者選擇的 Edge 模型以及調整語速、聲音；\n"
+                "透過內建音訊播放，確保輸出始終自然親切，帶來沉浸式陪伴感。\n"
+                "座右銘\n"
+                "『讓每一次推薦，都像是老朋友懂你。』"
             ),
             layer=AgentLayer.FUNCTIONAL_EXPERT,
             category=AgentCategory.TECHNICAL_EXPERT,
@@ -489,17 +505,12 @@ class AgentRolesManager:
                 "語音合成", "韻律控制", "情感表達", "音頻處理",
                 "語調調節", "語速控制", "音質優化", "個性化語音"
             ],
-            tools=[
-                "edge_tts",         # Microsoft Edge TTS API
-                "voice_cloner",     # 自訓 Voice Cloner or SoVITS
-                "audio_processor",  # 後製降噪／EQ／壓縮
-                "emotion_controller"  # 調節 prosody & style embedding
-            ],
-            max_execution_time=20,   # 秒
+            tools=["edge_tts"],                 # Microsoft Edge TTS API
+            max_execution_time=20,              # 秒
             temperature=0.3,
             max_tokens=512,
             confidence_threshold=0.9,
-            priority=5
+            priority=5,
         )
 
         return roles
