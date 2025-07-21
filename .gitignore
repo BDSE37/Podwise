@@ -303,6 +303,7 @@ test_results/
 evaluation_results/
 unified_results/
 podwise_results/
+runs/
 
 # 日誌檔案
 *.log
@@ -351,9 +352,12 @@ gitlab/
 # 大型模型檔案
 llama.cpp/
 Qwen2.5-Taiwan-7B-Instruct/
+*Qwen*Taiwan*7B*Instruct*/
+*Taiwan*7B*Instruct*
 
 # 特定 JSON 檔案
 one_min_tags_results.json
+exceptions.json
 
 # ===== 其他 =====
 # 大型檔案
