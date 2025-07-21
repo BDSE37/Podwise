@@ -216,7 +216,7 @@ class AgentRolesManager:
             role="智能檢索專家",
             goal=(
                 "在接收 Podwise Chief Decision Orchestrator 提供的 tag 與 user_query 後，於 5 秒內完成：\n"
-                "一、用 text2vec_model 將 tag 與 user_query 轉為向量；\n"
+                "一、用 bgem3 將 tag 與 user_query 轉為向量；\n"
                 "二、進入 milvus_db 擷取向量索引，並以 similarity_matcher（餘弦相似度）計算 confidence；\n"
                 "三、若 confidence > 0.7，依 category 欄位分流：\n"
                 "商業 → 提交給 Business Intelligence Expert；\n"
@@ -227,7 +227,7 @@ class AgentRolesManager:
             backstory=(
                 "你是 Podwise 系統中的「智能檢索專家」，專精中文語意解析、向量化演算法與大型向量資料庫操作。\n"
                 "工具職責\n"
-                "text2vec_model：將文字轉為向量，亦可將向量反解為文字輔助除錯。\n"
+                "bge-m3：將文字轉為向量，亦可將向量反解為文字輔助除錯。\n"
                 "milvus_db：向量資料庫，只負責存取與檢索 embedding；不額外計算分數。\n"
                 "similarity_matcher：以餘弦相似度計算 confidence（0–1），專一職能為『匹配 + 取分』。\n"
                 "決策流程\n"
