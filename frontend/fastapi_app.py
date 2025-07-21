@@ -57,9 +57,9 @@ async def serve_migrate_localStorage():
 templates = Jinja2Templates(directory=Path(__file__).parent)
 
 # 後端 API 服務 URL - 直接連接到各服務
-BACKEND_API_URL = "http://localhost:8005"  # RAG Pipeline
+BACKEND_API_URL = "http://localhost:8008"  # RAG Pipeline
 # RAG Pipeline API 服務 URL - 直接連接
-RAG_API_URL = "http://localhost:8005"
+RAG_API_URL = "http://localhost:8008"
 
 PROXY_PREFIXES = ["/api/", "/user_management/", "/utils/"]
 
@@ -243,7 +243,7 @@ async def call_backend_rag_pipeline(query: str, user_id: str) -> Optional[dict]:
     """調用後端 RAG Pipeline"""
     try:
         # 嘗試調用 RAG Pipeline 服務
-        rag_service_url = "http://localhost:8005"  # RAG Pipeline 端口
+        rag_service_url = "http://localhost:8008"  # RAG Pipeline 端口
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(f"{rag_service_url}/api/v1/query", json={
                 "query": query,

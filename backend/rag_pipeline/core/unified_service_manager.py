@@ -158,7 +158,7 @@ class UnifiedServiceManager:
             self.leader_agent = LeaderAgent(agent_config)
             logger.info("✅ 領導者代理初始化成功")
         except Exception as e:
-            logger.info(f"ℹ️ 領導者代理初始化失敗: {e}")
+            logger.warning(f"領導者代理初始化失敗: {e}")
             self.leader_agent = None
         
         try:

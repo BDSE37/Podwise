@@ -164,6 +164,8 @@ header.major .dash {
 
 		/* 新增 TAG 按鈕樣式：這裡只保留純 CSS，不要有 JS */
 		
+
+		
 		/* From Uiverse.io by catraco */ 
 		.heart-container {
 		  --heart-color: rgb(255, 91, 137);
@@ -926,7 +928,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			<!-- Step 2 -->
 			<div class="popup-step" id="popup-step-2" style="display:none;">
 				<h2>Which type?</h2>
-				<div id="category-tags" style="display: flex; gap: 1em; margin-bottom: 1.5em; justify-content: center;"></div>
+				<div id="category-tags" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em; margin-bottom: 1.5em; justify-content: center; max-width: 400px; margin-left: auto; margin-right: auto;"></div>
 				<button class="button primary" style="margin-top:2em;" onclick="goToStep(3)">下一步</button>
 			</div>
 			
@@ -1131,10 +1133,10 @@ document.addEventListener('DOMContentLoaded', function() {
           let audioUrl = rec.audio_url;
           if (!audioUrl && rec.minio_filename) {
             const folderMap = {
-              "business": "business-one-minutes-audio",
-              "education": "education-one-minutes-audio"
+              "business": "business-one-min-audio",
+              "education": "education-one-min-audio"
             };
-            const folder = folderMap[category] || "business-one-minutes-audio";
+            const folder = folderMap[category] || "business-one-min-audio";
             audioUrl = `http://192.168.32.66:30090/${folder}/${rec.minio_filename}`;
           }
           
@@ -2118,10 +2120,11 @@ document.addEventListener('DOMContentLoaded', function() {
 											const tags = data.tags;
 											console.log('從後端獲取的標籤:', tags);
 											
-											// 確保只顯示4個標籤，以2行2列顯示
-											const displayTags = tags.slice(0, 4);
+											// 過濾出4字標籤，並確保只顯示4個標籤，以2行2列顯示
+											const fourCharTags = tags.filter(tag => tag.length === 4).slice(0, 4);
+											console.log('4字標籤:', fourCharTags);
 											
-											displayTags.forEach(tag => {
+											fourCharTags.forEach(tag => {
 												const btn = document.createElement('button');
 												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 												btn.textContent = tag;
@@ -2137,8 +2140,8 @@ document.addEventListener('DOMContentLoaded', function() {
 											console.error('獲取標籤失敗:', data.message);
 											// 使用預設標籤
 											const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
-											const displayTags = defaultTags.slice(0, 4);
-											displayTags.forEach(tag => {
+											const fourCharTags = defaultTags.filter(tag => tag.length === 4).slice(0, 4);
+											fourCharTags.forEach(tag => {
 												const btn = document.createElement('button');
 												btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 												btn.textContent = tag;
@@ -2155,8 +2158,8 @@ document.addEventListener('DOMContentLoaded', function() {
 										console.error('獲取標籤異常:', error);
 										// 使用預設標籤
 										const defaultTags = window.CATEGORY_TAGS[window.mainCategory] || [];
-										const displayTags = defaultTags.slice(0, 4);
-										displayTags.forEach(tag => {
+										const fourCharTags = defaultTags.filter(tag => tag.length === 4).slice(0, 4);
+										fourCharTags.forEach(tag => {
 											const btn = document.createElement('button');
 											btn.className = 'quiz-type-btn' + (window.selectedTag === tag ? ' selected' : '');
 											btn.textContent = tag;

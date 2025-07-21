@@ -48,7 +48,7 @@ class WebSearchAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 Web 搜尋專家代理人"""
-        super().__init__("Web Search Expert", "網路搜尋備援專家", config)
+        super().__init__("Web Search Expert", config)
         
         # 載入角色配置
         try:
@@ -208,7 +208,7 @@ class RAGExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 RAG 專家代理人"""
-        super().__init__("rag_expert", "RAG 檢索專家", config)
+        super().__init__("rag_expert", config)
         
         # 載入角色配置
         try:
@@ -224,8 +224,12 @@ class RAGExpertAgent(BaseAgent):
             self.role_config = None
         
         # 初始化智能檢索專家
-        from core.intelligent_retrieval_expert import get_intelligent_retrieval_expert
-        self.intelligent_retrieval = get_intelligent_retrieval_expert()
+        try:
+            from core.intelligent_retrieval_expert import get_intelligent_retrieval_expert
+            self.intelligent_retrieval = get_intelligent_retrieval_expert()
+        except ImportError as e:
+            logger.warning(f"智能檢索專家導入失敗: {e}")
+            self.intelligent_retrieval = None
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -248,6 +252,16 @@ class RAGExpertAgent(BaseAgent):
             )
         
         try:
+            # 檢查智能檢索專家是否可用
+            if not self.intelligent_retrieval:
+                return AgentResponse(
+                    content="智能檢索服務不可用",
+                    confidence=0.3,
+                    reasoning="智能檢索專家未初始化",
+                    processing_time=time.time() - start_time,
+                    metadata={"status": "SERVICE_UNAVAILABLE"}
+                )
+            
             # 使用智能檢索專家處理查詢
             retrieval_response = await self.intelligent_retrieval.process_query(input_data.query)
             
@@ -364,7 +378,7 @@ class SummaryExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化摘要專家代理人"""
-        super().__init__("Summary Expert", "內容摘要生成專家", config)
+        super().__init__("Summary Expert", config)
         
         # 載入角色配置
         try:
@@ -437,7 +451,7 @@ class TagClassificationExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 TAG 分類專家代理人"""
-        super().__init__("TAG Classification Expert", "關鍵詞映射與內容分類專家", config)
+        super().__init__("TAG Classification Expert", config)
         
         # 載入角色配置
         try:
@@ -681,7 +695,7 @@ class TTSExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化 TTS 專家代理人"""
-        super().__init__("TTS Expert", "語音合成專家", config)
+        super().__init__("TTS Expert", config)
         
         # 載入角色配置
         try:
@@ -754,7 +768,7 @@ class UserManagerAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化用戶管理專家代理人"""
-        super().__init__("User Manager", "用戶管理專家", config)
+        super().__init__("User Manager", config)
         
         # 載入角色配置
         try:
@@ -836,7 +850,7 @@ class BusinessExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化商業專家代理人"""
-        super().__init__("Business Expert", "商業專家", config)
+        super().__init__("Business Expert", config)
         
         # 載入角色配置
         try:
@@ -948,7 +962,7 @@ class EducationExpertAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化教育專家代理人"""
-        super().__init__("Education Expert", "教育專家", config)
+        super().__init__("Education Expert", config)
         
         # 載入角色配置
         try:
@@ -1062,7 +1076,7 @@ class LeaderAgent(BaseAgent):
     
     def __init__(self, config: Dict[str, Any]) -> None:
         """初始化領導者代理人"""
-        super().__init__("Leader", "領導者", config)
+        super().__init__("Leader", config)
         
         # 載入角色配置
         try:
@@ -1077,16 +1091,49 @@ class LeaderAgent(BaseAgent):
             logger.info(f"ℹ️ 無法載入角色配置: {e}")
             self.role_config = None
         
-        # 初始化下層專家
-        self.rag_expert = RAGExpertAgent(config.get('rag_expert', {}))
-        self.summary_expert = SummaryExpertAgent(config.get('summary_expert', {}))
-        self.tag_classification_expert = TagClassificationExpertAgent(config.get('tag_classification_expert', {}))
-        self.tts_expert = TTSExpertAgent(config.get('tts_expert', {}))
-        self.user_manager = UserManagerAgent(config.get('user_manager', {}))
+        # 初始化下層專家（容錯模式）
+        try:
+            self.rag_expert = RAGExpertAgent(config.get('rag_expert', {}))
+        except Exception as e:
+            logger.warning(f"RAG 專家初始化失敗: {e}")
+            self.rag_expert = None
+            
+        try:
+            self.summary_expert = SummaryExpertAgent(config.get('summary_expert', {}))
+        except Exception as e:
+            logger.warning(f"摘要專家初始化失敗: {e}")
+            self.summary_expert = None
+            
+        try:
+            self.tag_classification_expert = TagClassificationExpertAgent(config.get('tag_classification_expert', {}))
+        except Exception as e:
+            logger.warning(f"TAG 分類專家初始化失敗: {e}")
+            self.tag_classification_expert = None
+            
+        try:
+            self.tts_expert = TTSExpertAgent(config.get('tts_expert', {}))
+        except Exception as e:
+            logger.warning(f"TTS 專家初始化失敗: {e}")
+            self.tts_expert = None
+            
+        try:
+            self.user_manager = UserManagerAgent(config.get('user_manager', {}))
+        except Exception as e:
+            logger.warning(f"用戶管理專家初始化失敗: {e}")
+            self.user_manager = None
         
-        # 類別專家
-        self.business_expert = BusinessExpertAgent(config.get('business_expert', {}))
-        self.education_expert = EducationExpertAgent(config.get('education_expert', {}))
+        # 類別專家（容錯模式）
+        try:
+            self.business_expert = BusinessExpertAgent(config.get('business_expert', {}))
+        except Exception as e:
+            logger.warning(f"商業專家初始化失敗: {e}")
+            self.business_expert = None
+            
+        try:
+            self.education_expert = EducationExpertAgent(config.get('education_expert', {}))
+        except Exception as e:
+            logger.warning(f"教育專家初始化失敗: {e}")
+            self.education_expert = None
     
     async def process(self, input_data: UserQuery) -> AgentResponse:
         """
@@ -1110,17 +1157,57 @@ class LeaderAgent(BaseAgent):
         
         try:
             # 1. 用戶管理層
-            user_result = await self.user_manager.process(input_data)
+            if self.user_manager:
+                user_result = await self.user_manager.process(input_data)
+            else:
+                user_result = AgentResponse(
+                    content="用戶管理服務不可用",
+                    confidence=0.5,
+                    reasoning="用戶管理專家未初始化",
+                    metadata={"user_management_available": False}
+                )
             
             # 2. 根據類別決定處理方式
             if input_data.category == "商業":
                 # 商業類別：交給商業專家處理
-                category_result = await self.business_expert.process(input_data)
-                rag_result = await self.rag_expert.process(input_data)
+                if self.business_expert:
+                    category_result = await self.business_expert.process(input_data)
+                else:
+                    category_result = AgentResponse(
+                        content="商業專家服務不可用",
+                        confidence=0.3,
+                        reasoning="商業專家未初始化",
+                        metadata={"business_expert_available": False}
+                    )
+                if self.rag_expert:
+                    rag_result = await self.rag_expert.process(input_data)
+                else:
+                    rag_result = AgentResponse(
+                        content="RAG 專家服務不可用",
+                        confidence=0.3,
+                        reasoning="RAG 專家未初始化",
+                        metadata={"rag_expert_available": False}
+                    )
             elif input_data.category == "教育":
                 # 教育類別：交給教育專家處理
-                category_result = await self.education_expert.process(input_data)
-                rag_result = await self.rag_expert.process(input_data)
+                if self.education_expert:
+                    category_result = await self.education_expert.process(input_data)
+                else:
+                    category_result = AgentResponse(
+                        content="教育專家服務不可用",
+                        confidence=0.3,
+                        reasoning="教育專家未初始化",
+                        metadata={"education_expert_available": False}
+                    )
+                if self.rag_expert:
+                    rag_result = await self.rag_expert.process(input_data)
+                else:
+                    rag_result = AgentResponse(
+                        content="RAG 專家服務不可用",
+                        confidence=0.3,
+                        reasoning="RAG 專家未初始化",
+                        metadata={"rag_expert_available": False}
+                    )
             else:
                 # 其他類別：直接由 Leader 處理 RAG，不交給類別專家
                 category_result = AgentResponse(
@@ -1129,12 +1216,37 @@ class LeaderAgent(BaseAgent):
                     reasoning="其他類別由 Leader 直接處理",
                     metadata={"category": "其他"}
                 )
-                rag_result = await self.rag_expert.process(input_data)
+                if self.rag_expert:
+                    rag_result = await self.rag_expert.process(input_data)
+                else:
+                    rag_result = AgentResponse(
+                        content="RAG 專家服務不可用",
+                        confidence=0.3,
+                        reasoning="RAG 專家未初始化",
+                        metadata={"rag_expert_available": False}
+                    )
             
             # 3. 功能專家層（所有類別都使用）
-            summary_result = await self.summary_expert.process(rag_result.metadata.get("results", []))
+            if self.summary_expert and rag_result.metadata.get("results"):
+                summary_result = await self.summary_expert.process(rag_result.metadata.get("results", []))
+            else:
+                summary_result = AgentResponse(
+                    content="摘要服務不可用",
+                    confidence=0.3,
+                    reasoning="摘要專家未初始化或無結果可摘要",
+                    metadata={"summary_expert_available": False}
+                )
+            
             # 使用 TAG 分類專家進行分類
-            tag_classification_result = await self.tag_classification_expert.process(input_data)
+            if self.tag_classification_expert:
+                tag_classification_result = await self.tag_classification_expert.process(input_data)
+            else:
+                tag_classification_result = AgentResponse(
+                    content="TAG 分類服務不可用",
+                    confidence=0.3,
+                    reasoning="TAG 分類專家未初始化",
+                    metadata={"tag_classification_expert_available": False}
+                )
             
             # 4. 最終決策
             final_response = await self._make_final_decision(

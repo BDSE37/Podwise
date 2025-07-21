@@ -355,7 +355,7 @@ class WebSearchService(BaseService):
             name="Web Search Service",
             service_type=ServiceType.WEB_SEARCH,
             host="localhost",
-            port=8006,
+            port=8004,
             health_check_url="http://localhost:8006/health",
             environment_vars={
                 "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY") or "",

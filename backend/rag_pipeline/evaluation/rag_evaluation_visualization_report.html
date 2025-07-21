@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG 系統評估視覺化報告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-name {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .metric-value {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .pass {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .fail {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .warning {
+            background: #fef9e7;
+            color: #f39c12;
+        }
+        
+        .charts-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .charts-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+        
+        .chart-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .chart-item h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .chart-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-description {
+            margin-top: 15px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .recommendations {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recommendations h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .rec-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .rec-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .rec-list {
+            list-style: none;
+        }
+        
+        .rec-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .rec-list li:before {
+            content: "•";
+            color: #3498db;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 RAG 系統評估視覺化報告</h1>
+            <p>調整前後性能對比與改善建議</p>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>📊 主觀指標 (Braintrust AvgScore)</h3>
+                <div class="metric">
+                    <span class="metric-name">Baseline</span>
+                    <span class="metric-value fail">0.008</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">Naive RAG</span>
+                    <span class="metric-value fail">0.008</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">Enhanced RAG</span>
+                    <span class="metric-value pass">1.000</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">及格門檻</span>
+                    <span class="metric-value warning">≥ 0.308</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>🎯 客觀指標</h3>
+                <div class="metric">
+                    <span class="metric-name">真實度 (Faithfulness)</span>
+                    <span class="metric-value fail">0.333</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">切題度 (Relevancy)</span>
+                    <span class="metric-value fail">0.167</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">召回率 (Recall)</span>
+                    <span class="metric-value pass">0.750</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">信心度</span>
+                    <span class="metric-value pass">1.000</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>⚡ 效能指標</h3>
+                <div class="metric">
+                    <span class="metric-name">本地 LLM 延遲</span>
+                    <span class="metric-value fail">2.002s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">OpenAI 延遲</span>
+                    <span class="metric-value pass">0.501s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">本地 Token 使用</span>
+                    <span class="metric-value pass">29.7</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">OpenAI Token 使用</span>
+                    <span class="metric-value warning">40.0</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>📈 改善幅度</h3>
+                <div class="metric">
+                    <span class="metric-name">信心度提升</span>
+                    <span class="metric-value pass">+7.4%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">真實度提升</span>
+                    <span class="metric-value pass">+333%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">切題度變化</span>
+                    <span class="metric-value fail">-50%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-name">Enhanced RAG 提升</span>
+                    <span class="metric-value pass">+516%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="charts-section">
+            <h2>📊 視覺化圖表</h2>
+            <div class="chart-grid">
+                <div class="chart-item">
+                    <h3>🎯 多維度評估雷達圖</h3>
+                    <img src="radar_chart.png" alt="雷達圖">
+                    <div class="chart-description">
+                        展示調整前後在信心度、真實度、切題度、連貫性、召回率、延遲等六個維度的對比。
+                        紅色虛線為及格門檻，藍色為調整後表現。
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h3>📈 對比柱狀圖</h3>
+                    <img src="comparison_bar_chart.png" alt="對比柱狀圖">
+                    <div class="chart-description">
+                        包含主觀指標、客觀指標、效能指標和 Token 使用的詳細對比。
+                        清楚顯示本地 LLM 與 OpenAI 在各項指標上的差異。
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h3>🔥 改善熱力圖</h3>
+                    <img src="improvement_heatmap.png" alt="改善熱力圖">
+                    <div class="chart-description">
+                        以顏色深淺表示改善幅度，綠色表示改善，紅色表示下降。
+                        幫助識別需要重點關注的指標。
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h3>🎯 門檻儀表板</h3>
+                    <img src="threshold_gauge_chart.png" alt="門檻儀表板">
+                    <div class="chart-description">
+                        六個指標的儀表板顯示，清楚標示當前值與及格門檻的差距。
+                        綠色表示及格，紅色表示不及格。
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h3>⏰ 時間軸發展圖</h3>
+                    <img src="timeline_chart.png" alt="時間軸圖">
+                    <div class="chart-description">
+                        展示從 Baseline 到 Naive RAG 再到 Enhanced RAG 的發展歷程。
+                        包含門檻線和改善箭頭，清楚顯示發展趨勢。
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h3>📋 綜合性能儀表板</h3>
+                    <img src="performance_dashboard.png" alt="綜合儀表板">
+                    <div class="chart-description">
+                        整合所有關鍵指標的綜合儀表板，包含及格狀況分布、模型對比、
+                        發展趨勢、效能指標和改善建議。
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recommendations">
+            <h2>💡 改善建議</h2>
+            <div class="rec-grid">
+                <div class="rec-card">
+                    <h3>🎯 真實度提升策略</h3>
+                    <ul class="rec-list">
+                        <li>k 值從 4 提升到 6</li>
+                        <li>更換 Reranker 模型</li>
+                        <li>過濾離題段落</li>
+                        <li>強化上下文驗證</li>
+                    </ul>
+                </div>
+                
+                <div class="rec-card">
+                    <h3>⚡ 效能優化策略</h3>
+                    <ul class="rec-list">
+                        <li>模型量化</li>
+                        <li>KV-Cache 優化</li>
+                        <li>批次處理</li>
+                        <li>輕量 Reranker</li>
+                    </ul>
+                </div>
+                
+                <div class="rec-card">
+                    <h3>💰 成本控制策略</h3>
+                    <ul class="rec-list">
+                        <li>本地優先部署</li>
+                        <li>壓縮 context</li>
+                        <li>部分引用策略</li>
+                        <li>動態路由選擇</li>
+                    </ul>
+                </div>
+                
+                <div class="rec-card">
+                    <h3>🔧 技術改進策略</h3>
+                    <ul class="rec-list">
+                        <li>更換 Embedding 模型</li>
+                        <li>實作 Hybrid 檢索</li>
+                        <li>強化 Prompt 工程</li>
+                        <li>添加 Agent 架構</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>📅 報告生成時間: 2025-07-20 17:24</p>
+            <p>🔧 基於 Podwise RAG 評估系統</p>
+        </div>
+    </div>
+</body>
+</html> 

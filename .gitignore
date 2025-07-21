@@ -316,6 +316,45 @@ monitoring/data/
 grafana/data/
 prometheus/data/
 
+# ===== 用戶指定的忽略項目 =====
+# 分析輸出
+backend/analysis_output/
+analysis_output/
+
+# 初始化腳本
+backend/config/init-scripts/
+init-scripts/
+
+# 日誌目錄
+logs/
+backend/logs/
+rag_pipeline/logs/
+vector_pipeline/logs/
+ml_pipeline/logs/
+stt/logs/
+tts/logs/
+
+# 資料目錄
+backend/vector_pipeline/data/
+data/
+backend/data_cleaning/batch_input/
+
+# 圖片和音訊
+frontend/images/
+frontend/audio/
+images/
+audio/
+
+# GitLab 配置
+gitlab/
+
+# 大型模型檔案
+llama.cpp/
+Qwen2.5-Taiwan-7B-Instruct/
+
+# 特定 JSON 檔案
+one_min_tags_results.json
+
 # ===== 其他 =====
 # 大型檔案
 *.iso
