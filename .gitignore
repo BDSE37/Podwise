@@ -132,6 +132,15 @@ backend/vector_pipeline/data/
 *.parquet
 *.feather
 
+# 機器學習模型檔案
+*.joblib
+*.model
+*.pkl
+
+# 進度和狀態檔案
+*_progress.json
+insert_progress.json
+
 # 保留重要的 JSON 配置檔案
 !*.config.json
 !*.config.yaml
