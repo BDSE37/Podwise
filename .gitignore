@@ -368,6 +368,12 @@ exceptions.json
 *.rpm
 *.pkg
 
+# PowerPoint 檔案和鎖定檔案
+*.pptx
+*.ppt
+.~lock.*.pptx#
+.~lock.*.ppt#
+
 # 敏感資訊
 secrets/
 keys/
