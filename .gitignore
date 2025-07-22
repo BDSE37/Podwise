@@ -392,6 +392,10 @@ certificates/
 *.crt
 *.p12
 
+# GitLab 敏感配置
+gitlab/config/gitlab-secrets.json
+*secrets*.json
+
 # 個人檔案
 personal/
 private/ 
