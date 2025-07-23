@@ -1,5 +1,5 @@
 
-# 📡 Podwise: 模組化 Podcast 智慧推薦系統
+# Podwise: 模組化 Podcast 智慧推薦系統
 
 Podwise 是一套模組化的 Podcast 智慧推薦系統，整合語音互動、語意檢索（RAG）、個人化推薦與 MLOps。具備高度可擴充性、跨模組開發能力，並部署於 Kubernetes 叢集上，支援 GPU 推論與多容器整合。
 
