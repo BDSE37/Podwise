@@ -114,11 +114,8 @@ graph TD
   C2 --> C5 --> D6
   C1 --> C4 --> D6
 ```
-
 ---
-
-## 👥 組員分工 Roles & Responsibilities
-
+##👥 組員分工 Roles & Responsibilities
 | 姓名 | 工作內容 |
 |------|-----------|
 | 張書婷 | 系統建置、程式開發撰寫、TTS 實作開發、特徵工程、專案整合、RAG 實作評估、專案版本控管 |
